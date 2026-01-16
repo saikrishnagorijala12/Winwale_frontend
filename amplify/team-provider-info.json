@@ -1,0 +1,20 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-winvaleanalysisplatf-dev-90271-authRole",
+      "UnauthRoleArn": "arn:aws:iam::924665350698:role/amplify-winvaleanalysisplatf-dev-90271-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::924665350698:role/amplify-winvaleanalysisplatf-dev-90271-authRole",
+      "Region": "eu-north-1",
+      "DeploymentBucketName": "amplify-winvaleanalysisplatf-dev-90271-deployment",
+      "UnauthRoleName": "amplify-winvaleanalysisplatf-dev-90271-unauthRole",
+      "StackName": "amplify-winvaleanalysisplatf-dev-90271",
+      "StackId": "arn:aws:cloudformation:eu-north-1:924665350698:stack/amplify-winvaleanalysisplatf-dev-90271/94537770-eadf-11f0-94ce-0a2137945cd1",
+      "AmplifyAppId": "d349hweq875gni"
+    },
+    "categories": {
+      "auth": {
+        "winvaleanalysisplatfdf4d4edd": {}
+      }
+    }
+  }
+}

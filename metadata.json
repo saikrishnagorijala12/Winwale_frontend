@@ -1,0 +1,5 @@
+{
+  "name": "Winvale Analysis Platform",
+  "description": "A professional GSA Price List Analysis Platform with custom AWS Amplify authentication and dashboard.",
+  "requestFramePermissions": []
+}

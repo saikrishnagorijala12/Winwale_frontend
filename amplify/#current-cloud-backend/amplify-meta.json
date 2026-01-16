@@ -1,0 +1,58 @@
+{
+  "providers": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-winvaleanalysisplatf-dev-90271-authRole",
+      "UnauthRoleArn": "arn:aws:iam::924665350698:role/amplify-winvaleanalysisplatf-dev-90271-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::924665350698:role/amplify-winvaleanalysisplatf-dev-90271-authRole",
+      "Region": "eu-north-1",
+      "DeploymentBucketName": "amplify-winvaleanalysisplatf-dev-90271-deployment",
+      "UnauthRoleName": "amplify-winvaleanalysisplatf-dev-90271-unauthRole",
+      "StackName": "amplify-winvaleanalysisplatf-dev-90271",
+      "StackId": "arn:aws:cloudformation:eu-north-1:924665350698:stack/amplify-winvaleanalysisplatf-dev-90271/94537770-eadf-11f0-94ce-0a2137945cd1",
+      "AmplifyAppId": "d349hweq875gni"
+    }
+  },
+  "auth": {
+    "winvaleanalysisplatfdf4d4edd": {
+      "service": "Cognito",
+      "providerPlugin": "awscloudformation",
+      "dependsOn": [],
+      "customAuth": false,
+      "frontendAuthConfig": {
+        "socialProviders": [],
+        "usernameAttributes": [
+          "EMAIL"
+        ],
+        "signupAttributes": [
+          "EMAIL"
+        ],
+        "passwordProtectionSettings": {
+          "passwordPolicyMinLength": 8,
+          "passwordPolicyCharacters": []
+        },
+        "mfaConfiguration": "OFF",
+        "mfaTypes": [
+          "SMS"
+        ],
+        "verificationMechanisms": [
+          "EMAIL"
+        ]
+      },
+      "providerMetadata": {
+        "s3TemplateURL": "https://s3.amazonaws.com/amplify-winvaleanalysisplatf-dev-90271-deployment/amplify-cfn-templates/auth/winvaleanalysisplatfdf4d4edd-cloudformation-template.json",
+        "logicalId": "authwinvaleanalysisplatfdf4d4edd"
+      },
+      "lastPushTimeStamp": "2026-01-06T09:13:46.868Z",
+      "output": {
+        "UserPoolId": "eu-north-1_6otZrR1l5",
+        "AppClientIDWeb": "7hk1q4rodihotqbjr8mrqsebmv",
+        "AppClientID": "4uphac3iqnj473tvfva173138o",
+        "IdentityPoolId": "eu-north-1:ef1237d0-a8e5-46e9-9d62-50af93996a5a",
+        "UserPoolArn": "arn:aws:cognito-idp:eu-north-1:924665350698:userpool/eu-north-1_6otZrR1l5",
+        "IdentityPoolName": "winvaleanalysisplatfdf4d4edd_identitypool_df4d4edd__dev",
+        "UserPoolName": "winvaleanalysisplatfdf4d4edd_userpool_df4d4edd"
+      },
+      "lastPushDirHash": "JhX02ZVRFfivRjNR6egmlph0Vso="
+    }
+  }
+}
