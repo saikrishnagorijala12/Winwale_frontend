@@ -152,6 +152,7 @@ const AppContent: React.FC = () => {
               <Route path="/client-activation" element={<ClientActivation />} />
               <Route path="/user-activation" element={<UserActivation />} />
               <Route path="/gsa-products" element={<GsaProducts />} />
+              <Route path="/upload-gsa" element={<UploadGsa />} />
             </Route>
           </Route>
         </Route>
