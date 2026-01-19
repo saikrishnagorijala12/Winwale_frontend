@@ -52,7 +52,17 @@ interface ClientContractRead extends ClientContractBase {
 }
 
 interface ClientContractCreate extends ClientContractBase {
+  client_id: any;
   is_deleted?: boolean;
+}
+
+interface ClientContractUpdate extends ClientContractBase {
+  is_deleted?: boolean;
+}
+
+interface ClientListRead {
+  client_id: number;
+  company_name: string;
 }
 
 const apiService = {
@@ -68,7 +78,7 @@ const apiService = {
 
   async createContract(
     clientId: number,
-    data: Omit<ClientContractCreate, "client_id">
+    data: Omit<ClientContractCreate, "client_id">,
   ): Promise<ClientContractRead> {
     const response = await api.post(`/contracts/${clientId}`, data);
     return response.data;
@@ -76,7 +86,7 @@ const apiService = {
 
   async updateContract(
     clientId: number,
-    data: Partial<ClientContractBase>
+    data: Partial<ClientContractBase>,
   ): Promise<ClientContractRead> {
     const response = await api.put(`/contracts/${clientId}`, data);
     return response.data;
@@ -87,19 +97,32 @@ const apiService = {
   },
 };
 
+const clientApiService = {
+  async getAllClients(): Promise<ClientListRead[]> {
+    const response = await api.get("/clients");
+    return response.data;
+  },
+};
+
 export default function ContractsPage() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedContract, setSelectedContract] =
-    useState<ClientContractRead | null>(null);
+  const [selectedContract, setSelectedContract] = useState<ClientContractRead | null>(null);
   const [contracts, setContracts] = useState<ClientContractRead[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showAddDialog, setShowAddDialog] = useState(false);
+  const [showEditDialog, setShowEditDialog] = useState(false);
   const [addStep, setAddStep] = useState(1);
+  const [editStep, setEditStep] = useState(1);
   const [openContractId, setOpenContractId] = useState<number | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const [clients, setClients] = useState<ClientListRead[]>([]);
+  const [clientSearch, setClientSearch] = useState("");
+  const [showClientDropdown, setShowClientDropdown] = useState(false);
+
   const initialForm: ClientContractCreate = {
+    client_id: 0,
     contract_number: "",
     contract_officer_name: "",
     contract_officer_address: "",
@@ -116,10 +139,26 @@ export default function ContractsPage() {
     energy_star_compliance: "Yes",
     is_deleted: false,
   };
-  const [newContract, setNewContract] =
-    useState<ClientContractCreate>(initialForm);
+  
+  const [newContract, setNewContract] = useState<ClientContractCreate>(initialForm);
+  const [editContract, setEditContract] = useState<ClientContractUpdate>({
+    contract_number: "",
+    contract_officer_name: "",
+    contract_officer_address: "",
+    contract_officer_city: "",
+    contract_officer_state: "",
+    contract_officer_zip: "",
+    origin_country: "USA",
+    gsa_proposed_discount: 0,
+    q_v_discount: "",
+    additional_concessions: "",
+    normal_delivery_time: 30,
+    expedited_delivery_time: 10,
+    fob_term: "Origin",
+    energy_star_compliance: "Yes",
+  });
+  const [editingClientId, setEditingClientId] = useState<number | null>(null);
 
-  // Fetch contracts on component mount
   useEffect(() => {
     fetchContracts();
   }, []);
@@ -138,39 +177,98 @@ export default function ContractsPage() {
     }
   };
 
+  const fetchClients = async () => {
+    try {
+      const data = await clientApiService.getAllClients();
+      setClients(data);
+    } catch (err) {
+      console.error("Failed to load clients", err);
+    }
+  };
+
+  const filteredClients = useMemo(() => {
+    return clients.filter(
+      (c) =>
+        c.client_id.toString().includes(clientSearch) ||
+        c.company_name.toLowerCase().includes(clientSearch.toLowerCase()),
+    );
+  }, [clients, clientSearch]);
+
   const filteredContracts = useMemo(() => {
     return contracts.filter((c) => {
       if (c.is_deleted) return false;
       const matchesSearch =
         c.contract_number.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        c.contract_officer_name
-          ?.toLowerCase()
-          .includes(searchQuery.toLowerCase());
+        c.contract_officer_name?.toLowerCase().includes(searchQuery.toLowerCase());
       return matchesSearch;
     });
   }, [contracts, searchQuery]);
 
   const handleAddContract = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (addStep !== 2) {
+      console.warn("Submit blocked: not on step 2");
+      return;
+    }
+
+    if (!newContract.client_id) {
+      setError("Please select a client");
+      return;
+    }
+
+    setIsSubmitting(true);
+    setError(null);
+    setShowClientDropdown(false);
+
+    try {
+      const { client_id, ...payload } = newContract;
+      const createdContract = await apiService.createContract(client_id, payload);
+      setContracts((prev) => [createdContract, ...prev]);
+      setShowAddDialog(false);
+      setAddStep(1);
+      setClientSearch("");
+      setNewContract(initialForm);
+      await fetchClients();
+    } catch (err: any) {
+      if (err?.response?.status === 409 || err?.message?.includes("already exists")) {
+        setError("Contract already exists for this client");
+      } else {
+        setError("Failed to create contract");
+      }
+      console.error("Error creating contract:", err);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleEditContract = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (editStep !== 2) {
+      console.warn("Submit blocked: not on step 2");
+      return;
+    }
+
+    if (!editingClientId) {
+      setError("No client selected for editing");
+      return;
+    }
+
     setIsSubmitting(true);
     setError(null);
 
     try {
-      const { client_id, ...payload } = newContract;
-      const createdContract = await apiService.createContract(
-        client_id,
-        payload
+      const updatedContract = await apiService.updateContract(editingClientId, editContract);
+      setContracts((prev) =>
+        prev.map((c) => (c.client_id === editingClientId ? updatedContract : c))
       );
-
-      setContracts((prev) => [createdContract, ...prev]);
-      setShowAddDialog(false);
-      setNewContract(initialForm);
-      setAddStep(1);
-    } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Failed to create contract"
-      );
-      console.error("Error creating contract:", err);
+      setShowEditDialog(false);
+      setEditStep(1);
+      setEditingClientId(null);
+    } catch (err: any) {
+      setError("Failed to update contract");
+      console.error("Error updating contract:", err);
     } finally {
       setIsSubmitting(false);
     }
@@ -182,16 +280,34 @@ export default function ContractsPage() {
     try {
       await apiService.deleteContract(clientId);
       setContracts((prev) =>
-        prev.map((c) =>
-          c.client_id === clientId ? { ...c, is_deleted: true } : c
-        )
+        prev.map((c) => (c.client_id === clientId ? { ...c, is_deleted: true } : c))
       );
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Failed to delete contract"
-      );
+      setError(err instanceof Error ? err.message : "Failed to delete contract");
       console.error("Error deleting contract:", err);
     }
+  };
+
+  const openEditDialog = (contract: ClientContractRead) => {
+    setEditContract({
+      contract_number: contract.contract_number,
+      contract_officer_name: contract.contract_officer_name || "",
+      contract_officer_address: contract.contract_officer_address || "",
+      contract_officer_city: contract.contract_officer_city || "",
+      contract_officer_state: contract.contract_officer_state || "",
+      contract_officer_zip: contract.contract_officer_zip || "",
+      origin_country: contract.origin_country || "USA",
+      gsa_proposed_discount: contract.gsa_proposed_discount || 0,
+      q_v_discount: contract.q_v_discount || "",
+      additional_concessions: contract.additional_concessions || "",
+      normal_delivery_time: contract.normal_delivery_time || 30,
+      expedited_delivery_time: contract.expedited_delivery_time || 10,
+      fob_term: contract.fob_term || "Origin",
+      energy_star_compliance: contract.energy_star_compliance || "Yes",
+    });
+    setEditingClientId(contract.client_id);
+    setShowEditDialog(true);
+    setEditStep(1);
   };
 
   const ContactRow = ({ icon: Icon, value }: { icon: any; value: any }) => {
@@ -204,37 +320,34 @@ export default function ContractsPage() {
     );
   };
 
+
   return (
     <div className="min-h-screen bg-linear-to-br from-slate-50 via-blue-50/30 to-slate-50 p-8">
-      {/* Error Banner */}
       {error && (
         <div className="mx-auto max-w-7xl mb-6 bg-red-50 border border-red-200 rounded-2xl p-4 flex items-start gap-3">
           <AlertCircle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
           <div className="flex-1">
             <p className="text-sm font-semibold text-red-800">{error}</p>
           </div>
-          <button
-            onClick={() => setError(null)}
-            className="text-red-400 hover:text-red-600"
-          >
+          <button onClick={() => setError(null)} className="text-red-400 hover:text-red-600">
             <X className="w-4 h-4" />
           </button>
         </div>
       )}
 
-      {/* Header Section */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-12 mx-auto">
         <div>
-          <h1 className="text-4xl font-extrabold tracking-tight text-[#1E293B]">
-            Contracts
-          </h1>
+          <h1 className="text-4xl font-extrabold tracking-tight text-[#1E293B]">Contracts</h1>
           <p className="text-slate-500 font-medium mt-1">
             Manage your GSA contract profiles and logistics information
           </p>
         </div>
 
         <button
-          onClick={() => setShowAddDialog(true)}
+          onClick={() => {
+            setShowAddDialog(true);
+            fetchClients();
+          }}
           className="flex items-center justify-center gap-2 bg-[#38A1DB] hover:bg-[#2D8BBF] text-white px-7 py-3 rounded-xl shadow-lg shadow-blue-200 transition-all active:scale-95 font-bold"
         >
           <Plus className="w-5 h-5 stroke-[3px]" />
@@ -242,8 +355,7 @@ export default function ContractsPage() {
         </button>
       </div>
 
-      {/* Search & Filter Pill Container */}
-      <div className=" mx-auto bg-white p-5 rounded-3xl shadow-sm border border-slate-100 mb-8 flex flex-col lg:flex-row gap-6 items-center">
+      <div className="mx-auto bg-white p-5 rounded-3xl shadow-sm border border-slate-100 mb-8 flex flex-col lg:flex-row gap-6 items-center">
         <div className="relative flex-1 w-full">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
           <input
@@ -256,24 +368,15 @@ export default function ContractsPage() {
         </div>
       </div>
 
-      {/* Main Table Container */}
-      <div className=" mx-auto bg-white rounded-2xl shadow-xs border border-slate-100 ">
+      <div className="mx-auto bg-white rounded-2xl shadow-xs border border-slate-100">
         <table className="w-full">
           <thead className="border-b-2 border-slate-200">
             <tr>
-              <th className="text-left p-5 font-bold text-slate-700">
-                Contract
-              </th>
-              <th className="text-left p-5 font-bold text-slate-700">
-                Officer
-              </th>
-              <th className="text-left p-5 font-bold text-slate-700">
-                Location
-              </th>
+              <th className="text-left p-5 font-bold text-slate-700">Contract</th>
+              <th className="text-left p-5 font-bold text-slate-700">Officer</th>
+              <th className="text-left p-5 font-bold text-slate-700">Location</th>
               <th className="text-left p-5 font-bold text-slate-700">Terms</th>
-              <th className="text-left p-5 font-bold text-slate-700">
-                Last Modified
-              </th>
+              <th className="text-left p-5 font-bold text-slate-700">Last Modified</th>
               <th className="w-16"></th>
             </tr>
           </thead>
@@ -306,9 +409,7 @@ export default function ContractsPage() {
                         <span className="font-semibold text-slate-800 block">
                           {contract.contract_number}
                         </span>
-                        <span className="text-xs text-slate-400">
-                          ID: {contract.client_id}
-                        </span>
+                        <span className="text-xs text-slate-400">ID: {contract.client_id}</span>
                       </div>
                     </div>
                   </td>
@@ -316,8 +417,7 @@ export default function ContractsPage() {
                     {contract.contract_officer_name || "—"}
                   </td>
                   <td className="p-5 text-slate-600 text-sm">
-                    {contract.contract_officer_city &&
-                    contract.contract_officer_state
+                    {contract.contract_officer_city && contract.contract_officer_state
                       ? `${contract.contract_officer_city}, ${contract.contract_officer_state}`
                       : "—"}
                   </td>
@@ -332,14 +432,11 @@ export default function ContractsPage() {
                     </div>
                   </td>
                   <td className="p-5 text-slate-600">
-                    {new Date(contract.updated_time).toLocaleDateString(
-                      "en-US",
-                      {
-                        month: "long",
-                        day: "2-digit",
-                        year: "numeric",
-                      }
-                    )}
+                    {new Date(contract.updated_time).toLocaleDateString("en-US", {
+                      month: "long",
+                      day: "2-digit",
+                      year: "numeric",
+                    })}
                   </td>
 
                   <td className="p-5 relative">
@@ -347,9 +444,7 @@ export default function ContractsPage() {
                       onClick={(e) => {
                         e.stopPropagation();
                         setOpenContractId(
-                          openContractId === contract.client_id
-                            ? null
-                            : contract.client_id
+                          openContractId === contract.client_id ? null : contract.client_id
                         );
                       }}
                       className="p-2 hover:bg-slate-200 rounded-lg transition-colors"
@@ -380,7 +475,14 @@ export default function ContractsPage() {
                           >
                             <Eye className="w-4 h-4" /> View Details
                           </button>
-                          <button className="w-full px-4 py-3 text-left text-sm font-bold text-slate-700 hover:bg-slate-50 flex items-center gap-3">
+                          <button
+                            className="w-full px-4 py-3 text-left text-sm font-bold text-slate-700 hover:bg-slate-50 flex items-center gap-3"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              openEditDialog(contract);
+                              setOpenContractId(null);
+                            }}
+                          >
                             <Edit className="w-4 h-4" /> Edit Contract
                           </button>
                           <hr className="my-1 border-slate-100" />
@@ -405,16 +507,11 @@ export default function ContractsPage() {
         </table>
       </div>
 
-      {/* --- Details Modal --- */}
       {selectedContract && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div
-            className="absolute inset-0"
-            onClick={() => setSelectedContract(null)}
-          />
+          <div className="absolute inset-0" onClick={() => setSelectedContract(null)} />
 
           <div className="relative bg-white rounded-3xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-            {/* Header Section */}
             <div className="sticky top-0 bg-linear-to-br from-[#38A1DB] to-[#2D8BBF] px-8 py-6 rounded-t-3xl z-10">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-5">
@@ -444,15 +541,11 @@ export default function ContractsPage() {
               </div>
             </div>
 
-            {/* Main Content Body */}
             <div className="p-8 grid md:grid-cols-2 gap-6">
-              {/* Officer & Location Card */}
               <div className="bg-linear-to-br from-slate-50 to-white p-6 rounded-2xl border border-slate-200">
                 <div className="flex items-center gap-3 mb-6">
                   <User className="w-6 h-6 text-[#38A1DB]" />
-                  <h3 className="text-xl font-bold text-slate-800">
-                    Contract Officer
-                  </h3>
+                  <h3 className="text-xl font-bold text-slate-800">Contract Officer</h3>
                 </div>
                 <div className="space-y-4">
                   <div>
@@ -465,33 +558,28 @@ export default function ContractsPage() {
                   </div>
                   <ContactRow
                     icon={MapPin}
-                    value={`${
-                      selectedContract.contract_officer_address || ""
-                    }, ${selectedContract.contract_officer_city || ""}, ${
-                      selectedContract.contract_officer_state || ""
-                    } ${selectedContract.contract_officer_zip || ""}`
+                    value={`${selectedContract.contract_officer_address || ""}, ${
+                      selectedContract.contract_officer_city || ""
+                    }, ${selectedContract.contract_officer_state || ""} ${
+                      selectedContract.contract_officer_zip || ""
+                    }`
                       .trim()
                       .replace(/^,\s*/, "")}
                   />
                 </div>
               </div>
 
-              {/* Logistics & Discounts Card */}
               <div className="bg-linear-to-br from-blue-50 to-white p-6 rounded-2xl border border-blue-200">
                 <div className="flex items-center gap-3 mb-6">
                   <Settings className="w-6 h-6 text-[#38A1DB]" />
-                  <h3 className="text-xl font-bold text-slate-800">
-                    Terms & Logistics
-                  </h3>
+                  <h3 className="text-xl font-bold text-slate-800">Terms & Logistics</h3>
                 </div>
                 <div className="space-y-4">
                   <div className="flex justify-between items-center border-b border-blue-100 pb-2">
                     <span className="text-sm text-slate-500 font-medium uppercase tracking-tight">
                       FOB Term
                     </span>
-                    <span className="font-bold text-slate-800">
-                      {selectedContract.fob_term}
-                    </span>
+                    <span className="font-bold text-slate-800">{selectedContract.fob_term}</span>
                   </div>
                   <div className="flex justify-between items-center border-b border-blue-100 pb-2">
                     <span className="text-sm text-slate-500 font-medium uppercase tracking-tight">
@@ -539,13 +627,10 @@ export default function ContractsPage() {
                 </div>
               </div>
 
-              {/* Concessions Full Width Card */}
               <div className="md:col-span-2 bg-slate-50 p-6 rounded-2xl border border-slate-200">
                 <div className="flex items-center gap-3 mb-4">
                   <Info className="w-6 h-6 text-slate-400" />
-                  <h3 className="text-xl font-bold text-slate-800">
-                    Additional Terms
-                  </h3>
+                  <h3 className="text-xl font-bold text-slate-800">Additional Terms</h3>
                 </div>
                 <div className="grid md:grid-cols-2 gap-8">
                   <div>
@@ -553,8 +638,7 @@ export default function ContractsPage() {
                       Additional Concessions
                     </label>
                     <p className="text-slate-700 mt-2 text-sm leading-relaxed">
-                      {selectedContract.additional_concessions ||
-                        "None specified"}
+                      {selectedContract.additional_concessions || "None specified"}
                     </p>
                   </div>
                   <div>
@@ -569,7 +653,6 @@ export default function ContractsPage() {
               </div>
             </div>
 
-            {/* Footer Actions */}
             <div className="sticky bottom-0 bg-slate-50 p-6 rounded-b-3xl flex justify-between border-t border-slate-200 z-10">
               <button
                 onClick={() => setSelectedContract(null)}
@@ -577,25 +660,36 @@ export default function ContractsPage() {
               >
                 Dismiss
               </button>
-              <button className="px-6 py-3 rounded-2xl bg-linear-to-br from-[#38A1DB] to-[#2D8BBF] text-white font-bold shadow-lg hover:shadow-xl transition-all active:scale-95">
-                Full Contract Analysis
+              <button
+                onClick={() => {
+                  if (selectedContract) {
+                    openEditDialog(selectedContract);
+                    setSelectedContract(null);
+                  }
+                }}
+                className="px-6 py-3 rounded-2xl bg-linear-to-br from-[#38A1DB] to-[#2D8BBF] text-white font-bold shadow-lg hover:shadow-xl transition-all active:scale-95"
+              >
+                Edit Contract
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* --- Add Contract Modal --- */}
       {showAddDialog && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="relative bg-white rounded-3xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-hidden flex flex-col">
-            {/* Header */}
             <div className="bg-linear-to-br from-[#38A1DB] to-[#2D8BBF] py-4 px-8 shrink-0">
               <div className="flex items-center justify-between">
                 <h2 className="text-2xl font-bold text-white">Add Contract</h2>
                 <button
                   type="button"
-                  onClick={() => setShowAddDialog(false)}
+                  onClick={() => {
+                    setShowAddDialog(false);
+                    setAddStep(1);
+                    setNewContract(initialForm);
+                    setClientSearch("");
+                  }}
                   className="p-2 hover:bg-white/20 rounded-full"
                   disabled={isSubmitting}
                 >
@@ -604,7 +698,6 @@ export default function ContractsPage() {
               </div>
             </div>
 
-            {/* Stepper */}
             <div className="flex items-center justify-center gap-4 p-4 bg-slate-50 border-b border-slate-200 shrink-0">
               {["Officer Info", "Logistics & Terms"].map((label, i) => {
                 const stepNum = i + 1;
@@ -616,157 +709,135 @@ export default function ContractsPage() {
                     <div className="flex items-center gap-3">
                       <div
                         className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ${
-                          active
-                            ? "bg-[#38A1DB] text-white"
-                            : "bg-slate-200 text-slate-400"
+                          active ? "bg-[#38A1DB] text-white" : "bg-slate-200 text-slate-400"
                         }`}
                       >
-                        {completed ? (
-                          <CheckCircle2 className="w-6 h-6" />
-                        ) : (
-                          stepNum
-                        )}
+                        {completed ? <CheckCircle2 className="w-6 h-6" /> : stepNum}
                       </div>
-                      <span
-                        className={`font-semibold ${
-                          active ? "text-[#38A1DB]" : "text-slate-400"
-                        }`}
-                      >
+                      <span className={`font-semibold ${active ? "text-[#38A1DB]" : "text-slate-400"}`}>
                         {label}
                       </span>
                     </div>
                     {i < 1 && (
-                      <div
-                        className={`w-16 h-1 rounded-full ${
-                          completed ? "bg-[#38A1DB]" : "bg-slate-200"
-                        }`}
-                      />
+                      <div className={`w-16 h-1 rounded-full ${completed ? "bg-[#38A1DB]" : "bg-slate-200"}`} />
                     )}
                   </div>
                 );
               })}
             </div>
 
-            {/* Form Body */}
-            <form
-              onSubmit={handleAddContract}
-              className="flex-1 overflow-y-auto"
-            >
+            <form onSubmit={handleAddContract} noValidate className="flex-1 overflow-y-auto">
               <div className="py-4 px-8 space-y-6">
                 {addStep === 1 && (
                   <div className="grid md:grid-cols-2 gap-6">
                     <div className="md:col-span-2">
-                      <label className="text-sm font-bold text-slate-700">
-                        Contract Number *
-                      </label>
+                      <label className="text-sm font-bold text-slate-700">Contract Number *</label>
                       <input
                         type="text"
-                        required
                         className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] outline-none"
                         value={newContract.contract_number}
                         onChange={(e) =>
-                          setNewContract({
-                            ...newContract,
-                            contract_number: e.target.value,
-                          })
+                          setNewContract({ ...newContract, contract_number: e.target.value })
                         }
                       />
                     </div>
-                    <div>
-                      <label className="text-sm font-bold text-slate-700">
-                        Client ID *
-                      </label>
+
+                    <div className="md:col-span-2 relative">
+                      <label className="text-sm font-bold text-slate-700">Client *</label>
                       <input
-                        type="number"
-                        required
+                        type="text"
+                        placeholder="Search by Client ID or Company Name"
                         className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] outline-none"
-                        value={newContract.client_id || ""}
-                        onChange={(e) =>
-                          setNewContract({
-                            ...newContract,
-                            client_id: parseInt(e.target.value),
-                          })
-                        }
+                        value={clientSearch}
+                        onFocus={() => setShowClientDropdown(true)}
+                        onChange={(e) => {
+                          setClientSearch(e.target.value);
+                          setShowClientDropdown(true);
+                        }}
                       />
+
+                      {showClientDropdown && (
+                        <div className="fixed inset-0 z-40" onClick={() => setShowClientDropdown(false)} />
+                      )}
+
+                      {showClientDropdown && (
+                        <div className="absolute z-50 mt-2 w-full max-h-60 overflow-y-auto bg-white border border-slate-200 rounded-xl shadow-lg">
+                          {filteredClients.length === 0 ? (
+                            <div className="px-4 py-3 text-slate-500 text-sm">No clients found</div>
+                          ) : (
+                            filteredClients.map((client) => (
+                              <button
+                                key={client.client_id}
+                                type="button"
+                                className="w-full px-4 py-3 text-left hover:bg-blue-50 flex justify-between items-center"
+                                onClick={() => {
+                                  setNewContract({ ...newContract, client_id: client.client_id });
+                                  setClientSearch(`${client.client_id} - ${client.company_name}`);
+                                  setShowClientDropdown(false);
+                                }}
+                              >
+                                <span className="font-semibold text-slate-700">{client.company_name}</span>
+                                <span className="text-xs text-slate-400">ID: {client.client_id}</span>
+                              </button>
+                            ))
+                          )}
+                        </div>
+                      )}
                     </div>
+
                     <div>
-                      <label className="text-sm font-bold text-slate-700">
-                        Officer Name
-                      </label>
+                      <label className="text-sm font-bold text-slate-700">Officer Name</label>
                       <input
                         type="text"
                         className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] outline-none"
                         value={newContract.contract_officer_name}
                         onChange={(e) =>
-                          setNewContract({
-                            ...newContract,
-                            contract_officer_name: e.target.value,
-                          })
+                          setNewContract({ ...newContract, contract_officer_name: e.target.value })
                         }
                       />
                     </div>
-                    <div className="md:col-span-2">
-                      <label className="text-sm font-bold text-slate-700">
-                        Officer Address
-                      </label>
+                    <div>
+                      <label className="text-sm font-bold text-slate-700">Officer Address</label>
                       <input
                         type="text"
                         className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] outline-none"
                         value={newContract.contract_officer_address}
                         onChange={(e) =>
-                          setNewContract({
-                            ...newContract,
-                            contract_officer_address: e.target.value,
-                          })
+                          setNewContract({ ...newContract, contract_officer_address: e.target.value })
                         }
                       />
                     </div>
                     <div>
-                      <label className="text-sm font-bold text-slate-700">
-                        City
-                      </label>
+                      <label className="text-sm font-bold text-slate-700">City</label>
                       <input
                         type="text"
                         className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] outline-none"
                         value={newContract.contract_officer_city}
                         onChange={(e) =>
-                          setNewContract({
-                            ...newContract,
-                            contract_officer_city: e.target.value,
-                          })
+                          setNewContract({ ...newContract, contract_officer_city: e.target.value })
                         }
                       />
                     </div>
                     <div className="grid grid-cols-2 gap-2">
                       <div>
-                        <label className="text-sm font-bold text-slate-700">
-                          State
-                        </label>
+                        <label className="text-sm font-bold text-slate-700">State</label>
                         <input
                           type="text"
                           className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] outline-none"
                           value={newContract.contract_officer_state}
                           onChange={(e) =>
-                            setNewContract({
-                              ...newContract,
-                              contract_officer_state: e.target.value,
-                            })
+                            setNewContract({ ...newContract, contract_officer_state: e.target.value })
                           }
                         />
                       </div>
                       <div>
-                        <label className="text-sm font-bold text-slate-700">
-                          ZIP
-                        </label>
+                        <label className="text-sm font-bold text-slate-700">ZIP</label>
                         <input
                           type="text"
                           className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] outline-none"
                           value={newContract.contract_officer_zip}
                           onChange={(e) =>
-                            setNewContract({
-                              ...newContract,
-                              contract_officer_zip: e.target.value,
-                            })
+                            setNewContract({ ...newContract, contract_officer_zip: e.target.value })
                           }
                         />
                       </div>
@@ -777,68 +848,46 @@ export default function ContractsPage() {
                 {addStep === 2 && (
                   <div className="grid md:grid-cols-2 gap-6">
                     <div>
-                      <label className="text-sm font-bold text-slate-700">
-                        Origin Country
-                      </label>
+                      <label className="text-sm font-bold text-slate-700">Origin Country</label>
                       <input
                         type="text"
                         className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] outline-none"
                         value={newContract.origin_country}
                         onChange={(e) =>
-                          setNewContract({
-                            ...newContract,
-                            origin_country: e.target.value,
-                          })
+                          setNewContract({ ...newContract, origin_country: e.target.value })
                         }
                       />
                     </div>
                     <div>
-                      <label className="text-sm font-bold text-slate-700">
-                        FOB Term
-                      </label>
+                      <label className="text-sm font-bold text-slate-700">FOB Term</label>
                       <select
                         className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] outline-none bg-white"
                         value={newContract.fob_term}
-                        onChange={(e) =>
-                          setNewContract({
-                            ...newContract,
-                            fob_term: e.target.value,
-                          })
-                        }
+                        onChange={(e) => setNewContract({ ...newContract, fob_term: e.target.value })}
                       >
                         <option value="Origin">Origin</option>
                         <option value="Destination">Destination</option>
                       </select>
                     </div>
                     <div>
-                      <label className="text-sm font-bold text-slate-700">
-                        GSA Proposed Discount (%)
-                      </label>
+                      <label className="text-sm font-bold text-slate-700">GSA Proposed Discount (%)</label>
                       <input
                         type="number"
                         step="0.01"
                         className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] outline-none"
                         value={newContract.gsa_proposed_discount}
                         onChange={(e) =>
-                          setNewContract({
-                            ...newContract,
-                            gsa_proposed_discount: parseFloat(e.target.value),
-                          })
+                          setNewContract({ ...newContract, gsa_proposed_discount: parseFloat(e.target.value) })
                         }
                       />
                     </div>
                     <div>
-                      <label className="text-sm font-bold text-slate-700">
-                        Energy Star Compliance
-                      </label>
+                      <label className="text-sm font-bold text-slate-700">Energy Star Compliance</label>
                       <select
                         className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] outline-none bg-white"
                         value={newContract.energy_star_compliance}
                         onChange={(e) =>
-                          setNewContract({
-                            ...newContract,
-                            energy_star_compliance: e.target.value,
-                          })
+                          setNewContract({ ...newContract, energy_star_compliance: e.target.value })
                         }
                       >
                         <option value="Yes">Yes</option>
@@ -847,66 +896,44 @@ export default function ContractsPage() {
                       </select>
                     </div>
                     <div>
-                      <label className="text-sm font-bold text-slate-700">
-                        Normal Delivery (Days)
-                      </label>
+                      <label className="text-sm font-bold text-slate-700">Normal Delivery (Days)</label>
                       <input
                         type="number"
                         className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] outline-none"
                         value={newContract.normal_delivery_time}
                         onChange={(e) =>
-                          setNewContract({
-                            ...newContract,
-                            normal_delivery_time: parseInt(e.target.value),
-                          })
+                          setNewContract({ ...newContract, normal_delivery_time: parseInt(e.target.value) })
                         }
                       />
                     </div>
                     <div>
-                      <label className="text-sm font-bold text-slate-700">
-                        Expedited Delivery (Days)
-                      </label>
+                      <label className="text-sm font-bold text-slate-700">Expedited Delivery (Days)</label>
                       <input
                         type="number"
                         className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] outline-none"
                         value={newContract.expedited_delivery_time}
                         onChange={(e) =>
-                          setNewContract({
-                            ...newContract,
-                            expedited_delivery_time: parseInt(e.target.value),
-                          })
+                          setNewContract({ ...newContract, expedited_delivery_time: parseInt(e.target.value) })
                         }
                       />
                     </div>
                     <div className="md:col-span-2">
-                      <label className="text-sm font-bold text-slate-700">
-                        Quantity/Volume Discounts
-                      </label>
+                      <label className="text-sm font-bold text-slate-700">Quantity/Volume Discounts</label>
                       <textarea
                         rows={2}
                         className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] outline-none resize-none"
                         value={newContract.q_v_discount}
-                        onChange={(e) =>
-                          setNewContract({
-                            ...newContract,
-                            q_v_discount: e.target.value,
-                          })
-                        }
+                        onChange={(e) => setNewContract({ ...newContract, q_v_discount: e.target.value })}
                       />
                     </div>
                     <div className="md:col-span-2">
-                      <label className="text-sm font-bold text-slate-700">
-                        Additional Concessions
-                      </label>
+                      <label className="text-sm font-bold text-slate-700">Additional Concessions</label>
                       <textarea
                         rows={2}
                         className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] outline-none resize-none"
                         value={newContract.additional_concessions}
                         onChange={(e) =>
-                          setNewContract({
-                            ...newContract,
-                            additional_concessions: e.target.value,
-                          })
+                          setNewContract({ ...newContract, additional_concessions: e.target.value })
                         }
                       />
                     </div>
@@ -914,13 +941,18 @@ export default function ContractsPage() {
                 )}
               </div>
 
-              {/* Footer */}
               <div className="sticky bottom-0 bg-slate-50 p-6 flex justify-between border-t border-slate-200 shrink-0 z-20">
                 <button
                   type="button"
-                  onClick={() =>
-                    addStep === 1 ? setShowAddDialog(false) : setAddStep(1)
-                  }
+                  onClick={() => {
+                    if (addStep === 1) {
+                      setShowAddDialog(false);
+                      setNewContract(initialForm);
+                      setClientSearch("");
+                    } else {
+                      setAddStep(1);
+                    }
+                  }}
                   className="px-6 py-3 rounded-xl border-2 border-slate-300 font-bold text-slate-600 hover:bg-slate-100 transition-all disabled:opacity-50"
                   disabled={isSubmitting}
                 >
@@ -930,7 +962,20 @@ export default function ContractsPage() {
                 {addStep === 1 ? (
                   <button
                     type="button"
-                    onClick={() => setAddStep(2)}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      if (!newContract.contract_number.trim()) {
+                        setError("Contract number is required");
+                        return;
+                      }
+                      if (!newContract.client_id) {
+                        setError("Please select a client");
+                        return;
+                      }
+                      setError(null);
+                      setAddStep(2);
+                    }}
                     className="px-8 py-3 rounded-xl bg-[#38A1DB] text-white font-bold hover:bg-[#2D8BBF]"
                   >
                     Next
@@ -941,10 +986,278 @@ export default function ContractsPage() {
                     disabled={isSubmitting}
                     className="px-8 py-3 rounded-xl bg-[#38A1DB] text-white font-bold hover:bg-[#2D8BBF] shadow-lg shadow-blue-200 flex items-center gap-2 disabled:opacity-50"
                   >
-                    {isSubmitting ? (
-                      <Loader2 className="w-5 h-5 animate-spin" />
-                    ) : null}
+                    {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : null}
                     {isSubmitting ? "Saving..." : "Create Contract Profile"}
+                  </button>
+                )}
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {showEditDialog && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="relative bg-white rounded-3xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+            <div className="bg-linear-to-br from-[#38A1DB] to-[#2D8BBF] py-4 px-8 shrink-0">
+              <div className="flex items-center justify-between">
+                <h2 className="text-2xl font-bold text-white">Edit Contract</h2>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowEditDialog(false);
+                    setEditStep(1);
+                    setEditingClientId(null);
+                  }}
+                  className="p-2 hover:bg-white/20 rounded-full"
+                  disabled={isSubmitting}
+                >
+                  <X className="w-6 h-6 text-white" />
+                </button>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-center gap-4 p-4 bg-slate-50 border-b border-slate-200 shrink-0">
+              {["Officer Info", "Logistics & Terms"].map((label, i) => {
+                const stepNum = i + 1;
+                const active = editStep >= stepNum;
+                const completed = editStep > stepNum;
+
+                return (
+                  <div key={stepNum} className="flex items-center gap-4">
+                    <div className="flex items-center gap-3">
+                      <div
+                        className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ${
+                          active ? "bg-[#38A1DB] text-white" : "bg-slate-200 text-slate-400"
+                        }`}
+                      >
+                        {completed ? <CheckCircle2 className="w-6 h-6" /> : stepNum}
+                      </div>
+                      <span className={`font-semibold ${active ? "text-[#38A1DB]" : "text-slate-400"}`}>
+                        {label}
+                      </span>
+                    </div>
+                    {i < 1 && (
+                      <div className={`w-16 h-1 rounded-full ${completed ? "bg-[#38A1DB]" : "bg-slate-200"}`} />
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            <form onSubmit={handleEditContract} noValidate className="flex-1 overflow-y-auto">
+              <div className="py-4 px-8 space-y-6">
+                {editStep === 1 && (
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <div className="md:col-span-2">
+                      <label className="text-sm font-bold text-slate-700">Contract Number *</label>
+                      <input
+                        type="text"
+                        className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] outline-none"
+                        value={editContract.contract_number}
+                        onChange={(e) =>
+                          setEditContract({ ...editContract, contract_number: e.target.value })
+                        }
+                      />
+                    </div>
+                    <div>
+                      <label className="text-sm font-bold text-slate-700">Officer Name</label>
+                      <input
+                        type="text"
+                        className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] outline-none"
+                        value={editContract.contract_officer_name}
+                        onChange={(e) =>
+                          setEditContract({ ...editContract, contract_officer_name: e.target.value })
+                        }
+                      />
+                    </div>
+                    <div>
+                      <label className="text-sm font-bold text-slate-700">Officer Address</label>
+                      <input
+                        type="text"
+                        className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] outline-none"
+                        value={editContract.contract_officer_address}
+                        onChange={(e) =>
+                          setEditContract({ ...editContract, contract_officer_address: e.target.value })
+                        }
+                      />
+                    </div>
+                    <div>
+                      <label className="text-sm font-bold text-slate-700">City</label>
+                      <input
+                        type="text"
+                        className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] outline-none"
+                        value={editContract.contract_officer_city}
+                        onChange={(e) =>
+                          setEditContract({ ...editContract, contract_officer_city: e.target.value })
+                        }
+                      />
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      <div>
+                        <label className="text-sm font-bold text-slate-700">State</label>
+                        <input
+                          type="text"
+                          className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] outline-none"
+                          value={editContract.contract_officer_state}
+                          onChange={(e) =>
+                            setEditContract({ ...editContract, contract_officer_state: e.target.value })
+                          }
+                        />
+                      </div>
+                      <div>
+                        <label className="text-sm font-bold text-slate-700">ZIP</label>
+                        <input
+                          type="text"
+                          className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] outline-none"
+                          value={editContract.contract_officer_zip}
+                          onChange={(e) =>
+                            setEditContract({ ...editContract, contract_officer_zip: e.target.value })
+                          }
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {editStep === 2 && (
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="text-sm font-bold text-slate-700">Origin Country</label>
+                      <input
+                        type="text"
+                        className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] outline-none"
+                        value={editContract.origin_country}
+                        onChange={(e) =>
+                          setEditContract({ ...editContract, origin_country: e.target.value })
+                        }
+                      />
+                    </div>
+                    <div>
+                      <label className="text-sm font-bold text-slate-700">FOB Term</label>
+                      <select
+                        className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] outline-none bg-white"
+                        value={editContract.fob_term}
+                        onChange={(e) => setEditContract({ ...editContract, fob_term: e.target.value })}
+                      >
+                        <option value="Origin">Origin</option>
+                        <option value="Destination">Destination</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="text-sm font-bold text-slate-700">GSA Proposed Discount (%)</label>
+                      <input
+                        type="number"
+                        step="0.01"
+                        className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] outline-none"
+                        value={editContract.gsa_proposed_discount}
+                        onChange={(e) =>
+                          setEditContract({ ...editContract, gsa_proposed_discount: parseFloat(e.target.value) })
+                        }
+                      />
+                    </div>
+                    <div>
+                      <label className="text-sm font-bold text-slate-700">Energy Star Compliance</label>
+                      <select
+                        className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] outline-none bg-white"
+                        value={editContract.energy_star_compliance}
+                        onChange={(e) =>
+                          setEditContract({ ...editContract, energy_star_compliance: e.target.value })
+                        }
+                      >
+                        <option value="Yes">Yes</option>
+                        <option value="No">No</option>
+                        <option value="N/A">N/A</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="text-sm font-bold text-slate-700">Normal Delivery (Days)</label>
+                      <input
+                        type="number"
+                        className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] outline-none"
+                        value={editContract.normal_delivery_time}
+                        onChange={(e) =>
+                          setEditContract({ ...editContract, normal_delivery_time: parseInt(e.target.value) })
+                        }
+                      />
+                    </div>
+                    <div>
+                      <label className="text-sm font-bold text-slate-700">Expedited Delivery (Days)</label>
+                      <input
+                        type="number"
+                        className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] outline-none"
+                        value={editContract.expedited_delivery_time}
+                        onChange={(e) =>
+                          setEditContract({ ...editContract, expedited_delivery_time: parseInt(e.target.value) })
+                        }
+                      />
+                    </div>
+                    <div className="md:col-span-2">
+                      <label className="text-sm font-bold text-slate-700">Quantity/Volume Discounts</label>
+                      <textarea
+                        rows={2}
+                        className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] outline-none resize-none"
+                        value={editContract.q_v_discount}
+                        onChange={(e) => setEditContract({ ...editContract, q_v_discount: e.target.value })}
+                      />
+                    </div>
+                    <div className="md:col-span-2">
+                      <label className="text-sm font-bold text-slate-700">Additional Concessions</label>
+                      <textarea
+                        rows={2}
+                        className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] outline-none resize-none"
+                        value={editContract.additional_concessions}
+                        onChange={(e) =>
+                          setEditContract({ ...editContract, additional_concessions: e.target.value })
+                        }
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="sticky bottom-0 bg-slate-50 p-6 flex justify-between border-t border-slate-200 shrink-0 z-20">
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (editStep === 1) {
+                      setShowEditDialog(false);
+                      setEditingClientId(null);
+                    } else {
+                      setEditStep(1);
+                    }
+                  }}
+                  className="px-6 py-3 rounded-xl border-2 border-slate-300 font-bold text-slate-600 hover:bg-slate-100 transition-all disabled:opacity-50"
+                  disabled={isSubmitting}
+                >
+                  {editStep === 1 ? "Cancel" : "Back"}
+                </button>
+
+                {editStep === 1 ? (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      if (!editContract.contract_number?.trim()) {
+                        setError("Contract number is required");
+                        return;
+                      }
+                      setError(null);
+                      setEditStep(2);
+                    }}
+                    className="px-8 py-3 rounded-xl bg-[#38A1DB] text-white font-bold hover:bg-[#2D8BBF]"
+                  >
+                    Next
+                  </button>
+                ) : (
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="px-8 py-3 rounded-xl bg-[#38A1DB] text-white font-bold hover:bg-[#2D8BBF] shadow-lg shadow-blue-200 flex items-center gap-2 disabled:opacity-50"
+                  >
+                    {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : null}
+                    {isSubmitting ? "Updating..." : "Update Contract"}
                   </button>
                 )}
               </div>

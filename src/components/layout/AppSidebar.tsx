@@ -12,6 +12,10 @@ import {
   UserCheck,
   File,
   Upload,
+  Building,
+  Building2Icon,
+  List,
+  ListCheckIcon,
 } from 'lucide-react';
 import { Role, ROLES } from '@/src/types/roles.types';
 
@@ -38,19 +42,19 @@ export const navItems = [
   {
     to: "/user-activation",
     icon: UserCheck,
-    label: "User Activation",
+    label: "User Management",
     roles: [ROLES.ADMIN],
   },
   {
     to: "/client-activation",
-    icon: CheckCircle,
-    label: "Client Activation",
+    icon: Building2Icon,
+    label: "Client Management",
     roles: [ROLES.ADMIN],
   },
   {
-    to: "/upload-gsa",
-    icon: Upload,
-    label: "Upload GSA",
+    to: "/gsa-products",
+    icon: ListCheckIcon,
+    label: "GSA Products",
     roles: [ROLES.ADMIN],
   },
   {
@@ -88,7 +92,7 @@ const ROLE_MAP: Record<Role, string> = {
 
   /* ===================== ROLE FILTER ===================== */
   const visibleNavItems = navItems.filter(
-    (item) => user && item.roles.includes(user.role)
+    (item) => user && item.roles.includes(user.role as Role)
   );
 
   return (
