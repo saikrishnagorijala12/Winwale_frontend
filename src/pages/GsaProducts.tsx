@@ -105,7 +105,7 @@ export default function ProductsPage() {
     return (
       <div className="flex items-center justify-center min-h-screen bg-linear-to-br from-slate-50 to-slate-100">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+          <div className="w-12 h-12 border-4 border-[#3399cc] border-t-transparent rounded-full animate-spin"></div>
           <p className="text-slate-600 font-medium">Loading products...</p>
         </div>
       </div>
@@ -162,7 +162,7 @@ export default function ProductsPage() {
                 setSearchTerm(e.target.value);
                 setCurrentPage(1);
               }}
-              className="w-full pl-12 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all bg-white shadow-sm"
+              className="w-full pl-12 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#3399cc] focus:border-transparent outline-none transition-all bg-white shadow-sm"
             />
           </div>
         </div>

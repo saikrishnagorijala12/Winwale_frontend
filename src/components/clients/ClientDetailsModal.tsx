@@ -1,6 +1,5 @@
-// components/clients/ClientDetailsModal.tsx
 import React from 'react';
-import { X, Building2, User, Mail, Phone, MapPin } from 'lucide-react';
+import { X, Building2, User, Mail, Phone, MapPin, Globe } from 'lucide-react';
 import { Client } from '../../types/client.types';
 import { ContactRow } from './ContactRow';
 
@@ -13,101 +12,100 @@ export const ClientDetailsModal: React.FC<ClientDetailsModalProps> = ({ client, 
   if (!client) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-none z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 bg-slate-900/60  z-50 flex items-center justify-center p-4">
+      {/* Click-away backdrop */}
       <div className="absolute inset-0" onClick={onClose} />
 
-      <div className="relative bg-white rounded-3xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+      <div className="relative bg-white rounded-2xl shadow-xl max-w-4xl w-full max-h-[90vh] flex flex-col overflow-hidden">
         {/* Header Section */}
-        <div className="sticky top-0 bg-linear-to-br from-[#38A1DB] to-[#2D8BBF] px-8 py-6 rounded-t-3xl">
-          <div className="flex items-center justify-between">
-            {/* Left: Logo + Info */}
-            <div className="flex items-center gap-5">
-              <div className="relative">
-                <div className="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center shadow-inner">
-                  <div className="w-11 h-11 rounded-xl bg-linear-to-br from-[#E0F2FE] to-[#BAE6FD] flex items-center justify-center text-[#0369A1] font-extrabold text-lg">
-                    {client.name
-                      .split(" ")
-                      .map((w) => w[0])
-                      .slice(0, 2)
-                      .join("")
-                      .toUpperCase()}
-                  </div>
-                </div>
-              </div>
-              <div>
-                <h2 className="text-2xl md:text-3xl font-extrabold text-white leading-tight">
-                  {client.name}
-                </h2>
-                <p className="text-sm md:text-base text-blue-100 font-medium mt-1">
-                  Contract&nbsp;
-                  <span className="font-semibold text-white/90">
-                    {client.contract || "—"}
-                  </span>
-                </p>
-              </div>
+        <div className="relative bg-linear-to-br from-[#38A1DB] to-[#2D8BBF] p-8">
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-colors"
+          >
+            <X className="w-5 h-5" />
+          </button>
+
+          <div className="flex items-center gap-6">
+            <div className="w-20 h-20 rounded-2xl bg-white shadow-lg flex items-center justify-center text-[#38A1DB] font-black text-2xl border-4 border-white/20">
+              {client.name
+                .split(" ")
+                .map((w) => w[0])
+                .slice(0, 2)
+                .join("")
+                .toUpperCase()}
             </div>
-            <button
-              onClick={onClose}
-              className="p-3 rounded-full hover:bg-white/20"
-              aria-label="Close"
-            >
-              <X className="w-6 h-6 text-white" />
-            </button>
+            <div>
+              <p className="text-blue-100 text-sm font-medium uppercase tracking-widest mb-1">Client Profile</p>
+              <h2 className="text-3xl font-bold text-white tracking-tight">
+                {client.name}
+              </h2>
+            </div>
           </div>
         </div>
 
         {/* Main Content Body */}
-        <div className="p-8 grid md:grid-cols-2 gap-6">
-          {/* Left Card: Company Details */}
-          <div className="bg-linear-to-br from-slate-50 to-white p-6 rounded-2xl border border-slate-200">
-            <div className="flex items-center gap-3 mb-9">
-              <Building2 className="w-6 h-6 text-[#38A1DB]" />
-              <h3 className="text-xl font-bold text-slate-800">Company Details</h3>
-            </div>
-            <div className="space-y-5">
-              <ContactRow icon={Mail} value={client.email} />
-              <ContactRow icon={Phone} value={client.phone} />
-              <ContactRow icon={MapPin} value={client.address} />
-            </div>
-          </div>
-
-          {/* Right Card: Primary Contact */}
-          <div className="bg-linear-to-br from-blue-50 to-white p-6 rounded-2xl border border-blue-200">
-            <div className="flex items-center gap-3 mb-6">
-              <User className="w-6 h-6 text-[#38A1DB]" />
-              <h3 className="text-xl font-bold text-slate-800">Primary Contact</h3>
+        <div className="flex-1 overflow-y-auto p-8">
+          <div className="grid md:grid-cols-2 gap-8">
+            
+            {/* Left Column: Company Info */}
+            <div className="space-y-6">
+              <div className="flex items-center gap-2 pb-2 border-b border-slate-100">
+                <Building2 className="w-5 h-5 text-[#38A1DB]" />
+                <h3 className="font-bold text-slate-800 uppercase text-sm tracking-wider">Company Details</h3>
+              </div>
+              
+              <div className="bg-slate-50/50 rounded-xl p-5 border border-slate-100 space-y-4">
+                <ContactRow icon={Mail} value={client.email} />
+                <ContactRow icon={Phone} value={client.phone} />
+                <ContactRow icon={MapPin} value={client.address} />
+              </div>
             </div>
 
-            {!client.contact ? (
-              <div className="text-center py-8">
-                <User className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-                <p className="text-slate-500 mb-4">No primary contact added</p>
+            {/* Right Column: Primary Contact */}
+            <div className="space-y-6">
+              <div className="flex items-center gap-2 pb-2 border-b border-slate-100">
+                <User className="w-5 h-5 text-[#38A1DB]" />
+                <h3 className="font-bold text-slate-800 uppercase text-sm tracking-wider">Primary Contact</h3>
               </div>
-            ) : (
-              <div className="space-y-4">
-                <div>
-                  <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-                    Contact Name
-                  </label>
-                  <p className="text-slate-800 font-semibold mt-1">
-                    {client.contact.name || "—"}
-                  </p>
-                </div>
-                <ContactRow icon={Mail} value={client.contact.email} />
-                <ContactRow icon={Phone} value={client.contact.phone} />
-                <ContactRow icon={MapPin} value={client.contact.address} />
+
+              <div className="bg-blue-50/30 rounded-xl p-5 border border-blue-100/50">
+                {!client.contact ? (
+                  <div className="text-center py-6">
+                    <p className="text-slate-400 italic text-sm">No primary contact assigned</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    <div>
+                      <span className="text-[10px] font-bold text-[#38A1DB] uppercase tracking-tighter">Full Name</span>
+                      <p className="text-slate-900 font-bold text-lg leading-none mt-1">
+                        {client.contact.name || "—"}
+                      </p>
+                    </div>
+                    <div className="pt-2 space-y-3 border-t border-blue-100/50">
+                      <ContactRow icon={Mail} value={client.contact.email} />
+                      <ContactRow icon={Phone} value={client.contact.phone} />
+                    </div>
+                  </div>
+                )}
               </div>
-            )}
+            </div>
+
           </div>
         </div>
 
         {/* Footer Actions */}
-        <div className="sticky bottom-0 bg-slate-50 p-6 rounded-b-3xl flex justify-between border-t border-slate-200">
+        <div className="bg-slate-50 px-8 py-4 flex justify-end items-center gap-3 border-t border-slate-100">
           <button
             onClick={onClose}
-            className="px-6 py-3 rounded-2xl font-bold text-slate-500 hover:text-slate-700 hover:bg-slate-100 transition-all active:scale-95"
+            className="px-6 py-2.5 rounded-xl font-bold text-slate-500 hover:bg-slate-200/50 transition-all active:scale-95 text-sm"
           >
-            Close
+            Dismiss
+          </button>
+          <button
+            className="px-6 py-2.5 rounded-xl font-bold bg-[#38A1DB] text-white shadow-md shadow-blue-200 hover:bg-[#2D8BBF] transition-all active:scale-95 text-sm"
+          >
+            Edit Client
           </button>
         </div>
       </div>

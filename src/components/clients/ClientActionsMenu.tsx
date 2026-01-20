@@ -1,3 +1,71 @@
+// // components/clients/ClientActionsMenu.tsx
+// import React from "react";
+// import { Eye, Edit, File, Trash2 } from "lucide-react";
+// import { Client } from "../../types/client.types";
+// import { useNavigate } from "react-router-dom";
+
+// interface ClientActionsMenuProps {
+//   client: Client;
+//   onView: () => void;
+//   onEdit: () => void;
+//   onClose: () => void;
+// }
+
+// export const ClientActionsMenu: React.FC<ClientActionsMenuProps> = ({
+//   client,
+//   onView,
+//   onEdit,
+//   onClose,
+// }) => {
+//   const navigate = useNavigate();
+//   return (
+//     <>
+//       <div
+//         className="fixed inset-0 z-40"
+//         onClick={(e) => {
+//           e.stopPropagation();
+//           onClose();
+//         }}
+//       />
+//       <div
+//         className="absolute right-8 top-12 z-50 w-48 bg-white border border-slate-100 rounded-2xl shadow-xl py-2"
+//         onClick={(e) => e.stopPropagation()}
+//       >
+//         <button
+//           className="w-full px-4 py-3 text-left text-sm font-bold text-slate-700 hover:bg-slate-50 flex items-center gap-3"
+//           onClick={(e) => {
+//             e.stopPropagation();
+//             onView();
+//             onClose();
+//           }}
+//         >
+//           <Eye className="w-4 h-4" /> View Details
+//         </button>
+//         <button
+//           className="w-full px-4 py-3 text-left text-sm font-bold text-slate-700 hover:bg-slate-50 flex items-center gap-3"
+//           onClick={(e) => {
+//             e.stopPropagation();
+//             onEdit();
+//             onClose();
+//           }}
+//         >
+//           <Edit className="w-4 h-4" /> Edit Client
+//         </button>
+//         {/* <button
+//           onClick={() => navigate("/contracts")}
+//           className="w-full px-4 py-3 text-left text-sm font-bold text-slate-700 hover:bg-slate-50 flex items-center gap-3"
+//         >
+//           <File className="w-4 h-4" />
+//           Contract
+//         </button> */}
+//         <hr className="my-1 border-slate-100" />
+//         <button className="w-full px-4 py-3 text-left text-sm font-bold text-red-500 hover:bg-red-50 flex items-center gap-3">
+//           <Trash2 className="w-4 h-4" /> Delete
+//         </button>
+//       </div>
+//     </>
+//   );
+// };
 // components/clients/ClientActionsMenu.tsx
 import React from "react";
 import { Eye, Edit, File, Trash2, Package } from "lucide-react";
@@ -34,7 +102,7 @@ export const ClientActionsMenu: React.FC<ClientActionsMenuProps> = ({
         onClick={(e) => e.stopPropagation()}
       >
         <button
-          className="menu-item"
+          className="w-full px-4 py-3 text-left text-sm font-bold text-slate-700 hover:bg-slate-50 flex items-center gap-3"
           onClick={() => {
             onView();
             onClose();
@@ -45,7 +113,7 @@ export const ClientActionsMenu: React.FC<ClientActionsMenuProps> = ({
         </button>
 
         <button
-          className="menu-item"
+          className="w-full px-4 py-3 text-left text-sm font-bold text-slate-700 hover:bg-slate-50 flex items-center gap-3"
           onClick={() => {
             onEdit();
             onClose();
@@ -55,9 +123,8 @@ export const ClientActionsMenu: React.FC<ClientActionsMenuProps> = ({
           Edit Client
         </button>
 
-        {/* NEW: View Products */}
         <button
-          className="menu-item"
+          className="w-full px-4 py-3 text-left text-sm font-bold text-slate-700 hover:bg-slate-50 flex items-center gap-3"
           onClick={() => {
             navigate(`/clients/${client.id}/products`);
             onClose();
@@ -68,7 +135,7 @@ export const ClientActionsMenu: React.FC<ClientActionsMenuProps> = ({
         </button>
 
         {/* <button
-          className="menu-item"
+          className="w-full px-4 py-3 text-left text-sm font-bold text-slate-700 hover:bg-slate-50 flex items-center gap-3"
           onClick={() => navigate("/contracts")}
         >
           <File className="w-4 h-4" />
@@ -77,7 +144,7 @@ export const ClientActionsMenu: React.FC<ClientActionsMenuProps> = ({
 
         <hr className="my-1 border-slate-100" />
 
-        <button className="menu-item text-red-500 hover:bg-red-50">
+        <button className="w-full px-4 py-3 text-left text-sm font-bold text-red-500 hover:bg-red-50 flex items-center gap-3">
           <Trash2 className="w-4 h-4" />
           Delete
         </button>

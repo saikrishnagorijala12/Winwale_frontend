@@ -24,7 +24,6 @@ import {
 } from "lucide-react";
 import api from "../lib/axios";
 
-// --- Types & Interfaces (Based on Backend Schema) ---
 
 interface ClientContractBase {
   contract_number: string;
@@ -373,9 +372,9 @@ export default function ContractsPage() {
           <thead className="border-b-2 border-slate-200">
             <tr>
               <th className="text-left p-5 font-bold text-slate-700">Contract</th>
+              <th className="text-left p-5 font-bold text-slate-700">Client</th>
               <th className="text-left p-5 font-bold text-slate-700">Officer</th>
               <th className="text-left p-5 font-bold text-slate-700">Location</th>
-              <th className="text-left p-5 font-bold text-slate-700">Terms</th>
               <th className="text-left p-5 font-bold text-slate-700">Last Modified</th>
               <th className="w-16"></th>
             </tr>
@@ -413,6 +412,7 @@ export default function ContractsPage() {
                       </div>
                     </div>
                   </td>
+                  <td>{contract.client_id}</td>
                   <td className="p-5 text-slate-600 font-medium">
                     {contract.contract_officer_name || "—"}
                   </td>
@@ -421,16 +421,7 @@ export default function ContractsPage() {
                       ? `${contract.contract_officer_city}, ${contract.contract_officer_state}`
                       : "—"}
                   </td>
-                  <td className="p-5">
-                    <div className="flex items-center gap-2">
-                      <span className="px-3 py-1 rounded-full text-xs font-bold bg-[#DCFCE7] text-[#15803D]">
-                        {contract.fob_term}
-                      </span>
-                      <span className="text-xs font-bold text-slate-500">
-                        {contract.gsa_proposed_discount}% Disc.
-                      </span>
-                    </div>
-                  </td>
+                  
                   <td className="p-5 text-slate-600">
                     {new Date(contract.updated_time).toLocaleDateString("en-US", {
                       month: "long",

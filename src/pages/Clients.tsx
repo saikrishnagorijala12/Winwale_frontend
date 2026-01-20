@@ -222,7 +222,12 @@ export default function ClientsPage() {
     <div className="min-h-screen bg-linear-to-br from-slate-50 via-blue-50/30 to-slate-50 p-8">
       <ClientHeader onAddClick={() => setShowAddDialog(true)} />
       
-      <SearchBar searchQuery={searchQuery} onSearchChange={setSearchQuery} />
+      <SearchBar 
+        searchQuery={searchQuery} 
+        onSearchChange={setSearchQuery}
+        filterStatus={filterStatus}
+        onFilterChange={setFilterStatus}
+      />
 
       <ClientTable
         clients={filteredClients}

@@ -7,9 +7,9 @@ import {
 } from "react-router-dom";
 import { Amplify } from "aws-amplify";
 import { fetchAuthSession, signOut } from "aws-amplify/auth";
- 
+
 import awsExports from "./src/aws-exports";
- 
+
 import Login from "./src/pages/auth/Login";
 import Signup from "./src/pages/auth/Signup";
 import ForgotPassword from "./src/pages/auth/ForgotPassword";
@@ -28,31 +28,32 @@ import ContractManagement from "./src/pages/Contracts";
 import UploadGsa from "./src/pages/UploadGsa";
 import PendingApproval from "./src/pages/PendingApproval";
 import GsaProducts from "./src/pages/GsaProducts";
- 
+import ClientProducts from "./src/pages/ClientProducts";
+
 try {
   Amplify.configure(awsExports);
 } catch (e) {
   console.warn("Amplify configuration failed.", e);
 }
- 
+
 const AppContent: React.FC = () => {
   const { status, setStatus, isActive, refreshUser } = useAuth();
- 
+
   useEffect(() => {
     bootstrapAuth();
   }, []);
- 
+
   // const bootstrapAuth = async () => {
   //   try {
   //     const session = await fetchAuthSession();
- 
+
   //     if (!session.tokens?.idToken) {
   //       setStatus("unauthenticated");
   //       return;
   //     }
- 
+
   //     const user = await getDbUser();
- 
+
   //     setUser(user);
   //     setStatus("authenticated");
   //   } catch (err) {
@@ -64,12 +65,12 @@ const AppContent: React.FC = () => {
   const bootstrapAuth = async () => {
     try {
       const session = await fetchAuthSession();
- 
+
       if (!session.tokens?.idToken) {
         setStatus("unauthenticated");
         return;
       }
- 
+
       await refreshUser();
     } catch (err) {
       console.error("Auth bootstrap failed:", err);
@@ -77,7 +78,7 @@ const AppContent: React.FC = () => {
       setStatus("unauthenticated");
     }
   };
- 
+
   if (status === "loading") {
     return (
       <div className="flex items-center justify-center min-h-screen bg-[hsl(220,25%,97%)]">
@@ -85,9 +86,9 @@ const AppContent: React.FC = () => {
       </div>
     );
   }
- 
+
   const isAuthenticated = status === "authenticated";
- 
+
   return (
     <Router>
       <Routes>
@@ -105,10 +106,10 @@ const AppContent: React.FC = () => {
             )
           }
         />
- 
+
         <Route path="/signup" element={<Signup />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
- 
+
         <Route
           path="/pending-approval"
           element={
@@ -121,12 +122,12 @@ const AppContent: React.FC = () => {
             )
           }
         />
- 
+
         <Route element={<ProtectedRoute isAuthenticated={isAuthenticated} />}>
           <Route element={<AppLayout />}>
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/settings" element={<Settings />} />
- 
+
             {/* Consultant only */}
             <Route
               element={
@@ -137,9 +138,14 @@ const AppContent: React.FC = () => {
               }
             >
               <Route path="/clients" element={<Clients />} />
+              <Route
+                path="/clients/:clientId/products"
+                element={<ClientProducts />}
+              />
+
               <Route path="/contracts" element={<ContractManagement />} />
             </Route>
- 
+
             {/* Admin only */}
             <Route
               element={
@@ -156,7 +162,7 @@ const AppContent: React.FC = () => {
             </Route>
           </Route>
         </Route>
- 
+
         <Route
           path="/"
           element={
@@ -172,13 +178,13 @@ const AppContent: React.FC = () => {
             />
           }
         />
- 
+
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Router>
   );
 };
- 
+
 const App: React.FC = () => {
   return (
     <AuthProvider>
@@ -186,5 +192,5 @@ const App: React.FC = () => {
     </AuthProvider>
   );
 };
- 
+
 export default App;
