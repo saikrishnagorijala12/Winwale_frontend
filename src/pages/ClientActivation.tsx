@@ -21,7 +21,6 @@ const ClientActivation = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState<TabType>("pending");
 
-  // Fetch Clients from API
   const fetchClients = async () => {
     try {
       setLoading(true);

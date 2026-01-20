@@ -1,6 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Upload, Search, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  Upload,
+  Search,
+  ChevronLeft,
+  ChevronRight,
+  X,
+  ExternalLink,
+} from "lucide-react";
 import { ROLES } from "@/src/types/roles.types";
 import { getCurrentUser } from "../api/user";
 import api from "../lib/axios";
@@ -34,12 +41,16 @@ interface Product {
 
 export default function ProductsPage() {
   const navigate = useNavigate();
+
   const [products, setProducts] = useState<Product[]>([]);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [userRole, setUserRole] = useState<string>("");
+
   const itemsPerPage = 10;
 
   useEffect(() => {
@@ -59,12 +70,7 @@ export default function ProductsPage() {
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      const response = await api.get("/products", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
-
+      const response = await api.get("/products");
       setProducts(response.data);
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
@@ -167,165 +173,187 @@ export default function ProductsPage() {
           </div>
         </div>
 
-        {/* Stats */}
-        {/* <div className="mb-6 flex gap-4">
-          <div className="bg-white rounded-lg shadow-sm px-6 py-4 flex-1">
-            <p className="text-slate-600 text-sm">Total Products</p>
-            <p className="text-2xl font-bold text-slate-800">{products.length}</p>
-          </div>
-          <div className="bg-white rounded-lg shadow-sm px-6 py-4 flex-1">
-            <p className="text-slate-600 text-sm">Filtered Results</p>
-            <p className="text-2xl font-bold text-slate-800">{filteredProducts.length}</p>
-          </div>
-        </div> */}
-
         {/* Table Card */}
         <div className="mx-auto bg-white rounded-2xl shadow-xs border border-slate-100">
-          <div className="">
-            <table className="w-full">
-              <thead className="border-b-2 border-slate-200">
-                <tr>
-                  <th className="text-left p-5 font-bold text-slate-700">
-                    Item Name
-                  </th>
-                  <th className="text-left p-5 font-bold text-slate-700">
-                    Type
-                  </th>
-                  <th className="text-left p-5 font-bold text-slate-700">
-                    Client
-                  </th>
-                  <th className="text-left p-5 font-bold text-slate-700">
-                    Manufacturer
-                  </th>
-                  <th className="text-left p-5 font-bold text-slate-700">
-                    MFR Part #
-                  </th>
-                  <th className="text-left p-5 font-bold text-slate-700">
-                    Price
-                  </th>
-                  <th className="text-left p-5 font-bold text-slate-700">
-                    UOM
-                  </th>
+          <table className="w-full">
+            <thead className="border-b-2 border-slate-200">
+              <tr>
+                <th className="text-left p-5 font-bold text-slate-700">
+                  Item Name
+                </th>
+                <th className="text-left p-5 font-bold text-slate-700">Type</th>
+                <th className="text-left p-5 font-bold text-slate-700">
+                  Client
+                </th>
+                <th className="text-left p-5 font-bold text-slate-700">
+                  Manufacturer
+                </th>
+                <th className="text-left p-5 font-bold text-slate-700">
+                  MFR Part #
+                </th>
+                <th className="text-left p-5 font-bold text-slate-700">
+                  Price
+                </th>
+                <th className="text-left p-5 font-bold text-slate-700">UOM</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-200">
+              {paginatedProducts.map((product) => (
+                <tr
+                  key={product.product_id}
+                  className="hover:bg-slate-50 transition-colors cursor-pointer"
+                  onClick={() => setSelectedProduct(product)}
+                >
+                  <td className="px-6 py-4">
+                    <div className="text-sm font-medium text-slate-900">
+                      {product.item_name}
+                    </div>
+                    {product.item_description && (
+                      <div className="text-xs text-slate-500 mt-1 truncate max-w-xs">
+                        {product.item_description}
+                      </div>
+                    )}
+                  </td>
+                  <td className="px-6 py-4 text-sm">
+                    {product.item_type === "A" && (
+                      <span className="px-2 py-1 rounded-full bg-blue-100 text-blue-700 font-medium">
+                        Accessory
+                      </span>
+                    )}
+                    {product.item_type === "B" && (
+                      <span className="px-2 py-1 rounded-full bg-green-100 text-green-700 font-medium">
+                        Base Product
+                      </span>
+                    )}
+                  </td>
+                  <td className="px-6 py-4 text-sm text-slate-700">
+                    {product.client}
+                  </td>
+                  <td className="px-6 py-4 text-sm text-slate-700">
+                    {product.manufacturer}
+                  </td>
+                  <td className="px-6 py-4 text-sm text-slate-700 font-mono">
+                    {product.manufacturer_part_number}
+                  </td>
+                  <td className="px-6 py-4 text-sm text-slate-900 font-medium">
+                    {formatCurrency(product.commercial_list_price)}
+                  </td>
+                  <td className="px-6 py-4 text-sm text-slate-700">
+                    {product.uom || "-"}
+                  </td>
                 </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-200">
-                {paginatedProducts.length === 0 ? (
-                  <tr>
-                    <td
-                      colSpan={7}
-                      className="px-6 py-12 text-center text-slate-500"
-                    >
-                      {searchTerm
-                        ? "No products found matching your search."
-                        : "No products available."}
-                    </td>
-                  </tr>
-                ) : (
-                  paginatedProducts.map((product, index) => (
-                    <tr
-                      key={product.product_id}
-                      className="hover:bg-slate-50 transition-colors cursor-pointer"
-                      onClick={() =>
-                        navigate(`/products/${product.product_id}`)
-                      }
-                    >
-                      <td className="px-6 py-4">
-                        <div className="text-sm font-medium text-slate-900">
-                          {product.item_name}
-                        </div>
-                        {product.item_description && (
-                          <div className="text-xs text-slate-500 mt-1 truncate max-w-xs">
-                            {product.item_description}
-                          </div>
-                        )}
-                      </td>
-                      <td className="px-6 py-4 text-sm">
-                        {product.item_type === "A" && (
-                          <span className="px-2 py-1 rounded-full bg-blue-100 text-blue-700 font-medium">
-                            Accessory
-                          </span>
-                        )}
-
-                        {product.item_type === "B" && (
-                          <span className="px-2 py-1 rounded-full bg-green-100 text-green-700 font-medium">
-                            Base Product
-                          </span>
-                        )}
-
-                        {!product.item_type && "-"}
-                      </td>
-
-                      <td className="px-6 py-4 text-sm text-slate-700">
-                        {product.client}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-slate-700">
-                        {product.manufacturer}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-slate-700 font-mono">
-                        {product.manufacturer_part_number}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-slate-900 font-medium">
-                        {formatCurrency(product.commercial_list_price)}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-slate-700">
-                        {product.uom || "-"}
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
-
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <div className="flex items-center justify-between px-6 py-4 bg-slate-50 border-t border-slate-200">
-              <div className="text-sm text-slate-600">
-                Showing {startIndex + 1} to{" "}
-                {Math.min(startIndex + itemsPerPage, filteredProducts.length)}{" "}
-                of {filteredProducts.length} results
-              </div>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() =>
-                    setCurrentPage((prev) => Math.max(1, prev - 1))
-                  }
-                  disabled={currentPage === 1}
-                  className="p-2 rounded-lg border border-slate-300 hover:bg-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                >
-                  <ChevronLeft size={20} />
-                </button>
-                <div className="flex gap-1">
-                  {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                    (page) => (
-                      <button
-                        key={page}
-                        onClick={() => setCurrentPage(page)}
-                        className={`px-4 py-2 rounded-lg transition-colors ${
-                          currentPage === page
-                            ? "bg-blue-600 text-white"
-                            : "border border-slate-300 hover:bg-white"
-                        }`}
-                      >
-                        {page}
-                      </button>
-                    )
-                  )}
-                </div>
-                <button
-                  onClick={() =>
-                    setCurrentPage((prev) => Math.min(totalPages, prev + 1))
-                  }
-                  disabled={currentPage === totalPages}
-                  className="p-2 rounded-lg border border-slate-300 hover:bg-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                >
-                  <ChevronRight size={20} />
-                </button>
-              </div>
-            </div>
-          )}
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
+
+      {/* RIGHT DRAWER */}
+      {selectedProduct && (
+        <div className="fixed inset-0 z-50 flex justify-end">
+          <div
+            className="absolute inset-0 bg-slate-900/40"
+            onClick={() => setSelectedProduct(null)}
+          />
+          <div className="relative w-full max-w-lg bg-white h-full shadow-2xl flex flex-col">
+            <div className="p-6 border-b flex items-center justify-between bg-slate-50">
+              <div>
+                <h2 className="text-xl font-bold text-slate-900">
+                  {selectedProduct.item_name}
+                </h2>
+                <p className="text-sm text-slate-500">
+                  {selectedProduct.item_description}
+                </p>
+              </div>
+              <button
+                onClick={() => setSelectedProduct(null)}
+                className="p-2 hover:bg-slate-200 rounded-full"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-6 space-y-8">
+              <Section title="Classification">
+                <Field label="Client" value={selectedProduct.client} />
+                <Field label="SIN" value={selectedProduct.sin} />
+                <Field label="NSN" value={selectedProduct.nsn} />
+                <Field label="UPC" value={selectedProduct.upc} />
+                <Field label="UNSPSC" value={selectedProduct.unspsc} />
+              </Section>
+
+              <Section title="Pricing & Shipping">
+                <Field
+                  label="List Price"
+                  value={formatCurrency(selectedProduct.commercial_list_price)}
+                />
+                <Field label="UOM" value={selectedProduct.uom} />
+                <Field
+                  label="Qty Per Pack"
+                  value={selectedProduct.quantity_per_pack}
+                />
+                <Field
+                  label="Country of Origin"
+                  value={selectedProduct.country_of_origin}
+                />
+              </Section>
+
+              <Section title="Documents & Links">
+                <div className="col-span-2 space-y-2">
+                  {selectedProduct.product_url && (
+                    <a
+                      href={selectedProduct.product_url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="flex items-center gap-2 text-[#3399cc] hover:underline font-medium"
+                    >
+                      <ExternalLink size={14} /> View Product Website
+                    </a>
+                  )}
+                  {selectedProduct.url_508 && (
+                    <a
+                      rel="noreferrer"
+                      className="flex items-center gap-2 text-[#3399cc] hover:underline font-medium"
+                    >
+                      <ExternalLink size={14} /> 508 Compliance Document
+                    </a>
+                  )}
+                </div>
+              </Section>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function Section({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div>
+      <h3 className="text-sm font-semibold text-slate-900 mb-4">{title}</h3>
+      <div className="grid grid-cols-2 gap-4">{children}</div>
+    </div>
+  );
+}
+
+function Field({
+  label,
+  value,
+}: {
+  label: string;
+  value?: string | number | null;
+}) {
+  return (
+    <div>
+      <p className="text-xs text-slate-500">{label}</p>
+      <p className="font-medium text-slate-900">{value ?? "-"}</p>
     </div>
   );
 }

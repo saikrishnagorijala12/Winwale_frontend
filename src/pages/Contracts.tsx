@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 import api from "../lib/axios";
 
+// --- Types & Interfaces (Based on Backend Schema) ---
 
 interface ClientContractBase {
   contract_number: string;
@@ -43,8 +44,8 @@ interface ClientContractBase {
 }
 
 interface ClientContractRead extends ClientContractBase {
-  client_profile_id: number;
   client_id: number;
+  client: string;
   is_deleted: boolean;
   created_time: string;
   updated_time: string;
@@ -64,6 +65,13 @@ interface ClientListRead {
   company_name: string;
 }
 
+interface ContractFormErrors {
+  contract_number?: string;
+  client_id?: string;
+  origin_country?: string;
+  gsa_proposed_discount?: string;
+}
+
 const apiService = {
   async getAllContracts(): Promise<ClientContractRead[]> {
     const response = await api.get("/contracts");
@@ -77,7 +85,7 @@ const apiService = {
 
   async createContract(
     clientId: number,
-    data: Omit<ClientContractCreate, "client_id">,
+    data: Omit<ClientContractCreate, "client_id">
   ): Promise<ClientContractRead> {
     const response = await api.post(`/contracts/${clientId}`, data);
     return response.data;
@@ -85,7 +93,7 @@ const apiService = {
 
   async updateContract(
     clientId: number,
-    data: Partial<ClientContractBase>,
+    data: Partial<ClientContractBase>
   ): Promise<ClientContractRead> {
     const response = await api.put(`/contracts/${clientId}`, data);
     return response.data;
@@ -105,7 +113,8 @@ const clientApiService = {
 
 export default function ContractsPage() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedContract, setSelectedContract] = useState<ClientContractRead | null>(null);
+  const [selectedContract, setSelectedContract] =
+    useState<ClientContractRead | null>(null);
   const [contracts, setContracts] = useState<ClientContractRead[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -119,6 +128,8 @@ export default function ContractsPage() {
   const [clients, setClients] = useState<ClientListRead[]>([]);
   const [clientSearch, setClientSearch] = useState("");
   const [showClientDropdown, setShowClientDropdown] = useState(false);
+
+  const [contractErrors, setContractErrors] = useState<ContractFormErrors>({});
 
   const initialForm: ClientContractCreate = {
     client_id: 0,
@@ -138,8 +149,9 @@ export default function ContractsPage() {
     energy_star_compliance: "Yes",
     is_deleted: false,
   };
-  
-  const [newContract, setNewContract] = useState<ClientContractCreate>(initialForm);
+
+  const [newContract, setNewContract] =
+    useState<ClientContractCreate>(initialForm);
   const [editContract, setEditContract] = useState<ClientContractUpdate>({
     contract_number: "",
     contract_officer_name: "",
@@ -158,9 +170,44 @@ export default function ContractsPage() {
   });
   const [editingClientId, setEditingClientId] = useState<number | null>(null);
 
+  const hasFetchedRef = React.useRef(false);
+
+  const validateContractStep1 = (
+    data: any,
+    setErrors: (e: ContractFormErrors) => void
+  ) => {
+    const errors: ContractFormErrors = {};
+
+    if (!data.contract_number.trim()) {
+      errors.contract_number = "Contract number is required";
+    }
+
+    if (!data.client_id) {
+      errors.client_id = "Client is required";
+    }
+
+    setErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const RequiredLabel = ({ text }: { text: string }) => (
+    <label className="text-sm font-bold text-slate-700">
+      {text} <span className="text-red-500">*</span>
+    </label>
+  );
+
   useEffect(() => {
+    if (hasFetchedRef.current) return;
+    hasFetchedRef.current = true;
+
     fetchContracts();
   }, []);
+
+  useEffect(() => {
+    if (!showAddDialog) {
+      setContractErrors({});
+    }
+  }, [showAddDialog]);
 
   const fetchContracts = async () => {
     try {
@@ -185,20 +232,30 @@ export default function ContractsPage() {
     }
   };
 
+  const clientsWithContracts = useMemo(() => {
+    return new Set(contracts.map((c) => c.client_id));
+  }, [contracts]);
+
   const filteredClients = useMemo(() => {
+    const q = clientSearch.toLowerCase();
+
     return clients.filter(
       (c) =>
-        c.client_id.toString().includes(clientSearch) ||
-        c.company_name.toLowerCase().includes(clientSearch.toLowerCase()),
+        !clientsWithContracts.has(c.client_id) &&
+        (c.client_id.toString().includes(q) ||
+          c.company_name.toLowerCase().includes(q))
     );
-  }, [clients, clientSearch]);
+  }, [clients, clientSearch, clientsWithContracts]);
 
   const filteredContracts = useMemo(() => {
     return contracts.filter((c) => {
       if (c.is_deleted) return false;
       const matchesSearch =
         c.contract_number.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        c.contract_officer_name?.toLowerCase().includes(searchQuery.toLowerCase());
+        c.client_id
+          .toString()
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase());
       return matchesSearch;
     });
   }, [contracts, searchQuery]);
@@ -222,15 +279,20 @@ export default function ContractsPage() {
 
     try {
       const { client_id, ...payload } = newContract;
-      const createdContract = await apiService.createContract(client_id, payload);
+      const createdContract = await apiService.createContract(
+        client_id,
+        payload
+      );
       setContracts((prev) => [createdContract, ...prev]);
       setShowAddDialog(false);
       setAddStep(1);
       setClientSearch("");
       setNewContract(initialForm);
-      await fetchClients();
     } catch (err: any) {
-      if (err?.response?.status === 409 || err?.message?.includes("already exists")) {
+      if (
+        err?.response?.status === 409 ||
+        err?.message?.includes("already exists")
+      ) {
         setError("Contract already exists for this client");
       } else {
         setError("Failed to create contract");
@@ -258,7 +320,10 @@ export default function ContractsPage() {
     setError(null);
 
     try {
-      const updatedContract = await apiService.updateContract(editingClientId, editContract);
+      const updatedContract = await apiService.updateContract(
+        editingClientId,
+        editContract
+      );
       setContracts((prev) =>
         prev.map((c) => (c.client_id === editingClientId ? updatedContract : c))
       );
@@ -279,10 +344,14 @@ export default function ContractsPage() {
     try {
       await apiService.deleteContract(clientId);
       setContracts((prev) =>
-        prev.map((c) => (c.client_id === clientId ? { ...c, is_deleted: true } : c))
+        prev.map((c) =>
+          c.client_id === clientId ? { ...c, is_deleted: true } : c
+        )
       );
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to delete contract");
+      setError(
+        err instanceof Error ? err.message : "Failed to delete contract"
+      );
       console.error("Error deleting contract:", err);
     }
   };
@@ -319,7 +388,6 @@ export default function ContractsPage() {
     );
   };
 
-
   return (
     <div className="min-h-screen bg-linear-to-br from-slate-50 via-blue-50/30 to-slate-50 p-8">
       {error && (
@@ -328,7 +396,10 @@ export default function ContractsPage() {
           <div className="flex-1">
             <p className="text-sm font-semibold text-red-800">{error}</p>
           </div>
-          <button onClick={() => setError(null)} className="text-red-400 hover:text-red-600">
+          <button
+            onClick={() => setError(null)}
+            className="text-red-400 hover:text-red-600"
+          >
             <X className="w-4 h-4" />
           </button>
         </div>
@@ -336,7 +407,9 @@ export default function ContractsPage() {
 
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-12 mx-auto">
         <div>
-          <h1 className="text-4xl font-extrabold tracking-tight text-[#1E293B]">Contracts</h1>
+          <h1 className="text-4xl font-extrabold tracking-tight text-[#1E293B]">
+            Contracts
+          </h1>
           <p className="text-slate-500 font-medium mt-1">
             Manage your GSA contract profiles and logistics information
           </p>
@@ -371,11 +444,16 @@ export default function ContractsPage() {
         <table className="w-full">
           <thead className="border-b-2 border-slate-200">
             <tr>
-              <th className="text-left p-5 font-bold text-slate-700">Contract</th>
+              <th className="text-left p-5 font-bold text-slate-700">
+                Contract
+              </th>
               <th className="text-left p-5 font-bold text-slate-700">Client</th>
-              <th className="text-left p-5 font-bold text-slate-700">Officer</th>
-              <th className="text-left p-5 font-bold text-slate-700">Location</th>
-              <th className="text-left p-5 font-bold text-slate-700">Last Modified</th>
+              <th className="text-left p-5 font-bold text-slate-700">
+                Contracting Officer
+              </th>
+              <th className="text-left p-5 font-bold text-slate-700">
+                Last Modified
+              </th>
               <th className="w-16"></th>
             </tr>
           </thead>
@@ -395,7 +473,7 @@ export default function ContractsPage() {
             ) : (
               filteredContracts.map((contract) => (
                 <tr
-                  key={contract.client_profile_id}
+                  key={contract.client_id}
                   onClick={() => setSelectedContract(contract)}
                   className="border-b border-slate-100 hover:bg-blue-50/50 cursor-pointer transition-colors"
                 >
@@ -408,26 +486,38 @@ export default function ContractsPage() {
                         <span className="font-semibold text-slate-800 block">
                           {contract.contract_number}
                         </span>
-                        <span className="text-xs text-slate-400">ID: {contract.client_id}</span>
                       </div>
                     </div>
                   </td>
-                  <td>{contract.client_id}</td>
                   <td className="p-5 text-slate-600 font-medium">
-                    {contract.contract_officer_name || "—"}
+                    {contract.client || "—"}
                   </td>
-                  <td className="p-5 text-slate-600 text-sm">
-                    {contract.contract_officer_city && contract.contract_officer_state
-                      ? `${contract.contract_officer_city}, ${contract.contract_officer_state}`
-                      : "—"}
+                  <td className="p-5">
+                    <div className="flex flex-col gap-1">
+                      {/* Contract Officer */}
+                      <span className="text-slate-600 text-sm">
+                        {contract.contract_officer_name || "—"}
+                      </span>
+
+                      {/* Location */}
+                      <span className="text-slate-500 text-xs">
+                        {contract.contract_officer_city &&
+                        contract.contract_officer_state
+                          ? `${contract.contract_officer_city}, ${contract.contract_officer_state}`
+                          : "—"}
+                      </span>
+                    </div>
                   </td>
-                  
+
                   <td className="p-5 text-slate-600">
-                    {new Date(contract.updated_time).toLocaleDateString("en-US", {
-                      month: "long",
-                      day: "2-digit",
-                      year: "numeric",
-                    })}
+                    {new Date(contract.updated_time).toLocaleDateString(
+                      "en-US",
+                      {
+                        month: "long",
+                        day: "2-digit",
+                        year: "numeric",
+                      }
+                    )}
                   </td>
 
                   <td className="p-5 relative">
@@ -435,7 +525,9 @@ export default function ContractsPage() {
                       onClick={(e) => {
                         e.stopPropagation();
                         setOpenContractId(
-                          openContractId === contract.client_id ? null : contract.client_id
+                          openContractId === contract.client_id
+                            ? null
+                            : contract.client_id
                         );
                       }}
                       className="p-2 hover:bg-slate-200 rounded-lg transition-colors"
@@ -500,7 +592,10 @@ export default function ContractsPage() {
 
       {selectedContract && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0" onClick={() => setSelectedContract(null)} />
+          <div
+            className="absolute inset-0"
+            onClick={() => setSelectedContract(null)}
+          />
 
           <div className="relative bg-white rounded-3xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
             <div className="sticky top-0 bg-linear-to-br from-[#38A1DB] to-[#2D8BBF] px-8 py-6 rounded-t-3xl z-10">
@@ -536,7 +631,9 @@ export default function ContractsPage() {
               <div className="bg-linear-to-br from-slate-50 to-white p-6 rounded-2xl border border-slate-200">
                 <div className="flex items-center gap-3 mb-6">
                   <User className="w-6 h-6 text-[#38A1DB]" />
-                  <h3 className="text-xl font-bold text-slate-800">Contract Officer</h3>
+                  <h3 className="text-xl font-bold text-slate-800">
+                    Contract Officer
+                  </h3>
                 </div>
                 <div className="space-y-4">
                   <div>
@@ -549,11 +646,11 @@ export default function ContractsPage() {
                   </div>
                   <ContactRow
                     icon={MapPin}
-                    value={`${selectedContract.contract_officer_address || ""}, ${
-                      selectedContract.contract_officer_city || ""
-                    }, ${selectedContract.contract_officer_state || ""} ${
-                      selectedContract.contract_officer_zip || ""
-                    }`
+                    value={`${
+                      selectedContract.contract_officer_address || ""
+                    }, ${selectedContract.contract_officer_city || ""}, ${
+                      selectedContract.contract_officer_state || ""
+                    } ${selectedContract.contract_officer_zip || ""}`
                       .trim()
                       .replace(/^,\s*/, "")}
                   />
@@ -563,14 +660,18 @@ export default function ContractsPage() {
               <div className="bg-linear-to-br from-blue-50 to-white p-6 rounded-2xl border border-blue-200">
                 <div className="flex items-center gap-3 mb-6">
                   <Settings className="w-6 h-6 text-[#38A1DB]" />
-                  <h3 className="text-xl font-bold text-slate-800">Terms & Logistics</h3>
+                  <h3 className="text-xl font-bold text-slate-800">
+                    Terms & Logistics
+                  </h3>
                 </div>
                 <div className="space-y-4">
                   <div className="flex justify-between items-center border-b border-blue-100 pb-2">
                     <span className="text-sm text-slate-500 font-medium uppercase tracking-tight">
                       FOB Term
                     </span>
-                    <span className="font-bold text-slate-800">{selectedContract.fob_term}</span>
+                    <span className="font-bold text-slate-800">
+                      {selectedContract.fob_term}
+                    </span>
                   </div>
                   <div className="flex justify-between items-center border-b border-blue-100 pb-2">
                     <span className="text-sm text-slate-500 font-medium uppercase tracking-tight">
@@ -621,7 +722,9 @@ export default function ContractsPage() {
               <div className="md:col-span-2 bg-slate-50 p-6 rounded-2xl border border-slate-200">
                 <div className="flex items-center gap-3 mb-4">
                   <Info className="w-6 h-6 text-slate-400" />
-                  <h3 className="text-xl font-bold text-slate-800">Additional Terms</h3>
+                  <h3 className="text-xl font-bold text-slate-800">
+                    Additional Terms
+                  </h3>
                 </div>
                 <div className="grid md:grid-cols-2 gap-8">
                   <div>
@@ -629,7 +732,8 @@ export default function ContractsPage() {
                       Additional Concessions
                     </label>
                     <p className="text-slate-700 mt-2 text-sm leading-relaxed">
-                      {selectedContract.additional_concessions || "None specified"}
+                      {selectedContract.additional_concessions ||
+                        "None specified"}
                     </p>
                   </div>
                   <div>
@@ -700,41 +804,81 @@ export default function ContractsPage() {
                     <div className="flex items-center gap-3">
                       <div
                         className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ${
-                          active ? "bg-[#38A1DB] text-white" : "bg-slate-200 text-slate-400"
+                          active
+                            ? "bg-[#38A1DB] text-white"
+                            : "bg-slate-200 text-slate-400"
                         }`}
                       >
-                        {completed ? <CheckCircle2 className="w-6 h-6" /> : stepNum}
+                        {completed ? (
+                          <CheckCircle2 className="w-6 h-6" />
+                        ) : (
+                          stepNum
+                        )}
                       </div>
-                      <span className={`font-semibold ${active ? "text-[#38A1DB]" : "text-slate-400"}`}>
+                      <span
+                        className={`font-semibold ${
+                          active ? "text-[#38A1DB]" : "text-slate-400"
+                        }`}
+                      >
                         {label}
                       </span>
                     </div>
                     {i < 1 && (
-                      <div className={`w-16 h-1 rounded-full ${completed ? "bg-[#38A1DB]" : "bg-slate-200"}`} />
+                      <div
+                        className={`w-16 h-1 rounded-full ${
+                          completed ? "bg-[#38A1DB]" : "bg-slate-200"
+                        }`}
+                      />
                     )}
                   </div>
                 );
               })}
             </div>
 
-            <form onSubmit={handleAddContract} noValidate className="flex-1 overflow-y-auto">
+            <form
+              onSubmit={handleAddContract}
+              noValidate
+              className="flex-1 overflow-y-auto"
+            >
               <div className="py-4 px-8 space-y-6">
                 {addStep === 1 && (
                   <div className="grid md:grid-cols-2 gap-6">
                     <div className="md:col-span-2">
-                      <label className="text-sm font-bold text-slate-700">Contract Number *</label>
+                      <RequiredLabel text="Contract Number" />
                       <input
                         type="text"
-                        className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] outline-none"
                         value={newContract.contract_number}
-                        onChange={(e) =>
-                          setNewContract({ ...newContract, contract_number: e.target.value })
-                        }
+                        onChange={(e) => {
+                          setNewContract({
+                            ...newContract,
+                            contract_number: e.target.value,
+                          });
+                          setContractErrors((prev) => ({
+                            ...prev,
+                            contract_number: undefined,
+                          }));
+                        }}
+                        className={`w-full mt-2 px-4 py-3 rounded-xl border-2 outline-none
+                          ${
+                            contractErrors.contract_number
+                              ? "border-red-500 focus:border-red-500"
+                              : "border-slate-200 focus:border-[#38A1DB]"
+                          }
+                        `}
                       />
+                      {contractErrors.contract_number && (
+                        <p className="text-xs text-red-500 mt-1">
+                          {contractErrors.contract_number}
+                        </p>
+                      )}
                     </div>
 
                     <div className="md:col-span-2 relative">
-                      <label className="text-sm font-bold text-slate-700">Client *</label>
+                      <RequiredLabel text="Client (No Contract)" />
+                      <p className="text-xs text-slate-500 mt-1">
+                        Only clients without an existing contract are shown
+                      </p>
+
                       <input
                         type="text"
                         placeholder="Search by Client ID or Company Name"
@@ -748,13 +892,18 @@ export default function ContractsPage() {
                       />
 
                       {showClientDropdown && (
-                        <div className="fixed inset-0 z-40" onClick={() => setShowClientDropdown(false)} />
+                        <div
+                          className="fixed inset-0 z-40"
+                          onClick={() => setShowClientDropdown(false)}
+                        />
                       )}
 
                       {showClientDropdown && (
                         <div className="absolute z-50 mt-2 w-full max-h-60 overflow-y-auto bg-white border border-slate-200 rounded-xl shadow-lg">
                           {filteredClients.length === 0 ? (
-                            <div className="px-4 py-3 text-slate-500 text-sm">No clients found</div>
+                            <div className="px-4 py-3 text-slate-500 text-sm">
+                              No clients found
+                            </div>
                           ) : (
                             filteredClients.map((client) => (
                               <button
@@ -762,73 +911,116 @@ export default function ContractsPage() {
                                 type="button"
                                 className="w-full px-4 py-3 text-left hover:bg-blue-50 flex justify-between items-center"
                                 onClick={() => {
-                                  setNewContract({ ...newContract, client_id: client.client_id });
-                                  setClientSearch(`${client.client_id} - ${client.company_name}`);
+                                  setNewContract({
+                                    ...newContract,
+                                    client_id: client.client_id,
+                                  });
+                                  setClientSearch(
+                                    `${client.client_id} - ${client.company_name}`
+                                  );
                                   setShowClientDropdown(false);
+                                  setContractErrors((prev) => ({
+                                    ...prev,
+                                    client_id: undefined,
+                                  }));
                                 }}
                               >
-                                <span className="font-semibold text-slate-700">{client.company_name}</span>
-                                <span className="text-xs text-slate-400">ID: {client.client_id}</span>
+                                <span className="font-semibold text-slate-700">
+                                  {client.company_name}
+                                </span>
+                                <span className="text-xs text-slate-400">
+                                  ID: {client.client_id}
+                                </span>
                               </button>
                             ))
+                          )}
+                          {contractErrors.client_id && (
+                            <p className="text-xs text-red-500 mt-1">
+                              {contractErrors.client_id}
+                            </p>
                           )}
                         </div>
                       )}
                     </div>
 
                     <div>
-                      <label className="text-sm font-bold text-slate-700">Officer Name</label>
+                      <label className="text-sm font-bold text-slate-700">
+                        Officer Name
+                      </label>
                       <input
                         type="text"
                         className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] outline-none"
                         value={newContract.contract_officer_name}
                         onChange={(e) =>
-                          setNewContract({ ...newContract, contract_officer_name: e.target.value })
+                          setNewContract({
+                            ...newContract,
+                            contract_officer_name: e.target.value,
+                          })
                         }
                       />
                     </div>
                     <div>
-                      <label className="text-sm font-bold text-slate-700">Officer Address</label>
+                      <label className="text-sm font-bold text-slate-700">
+                        Officer Address
+                      </label>
                       <input
                         type="text"
                         className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] outline-none"
                         value={newContract.contract_officer_address}
                         onChange={(e) =>
-                          setNewContract({ ...newContract, contract_officer_address: e.target.value })
+                          setNewContract({
+                            ...newContract,
+                            contract_officer_address: e.target.value,
+                          })
                         }
                       />
                     </div>
                     <div>
-                      <label className="text-sm font-bold text-slate-700">City</label>
+                      <label className="text-sm font-bold text-slate-700">
+                        City
+                      </label>
                       <input
                         type="text"
                         className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] outline-none"
                         value={newContract.contract_officer_city}
                         onChange={(e) =>
-                          setNewContract({ ...newContract, contract_officer_city: e.target.value })
+                          setNewContract({
+                            ...newContract,
+                            contract_officer_city: e.target.value,
+                          })
                         }
                       />
                     </div>
                     <div className="grid grid-cols-2 gap-2">
                       <div>
-                        <label className="text-sm font-bold text-slate-700">State</label>
+                        <label className="text-sm font-bold text-slate-700">
+                          State
+                        </label>
                         <input
                           type="text"
                           className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] outline-none"
                           value={newContract.contract_officer_state}
                           onChange={(e) =>
-                            setNewContract({ ...newContract, contract_officer_state: e.target.value })
+                            setNewContract({
+                              ...newContract,
+                              contract_officer_state: e.target.value,
+                            })
                           }
                         />
                       </div>
                       <div>
-                        <label className="text-sm font-bold text-slate-700">ZIP</label>
+                        <label className="text-sm font-bold text-slate-700">
+                          ZIP
+                        </label>
                         <input
                           type="text"
                           className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] outline-none"
                           value={newContract.contract_officer_zip}
                           onChange={(e) =>
-                            setNewContract({ ...newContract, contract_officer_zip: e.target.value })
+                            setNewContract({
+                              ...newContract,
+                              contract_officer_zip: e.target.value,
+                            })
                           }
                         />
                       </div>
@@ -839,46 +1031,68 @@ export default function ContractsPage() {
                 {addStep === 2 && (
                   <div className="grid md:grid-cols-2 gap-6">
                     <div>
-                      <label className="text-sm font-bold text-slate-700">Origin Country</label>
+                      <label className="text-sm font-bold text-slate-700">
+                        Origin Country
+                      </label>
                       <input
                         type="text"
                         className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] outline-none"
                         value={newContract.origin_country}
                         onChange={(e) =>
-                          setNewContract({ ...newContract, origin_country: e.target.value })
+                          setNewContract({
+                            ...newContract,
+                            origin_country: e.target.value,
+                          })
                         }
                       />
                     </div>
                     <div>
-                      <label className="text-sm font-bold text-slate-700">FOB Term</label>
+                      <label className="text-sm font-bold text-slate-700">
+                        FOB Term
+                      </label>
                       <select
                         className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] outline-none bg-white"
                         value={newContract.fob_term}
-                        onChange={(e) => setNewContract({ ...newContract, fob_term: e.target.value })}
+                        onChange={(e) =>
+                          setNewContract({
+                            ...newContract,
+                            fob_term: e.target.value,
+                          })
+                        }
                       >
                         <option value="Origin">Origin</option>
                         <option value="Destination">Destination</option>
                       </select>
                     </div>
                     <div>
-                      <label className="text-sm font-bold text-slate-700">GSA Proposed Discount (%)</label>
+                      <label className="text-sm font-bold text-slate-700">
+                        GSA Proposed Discount (%)
+                      </label>
                       <input
                         type="number"
                         step="0.01"
                         className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] outline-none"
                         value={newContract.gsa_proposed_discount}
                         onChange={(e) =>
-                          setNewContract({ ...newContract, gsa_proposed_discount: parseFloat(e.target.value) })
+                          setNewContract({
+                            ...newContract,
+                            gsa_proposed_discount: parseFloat(e.target.value),
+                          })
                         }
                       />
                     </div>
                     <div>
-                      <label className="text-sm font-bold text-slate-700">Energy Star Compliance</label>
+                      <label className="text-sm font-bold text-slate-700">
+                        Energy Star Compliance
+                      </label>
                       <select
                         className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] outline-none bg-white"
                         value={newContract.energy_star_compliance}
                         onChange={(e) =>
-                          setNewContract({ ...newContract, energy_star_compliance: e.target.value })
+                          setNewContract({
+                            ...newContract,
+                            energy_star_compliance: e.target.value,
+                          })
                         }
                       >
                         <option value="Yes">Yes</option>
@@ -887,44 +1101,66 @@ export default function ContractsPage() {
                       </select>
                     </div>
                     <div>
-                      <label className="text-sm font-bold text-slate-700">Normal Delivery (Days)</label>
+                      <label className="text-sm font-bold text-slate-700">
+                        Normal Delivery (Days)
+                      </label>
                       <input
                         type="number"
                         className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] outline-none"
                         value={newContract.normal_delivery_time}
                         onChange={(e) =>
-                          setNewContract({ ...newContract, normal_delivery_time: parseInt(e.target.value) })
+                          setNewContract({
+                            ...newContract,
+                            normal_delivery_time: parseInt(e.target.value),
+                          })
                         }
                       />
                     </div>
                     <div>
-                      <label className="text-sm font-bold text-slate-700">Expedited Delivery (Days)</label>
+                      <label className="text-sm font-bold text-slate-700">
+                        Expedited Delivery (Days)
+                      </label>
                       <input
                         type="number"
                         className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] outline-none"
                         value={newContract.expedited_delivery_time}
                         onChange={(e) =>
-                          setNewContract({ ...newContract, expedited_delivery_time: parseInt(e.target.value) })
+                          setNewContract({
+                            ...newContract,
+                            expedited_delivery_time: parseInt(e.target.value),
+                          })
                         }
                       />
                     </div>
                     <div className="md:col-span-2">
-                      <label className="text-sm font-bold text-slate-700">Quantity/Volume Discounts</label>
+                      <label className="text-sm font-bold text-slate-700">
+                        Quantity/Volume Discounts
+                      </label>
                       <textarea
                         rows={2}
                         className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] outline-none resize-none"
                         value={newContract.q_v_discount}
-                        onChange={(e) => setNewContract({ ...newContract, q_v_discount: e.target.value })}
+                        onChange={(e) =>
+                          setNewContract({
+                            ...newContract,
+                            q_v_discount: e.target.value,
+                          })
+                        }
                       />
                     </div>
                     <div className="md:col-span-2">
-                      <label className="text-sm font-bold text-slate-700">Additional Concessions</label>
+                      <label className="text-sm font-bold text-slate-700">
+                        Additional Concessions
+                      </label>
                       <textarea
                         rows={2}
                         className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] outline-none resize-none"
                         value={newContract.additional_concessions}
                         onChange={(e) =>
-                          setNewContract({ ...newContract, additional_concessions: e.target.value })
+                          setNewContract({
+                            ...newContract,
+                            additional_concessions: e.target.value,
+                          })
                         }
                       />
                     </div>
@@ -956,15 +1192,12 @@ export default function ContractsPage() {
                     onClick={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
-                      if (!newContract.contract_number.trim()) {
-                        setError("Contract number is required");
+                      if (
+                        !validateContractStep1(newContract, setContractErrors)
+                      ) {
                         return;
                       }
-                      if (!newContract.client_id) {
-                        setError("Please select a client");
-                        return;
-                      }
-                      setError(null);
+
                       setAddStep(2);
                     }}
                     className="px-8 py-3 rounded-xl bg-[#38A1DB] text-white font-bold hover:bg-[#2D8BBF]"
@@ -977,7 +1210,9 @@ export default function ContractsPage() {
                     disabled={isSubmitting}
                     className="px-8 py-3 rounded-xl bg-[#38A1DB] text-white font-bold hover:bg-[#2D8BBF] shadow-lg shadow-blue-200 flex items-center gap-2 disabled:opacity-50"
                   >
-                    {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : null}
+                    {isSubmitting ? (
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                    ) : null}
                     {isSubmitting ? "Saving..." : "Create Contract Profile"}
                   </button>
                 )}
@@ -1019,91 +1254,139 @@ export default function ContractsPage() {
                     <div className="flex items-center gap-3">
                       <div
                         className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ${
-                          active ? "bg-[#38A1DB] text-white" : "bg-slate-200 text-slate-400"
+                          active
+                            ? "bg-[#38A1DB] text-white"
+                            : "bg-slate-200 text-slate-400"
                         }`}
                       >
-                        {completed ? <CheckCircle2 className="w-6 h-6" /> : stepNum}
+                        {completed ? (
+                          <CheckCircle2 className="w-6 h-6" />
+                        ) : (
+                          stepNum
+                        )}
                       </div>
-                      <span className={`font-semibold ${active ? "text-[#38A1DB]" : "text-slate-400"}`}>
+                      <span
+                        className={`font-semibold ${
+                          active ? "text-[#38A1DB]" : "text-slate-400"
+                        }`}
+                      >
                         {label}
                       </span>
                     </div>
                     {i < 1 && (
-                      <div className={`w-16 h-1 rounded-full ${completed ? "bg-[#38A1DB]" : "bg-slate-200"}`} />
+                      <div
+                        className={`w-16 h-1 rounded-full ${
+                          completed ? "bg-[#38A1DB]" : "bg-slate-200"
+                        }`}
+                      />
                     )}
                   </div>
                 );
               })}
             </div>
 
-            <form onSubmit={handleEditContract} noValidate className="flex-1 overflow-y-auto">
+            <form
+              onSubmit={handleEditContract}
+              noValidate
+              className="flex-1 overflow-y-auto"
+            >
               <div className="py-4 px-8 space-y-6">
                 {editStep === 1 && (
                   <div className="grid md:grid-cols-2 gap-6">
                     <div className="md:col-span-2">
-                      <label className="text-sm font-bold text-slate-700">Contract Number *</label>
+                      <label className="text-sm font-bold text-slate-700">
+                        Contract Number *
+                      </label>
                       <input
                         type="text"
                         className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] outline-none"
                         value={editContract.contract_number}
                         onChange={(e) =>
-                          setEditContract({ ...editContract, contract_number: e.target.value })
+                          setEditContract({
+                            ...editContract,
+                            contract_number: e.target.value,
+                          })
                         }
                       />
                     </div>
                     <div>
-                      <label className="text-sm font-bold text-slate-700">Officer Name</label>
+                      <label className="text-sm font-bold text-slate-700">
+                        Officer Name
+                      </label>
                       <input
                         type="text"
                         className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] outline-none"
                         value={editContract.contract_officer_name}
                         onChange={(e) =>
-                          setEditContract({ ...editContract, contract_officer_name: e.target.value })
+                          setEditContract({
+                            ...editContract,
+                            contract_officer_name: e.target.value,
+                          })
                         }
                       />
                     </div>
                     <div>
-                      <label className="text-sm font-bold text-slate-700">Officer Address</label>
+                      <label className="text-sm font-bold text-slate-700">
+                        Officer Address
+                      </label>
                       <input
                         type="text"
                         className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] outline-none"
                         value={editContract.contract_officer_address}
                         onChange={(e) =>
-                          setEditContract({ ...editContract, contract_officer_address: e.target.value })
+                          setEditContract({
+                            ...editContract,
+                            contract_officer_address: e.target.value,
+                          })
                         }
                       />
                     </div>
                     <div>
-                      <label className="text-sm font-bold text-slate-700">City</label>
+                      <label className="text-sm font-bold text-slate-700">
+                        City
+                      </label>
                       <input
                         type="text"
                         className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] outline-none"
                         value={editContract.contract_officer_city}
                         onChange={(e) =>
-                          setEditContract({ ...editContract, contract_officer_city: e.target.value })
+                          setEditContract({
+                            ...editContract,
+                            contract_officer_city: e.target.value,
+                          })
                         }
                       />
                     </div>
                     <div className="grid grid-cols-2 gap-2">
                       <div>
-                        <label className="text-sm font-bold text-slate-700">State</label>
+                        <label className="text-sm font-bold text-slate-700">
+                          State
+                        </label>
                         <input
                           type="text"
                           className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] outline-none"
                           value={editContract.contract_officer_state}
                           onChange={(e) =>
-                            setEditContract({ ...editContract, contract_officer_state: e.target.value })
+                            setEditContract({
+                              ...editContract,
+                              contract_officer_state: e.target.value,
+                            })
                           }
                         />
                       </div>
                       <div>
-                        <label className="text-sm font-bold text-slate-700">ZIP</label>
+                        <label className="text-sm font-bold text-slate-700">
+                          ZIP
+                        </label>
                         <input
                           type="text"
                           className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] outline-none"
                           value={editContract.contract_officer_zip}
                           onChange={(e) =>
-                            setEditContract({ ...editContract, contract_officer_zip: e.target.value })
+                            setEditContract({
+                              ...editContract,
+                              contract_officer_zip: e.target.value,
+                            })
                           }
                         />
                       </div>
@@ -1114,46 +1397,68 @@ export default function ContractsPage() {
                 {editStep === 2 && (
                   <div className="grid md:grid-cols-2 gap-6">
                     <div>
-                      <label className="text-sm font-bold text-slate-700">Origin Country</label>
+                      <label className="text-sm font-bold text-slate-700">
+                        Origin Country
+                      </label>
                       <input
                         type="text"
                         className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] outline-none"
                         value={editContract.origin_country}
                         onChange={(e) =>
-                          setEditContract({ ...editContract, origin_country: e.target.value })
+                          setEditContract({
+                            ...editContract,
+                            origin_country: e.target.value,
+                          })
                         }
                       />
                     </div>
                     <div>
-                      <label className="text-sm font-bold text-slate-700">FOB Term</label>
+                      <label className="text-sm font-bold text-slate-700">
+                        FOB Term
+                      </label>
                       <select
                         className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] outline-none bg-white"
                         value={editContract.fob_term}
-                        onChange={(e) => setEditContract({ ...editContract, fob_term: e.target.value })}
+                        onChange={(e) =>
+                          setEditContract({
+                            ...editContract,
+                            fob_term: e.target.value,
+                          })
+                        }
                       >
                         <option value="Origin">Origin</option>
                         <option value="Destination">Destination</option>
                       </select>
                     </div>
                     <div>
-                      <label className="text-sm font-bold text-slate-700">GSA Proposed Discount (%)</label>
+                      <label className="text-sm font-bold text-slate-700">
+                        GSA Proposed Discount (%)
+                      </label>
                       <input
                         type="number"
                         step="0.01"
                         className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] outline-none"
                         value={editContract.gsa_proposed_discount}
                         onChange={(e) =>
-                          setEditContract({ ...editContract, gsa_proposed_discount: parseFloat(e.target.value) })
+                          setEditContract({
+                            ...editContract,
+                            gsa_proposed_discount: parseFloat(e.target.value),
+                          })
                         }
                       />
                     </div>
                     <div>
-                      <label className="text-sm font-bold text-slate-700">Energy Star Compliance</label>
+                      <label className="text-sm font-bold text-slate-700">
+                        Energy Star Compliance
+                      </label>
                       <select
                         className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] outline-none bg-white"
                         value={editContract.energy_star_compliance}
                         onChange={(e) =>
-                          setEditContract({ ...editContract, energy_star_compliance: e.target.value })
+                          setEditContract({
+                            ...editContract,
+                            energy_star_compliance: e.target.value,
+                          })
                         }
                       >
                         <option value="Yes">Yes</option>
@@ -1162,44 +1467,66 @@ export default function ContractsPage() {
                       </select>
                     </div>
                     <div>
-                      <label className="text-sm font-bold text-slate-700">Normal Delivery (Days)</label>
+                      <label className="text-sm font-bold text-slate-700">
+                        Normal Delivery (Days)
+                      </label>
                       <input
                         type="number"
                         className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] outline-none"
                         value={editContract.normal_delivery_time}
                         onChange={(e) =>
-                          setEditContract({ ...editContract, normal_delivery_time: parseInt(e.target.value) })
+                          setEditContract({
+                            ...editContract,
+                            normal_delivery_time: parseInt(e.target.value),
+                          })
                         }
                       />
                     </div>
                     <div>
-                      <label className="text-sm font-bold text-slate-700">Expedited Delivery (Days)</label>
+                      <label className="text-sm font-bold text-slate-700">
+                        Expedited Delivery (Days)
+                      </label>
                       <input
                         type="number"
                         className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] outline-none"
                         value={editContract.expedited_delivery_time}
                         onChange={(e) =>
-                          setEditContract({ ...editContract, expedited_delivery_time: parseInt(e.target.value) })
+                          setEditContract({
+                            ...editContract,
+                            expedited_delivery_time: parseInt(e.target.value),
+                          })
                         }
                       />
                     </div>
                     <div className="md:col-span-2">
-                      <label className="text-sm font-bold text-slate-700">Quantity/Volume Discounts</label>
+                      <label className="text-sm font-bold text-slate-700">
+                        Quantity/Volume Discounts
+                      </label>
                       <textarea
                         rows={2}
                         className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] outline-none resize-none"
                         value={editContract.q_v_discount}
-                        onChange={(e) => setEditContract({ ...editContract, q_v_discount: e.target.value })}
+                        onChange={(e) =>
+                          setEditContract({
+                            ...editContract,
+                            q_v_discount: e.target.value,
+                          })
+                        }
                       />
                     </div>
                     <div className="md:col-span-2">
-                      <label className="text-sm font-bold text-slate-700">Additional Concessions</label>
+                      <label className="text-sm font-bold text-slate-700">
+                        Additional Concessions
+                      </label>
                       <textarea
                         rows={2}
                         className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] outline-none resize-none"
                         value={editContract.additional_concessions}
                         onChange={(e) =>
-                          setEditContract({ ...editContract, additional_concessions: e.target.value })
+                          setEditContract({
+                            ...editContract,
+                            additional_concessions: e.target.value,
+                          })
                         }
                       />
                     </div>
@@ -1247,7 +1574,9 @@ export default function ContractsPage() {
                     disabled={isSubmitting}
                     className="px-8 py-3 rounded-xl bg-[#38A1DB] text-white font-bold hover:bg-[#2D8BBF] shadow-lg shadow-blue-200 flex items-center gap-2 disabled:opacity-50"
                   >
-                    {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : null}
+                    {isSubmitting ? (
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                    ) : null}
                     {isSubmitting ? "Updating..." : "Update Contract"}
                   </button>
                 )}

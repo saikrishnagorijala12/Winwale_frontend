@@ -102,11 +102,11 @@ export const ClientDetailsModal: React.FC<ClientDetailsModalProps> = ({ client, 
           >
             Dismiss
           </button>
-          <button
+          {/* <button
             className="px-6 py-2.5 rounded-xl font-bold bg-[#38A1DB] text-white shadow-md shadow-blue-200 hover:bg-[#2D8BBF] transition-all active:scale-95 text-sm"
           >
             Edit Client
-          </button>
+          </button> */}
         </div>
       </div>
     </div>
