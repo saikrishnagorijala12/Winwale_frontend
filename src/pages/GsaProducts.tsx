@@ -14,7 +14,7 @@ import api from "../lib/axios";
 
 interface Product {
   product_id: number;
-  client: string;
+  client_name: string;
   item_type: string;
   item_name: string;
   item_description?: string;
@@ -227,7 +227,7 @@ export default function ProductsPage() {
                     )}
                   </td>
                   <td className="px-6 py-4 text-sm text-slate-700">
-                    {product.client}
+                    {product.client_name}
                   </td>
                   <td className="px-6 py-4 text-sm text-slate-700">
                     {product.manufacturer}
@@ -275,7 +275,7 @@ export default function ProductsPage() {
 
             <div className="flex-1 overflow-y-auto p-6 space-y-8">
               <Section title="Classification">
-                <Field label="Client" value={selectedProduct.client} />
+                <Field label="Client" value={selectedProduct.client_name} />
                 <Field label="SIN" value={selectedProduct.sin} />
                 <Field label="NSN" value={selectedProduct.nsn} />
                 <Field label="UPC" value={selectedProduct.upc} />

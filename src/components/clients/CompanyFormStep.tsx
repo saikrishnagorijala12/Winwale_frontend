@@ -1,4 +1,3 @@
-// components/clients/CompanyFormStep.tsx
 import React from 'react';
 import { ClientFormData, ClientFormErrors, EditingClient } from '../../types/client.types';
 

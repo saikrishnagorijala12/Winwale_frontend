@@ -342,7 +342,7 @@ const ClientActivation = () => {
                   <td className="px-4 py-5">
                     <div className="flex items-center gap-2 text-sm text-slate-400 font-medium">
                       <Calendar className="w-4 h-4" />
-                      {new Date(client.created_time).toLocaleDateString()}
+                      {new Date(client.created_time).toLocaleDateString("en-US")}
                     </div>
                   </td>
                   <td className="px-4 py-5">

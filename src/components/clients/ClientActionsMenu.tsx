@@ -66,7 +66,6 @@
 //     </>
 //   );
 // };
-// components/clients/ClientActionsMenu.tsx
 import React from "react";
 import { Eye, Edit, File, Trash2, Package } from "lucide-react";
 import { Client } from "../../types/client.types";

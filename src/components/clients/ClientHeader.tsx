@@ -1,4 +1,3 @@
-// components/clients/ClientHeader.tsx
 import React from 'react';
 import { Plus } from 'lucide-react';
 

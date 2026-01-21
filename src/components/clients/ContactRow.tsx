@@ -1,4 +1,3 @@
-// components/clients/ContactRow.tsx
 import React from 'react';
 import { LucideIcon } from 'lucide-react';
 

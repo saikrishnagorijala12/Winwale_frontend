@@ -1,4 +1,3 @@
-// components/clients/ClientFormModal.tsx
 import React from 'react';
 import { X } from 'lucide-react';
 import { ClientFormData, ClientFormErrors, EditingClient } from '../../types/client.types';

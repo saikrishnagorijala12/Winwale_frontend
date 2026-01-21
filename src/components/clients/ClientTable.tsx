@@ -78,15 +78,15 @@ export const ClientTable: React.FC<ClientTableProps> = ({
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="bg-slate-50 border-b border-slate-200">
-              <th className="p-5 font-bold text-slate-700 text-sm">Client</th>
-              <th className="p-5 font-bold text-slate-700 text-sm">Status</th>
-              <th className="p-5 font-bold text-slate-700 text-sm">
+              <th className="text-left px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Client</th>
+              <th className="text-left px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Status</th>
+              <th className="text-left px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                 Contact Person
               </th>
-              <th className="p-5 font-bold text-slate-700 text-sm">
+              <th className="text-left px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                 Company Email
               </th>
-              <th className="p-5 font-bold text-slate-700 text-sm">
+              <th className="text-left px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                 Last Modified
               </th>
               <th className="w-16 p-5"></th>
@@ -115,14 +115,14 @@ export const ClientTable: React.FC<ClientTableProps> = ({
                 <tr
                   key={client.id}
                   onClick={() => onClientClick(client)}
-                  className="hover:bg-blue-50/50 cursor-pointer transition-colors group"
+                  className="group hover:bg-blue-50/30 cursor-pointer transition-all duration-200"
                 >
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-4">
                       <div className="w-10 h-10 rounded-xl bg-linear-to-br from-[#3399cc] to-[#2980b9] flex items-center justify-center text-white font-bold shadow-sm shadow-blue-200">
                         {client.name.substring(0, 2).toUpperCase()}
                       </div>
-                      <span className="font-semibold text-slate-900 group-hover:text-[#24548f] transition-colors">
+                      <span className="font-semibold text-slate-900 group-hover:text-[#38A1DB] transition-colors">
                         {client.name}
                       </span>
                     </div>
