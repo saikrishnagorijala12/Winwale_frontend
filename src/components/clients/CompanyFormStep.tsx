@@ -1,5 +1,9 @@
-import React from 'react';
-import { ClientFormData, ClientFormErrors, EditingClient } from '../../types/client.types';
+import React from "react";
+import {
+  ClientFormData,
+  ClientFormErrors,
+  EditingClient,
+} from "../../types/client.types";
 
 interface CompanyFormStepProps {
   formData: ClientFormData | EditingClient;
@@ -14,6 +18,10 @@ export const CompanyFormStep: React.FC<CompanyFormStepProps> = ({
   onChange,
   onClearError,
 }) => {
+  const inputClass = (field: keyof ClientFormErrors) =>
+    `w-full mt-2 px-4 py-3 rounded-xl border-2 transition-colors focus:outline-none border-slate-200 focus:border-[#38A1DB]"
+    }`;
+
   return (
     <div className="grid md:grid-cols-2 gap-6">
       {/* Company Name */}
@@ -23,15 +31,19 @@ export const CompanyFormStep: React.FC<CompanyFormStepProps> = ({
         </label>
         <input
           type="text"
-          className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] focus:outline-none transition-colors"
+          required
+          className={inputClass("company_name")}
           value={formData.company_name}
           onChange={(e) => {
-            onChange('company_name', e.target.value);
-            onClearError('company_name');
+            onChange("company_name", e.target.value);
+            onClearError("company_name");
           }}
+          aria-invalid={!!errors.company_name}
         />
         {errors.company_name && (
-          <p className="mt-1 text-xs text-red-600">{errors.company_name}</p>
+          <p className="mt-1 text-xs text-red-600 font-medium">
+            {errors.company_name}
+          </p>
         )}
       </div>
 
@@ -42,15 +54,19 @@ export const CompanyFormStep: React.FC<CompanyFormStepProps> = ({
         </label>
         <input
           type="email"
-          className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] focus:outline-none transition-colors"
+          required
+          className={inputClass("company_email")}
           value={formData.company_email}
           onChange={(e) => {
-            onChange('company_email', e.target.value);
-            onClearError('company_email');
+            onChange("company_email", e.target.value);
+            onClearError("company_email");
           }}
+          aria-invalid={!!errors.company_email}
         />
         {errors.company_email && (
-          <p className="mt-1 text-xs text-red-600">{errors.company_email}</p>
+          <p className="mt-1 text-xs text-red-600 font-medium">
+            {errors.company_email}
+          </p>
         )}
       </div>
 
@@ -61,15 +77,19 @@ export const CompanyFormStep: React.FC<CompanyFormStepProps> = ({
         </label>
         <input
           type="tel"
-          className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] focus:outline-none transition-colors"
+          required
+          className={inputClass("company_phone_no")}
           value={formData.company_phone_no}
           onChange={(e) => {
-            onChange('company_phone_no', e.target.value);
-            onClearError('company_phone_no');
+            onChange("company_phone_no", e.target.value);
+            onClearError("company_phone_no");
           }}
+          aria-invalid={!!errors.company_phone_no}
         />
         {errors.company_phone_no && (
-          <p className="mt-1 text-xs text-red-600">{errors.company_phone_no}</p>
+          <p className="mt-1 text-xs text-red-600 font-medium">
+            {errors.company_phone_no}
+          </p>
         )}
       </div>
 
@@ -80,15 +100,19 @@ export const CompanyFormStep: React.FC<CompanyFormStepProps> = ({
         </label>
         <input
           type="text"
-          className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] focus:outline-none transition-colors"
+          required
+          className={inputClass("company_address")}
           value={formData.company_address}
           onChange={(e) => {
-            onChange('company_address', e.target.value);
-            onClearError('company_address');
+            onChange("company_address", e.target.value);
+            onClearError("company_address");
           }}
+          aria-invalid={!!errors.company_address}
         />
         {errors.company_address && (
-          <p className="mt-1 text-xs text-red-600">{errors.company_address}</p>
+          <p className="mt-1 text-xs text-red-600 font-medium">
+            {errors.company_address}
+          </p>
         )}
       </div>
 
@@ -99,15 +123,19 @@ export const CompanyFormStep: React.FC<CompanyFormStepProps> = ({
         </label>
         <input
           type="text"
-          className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] focus:outline-none transition-colors"
+          required
+          className={inputClass("company_city")}
           value={formData.company_city}
           onChange={(e) => {
-            onChange('company_city', e.target.value);
-            onClearError('company_city');
+            onChange("company_city", e.target.value);
+            onClearError("company_city");
           }}
+          aria-invalid={!!errors.company_city}
         />
         {errors.company_city && (
-          <p className="mt-1 text-xs text-red-600">{errors.company_city}</p>
+          <p className="mt-1 text-xs text-red-600 font-medium">
+            {errors.company_city}
+          </p>
         )}
       </div>
 
@@ -118,15 +146,19 @@ export const CompanyFormStep: React.FC<CompanyFormStepProps> = ({
         </label>
         <input
           type="text"
-          className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] focus:outline-none transition-colors"
+          required
+          className={inputClass("company_state")}
           value={formData.company_state}
           onChange={(e) => {
-            onChange('company_state', e.target.value);
-            onClearError('company_state');
+            onChange("company_state", e.target.value);
+            onClearError("company_state");
           }}
+          aria-invalid={!!errors.company_state}
         />
         {errors.company_state && (
-          <p className="mt-1 text-xs text-red-600">{errors.company_state}</p>
+          <p className="mt-1 text-xs text-red-600 font-medium">
+            {errors.company_state}
+          </p>
         )}
       </div>
 
@@ -137,15 +169,19 @@ export const CompanyFormStep: React.FC<CompanyFormStepProps> = ({
         </label>
         <input
           type="text"
-          className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] focus:outline-none transition-colors"
+          required
+          className={inputClass("company_zip")}
           value={formData.company_zip}
           onChange={(e) => {
-            onChange('company_zip', e.target.value);
-            onClearError('company_zip');
+            onChange("company_zip", e.target.value);
+            onClearError("company_zip");
           }}
+          aria-invalid={!!errors.company_zip}
         />
         {errors.company_zip && (
-          <p className="mt-1 text-xs text-red-600">{errors.company_zip}</p>
+          <p className="mt-1 text-xs text-red-600 font-medium">
+            {errors.company_zip}
+          </p>
         )}
       </div>
     </div>
