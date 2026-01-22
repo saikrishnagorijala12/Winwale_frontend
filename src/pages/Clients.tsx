@@ -32,15 +32,27 @@ export default function ClientsPage() {
   const [editingClient, setEditingClient] = useState<EditingClient | null>(null);
   const [newClient, setNewClient] = useState<ClientFormData>(getInitialFormData());
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10; 
+
   const filteredClients = clients.filter((client) => {
     const matchesSearch =
       client.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      client.contract.toLowerCase().includes(searchQuery.toLowerCase());
-    const clientStatusSlug = client.status;
+      (client.contact?.name || "").toLowerCase().includes(searchQuery.toLowerCase());
+    
     const matchesFilter =
-      filterStatus === "all" || clientStatusSlug === filterStatus;
+      filterStatus === "all" || client.status === filterStatus;
+    
     return matchesSearch && matchesFilter;
   });
+
+  const totalClients = filteredClients.length;
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedClients = filteredClients.slice(startIndex, startIndex + itemsPerPage);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, filterStatus]);
 
   const handleNextStep = (e: React.FormEvent) => {
     e.preventDefault();
@@ -58,14 +70,11 @@ export default function ClientsPage() {
 
   const handleAddClient = async (e: React.FormEvent) => {
     e.preventDefault();
-
     if (!validateStep1(newClient, setErrors)) {
       setAddStep(1);
       return;
     }
-
     setIsSubmitting(true);
-
     try {
       const res = await api.post("/clients", newClient);
       const createdClient = createClientFromResponse(res);
@@ -75,13 +84,7 @@ export default function ClientsPage() {
       toast.success("Client created successfully");
     } catch (err: any) {
       console.error(err);
-      if (err.response?.status === 409) {
-        toast.error("Client already exists");
-      } else if (err.response?.status === 403) {
-        toast.error("Admin access required");
-      } else {
-        toast.error(err.response?.data?.message || "Failed to create client");
-      }
+      toast.error(err.response?.data?.message || "Failed to create client");
     } finally {
       setIsSubmitting(false);
     }
@@ -89,55 +92,22 @@ export default function ClientsPage() {
 
   const handleEditClient = async (e: React.FormEvent) => {
     e.preventDefault();
-
     if (!editingClient || !validateStep1(editingClient, setErrors)) {
       setEditStep(1);
       return;
     }
-
     setIsSubmitting(true);
-
     try {
-      const res = await api.put(`/clients/${editingClient.id}`, {
-        company_name: editingClient.company_name,
-        company_email: editingClient.company_email,
-        company_phone_no: editingClient.company_phone_no,
-        company_address: editingClient.company_address,
-        company_city: editingClient.company_city,
-        company_state: editingClient.company_state,
-        company_zip: editingClient.company_zip,
-        contact_officer_name: editingClient.contact_officer_name || null,
-        contact_officer_email: editingClient.contact_officer_email || null,
-        contact_officer_phone_no: editingClient.contact_officer_phone_no || null,
-        contact_officer_address: editingClient.contact_officer_address || null,
-        contact_officer_city: editingClient.contact_officer_city || null,
-        contact_officer_state: editingClient.contact_officer_state || null,
-        contact_officer_zip: editingClient.contact_officer_zip || null,
-        status: editingClient.status,
-      });
-
+      const res = await api.put(`/clients/${editingClient.id}`, editingClient);
       const updatedClient = updateClientFromResponse(res, editingClient.products || 0);
-
-      setClients((prev) =>
-        prev.map((c) => (c.id === updatedClient.id ? updatedClient : c))
-      );
-
-      if (selectedClient?.id === updatedClient.id) {
-        setSelectedClient(updatedClient);
-      }
-
+      setClients((prev) => prev.map((c) => (c.id === updatedClient.id ? updatedClient : c)));
+      if (selectedClient?.id === updatedClient.id) setSelectedClient(updatedClient);
       setShowEditDialog(false);
       setEditingClient(null);
       toast.success("Client updated successfully");
     } catch (err: any) {
       console.error(err);
-      if (err.response?.status === 404) {
-        toast.error("Client not found");
-      } else if (err.response?.status === 403) {
-        toast.error("Admin access required");
-      } else {
-        toast.error(err.response?.data?.message || "Failed to update client");
-      }
+      toast.error(err.response?.data?.message || "Failed to update client");
     } finally {
       setIsSubmitting(false);
     }
@@ -150,24 +120,24 @@ export default function ClientsPage() {
 
   const openEditDialog = (client: Client) => {
     setEditingClient({
-      id: client.id,
-      company_name: client.name,
-      company_email: client.email,
-      company_phone_no: client.phone,
-      company_address: client.address.split(", ")[0] || "",
-      company_city: client.address.split(", ")[1] || "",
-      company_state: client.address.split(", ")[2] || "",
-      company_zip: client.address.split(", ")[3] || "",
-      contact_officer_name: client.contact?.name || "",
-      contact_officer_email: client.contact?.email || "",
-      contact_officer_phone_no: client.contact?.phone || "",
-      contact_officer_address: client.contact?.address?.split(", ")[0] || "",
-      contact_officer_city: client.contact?.address?.split(", ")[1] || "",
-      contact_officer_state: client.contact?.address?.split(", ")[2] || "",
-      contact_officer_zip: client.contact?.address?.split(", ")[3] || "",
-      status: client.status,
-      products: client.products,
-    });
+        id: client.id,
+        company_name: client.name,
+        company_email: client.email,
+        company_phone_no: client.phone,
+        company_address: client.address.split(", ")[0] || "",
+        company_city: client.address.split(", ")[1] || "",
+        company_state: client.address.split(", ")[2] || "",
+        company_zip: client.address.split(", ")[3] || "",
+        contact_officer_name: client.contact?.name || "",
+        contact_officer_email: client.contact?.email || "",
+        contact_officer_phone_no: client.contact?.phone || "",
+        contact_officer_address: client.contact?.address?.split(", ")[0] || "",
+        contact_officer_city: client.contact?.address?.split(", ")[1] || "",
+        contact_officer_state: client.contact?.address?.split(", ")[2] || "",
+        contact_officer_zip: client.contact?.address?.split(", ")[3] || "",
+        status: client.status,
+        products: client.products,
+      });
     setEditStep(1);
     setShowEditDialog(true);
   };
@@ -199,24 +169,8 @@ export default function ClientsPage() {
         setLoading(false);
       }
     };
-
     fetchClients();
   }, []);
-
-  useEffect(() => {
-    if (!showAddDialog) {
-      setErrors({});
-      resetAddClientForm();
-    }
-  }, [showAddDialog]);
-
-  useEffect(() => {
-    if (!showEditDialog) {
-      setErrors({});
-      setEditingClient(null);
-      setEditStep(1);
-    }
-  }, [showEditDialog]);
 
   return (
     <div className="min-h-screen bg-linear-to-br from-slate-50 via-blue-50/30 to-slate-50 p-8">
@@ -230,7 +184,7 @@ export default function ClientsPage() {
       />
 
       <ClientTable
-        clients={filteredClients}
+        clients={paginatedClients} 
         loading={loading}
         openClientId={openClientId}
         onClientClick={setSelectedClient}
@@ -239,6 +193,10 @@ export default function ClientsPage() {
         }
         onView={setSelectedClient}
         onEdit={openEditDialog}
+        currentPage={currentPage}
+        totalClients={totalClients}
+        itemsPerPage={itemsPerPage}
+        onPageChange={setCurrentPage}
       />
 
       <ClientDetailsModal

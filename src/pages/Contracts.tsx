@@ -1287,9 +1287,16 @@ export default function ContractsPage() {
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [contractToEdit, setContractToEdit] = useState<ClientContractRead | null>(null);
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8; 
+
   useEffect(() => {
     fetchContracts();
   }, []);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery]);
 
   const fetchContracts = async () => {
     try {
@@ -1316,6 +1323,10 @@ export default function ContractsPage() {
       );
     });
   }, [contracts, searchQuery]);
+
+  const totalContracts = filteredContracts.length;
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedContracts = filteredContracts.slice(startIndex, startIndex + itemsPerPage);
 
   const handleDelete = async (clientId: number) => {
     if (!window.confirm("Are you sure you want to delete this contract?")) return;
@@ -1373,7 +1384,7 @@ export default function ContractsPage() {
           <input
             type="text"
             placeholder="Search contracts by number, officer name, or client..."
-            className="w-full pl-12 pr-4 py-3 rounded-2xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-[#38A1DB] bg-white text-slate-700 placeholder:text-slate-400"
+            className="w-full pl-14 pr-6 py-3.5 rounded-2xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20  bg-slate-50/50 text-slate-700 placeholder:text-slate-400 transition-all font-medium"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
@@ -1382,11 +1393,15 @@ export default function ContractsPage() {
 
       <div className="mx-auto ">
         <ContractTable
-          contracts={filteredContracts}
+          contracts={paginatedContracts} 
           loading={loading}
           onView={setSelectedContract}
           onEdit={handleEdit}
           onDelete={handleDelete}
+          currentPage={currentPage}
+          totalContracts={totalContracts}
+          itemsPerPage={itemsPerPage}
+          onPageChange={setCurrentPage}
         />
       </div>
 
