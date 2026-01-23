@@ -30,6 +30,7 @@ import PendingApproval from "./src/pages/PendingApproval";
 import GsaProducts from "./src/pages/GsaProducts";
 import ClientProducts from "./src/pages/ClientProducts";
 import PriceListAnalysis from "./src/pages/PriceListAnalysis";
+import { Analysis } from "./src/pages/Analysis";
 
 try {
   Amplify.configure(awsExports);
@@ -145,7 +146,8 @@ const AppContent: React.FC = () => {
               />
 
               <Route path="/contracts" element={<ContractManagement />} />
-              <Route path="/pricelist-analysis" element={<PriceListAnalysis />} />
+              {/* <Route path="/pricelist-analysis" element={<PriceListAnalysis />} /> */}
+              <Route path="/pricelist-analysis" element={<Analysis />} />
             </Route>
 
             {/* Admin only */}
