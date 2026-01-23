@@ -14,10 +14,10 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({ title, subtitle, children }) =>
       {/* Left Side - Brand Branding */}
       <div className="hidden lg:flex lg:w-1/2 bg-[#1d4e89] flex-col p-12 justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0">
+          {/* <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0">
               <img src="logo.png" alt='Winvale Logo' />
             </div>
-          <span className="text-white text-2xl font-bold tracking-tight">Winvale</span>
+          <span className="text-white text-2xl font-bold tracking-tight">Winvale</span> */}
         </div>
 
         <div className="mb-24">

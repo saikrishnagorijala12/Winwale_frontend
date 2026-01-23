@@ -169,7 +169,7 @@ const UploadGsa: React.FC = () => {
                 
                 {loadingClients ? (
                   <div className="flex items-center gap-3 p-4 bg-slate-50 rounded-2xl">
-                    <Loader2 className="w-5 h-5 animate-spin text-[#3399cc]" />
+                    <Loader2 className="w-5 h-5 animate-spin text-[#24578f]" />
                     <span className="text-slate-500 text-sm font-medium">Fetching approved clients...</span>
                   </div>
                 ) : (

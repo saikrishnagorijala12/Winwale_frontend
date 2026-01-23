@@ -63,39 +63,28 @@ const AppRoutes: React.FC = () => {
     }
   };
 
-
   if (status === "loading") {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-[hsl(220,25%,97%)]">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[hsl(211,60%,35%)]" />
+      <div className="flex items-center justify-center min-h-screen bg-[#f5f7f9]">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#24578f]" />
       </div>
     );
   }
 
   const isAuthenticated = status === "authenticated";
 
-
-  if (isAuthenticated && !isActive) {
-    return (
-      <Router>
-        <Routes>
-          <Route path="/pending-approval" element={<PendingApproval />} />
-          <Route path="*" element={<Navigate to="/pending-approval" replace />} />
-        </Routes>
-      </Router>
-    );
-  }
-
-
   return (
     <Router>
       <Routes>
-        {/* Auth */}
         <Route
           path="/login"
           element={
             isAuthenticated ? (
-              <Navigate to="/dashboard" replace />
+              isActive ? (
+                <Navigate to="/dashboard" replace />
+              ) : (
+                <Navigate to="/pending-approval" replace />
+              )
             ) : (
               <Login onAuthSuccess={bootstrapAuth} />
             )
@@ -105,13 +94,25 @@ const AppRoutes: React.FC = () => {
         <Route path="/signup" element={<Signup />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
 
-        {/* Protected */}
+        <Route
+          path="/pending-approval"
+          element={
+            !isAuthenticated ? (
+              <Navigate to="/login" replace />
+            ) : !isActive ? (
+              <PendingApproval />
+            ) : (
+              <Navigate to="/dashboard" replace />
+            )
+          }
+        />
+
         <Route element={<ProtectedRoute isAuthenticated={isAuthenticated} />}>
           <Route element={<AppLayout />}>
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/settings" element={<Settings />} />
 
-            {/* Consultant */}
+            {/* Consultant only */}
             <Route
               element={
                 <ProtectedRoute
@@ -125,11 +126,13 @@ const AppRoutes: React.FC = () => {
                 path="/clients/:clientId/products"
                 element={<ClientProducts />}
               />
+
               <Route path="/contracts" element={<ContractManagement />} />
               <Route path="/pricelist-analysis" element={<PriceListAnalysis />} />
+              {/* <Route path="/pricelist-analysis" element={<Analysis />} /> */}
             </Route>
 
-            {/* Admin */}
+            {/* Admin only */}
             <Route
               element={
                 <ProtectedRoute
@@ -146,22 +149,21 @@ const AppRoutes: React.FC = () => {
           </Route>
         </Route>
 
-        {/* Root */}
         <Route
-                  path="/"
-                  element={
-                    <Navigate
-                      to={
-                        !isAuthenticated
-                          ? "/login"
-                          : isActive
-                          ? "/dashboard"
-                          : "/pending-approval"
-                      }
-                      replace
-                    />
-                  }
-                />
+          path="/"
+          element={
+            <Navigate
+              to={
+                !isAuthenticated
+                  ? "/login"
+                  : isActive
+                  ? "/dashboard"
+                  : "/pending-approval"
+              }
+              replace
+            />
+          }
+        />
 
         <Route path="*" element={<NotFound />} />
       </Routes>

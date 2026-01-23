@@ -122,7 +122,7 @@ export const ClientTable: React.FC<ClientTableProps> = ({
               <tr>
                 <td colSpan={6} className="py-20 text-center">
                   <div className="flex flex-col items-center gap-2">
-                    <Loader2 className="w-8 h-8 animate-spin text-[#3399cc]" />
+                    <Loader2 className="w-8 h-8 animate-spin text-[#24578f]" />
                     <p className="text-sm text-slate-500 font-medium">Loading clients...</p>
                   </div>
                 </td>
@@ -188,7 +188,7 @@ export const ClientTable: React.FC<ClientTableProps> = ({
       <div className="md:hidden divide-y divide-slate-100">
         {loading ? (
           <div className="py-20 text-center">
-            <Loader2 className="w-8 h-8 animate-spin mx-auto text-[#3399cc]" />
+            <Loader2 className="w-8 h-8 animate-spin mx-auto text-[#24578f]" />
           </div>
         ) : clients.length === 0 ? (
           <EmptyState />

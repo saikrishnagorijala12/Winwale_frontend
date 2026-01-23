@@ -10,6 +10,8 @@ import {
   ArrowRight,
   ArrowLeft,
   User,
+  EyeOff,
+  Eye,
 } from 'lucide-react';
 import AuthLayout from '../../components/auth/AuthLayout';
 
@@ -25,6 +27,7 @@ const Signup: React.FC = () => {
     password: '',
     confirmPassword: '',
   });
+  const [showPassword, setShowPassword] = useState(false);
   const [otp, setOtp] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -135,7 +138,7 @@ const Signup: React.FC = () => {
                   setFormData({ ...formData, fullName: e.target.value })
                 }
                 className="block w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
-                placeholder="John Doe"
+                placeholder="Your Name"
               />
             </div>
           </div>
@@ -169,7 +172,7 @@ const Signup: React.FC = () => {
                 <Lock className="h-5 w-5 text-slate-400" />
               </div>
               <input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 required
                 value={formData.password}
                 onChange={(e) =>
@@ -178,6 +181,18 @@ const Signup: React.FC = () => {
                 className="block w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
                 placeholder="Min. 8 characters"
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-slate-600"
+              >
+                {showPassword ? (
+                  <EyeOff className="h-5 w-5" />
+                ) : (
+                  <Eye className="h-5 w-5" />
+                )}
+              </button>
+              
             </div>
           </div>
 
@@ -190,7 +205,7 @@ const Signup: React.FC = () => {
                 <ShieldCheck className="h-5 w-5 text-slate-400" />
               </div>
               <input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 required
                 value={formData.confirmPassword}
                 onChange={(e) =>
@@ -199,6 +214,17 @@ const Signup: React.FC = () => {
                 className="block w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
                 placeholder="Re-enter password"
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-slate-600"
+              >
+                {showPassword ? (
+                  <EyeOff className="h-5 w-5" />
+                ) : (
+                  <Eye className="h-5 w-5" />
+                )}
+              </button>
             </div>
           </div>
 

@@ -20,7 +20,7 @@ import {
 } from 'lucide-react';
 import { Role, ROLES } from '@/src/types/roles.types';
 
-/* ===================== NAV CONFIG ===================== */
+/*  NAV CONFIG  */
 export const navItems = [
   {
     to: "/dashboard",
@@ -72,7 +72,7 @@ export const navItems = [
   },
 ];
 
-/* ===================== SIDEBAR ===================== */
+/*  SIDEBAR  */
 export default function AppSidebar() {
   const { user, logout } = useAuth();
   const [open, setOpen] = useState(false);
@@ -97,14 +97,13 @@ const ROLE_MAP: Record<Role, string> = {
     setOpen(false);
   };
 
-  /* ===================== ROLE FILTER ===================== */
   const visibleNavItems = navItems.filter(
     (item) => user && item.roles.includes(user.role as Role)
   );
 
   return (
     <>
-      {/* ===================== MOBILE HEADER ===================== */}
+      {/*  MOBILE HEADER  */}
       <header className="md:hidden sticky top-0 left-0 right-0 h-16 flex items-center justify-between px-4 z-40  border-b border-slate-200">
         <button
           onClick={() => setOpen(true)}
@@ -115,7 +114,7 @@ const ROLE_MAP: Record<Role, string> = {
         </button>
       </header>
 
-      {/* ===================== MOBILE OVERLAY ===================== */}
+      {/*  MOBILE OVERLAY  */}
       <div
         className={`fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 transition-opacity duration-300 md:hidden ${
           open ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
@@ -123,7 +122,7 @@ const ROLE_MAP: Record<Role, string> = {
         onClick={() => setOpen(false)}
       />
 
-      {/* ===================== SIDEBAR ===================== */}
+      {/*  SIDEBAR  */}
       <aside
         className={`
           fixed md:sticky top-0 inset-y-0 left-0 z-50
@@ -218,12 +217,12 @@ const ROLE_MAP: Record<Role, string> = {
         </div>
       </aside>
 
-      {/* ===================== LOGOUT CONFIRM MODAL ===================== */}
+      {/*  Logout Modal */}
       {showLogoutConfirm && (
         <div className="fixed inset-0 z-100 flex items-center justify-center bg-black/50">
           <div className="bg-white rounded-xl p-6 w-full max-w-sm shadow-xl">
             <h2 className="text-lg font-semibold text-slate-800">
-              Confirm Logout
+              Confirm Signout
             </h2>
 
             <p className="mt-2 text-sm text-slate-600">

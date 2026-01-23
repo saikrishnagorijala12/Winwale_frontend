@@ -366,7 +366,7 @@ export default function ProductsPage() {
           {loading && (
             <div className="absolute inset-0 bg-white/60 backdrop-blur-[2px] z-10 flex items-center justify-center">
               <div className="flex flex-col items-center gap-3">
-                <Loader2 className="w-10 h-10 animate-spin text-[#38A1DB]" />
+                <Loader2 className="w-10 h-10 animate-spin text-[#24578f]" />
                 <span className="text-slate-400 font-medium">
                   Loading Products...
                 </span>

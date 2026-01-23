@@ -398,7 +398,7 @@
 //             {loading ? (
 //               <tr>
 //                 <td colSpan={6} className="text-center py-12">
-//                   <Loader2 className="w-8 h-8 animate-spin mx-auto text-[#38A1DB]" />
+//                   <Loader2 className="w-8 h-8 animate-spin mx-auto text-[#24578f]" />
 //                 </td>
 //               </tr>
 //             ) : filteredContracts.length === 0 ? (

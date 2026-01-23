@@ -166,7 +166,7 @@ export default function UserActivation() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-[#3399cc]" />
+        <Loader2 className="w-8 h-8 animate-spin text-[#24578f]" />
       </div>
     );
   }

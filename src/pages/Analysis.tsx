@@ -33,7 +33,7 @@ interface UploadResult {
   next_step: string;
 }
 
-type PreviewRow = Record<string, unknown>;
+// type PreviewRow = Record<string, unknown>;
 
 export const Analysis: React.FC = () => {
   const navigate = useNavigate();
@@ -44,7 +44,7 @@ export const Analysis: React.FC = () => {
   const [loadingClients, setLoadingClients] = useState<boolean>(true);
   const [uploadResult, setUploadResult] = useState<UploadResult | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [previewData, setPreviewData] = useState<PreviewRow[] | null>(null);
+  const [previewData, setPreviewData] = useState<any[] | null>(null);
 
   useEffect(() => {
     fetchClients();
@@ -91,7 +91,9 @@ export const Analysis: React.FC = () => {
       const data = new Uint8Array(arrayBuffer);
       const workbook = XLSX.read(data, { type: "array" });
       const sheet = workbook.Sheets[workbook.SheetNames[0]];
-      const jsonData = XLSX.utils.sheet_to_json<PreviewRow>(sheet);
+      const jsonData = XLSX.utils.sheet_to_json(sheet, {
+            defval: "",
+          });
       setPreviewData(jsonData.slice(0, 10));
     } catch (err) {
       console.error("Preview failed:", err);
@@ -175,7 +177,7 @@ export const Analysis: React.FC = () => {
 
                 {loadingClients ? (
                   <div className="flex items-center gap-3 p-4 bg-slate-50 rounded-2xl">
-                    <Loader2 className="w-5 h-5 animate-spin text-[#3399cc]" />
+                    <Loader2 className="w-5 h-5 animate-spin text-[#24578f]" />
                     <span className="text-slate-500 text-sm font-medium">
                       Fetching approved clients...
                     </span>
