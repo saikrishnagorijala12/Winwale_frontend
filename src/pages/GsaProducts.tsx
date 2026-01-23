@@ -85,7 +85,7 @@ export default function ProductsPage() {
         setLoading(true);
         const [prodRes, clientRes, user] = await Promise.all([
           api.get("/products"),
-          api.get("/clients"),
+          api.get("/clients/approved"),
           getCurrentUser(),
         ]);
         setProducts(prodRes.data);
@@ -105,6 +105,7 @@ export default function ProductsPage() {
     setIsDropdownOpen(false);
     setClientSearch("");
     setCurrentPage(1);
+    setError("");
 
     try {
       setLoading(true);
@@ -115,12 +116,54 @@ export default function ProductsPage() {
         const res = await api.get(`/products/client/${client.client_id}`);
         setProducts(res.data);
       }
-    } catch (err) {
-      console.error("Filtering error", err);
+    } catch (err: any) {
+      if (err.response && err.response.status === 404) {
+        setProducts([]);
+      } else {
+        console.error("Filtering error", err);
+        setError("Failed to fetch products for this client");
+      }
     } finally {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    const initData = async () => {
+      try {
+        setLoading(true);
+        setError(""); 
+        const [prodRes, clientRes, user] = await Promise.allSettled([
+          api.get("/products"),
+          api.get("/clients/approved"),
+          getCurrentUser(),
+        ]);
+
+        if (prodRes.status === "fulfilled") {
+          setProducts(prodRes.value.data);
+        } else {
+          if (prodRes.reason.response?.status === 404) {
+            setProducts([]);
+          } else {
+            setError("Failed to load products");
+          }
+        }
+
+        if (clientRes.status === "fulfilled") {
+          setClients(clientRes.value.data);
+        }
+
+        if (user.status === "fulfilled") {
+          setUserRole(user.value.role);
+        }
+      } catch (err) {
+        setError("Failed to initialize page data");
+      } finally {
+        setLoading(false);
+      }
+    };
+    initData();
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {

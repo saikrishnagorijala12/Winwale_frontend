@@ -16,6 +16,7 @@ import {
   Building2Icon,
   List,
   ListCheckIcon,
+  FileSearch,
 } from 'lucide-react';
 import { Role, ROLES } from '@/src/types/roles.types';
 
@@ -26,6 +27,12 @@ export const navItems = [
     icon: LayoutDashboard,
     label: "Dashboard",
     roles: [ROLES.ADMIN, ROLES.USER],
+  },
+  {
+    to: "/pricelist-analysis",
+    icon: FileSearch,
+    label: "Pricelist Analysis",
+    roles: [ROLES.USER],
   },
   {
     to: "/clients",

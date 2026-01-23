@@ -8,28 +8,30 @@ import {
 import { Amplify } from "aws-amplify";
 import { fetchAuthSession, signOut } from "aws-amplify/auth";
 
-import awsExports from "./src/aws-exports";
+import awsExports from "../aws-exports";
 
-import Login from "./src/pages/auth/Login";
-import Signup from "./src/pages/auth/Signup";
-import ForgotPassword from "./src/pages/auth/ForgotPassword";
-import Dashboard from "./src/pages/Dashboard";
-import Settings from "./src/pages/Settings";
-import NotFound from "./src/pages/NotFound";
-import ProtectedRoute from "./src/components/ProtectedRoute";
-import { AuthProvider, useAuth } from "./src/context/AuthContext";
-import { getCurrentUser as getDbUser } from "./src/api/user";
-import AppLayout from "./src/components/layout/AppLayout";
-import Clients from "./src/pages/Clients";
-import ClientActivation from "./src/pages/ClientActivation";
-import UserActivation from "./src/pages/UserActivation";
-import { ROLES } from "./src/types/roles.types";
-import ContractManagement from "./src/pages/Contracts";
-import UploadGsa from "./src/pages/UploadGsa";
-import PendingApproval from "./src/pages/PendingApproval";
-import GsaProducts from "./src/pages/GsaProducts";
-import ClientProducts from "./src/pages/ClientProducts";
-import PriceListAnalysis from "./src/pages/PriceListAnalysis";
+import Login from "../pages/auth/Login";
+import Signup from "../pages/auth/Signup";
+import ForgotPassword from "../pages/auth/ForgotPassword";
+import Dashboard from "../pages/Dashboard";
+import Settings from "../pages/Settings";
+import NotFound from "../pages/NotFound";
+import PendingApproval from "../pages/PendingApproval";
+
+import ProtectedRoute from "../components/ProtectedRoute";
+import { useAuth } from "../context/AuthContext";
+import AppLayout from "../components/layout/AppLayout";
+
+import Clients from "../pages/Clients";
+import ClientProducts from "../pages/ClientProducts";
+import ClientActivation from "../pages/ClientActivation";
+import UserActivation from "../pages/UserActivation";
+import ContractManagement from "../pages/Contracts";
+import UploadGsa from "../pages/UploadGsa";
+import GsaProducts from "../pages/GsaProducts";
+
+import { ROLES } from "../types/roles.types";
+import PriceListAnalysis from "../pages/PriceListAnalysis";
 
 try {
   Amplify.configure(awsExports);
@@ -37,32 +39,13 @@ try {
   console.warn("Amplify configuration failed.", e);
 }
 
-const AppContent: React.FC = () => {
+const AppRoutes: React.FC = () => {
   const { status, setStatus, isActive, refreshUser } = useAuth();
 
   useEffect(() => {
     bootstrapAuth();
   }, []);
 
-  // const bootstrapAuth = async () => {
-  //   try {
-  //     const session = await fetchAuthSession();
-
-  //     if (!session.tokens?.idToken) {
-  //       setStatus("unauthenticated");
-  //       return;
-  //     }
-
-  //     const user = await getDbUser();
-
-  //     setUser(user);
-  //     setStatus("authenticated");
-  //   } catch (err) {
-  //     console.error("Auth bootstrap failed:", err);
-  //     await signOut().catch(() => {});
-  //     setStatus("unauthenticated");
-  //   }
-  // };
   const bootstrapAuth = async () => {
     try {
       const session = await fetchAuthSession();
@@ -80,6 +63,7 @@ const AppContent: React.FC = () => {
     }
   };
 
+
   if (status === "loading") {
     return (
       <div className="flex items-center justify-center min-h-screen bg-[hsl(220,25%,97%)]">
@@ -90,18 +74,28 @@ const AppContent: React.FC = () => {
 
   const isAuthenticated = status === "authenticated";
 
+
+  if (isAuthenticated && !isActive) {
+    return (
+      <Router>
+        <Routes>
+          <Route path="/pending-approval" element={<PendingApproval />} />
+          <Route path="*" element={<Navigate to="/pending-approval" replace />} />
+        </Routes>
+      </Router>
+    );
+  }
+
+
   return (
     <Router>
       <Routes>
+        {/* Auth */}
         <Route
           path="/login"
           element={
             isAuthenticated ? (
-              isActive ? (
-                <Navigate to="/dashboard" replace />
-              ) : (
-                <Navigate to="/pending-approval" replace />
-              )
+              <Navigate to="/dashboard" replace />
             ) : (
               <Login onAuthSuccess={bootstrapAuth} />
             )
@@ -111,25 +105,13 @@ const AppContent: React.FC = () => {
         <Route path="/signup" element={<Signup />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
 
-        <Route
-          path="/pending-approval"
-          element={
-            !isAuthenticated ? (
-              <Navigate to="/login" replace />
-            ) : !isActive ? (
-              <PendingApproval />
-            ) : (
-              <Navigate to="/dashboard" replace />
-            )
-          }
-        />
-
+        {/* Protected */}
         <Route element={<ProtectedRoute isAuthenticated={isAuthenticated} />}>
           <Route element={<AppLayout />}>
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/settings" element={<Settings />} />
 
-            {/* Consultant only */}
+            {/* Consultant */}
             <Route
               element={
                 <ProtectedRoute
@@ -143,12 +125,11 @@ const AppContent: React.FC = () => {
                 path="/clients/:clientId/products"
                 element={<ClientProducts />}
               />
-
               <Route path="/contracts" element={<ContractManagement />} />
               <Route path="/pricelist-analysis" element={<PriceListAnalysis />} />
             </Route>
 
-            {/* Admin only */}
+            {/* Admin */}
             <Route
               element={
                 <ProtectedRoute
@@ -165,21 +146,22 @@ const AppContent: React.FC = () => {
           </Route>
         </Route>
 
+        {/* Root */}
         <Route
-          path="/"
-          element={
-            <Navigate
-              to={
-                !isAuthenticated
-                  ? "/login"
-                  : isActive
-                  ? "/dashboard"
-                  : "/pending-approval"
-              }
-              replace
-            />
-          }
-        />
+                  path="/"
+                  element={
+                    <Navigate
+                      to={
+                        !isAuthenticated
+                          ? "/login"
+                          : isActive
+                          ? "/dashboard"
+                          : "/pending-approval"
+                      }
+                      replace
+                    />
+                  }
+                />
 
         <Route path="*" element={<NotFound />} />
       </Routes>
@@ -187,29 +169,4 @@ const AppContent: React.FC = () => {
   );
 };
 
-const App: React.FC = () => {
-  return (
-    <AuthProvider>
-      <AppContent />
-    </AuthProvider>
-  );
-};
-
-export default App;
-
-
-
-// import React from "react";
-// import { AuthProvider } from "./src/context/AuthContext";
-// import AppRoutes from "./src/routes/AppRoutes";
-
-// const App: React.FC = () => {
-//   return (
-//     <AuthProvider>
-//       <AppRoutes />
-//     </AuthProvider>
-//   );
-// };
-
-// export default App;
-
+export default AppRoutes;
