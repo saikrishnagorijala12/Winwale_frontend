@@ -6,7 +6,6 @@ import {
   Navigate,
 } from "react-router-dom";
 import { Amplify } from "aws-amplify";
-import { fetchAuthSession, signOut } from "aws-amplify/auth";
 
 import awsExports from "../aws-exports";
 
@@ -40,28 +39,7 @@ try {
 }
 
 const AppRoutes: React.FC = () => {
-  const { status, setStatus, isActive, refreshUser } = useAuth();
-
-  useEffect(() => {
-    bootstrapAuth();
-  }, []);
-
-  const bootstrapAuth = async () => {
-    try {
-      const session = await fetchAuthSession();
-
-      if (!session.tokens?.idToken) {
-        setStatus("unauthenticated");
-        return;
-      }
-
-      await refreshUser();
-    } catch (err) {
-      console.error("Auth bootstrap failed:", err);
-      await signOut().catch(() => {});
-      setStatus("unauthenticated");
-    }
-  };
+  const { status, isActive } = useAuth();
 
   if (status === "loading") {
     return (
@@ -86,7 +64,7 @@ const AppRoutes: React.FC = () => {
                 <Navigate to="/pending-approval" replace />
               )
             ) : (
-              <Login onAuthSuccess={bootstrapAuth} />
+              <Login />
             )
           }
         />
@@ -112,7 +90,6 @@ const AppRoutes: React.FC = () => {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/settings" element={<Settings />} />
 
-            {/* Consultant only */}
             <Route
               element={
                 <ProtectedRoute
@@ -126,12 +103,10 @@ const AppRoutes: React.FC = () => {
                 path="/clients/:clientId/products"
                 element={<ClientProducts />}
               />
-
               <Route path="/contracts" element={<ContractManagement />} />
               <Route path="/pricelist-analysis" element={<PriceListAnalysis />} />
             </Route>
 
-            {/* Admin only */}
             <Route
               element={
                 <ProtectedRoute

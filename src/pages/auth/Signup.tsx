@@ -234,7 +234,6 @@ const Signup: React.FC = () => {
             className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-[#3498db] hover:bg-[#2980b9] text-white font-semibold rounded-xl disabled:opacity-70 transition-all active:scale-[0.98]"
           >
             {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : 'Sign up'}
-            {!loading && <ArrowRight className="h-5 w-5" />}
           </button>
         </form>
       ) : (

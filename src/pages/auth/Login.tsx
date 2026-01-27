@@ -16,12 +16,10 @@ import {
   ChevronRight,
 } from "lucide-react";
 import AuthLayout from "../../components/auth/AuthLayout";
-import { getCurrentUser } from "../../api/user";
+import { useAuth } from "../../context/AuthContext";
 import QRCode from "qrcode";
  
-interface LoginProps {
-  onAuthSuccess: () => void;
-}
+
  
 type AuthStep =
   | "credentials"
@@ -30,7 +28,9 @@ type AuthStep =
   | "totp-setup-qr"
   | "totp-setup-verify";
  
-const Login: React.FC<LoginProps> = ({ onAuthSuccess }) => {
+const Login: React.FC = () => {
+  const { refreshUser } = useAuth();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [mfaCode, setMfaCode] = useState("");
@@ -64,14 +64,12 @@ const Login: React.FC<LoginProps> = ({ onAuthSuccess }) => {
   }, [authStep, totpSecret, email]);
  
   const handleNextStep = async (nextStep: any) => {
-    // Prevent state update if already processing completion
     if (isAuthProcessed.current) return;
  
     if (nextStep.signInStep === "DONE") {
       isAuthProcessed.current = true;
       try {
-        await getCurrentUser(); 
-        onAuthSuccess(); 
+        await refreshUser(); 
       } catch (err) {
         setError("Login successful, but profile could not be loaded.");
       } finally {

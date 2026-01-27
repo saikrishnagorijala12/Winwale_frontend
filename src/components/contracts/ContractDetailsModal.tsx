@@ -108,14 +108,14 @@ export default function ContractDetailsModal({
                 </span>
                 <span className="font-bold text-slate-800">{contract.fob_term}</span>
               </div>
-              <div className="flex justify-between items-center border-b border-blue-100 pb-2">
+              {/* <div className="flex justify-between items-center border-b border-blue-100 pb-2">
                 <span className="text-sm text-slate-500 font-medium uppercase tracking-tight">
                   GSA Discount
                 </span>
                 <span className="font-bold text-[#38A1DB]">
                   {contract.gsa_proposed_discount}%
                 </span>
-              </div>
+              </div> */}
               <div className="grid grid-cols-2 gap-4 pt-2">
                 <div>
                   <label className="text-[10px] font-bold text-slate-400 uppercase">

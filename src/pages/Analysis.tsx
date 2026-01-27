@@ -622,7 +622,7 @@ export default function PriceListAnalysis() {
 
               {/* Tab Bar */}
               <div className="px-6 pt-4">
-                <div className="bg-slate-100/80 p-1 rounded-2xl flex items-center w-full max-w-4xl">
+                <div className="bg-slate-100/80 p-1 rounded-2xl flex items-center w-full ">
                   {tabs.map((tab) => (
                     <button
                       key={tab.id}
@@ -672,10 +672,10 @@ export default function PriceListAnalysis() {
                         ) : (
                           <>
                             <th className="text-right p-3 font-bold text-slate-700">
-                              Old Value
+                              Old Price
                             </th>
                             <th className="text-right p-3 font-bold text-slate-700">
-                              New Value
+                              New Price
                             </th>
                           </>
                         )}
