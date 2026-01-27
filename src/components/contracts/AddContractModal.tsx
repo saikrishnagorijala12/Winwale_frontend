@@ -1,6 +1,5 @@
-// src/components/contracts/AddContractModal.tsx
 import React, { useState, useEffect } from "react";
-import { X, CheckCircle2, Loader2 } from "lucide-react";
+import { X, CheckCircle2, Loader2, AlertCircle } from "lucide-react";
 import {
   ClientContractCreate,
   ClientListRead,
@@ -66,12 +65,11 @@ export default function AddContractModal({
   const validateStep1 = (): boolean => {
     const newErrors: FormErrors = {};
 
+    if (!contract.client_id) {
+      newErrors.client_id = "You must select a client first";
+    }
     if (!contract.contract_number?.trim()) {
       newErrors.contract_number = "Contract number is required";
-    }
-
-    if (!contract.client_id) {
-      newErrors.client_id = "Please select a client";
     }
 
     setErrors(newErrors);
@@ -89,7 +87,8 @@ export default function AddContractModal({
     }
 
     if (!contract.client_id) {
-      setErrors({ client_id: "Please select a client" });
+      setErrors({ client_id: "Client selection is missing" });
+      setStep(1);
       return;
     }
 
@@ -99,27 +98,39 @@ export default function AddContractModal({
 
     try {
       const { client_id, ...payload } = contract;
-      await contractService.createContract(client_id!, payload);
-      handleClose();
+
+      const formattedPayload = {
+        ...payload,
+        origin_country: payload.origin_country || "USA",
+        gsa_proposed_discount: Number(payload.gsa_proposed_discount) || 0,
+        normal_delivery_time: Number(payload.normal_delivery_time) || 0,
+        expedited_delivery_time: Number(payload.expedited_delivery_time) || 0,
+      };
+
+      await contractService.createContract(client_id!, formattedPayload);
+
       onSuccess();
+      handleClose();
     } catch (err: any) {
-      const status = err?.response?.status;
       const detail = err?.response?.data?.detail;
+      const status = err?.response?.status;
 
-      if (status === 400) {
+      if (status === 409) {
         setErrors({
-          submit: detail || "Contract already exists for this client",
+          submit: detail || "This client already has an active contract.",
         });
-        return;
+      } else if (Array.isArray(detail)) {
+        setErrors({
+          submit: detail[0]?.msg || "Invalid data format provided.",
+        });
+      } else {
+        setErrors({
+          submit: detail || "An error occurred while creating the contract.",
+        });
       }
-
-      setErrors({
-        submit: detail || "Failed to create contract",
-      });
+    } finally {
+      setIsSubmitting(false);
     }
-    finally {
-    setIsSubmitting(false); 
-  }
   };
 
   const handleClose = () => {
@@ -130,19 +141,27 @@ export default function AddContractModal({
     onClose();
   };
 
+  useEffect(() => {
+    setErrors({});
+  }, [step]);
+
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/60  z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
       <div className="bg-white rounded-3xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-hidden flex flex-col">
-        {/* HEADER */}
-        <div className="bg-linear-to-br from-[#38A1DB] to-[#2D8BBF] py-4 px-8">
+        <div className="bg-linear-to-br from-[#38A1DB] to-[#2D8BBF] py-5 px-8 shrink-0">
           <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-bold text-white">Add Contract</h2>
+            <div>
+              <h2 className="text-2xl font-bold text-white">Create Contract</h2>
+              <p className="text-blue-50 text-sm opacity-80">
+                Setup a new contract profile for your client
+              </p>
+            </div>
             <button
               type="button"
               onClick={handleClose}
-              className="p-2 hover:bg-white/20 rounded-full"
+              className="p-2 hover:bg-white/20 rounded-full transition-colors"
               disabled={isSubmitting}
             >
               <X className="w-6 h-6 text-white" />
@@ -150,18 +169,17 @@ export default function AddContractModal({
           </div>
         </div>
 
-        {/* STEPS */}
-        <div className="flex items-center justify-center gap-4 p-4 bg-slate-50 border-b border-slate-200">
-          {["Officer Info", "Logistics & Terms"].map((label, i) => {
+        <div className="flex items-center justify-center gap-4 p-4 bg-slate-50 border-b border-slate-200 shrink-0">
+          {["Client & Officer", "Terms & Delivery"].map((label, i) => {
             const stepNum = (i + 1) as 1 | 2;
             const active = step >= stepNum;
             const completed = step > stepNum;
 
             return (
-              <div key={stepNum} className="flex items-center gap-4">
+              <React.Fragment key={stepNum}>
                 <div className="flex items-center gap-3">
                   <div
-                    className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ${
+                    className={`w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all ${
                       active
                         ? "bg-[#38A1DB] text-white"
                         : "bg-slate-200 text-slate-400"
@@ -170,37 +188,33 @@ export default function AddContractModal({
                     {completed ? <CheckCircle2 className="w-6 h-6" /> : stepNum}
                   </div>
                   <span
-                    className={`font-semibold ${
-                      active ? "text-[#38A1DB]" : "text-slate-400"
-                    }`}
+                    className={`font-semibold ${active ? "text-[#38A1DB]" : "text-slate-400"}`}
                   >
                     {label}
                   </span>
                 </div>
                 {i === 0 && (
                   <div
-                    className={`w-16 h-1 rounded-full ${
-                      completed ? "bg-[#38A1DB]" : "bg-slate-200"
-                    }`}
+                    className={`w-16 h-1 rounded-full transition-colors ${completed ? "bg-[#38A1DB]" : "bg-slate-200"}`}
                   />
                 )}
-              </div>
+              </React.Fragment>
             );
           })}
         </div>
 
-        {/* FORM */}
         <form
           onSubmit={handleFormSubmit}
           noValidate
           className="flex-1 overflow-y-auto"
         >
-          <div className="py-4 px-8 space-y-6">
+          <div className="py-6 px-8 space-y-6">
             {errors.submit && (
-              <div className="bg-red-50 border border-red-200 rounded-xl p-4">
-                <p className="text-sm font-semibold text-red-800">
-                  {errors.submit}
-                </p>
+              <div className="bg-red-50 border-l-4 border-red-500 rounded-r-xl p-4 flex items-start gap-3">
+                <AlertCircle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-sm text-red-700">{errors.submit}</p>
+                </div>
               </div>
             )}
 
@@ -226,15 +240,15 @@ export default function AddContractModal({
             )}
           </div>
 
-          {/* FOOTER */}
-          <div className="sticky bottom-0 bg-slate-50 p-6 flex justify-between border-t border-slate-200">
+          {/* FOOTER ACTIONS */}
+          <div className="sticky bottom-0 bg-slate-50 p-6 flex justify-between border-t border-slate-200 shrink-0">
             <button
               type="button"
               onClick={() => {
                 if (step === 1) handleClose();
                 else setStep(1);
               }}
-              className="px-6 py-3 rounded-xl border-2 border-slate-300 font-bold text-slate-600 hover:bg-slate-100"
+              className="px-6 py-3 rounded-xl border-2 border-slate-300 font-bold text-slate-600 hover:bg-slate-100 transition-colors disabled:opacity-50"
               disabled={isSubmitting}
             >
               {step === 1 ? "Cancel" : "Back"}
@@ -243,10 +257,18 @@ export default function AddContractModal({
             <button
               type="submit"
               disabled={isSubmitting}
-              className="px-8 py-3 rounded-xl bg-[#38A1DB] text-white font-bold hover:bg-[#2D8BBF] shadow-lg shadow-blue-200 flex items-center gap-2 disabled:opacity-50"
+              className="px-8 py-3 rounded-xl bg-[#38A1DB] text-white font-bold hover:bg-[#2D8BBF] shadow-lg shadow-blue-200 flex items-center gap-2 transition-all disabled:opacity-50 active:scale-95"
             >
-              {isSubmitting && <Loader2 className="w-5 h-5 animate-spin" />}
-              {step === 1 ? "Next" : "Create Contract Profile"}
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  Processing...
+                </>
+              ) : step === 1 ? (
+                "Next Step"
+              ) : (
+                "Create Contract Profile"
+              )}
             </button>
           </div>
         </form>

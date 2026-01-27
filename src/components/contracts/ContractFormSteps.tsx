@@ -173,15 +173,6 @@ export function Step2({ contract, onChange, errors }: Step2Props) {
   return (
     <div className="grid md:grid-cols-2 gap-6">
       <div>
-        <label className="text-sm font-bold text-slate-700">Origin Country</label>
-        <input
-          type="text"
-          className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] outline-none"
-          value={contract.origin_country || ""}
-          onChange={(e) => onChange({ ...contract, origin_country: e.target.value })}
-        />
-      </div>
-      <div>
         <label className="text-sm font-bold text-slate-700">FOB Term</label>
         <select
           className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] outline-none bg-white"
@@ -192,18 +183,7 @@ export function Step2({ contract, onChange, errors }: Step2Props) {
           <option value="Destination">Destination</option>
         </select>
       </div>
-      <div>
-        <label className="text-sm font-bold text-slate-700">GSA Proposed Discount (%)</label>
-        <input
-          type="number"
-          step="0.01"
-          className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] outline-none"
-          value={contract.gsa_proposed_discount || 0}
-          onChange={(e) =>
-            onChange({ ...contract, gsa_proposed_discount: parseFloat(e.target.value) || 0 })
-          }
-        />
-      </div>
+      
       <div>
         <label className="text-sm font-bold text-slate-700">Energy Star Compliance</label>
         <select
