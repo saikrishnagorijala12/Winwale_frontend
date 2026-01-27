@@ -129,7 +129,6 @@ const AppRoutes: React.FC = () => {
 
               <Route path="/contracts" element={<ContractManagement />} />
               <Route path="/pricelist-analysis" element={<PriceListAnalysis />} />
-              {/* <Route path="/pricelist-analysis" element={<Analysis />} /> */}
             </Route>
 
             {/* Admin only */}
