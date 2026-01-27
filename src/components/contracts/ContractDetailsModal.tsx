@@ -52,9 +52,8 @@ export default function ContractDetailsModal({
                   Contract {contract.contract_number}
                 </h2>
                 <p className="text-sm md:text-base text-blue-100 font-medium mt-1">
-                  Origin Country:{" "}
                   <span className="font-semibold text-white/90">
-                    {contract.origin_country || "—"}
+                    {contract.client || "—"}
                   </span>
                 </p>
               </div>

@@ -53,7 +53,8 @@ export const ContactFormStep: React.FC<ContactFormStepProps> = ({
     touched[field] && errors[field];
 
   const inputClass = (field: keyof ClientFormData) =>
-    `w-full px-4 py-3 rounded-xl border-2 transition-colors focus:outline-none border-slate-200 focus:border-[#38A1DB]"
+    `w-full px-4 py-3 rounded-xl border-2 transition-colors focus:outline-none ${
+      showError(field) ? "border-red-500" : "border-slate-200 focus:border-[#38A1DB]"
     }`;
 
   return (

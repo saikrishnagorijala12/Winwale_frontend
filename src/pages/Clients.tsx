@@ -27,6 +27,7 @@ export default function ClientsPage() {
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
   const [errors, setErrors] = useState<ClientFormErrors>({});
+  const [backendError, setBackendError] = useState<string>("");
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [addStep, setAddStep] = useState(1);
@@ -80,6 +81,65 @@ export default function ClientsPage() {
     }
   };
 
+  const handleApiError = (err: any, context: string = "operation") => {
+    console.error(`Error during ${context}:`, err);
+
+    const status = err.response?.status;
+    const message = err.response?.data?.detail || err.response?.data?.message;
+    let errorMessage = "";
+
+    switch (status) {
+      case 400:
+        errorMessage = message || "Invalid data provided. Please check your inputs.";
+        break;
+
+      case 401:
+        errorMessage = message || "You are not authorized. Please log in again.";
+        break;
+
+      case 403:
+        errorMessage = message || "You don't have permission to perform this action.";
+        break;
+
+      case 404:
+        errorMessage = message || "Client not found.";
+        break;
+
+      case 409:
+        errorMessage =
+          message ||
+          "A client with this email or phone number already exists. Please use different contact information.";
+        // Go back to step 1 to show the error
+        if (context === "create client") {
+          setAddStep(1);
+        } else if (context === "update client") {
+          setEditStep(1);
+        }
+        break;
+
+      case 422:
+        errorMessage = message || "Validation error. Please check all required fields.";
+        break;
+
+      case 500:
+        errorMessage = message || "Server error occurred. Please try again later.";
+        break;
+
+      case 503:
+        errorMessage = message || "Service temporarily unavailable. Please try again later.";
+        break;
+
+      default:
+        if (err.message === "Network Error") {
+          errorMessage = "Network error";
+        } else {
+          errorMessage = message || `Failed to ${context}. Please try again.`;
+        }
+    }
+
+    setBackendError(errorMessage);
+  };
+
   const handleAddClient = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -100,8 +160,7 @@ export default function ClientsPage() {
       resetAddClientForm();
       toast.success("Client created successfully");
     } catch (err: any) {
-      console.error(err);
-      toast.error(err.response?.data?.message || "Failed to create client");
+      handleApiError(err, "create client");
     } finally {
       setIsSubmitting(false);
     }
@@ -109,7 +168,7 @@ export default function ClientsPage() {
 
   const handleEditClient = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!editingClient) {
       return;
     }
@@ -140,8 +199,7 @@ export default function ClientsPage() {
       setErrors({});
       toast.success("Client updated successfully");
     } catch (err: any) {
-      console.error(err);
-      toast.error(err.response?.data?.message || "Failed to update client");
+      handleApiError(err, "update client");
     } finally {
       setIsSubmitting(false);
     }
@@ -155,6 +213,7 @@ export default function ClientsPage() {
     setNewClient(getInitialFormData());
     setAddStep(1);
     setErrors({});
+    setBackendError("");
   };
 
   const openEditDialog = (client: Client) => {
@@ -179,6 +238,7 @@ export default function ClientsPage() {
     });
     setEditStep(1);
     setErrors({});
+    setBackendError("");
     setShowEditDialog(true);
   };
 
@@ -202,9 +262,8 @@ export default function ClientsPage() {
         const res = await api.get("/clients");
         const normalized = res.data.map(normalizeClientFromAPI);
         setClients(normalized);
-      } catch (err) {
-        console.error("Failed to fetch clients", err);
-        toast.error("Failed to load clients");
+      } catch (err: any) {
+        handleApiError(err, "load clients");
       } finally {
         setLoading(false);
       }
@@ -249,6 +308,7 @@ export default function ClientsPage() {
         title="Add Client"
         formData={newClient}
         errors={errors}
+        backendError={backendError}
         currentStep={addStep}
         isSubmitting={isSubmitting}
         onClose={() => {
@@ -262,6 +322,7 @@ export default function ClientsPage() {
           handleFormChange(newClient, setNewClient, field, value)
         }
         onClearError={handleClearError}
+        onClearBackendError={() => setBackendError("")}
         submitButtonText="Create Client Profile"
       />
 
@@ -271,12 +332,14 @@ export default function ClientsPage() {
           title="Edit Client"
           formData={editingClient}
           errors={errors}
+          backendError={backendError}
           currentStep={editStep}
           isSubmitting={isSubmitting}
           onClose={() => {
             setShowEditDialog(false);
             setEditStep(1);
             setErrors({});
+            setBackendError("");
           }}
           onSubmit={handleEditClient}
           onNext={handleEditNextStep}
@@ -285,6 +348,7 @@ export default function ClientsPage() {
             handleFormChange(editingClient, setEditingClient, field, value)
           }
           onClearError={handleClearError}
+          onClearBackendError={() => setBackendError("")}
           submitButtonText="Update Client"
         />
       )}

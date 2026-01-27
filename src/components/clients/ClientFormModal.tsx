@@ -10,6 +10,7 @@ interface ClientFormModalProps {
   title: string;
   formData: ClientFormData | EditingClient;
   errors: ClientFormErrors;
+  backendError?: string;
   currentStep: number;
   isSubmitting: boolean;
   onClose: () => void;
@@ -18,7 +19,10 @@ interface ClientFormModalProps {
   onBack: () => void;
   onChange: (field: keyof ClientFormData, value: string) => void;
   onClearError: (field: keyof ClientFormErrors) => void;
+  onClearBackendError?: () => void;
   submitButtonText?: string;
+  errorMessage?: string;
+  onClearErrorMessage?: () => void;
 }
 
 const STEPS = ["Company Info", "Primary Contact"];
@@ -28,6 +32,7 @@ export const ClientFormModal: React.FC<ClientFormModalProps> = ({
   title,
   formData,
   errors,
+  backendError,
   currentStep,
   isSubmitting,
   onClose,
@@ -36,6 +41,7 @@ export const ClientFormModal: React.FC<ClientFormModalProps> = ({
   onBack,
   onChange,
   onClearError,
+  onClearBackendError,
   submitButtonText = "Create Client Profile",
 }) => {
   const [isContactFormValid, setIsContactFormValid] = useState(false);
@@ -45,7 +51,6 @@ export const ClientFormModal: React.FC<ClientFormModalProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Only allow submission if we're on step 2 and contact form is valid
     if (currentStep === 2 && isContactFormValid) {
       onSubmit(e);
     }
@@ -71,6 +76,28 @@ export const ClientFormModal: React.FC<ClientFormModalProps> = ({
 
         {/* Stepper */}
         <FormStepper currentStep={currentStep} steps={STEPS} />
+
+        {/* Backend Error Message */}
+        {backendError && (
+          <div className="mx-8 mt-4 p-4 bg-red-50 border-l-4 border-red-500 ">
+            <div className="flex items-start">
+              <div className="ml-3 flex-1">
+                <p className="text-sm font-medium text-red-800">
+                  {backendError}
+                </p>
+              </div>
+              {onClearBackendError && (
+                <button
+                  type="button"
+                  onClick={onClearBackendError}
+                  className="ml-3 shrink-0 text-red-400 hover:text-red-600 transition-colors"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Body */}
         <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto">

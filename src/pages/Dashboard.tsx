@@ -58,7 +58,7 @@ export default function Dashboard() {
           </p>
         </div>
         <button
-          onClick={() => navigate('/price-list-analysis')}
+          onClick={() => navigate('/pricelist-analysis')}
           className="btn-primary"
 
         >
