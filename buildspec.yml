@@ -1,14 +1,18 @@
 version: 0.2
 
 phases:
+  install:
+    runtime-versions:
+      nodejs: 24
+      # This fixes the "Unsupported engine" error - your packages require Node 20+
+      
   pre_build:
     commands:
       - echo Installing dependencies...
       - node --version
       - npm --version
-      - npm ci
-      # Alternative: use 'npm install' if you don't have package-lock.json
-      # - npm install
+      # Use 'npm install' instead of 'npm ci' to handle lock file sync issues
+      - npm install
       
   build:
     commands:
@@ -24,9 +28,7 @@ artifacts:
   files:
     - '**/*'
   base-directory: 'dist'
-  # Change 'dist' to your build output directory if different
   
 cache:
   paths:
     - 'node_modules/**/*'
-    # Caching node_modules speeds up subsequent builds
