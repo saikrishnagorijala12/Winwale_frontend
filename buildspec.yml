@@ -1,19 +1,32 @@
 version: 0.2
 
 phases:
-  install:
-    runtime-versions:
-      nodejs: 20
+  pre_build:
     commands:
-      - echo Installing dependencies
-      - npm install
-
+      - echo Installing dependencies...
+      - node --version
+      - npm --version
+      - npm ci
+      # Alternative: use 'npm install' if you don't have package-lock.json
+      # - npm install
+      
   build:
     commands:
-      - echo Building Vite app
+      - echo Build started on `date`
       - npm run build
+      - echo Build completed on `date`
+      
+  post_build:
+    commands:
+      - echo Build finished
 
 artifacts:
   files:
     - '**/*'
-  discard-paths: no
+  base-directory: 'dist'
+  # Change 'dist' to your build output directory if different
+  
+cache:
+  paths:
+    - 'node_modules/**/*'
+    # Caching node_modules speeds up subsequent builds
