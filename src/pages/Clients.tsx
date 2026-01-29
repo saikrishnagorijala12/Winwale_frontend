@@ -306,6 +306,7 @@ export default function ClientsPage() {
       <ClientFormModal
         isOpen={showAddDialog}
         title="Add Client"
+        subtitle="Set up a new Client Profile "
         formData={newClient}
         errors={errors}
         backendError={backendError}
@@ -330,6 +331,7 @@ export default function ClientsPage() {
         <ClientFormModal
           isOpen={showEditDialog}
           title="Edit Client"
+          subtitle="Update client profile details"
           formData={editingClient}
           errors={errors}
           backendError={backendError}

@@ -72,7 +72,9 @@ export default function ContractDetailsModal({
           <div className="bg-linear-to-br from-slate-50 to-white p-6 rounded-2xl border border-slate-200">
             <div className="flex items-center gap-3 mb-6">
               <User className="w-6 h-6 text-[#38A1DB]" />
-              <h3 className="text-xl font-bold text-slate-800">Contract Officer</h3>
+              <h3 className="text-xl font-bold text-slate-800">
+                Contract Officer
+              </h3>
             </div>
             <div className="space-y-4">
               <div>
@@ -100,14 +102,18 @@ export default function ContractDetailsModal({
           <div className="bg-linear-to-br from-blue-50 to-white p-6 rounded-2xl border border-blue-200">
             <div className="flex items-center gap-3 mb-6">
               <Settings className="w-6 h-6 text-[#38A1DB]" />
-              <h3 className="text-xl font-bold text-slate-800">Terms & Logistics</h3>
+              <h3 className="text-xl font-bold text-slate-800">
+                Terms & Logistics
+              </h3>
             </div>
             <div className="space-y-4">
               <div className="flex justify-between items-center border-b border-blue-100 pb-2">
                 <span className="text-sm text-slate-500 font-medium uppercase tracking-tight">
                   FOB Term
                 </span>
-                <span className="font-bold text-slate-800">{contract.fob_term}</span>
+                <span className="font-bold text-slate-800">
+                  {contract.fob_term}
+                </span>
               </div>
               {/* <div className="flex justify-between items-center border-b border-blue-100 pb-2">
                 <span className="text-sm text-slate-500 font-medium uppercase tracking-tight">
@@ -158,7 +164,9 @@ export default function ContractDetailsModal({
           <div className="md:col-span-2 bg-slate-50 p-6 rounded-2xl border border-slate-200">
             <div className="flex items-center gap-3 mb-4">
               <Info className="w-6 h-6 text-slate-400" />
-              <h3 className="text-xl font-bold text-slate-800">Additional Terms</h3>
+              <h3 className="text-xl font-bold text-slate-800">
+                Additional Terms
+              </h3>
             </div>
             <div className="grid md:grid-cols-2 gap-8">
               <div>
@@ -193,9 +201,12 @@ export default function ContractDetailsModal({
               onEdit(contract);
               onClose();
             }}
-            className="px-6 py-3 rounded-2xl bg-linear-to-br from-[#38A1DB] to-[#2D8BBF] text-white font-bold shadow-lg hover:shadow-xl transition-all active:scale-95"
+            className="flex items-center gap-2 px-6 py-3 rounded-2xl
+             bg-linear-to-br from-[#38A1DB] to-[#2D8BBF]
+             text-white font-bold shadow-lg hover:shadow-xl
+             transition-all active:scale-95"
           >
-            <Edit className="w-4 h-4" />
+            <Edit className="w-4 h-4 stroke-[2.5px]" />
             Edit Contract
           </button>
         </div>

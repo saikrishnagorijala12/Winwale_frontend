@@ -8,6 +8,7 @@ import { ContactFormStep } from './ContactFormStep';
 interface ClientFormModalProps {
   isOpen: boolean;
   title: string;
+  subtitle:string;
   formData: ClientFormData | EditingClient;
   errors: ClientFormErrors;
   backendError?: string;
@@ -30,6 +31,7 @@ const STEPS = ["Company Info", "Primary Contact"];
 export const ClientFormModal: React.FC<ClientFormModalProps> = ({
   isOpen,
   title,
+  subtitle,
   formData,
   errors,
   backendError,
@@ -62,7 +64,10 @@ export const ClientFormModal: React.FC<ClientFormModalProps> = ({
         {/* Header */}
         <div className="bg-linear-to-br from-[#38A1DB] to-[#2D8BBF] py-4 px-8 shrink-0">
           <div className="flex items-center justify-between">
+            <div>
             <h2 className="text-2xl font-bold text-white">{title}</h2>
+            <p className="text-blue-50 text-sm opacity-80">{subtitle}</p>
+            </div>
             <button
               type="button"
               onClick={onClose}
