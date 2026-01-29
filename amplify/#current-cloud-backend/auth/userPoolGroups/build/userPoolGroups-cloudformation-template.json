@@ -1,0 +1,109 @@
+{
+  "Description": "{\"createdOn\":\"Linux\",\"createdBy\":\"Amplify\",\"createdWith\":\"12.13.1\",\"stackType\":\"auth-Cognito-UserPool-Groups\",\"metadata\":{\"whyContinueWithGen1\":\"Prefer not to answer\"}}",
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Parameters": {
+    "env": {
+      "Type": "String"
+    },
+    "AuthRoleArn": {
+      "Type": "String"
+    },
+    "UnauthRoleArn": {
+      "Type": "String"
+    },
+    "authwinvaleanalysisplatfdf4d4eddUserPoolId": {
+      "Type": "String",
+      "Default": "authwinvaleanalysisplatfdf4d4eddUserPoolId"
+    },
+    "authwinvaleanalysisplatfdf4d4eddIdentityPoolId": {
+      "Type": "String",
+      "Default": "authwinvaleanalysisplatfdf4d4eddIdentityPoolId"
+    },
+    "authwinvaleanalysisplatfdf4d4eddAppClientID": {
+      "Type": "String",
+      "Default": "authwinvaleanalysisplatfdf4d4eddAppClientID"
+    },
+    "authwinvaleanalysisplatfdf4d4eddAppClientIDWeb": {
+      "Type": "String",
+      "Default": "authwinvaleanalysisplatfdf4d4eddAppClientIDWeb"
+    }
+  },
+  "Conditions": {
+    "ShouldNotCreateEnvResources": {
+      "Fn::Equals": [
+        {
+          "Ref": "env"
+        },
+        "NONE"
+      ]
+    }
+  },
+  "Resources": {
+    "winvaleanalysisuseastGroup": {
+      "Type": "AWS::Cognito::UserPoolGroup",
+      "Properties": {
+        "Description": "override success",
+        "GroupName": "winvaleanalysisuseast",
+        "Precedence": 1,
+        "RoleArn": {
+          "Fn::GetAtt": [
+            "winvaleanalysisuseastGroupRole",
+            "Arn"
+          ]
+        },
+        "UserPoolId": {
+          "Ref": "authwinvaleanalysisplatfdf4d4eddUserPoolId"
+        }
+      }
+    },
+    "winvaleanalysisuseastGroupRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Sid": "",
+              "Effect": "Allow",
+              "Principal": {
+                "Federated": "cognito-identity.amazonaws.com"
+              },
+              "Action": "sts:AssumeRoleWithWebIdentity",
+              "Condition": {
+                "StringEquals": {
+                  "cognito-identity.amazonaws.com:aud": {
+                    "Ref": "authwinvaleanalysisplatfdf4d4eddIdentityPoolId"
+                  }
+                },
+                "ForAnyValue:StringLike": {
+                  "cognito-identity.amazonaws.com:amr": "authenticated"
+                }
+              }
+            }
+          ]
+        },
+        "RoleName": {
+          "Fn::Join": [
+            "",
+            [
+              {
+                "Ref": "authwinvaleanalysisplatfdf4d4eddUserPoolId"
+              },
+              "-winvaleanalysisuseastGroupRole"
+            ]
+          ]
+        }
+      }
+    }
+  },
+  "Outputs": {
+    "winvaleanalysisuseastGroupRole": {
+      "Value": {
+        "Fn::GetAtt": [
+          "winvaleanalysisuseastGroupRole",
+          "Arn"
+        ]
+      }
+    }
+  }
+}
