@@ -31,6 +31,11 @@ import GsaProducts from "../pages/GsaProducts";
 
 import { ROLES } from "../types/roles.types";
 import PriceListAnalysis from "../pages/PriceListAnalysis";
+import Analysis from "../pages/Analysis";
+import { DocumentProvider } from "../context/DocumentContext";
+import { DocumentWorkflowRenderer } from "../pages/DocumentGeneration";
+import AnalysisHistory from "../pages/AnalysisHistory";
+import DownloadHistory from "../pages/DownloadHistory";
 
 try {
   Amplify.configure(awsExports);
@@ -104,7 +109,23 @@ const AppRoutes: React.FC = () => {
                 element={<ClientProducts />}
               />
               <Route path="/contracts" element={<ContractManagement />} />
-              <Route path="/pricelist-analysis" element={<PriceListAnalysis />} />
+              <Route
+                path="/pricelist-analysis"
+                element={<PriceListAnalysis />}
+              />
+              {/* <Route path="/pricelist-analysis" element={<Analysis />} />
+              <Route
+                path="/documents"
+                element={
+                  <DocumentProvider>
+                    <DocumentWorkflowRenderer />
+                  </DocumentProvider>
+                }
+              />
+
+              <Route path="/analysis" element={<AnalysisHistory />} />
+
+              <Route path="/downloads" element={<DownloadHistory />} /> */}
             </Route>
 
             <Route
@@ -131,8 +152,8 @@ const AppRoutes: React.FC = () => {
                 !isAuthenticated
                   ? "/login"
                   : isActive
-                  ? "/dashboard"
-                  : "/pending-approval"
+                    ? "/dashboard"
+                    : "/pending-approval"
               }
               replace
             />

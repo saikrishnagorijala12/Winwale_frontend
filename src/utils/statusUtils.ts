@@ -1,45 +1,81 @@
-// src/constants/status.ts
-import { StatusMapItem } from "../types/client.types";
+import {
+  Clock,
+  CheckCircle2,
+  XCircle,
+  PauseCircle,
+  PlayCircle,
+} from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 
-export const STATUS_MAP: StatusMapItem[] = [
-  { label: "Pending", slug: "pending" },
-  { label: "Active", slug: "active" },
-  { label: "Inactive", slug: "inactive" },
-  { label: "Approved", slug: "approved" },
-  { label: "Rejected", slug: "rejected" },
-];
+
+export type StatusSlug =
+  | "pending"
+  | "active"
+  | "inactive"
+  | "approved"
+  | "rejected";
+
+export type StatusConfig = {
+  slug: StatusSlug;
+  label: string;
+  styles: string;
+  icon: LucideIcon;
+};
+
+
+export const STATUS_BADGE_BASE =
+  "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border";
+
+
+export const STATUS_MAP: Record<StatusSlug, StatusConfig> = {
+  pending: {
+    slug: "pending",
+    label: "Pending",
+    styles: "bg-orange-50 text-orange-600 border-orange-100",
+    icon: Clock,
+  },
+  active: {
+    slug: "active",
+    label: "Active",
+    styles: "bg-[#DCFCE7] text-[#15803D] border-[#BBF7D0]",
+    icon: PlayCircle,
+  },
+  inactive: {
+    slug: "inactive",
+    label: "Inactive",
+    styles: "bg-[#E5E7EB] text-[#374151] border-[#D1D5DB]",
+    icon: PauseCircle,
+  },
+  approved: {
+    slug: "approved",
+    label: "Approved",
+    styles: "bg-emerald-50 text-emerald-600 border-emerald-100",
+    icon: CheckCircle2,
+  },
+  rejected: {
+    slug: "rejected",
+    label: "Rejected",
+    styles: "bg-rose-50 text-rose-600 border-rose-100",
+    icon: XCircle,
+  },
+};
+
+
+export const normalizeStatus = (status?: string): StatusSlug | "unknown" => {
+  if (!status) return "unknown";
+
+  const normalized = status.toLowerCase() as StatusSlug;
+  return normalized in STATUS_MAP ? normalized : "unknown";
+};
 
 export const getStatusLabel = (status: string): string => {
-  return (
-    STATUS_MAP.find((item) => item.slug === status)?.label || "Unknown"
-  );
+  const slug = normalizeStatus(status);
+  return slug === "unknown" ? "Unknown" : STATUS_MAP[slug].label;
 };
 
-export const normalizeStatus = (status?: string): string => {
-  if (!status) return "Unknown";
-
-  const normalized = status.toLowerCase();
-
-  return STATUS_MAP.some((item) => item.slug === normalized)
-    ? normalized
-    : "Unknown";
-};
-
-
-
-export const getStatusStyles = (slug: string): string => {
-  switch (slug) {
-    case "active":
-      return "bg-[#DCFCE7] text-[#15803D]";
-    case "pending":
-      return "bg-[#FEF9C3] text-[#A16207]";
-    case "inactive":
-      return "bg-[#E5E7EB] text-[#374151]";
-    case "approved":
-      return "bg-[#DBEAFE] text-[#1D4ED8]";
-    case "rejected":
-      return "bg-[#FEE2E2] text-[#B91C1C]";
-    default:
-      return "bg-slate-100 text-slate-700";
-  }
+export const getStatusStyles = (status: string): string => {
+  const slug = normalizeStatus(status);
+  return slug === "unknown"
+    ? "bg-slate-100 text-slate-700 border-slate-200"
+    : STATUS_MAP[slug].styles;
 };

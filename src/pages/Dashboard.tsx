@@ -154,7 +154,7 @@ export default function Dashboard() {
 
             <div className="space-y-3">
               {[
-                { label: 'New Analysis', icon: PlusCircle, to: '/price-list-analysis' },
+                { label: 'New Analysis', icon: PlusCircle, to: '/pricelist-analysis' },
                 { label: 'Add Client', icon: UserPlus, to: '/clients' },
                 { label: 'View Reports', icon: BarChart3, to: '/dashboard' }
               ].map((action) => (
@@ -175,13 +175,13 @@ export default function Dashboard() {
           {/* Contract Status List */}
           <div className="bg-white p-8 rounded-2xl shadow-sm ">
             <h3 className="text-xs font-black uppercase tracking-widest mb-6" style={{ color: colors.muted }}>
-              Contract Status
+              Clients Status
             </h3>
             <div className="space-y-5">
               {[
                 { label: 'Active', val: '24', color: colors.success },
                 { label: 'Pending', val: '05', color: colors.warning },
-                { label: 'Expired', val: '02', color: colors.destructive }
+                { label: 'Rejected', val: '02', color: colors.destructive }
               ].map((item) => (
                 <div key={item.label} className="flex items-center justify-between group">
                   <div className="flex items-center gap-3">

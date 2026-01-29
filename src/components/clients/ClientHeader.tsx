@@ -9,7 +9,7 @@ export const ClientHeader: React.FC<ClientHeaderProps> = ({ onAddClick }) => {
   return (
     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-12 mx-auto">
       <div>
-        <h1 className="text-4xl font-extrabold tracking-tight text-[#1E293B]">
+        <h1 className="text-3xl font-extrabold tracking-tight text-[#1E293B]">
           Clients
         </h1>
         <p className="text-slate-500 font-medium mt-1">

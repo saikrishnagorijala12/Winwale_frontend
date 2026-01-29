@@ -102,18 +102,18 @@ export default function ContractTable({
                   className="group hover:bg-blue-50/30 cursor-pointer transition-all duration-200"
                 >
                   <td className="px-6 py-4 whitespace-nowrap">
+                        <span className="font-bold text-slate-800 text-sm group-hover:text-[#38A1DB] transition-colors">{contract.contract_number}</span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center gap-4">
                       <div className="w-10 h-10 shrink-0 rounded-xl bg-linear-to-br from-[#38A1DB] to-[#2D8BBF] flex items-center justify-center text-white text-xs font-bold shadow-sm">
-                        {contract.contract_number.slice(0, 2)}
+                        {contract.client.slice(0, 2).toLocaleUpperCase()}
                       </div>
                       <div className="flex flex-col">
-                        <span className="font-bold text-slate-800 text-sm group-hover:text-[#38A1DB] transition-colors">{contract.contract_number}</span>
+                        <span className="font-bold text-slate-800 text-sm transition-colors">{contract.client}</span>
                         <span className="text-[11px] text-slate-400 font-medium">ID: #{contract.client_id}</span>
                       </div>
                     </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="text-sm font-semibold text-slate-700">{contract.client}</span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-slate-600 font-medium">

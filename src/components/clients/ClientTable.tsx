@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { Client } from "../../types/client.types";
 import { ClientActionsMenu } from "./ClientActionsMenu";
+import { normalizeStatus, STATUS_BADGE_BASE, STATUS_MAP } from "@/src/utils/statusUtils";
 
 interface ClientTableProps {
   clients: Client[];
@@ -39,29 +40,26 @@ const formatDate = (value?: string | Date | null) => {
 };
 
 const getStatusBadge = (status: string) => {
-  const baseClasses =
-    "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border";
+  const slug = normalizeStatus(status);
 
-  if (status === "rejected") {
+  if (slug === "unknown") {
     return (
-      <span className={`${baseClasses} bg-rose-50 text-rose-700 border-rose-100`}>
-        <XCircle className="w-3 h-3" /> <span className="hidden sm:inline">Rejected</span>
-      </span>
-    );
-  } else if (status === "approved") {
-    return (
-      <span className={`${baseClasses} bg-emerald-50 text-emerald-700 border-emerald-100`}>
-        <CheckCircle2 className="w-3 h-3" /> <span className="hidden sm:inline">Approved</span>
-      </span>
-    );
-  } else {
-    return (
-      <span className={`${baseClasses} bg-amber-50 text-amber-700 border-amber-100`}>
-        <Clock className="w-3 h-3" /> <span className="hidden sm:inline">Pending</span>
+      <span className={`${STATUS_BADGE_BASE} bg-slate-100 text-slate-700 border-slate-200`}>
+        Unknown
       </span>
     );
   }
+
+  const { label, styles, icon: Icon } = STATUS_MAP[slug];
+
+  return (
+    <span className={`${STATUS_BADGE_BASE} ${styles}`}>
+      <Icon className="w-3 h-3 stroke-[2.5px]" />
+      <span className="hidden sm:inline">{label}</span>
+    </span>
+  );
 };
+
 
 export const ClientTable: React.FC<ClientTableProps> = ({
   clients,

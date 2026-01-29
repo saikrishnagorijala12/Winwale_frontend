@@ -1305,7 +1305,6 @@ export default function ContractsPage() {
       const data = await contractService.getAllContracts();
       setContracts(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load contracts");
       console.error("Error fetching contracts:", err);
     } finally {
       setLoading(false);
@@ -1348,7 +1347,7 @@ export default function ContractsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-slate-50 via-blue-50/30 to-slate-50 p-8">
+    <div className="min-h-screen bg-linear-to-br from-slate-50 via-blue-50/30 to-slate-100 p-6 lg:p-10 space-y-10">
       {error && (
         <div className="mx-auto mb-6 bg-red-50 border border-red-200 rounded-2xl p-4 flex items-start gap-3">
           <AlertCircle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
@@ -1363,7 +1362,7 @@ export default function ContractsPage() {
 
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-12 mx-auto ">
         <div>
-          <h1 className="text-4xl font-extrabold tracking-tight text-slate-800">Contracts</h1>
+          <h1 className="text-3xl font-extrabold tracking-tight text-slate-800">Contracts</h1>
           <p className="text-slate-500 font-medium mt-1">
             Manage your GSA contract profiles and logistics information
           </p>

@@ -3,20 +3,16 @@ import { useAuth } from '../../context/AuthContext';
 import { useState, useEffect } from 'react';
 import {
   LayoutDashboard,
-  Users,
   Settings,
   LogOut,
   Menu,
   X,
-  CheckCircle,
   UserCheck,
   File,
-  Upload,
-  Building,
   Building2Icon,
-  List,
   ListCheckIcon,
-  FileSearch,
+  History,
+  FileSearchCorner,
 } from 'lucide-react';
 import { Role, ROLES } from '@/src/types/roles.types';
 
@@ -30,13 +26,13 @@ export const navItems = [
   },
   {
     to: "/pricelist-analysis",
-    icon: FileSearch,
+    icon: FileSearchCorner,
     label: "Pricelist Analysis",
     roles: [ROLES.USER],
   },
   {
     to: "/clients",
-    icon: Users,
+    icon: Building2Icon,
     label: "Clients",
     roles: [ROLES.USER],
   },
@@ -46,6 +42,12 @@ export const navItems = [
     label: "Contracts",
     roles: [ROLES.USER],
   },
+  // {
+  //   to: "/analysis",
+  //   icon: History,
+  //   label: "Analysis History",
+  //   roles: [ROLES.USER],
+  // },
   {
     to: "/user-activation",
     icon: UserCheck,

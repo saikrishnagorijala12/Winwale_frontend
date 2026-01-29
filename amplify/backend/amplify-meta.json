@@ -14,35 +14,30 @@
   },
   "auth": {
     "winvaleanalysisplatfdf4d4edd": {
-      "service": "Cognito",
-      "providerPlugin": "awscloudformation",
-      "dependsOn": [],
       "customAuth": false,
+      "dependsOn": [],
       "frontendAuthConfig": {
-        "socialProviders": [],
-        "usernameAttributes": [
-          "EMAIL"
-        ],
-        "signupAttributes": [
-          "EMAIL"
+        "mfaConfiguration": "OFF",
+        "mfaTypes": [
+          "SMS"
         ],
         "passwordProtectionSettings": {
           "passwordPolicyMinLength": 8,
           "passwordPolicyCharacters": []
         },
-        "mfaConfiguration": "OFF",
-        "mfaTypes": [
-          "SMS"
+        "signupAttributes": [
+          "EMAIL"
+        ],
+        "socialProviders": [],
+        "usernameAttributes": [
+          "EMAIL"
         ],
         "verificationMechanisms": [
           "EMAIL"
         ]
       },
-      "providerMetadata": {
-        "s3TemplateURL": "https://s3.amazonaws.com/amplify-winvaleanalysisplatf-dev-90271-deployment/amplify-cfn-templates/auth/winvaleanalysisplatfdf4d4edd-cloudformation-template.json",
-        "logicalId": "authwinvaleanalysisplatfdf4d4edd"
-      },
-      "lastPushTimeStamp": "2026-01-06T09:13:46.868Z",
+      "providerPlugin": "awscloudformation",
+      "service": "Cognito",
       "output": {
         "UserPoolId": "eu-north-1_6otZrR1l5",
         "AppClientIDWeb": "7hk1q4rodihotqbjr8mrqsebmv",
@@ -52,7 +47,11 @@
         "IdentityPoolName": "winvaleanalysisplatfdf4d4edd_identitypool_df4d4edd__dev",
         "UserPoolName": "winvaleanalysisplatfdf4d4edd_userpool_df4d4edd"
       },
-      "lastPushDirHash": "JhX02ZVRFfivRjNR6egmlph0Vso="
+      "lastPushTimeStamp": "2026-01-29T06:23:24.629Z",
+      "providerMetadata": {
+        "s3TemplateURL": "https://s3.amazonaws.com/amplify-winvaleanalysisplatf-dev-90271-deployment/amplify-cfn-templates/auth/winvaleanalysisplatfdf4d4edd-cloudformation-template.json",
+        "logicalId": "authwinvaleanalysisplatfdf4d4edd"
+      }
     }
   }
 }

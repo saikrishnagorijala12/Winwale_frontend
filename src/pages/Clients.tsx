@@ -80,6 +80,7 @@ export default function ClientsPage() {
       setEditStep(2);
     }
   };
+  
 
   const handleApiError = (err: any, context: string = "operation") => {
     console.error(`Error during ${context}:`, err);
@@ -131,7 +132,6 @@ export default function ClientsPage() {
 
       default:
         if (err.message === "Network Error") {
-          errorMessage = "Network error";
         } else {
           errorMessage = message || `Failed to ${context}. Please try again.`;
         }
@@ -272,7 +272,7 @@ export default function ClientsPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-slate-50 via-blue-50/30 to-slate-50 p-8">
+    <div className="min-h-screen bg-linear-to-br from-slate-50 via-blue-50/30 to-slate-100 p-6 lg:p-10 space-y-10">
       <ClientHeader onAddClick={() => setShowAddDialog(true)} />
 
       <SearchBar

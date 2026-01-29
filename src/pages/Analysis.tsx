@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useEffect, useState } from "react";
+import React,{ ChangeEvent, useEffect, useState } from "react";
 import {
   Plus,
   Minus,
@@ -22,9 +22,11 @@ import {
   X,
   Play,
   FileSearch,
+  Hash,
 } from "lucide-react";
 import api from "../lib/axios";
 import * as XLSX from "xlsx";
+import { toast } from "sonner";
 
 interface Client {
   client_id: string;
@@ -71,7 +73,6 @@ export default function PriceListAnalysis() {
       const response = await api.get<Client[]>("clients/approved");
       setClients(response.data);
     } catch {
-      setError("Failed to load approved clients");
     } finally {
       setLoadingClients(false);
     }
@@ -90,7 +91,7 @@ export default function PriceListAnalysis() {
   };
 
   const handleFileChange = async (
-    e: ChangeEvent<HTMLInputElement> | React.MouseEvent
+    e: ChangeEvent<HTMLInputElement> | React.MouseEvent,
   ) => {
     if (e.type === "click") {
       document.getElementById("file-upload-input")?.click();
@@ -114,7 +115,7 @@ export default function PriceListAnalysis() {
     const sheet = workbook.Sheets[workbook.SheetNames[0]];
     const jsonData = XLSX.utils.sheet_to_json(sheet, { defval: "" });
     setTotalRows(jsonData.length);
-    setPreviewData(jsonData.slice(0, 5));
+    setPreviewData(jsonData);
   };
 
   const handleRunAnalysis = async () => {
@@ -140,7 +141,7 @@ export default function PriceListAnalysis() {
     } catch (err: any) {
       setIsAnalyzing(false);
       setError(
-        err?.response?.data?.detail ?? "Analysis failed. Please try again."
+        err?.response?.data?.detail ?? "Analysis failed. Please try again.",
       );
     }
   };
@@ -150,17 +151,19 @@ export default function PriceListAnalysis() {
     return {
       additions: actions.filter(
         (a: any) =>
-          a.action_type === "NEW_PRODUCT" || a.action_type === "ADD_PRODUCT"
+          a.action_type === "NEW_PRODUCT" || a.action_type === "ADD_PRODUCT",
       ),
-      deletions: actions.filter((a: any) => a.action_type === "REMOVED_PRODUCT"),
+      deletions: actions.filter(
+        (a: any) => a.action_type === "REMOVED_PRODUCT",
+      ),
       priceIncreases: actions.filter(
-        (a: any) => a.action_type === "PRICE_INCREASE"
+        (a: any) => a.action_type === "PRICE_INCREASE",
       ),
       priceDecreases: actions.filter(
-        (a: any) => a.action_type === "PRICE_DECREASE"
+        (a: any) => a.action_type === "PRICE_DECREASE",
       ),
       descriptionChanges: actions.filter(
-        (a: any) => a.action_type === "DESCRIPTION_CHANGE"
+        (a: any) => a.action_type === "DESCRIPTION_CHANGE",
       ),
     };
   };
@@ -310,10 +313,10 @@ export default function PriceListAnalysis() {
               </div>
 
               {previewData && (
-                <div className="mt-6 border border-slate-200 rounded-xl overflow-hidden animate-in fade-in slide-in-from-top-4">
+                <div className="mt-6 border border-slate-200 rounded-xl overflow-hidden">
                   <div className="bg-slate-50 px-4 py-2 border-b border-slate-200 flex justify-between items-center">
-                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
-                      Data Preview
+                    <span className="text-[10px] font-bold text-slate-500 uppercase">
+                      Data Preview ({totalRows} rows)
                     </span>
                     <button
                       onClick={() => {
@@ -325,10 +328,10 @@ export default function PriceListAnalysis() {
                       <X className="w-4 h-4" />
                     </button>
                   </div>
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-[11px] text-left">
-                      <thead>
-                        <tr className="bg-white border-b border-slate-100">
+                  <div className="max-h-100 overflow-auto">
+                    <table className="w-full text-[11px] text-left border-collapse">
+                      <thead className="sticky top-0 z-10">
+                        <tr className="bg-slate-100 border-b border-slate-200">
                           {Object.keys(previewData[0]).map((h) => (
                             <th
                               key={h}
@@ -343,7 +346,7 @@ export default function PriceListAnalysis() {
                         {previewData.map((row, i) => (
                           <tr
                             key={i}
-                            className="bg-white/50 border-b border-slate-50"
+                            className="bg-white hover:bg-slate-50 border-b border-slate-50 transition-colors"
                           >
                             {Object.values(row).map((val: any, j) => (
                               <td
@@ -396,7 +399,7 @@ export default function PriceListAnalysis() {
 
       case 3:
         const activeClient = clients.find(
-          (c) => String(c.client_id) === String(selectedClient)
+          (c) => String(c.client_id) === String(selectedClient),
         );
         return (
           <div className="group bg-white/80 backdrop-blur-md rounded-3xl border border-slate-200 shadow-2xl shadow-slate-200/60 overflow-hidden">
@@ -416,30 +419,58 @@ export default function PriceListAnalysis() {
 
             <div className="p-6 space-y-6">
               {!uploadResult ? (
-                <div className="p-6 rounded-2xl bg-slate-50 border border-slate-200 grid grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-[10px] text-slate-400 uppercase font-bold tracking-widest mb-1">
-                      Client
-                    </p>
-                    <p className="font-semibold text-slate-900">
-                      {activeClient?.company_name}
-                    </p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full mb-10">
+                  <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 flex items-center gap-4">
+                    <div className="p-3 bg-white rounded-xl shadow-sm">
+                      <Building2 className="w-5 h-5 text-[#3399cc]" />
+                    </div>
+                    <div>
+                      <p className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">
+                        Client Name
+                      </p>
+                      <p className="text-sm font-semibold text-slate-700">
+                        {activeClient?.company_name || "N/A"}
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-[10px] text-slate-400 uppercase font-bold tracking-widest mb-1">
-                      Contract
-                    </p>
-                    <p className="font-semibold text-slate-900">
-                      {activeClient?.contract_number || "N/A"}
-                    </p>
+                  <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 flex items-center gap-4">
+                    <div className="p-3 bg-white rounded-xl shadow-sm">
+                      <FileSearch className="w-5 h-5 text-emerald-600" />
+                    </div>
+                    <div>
+                      <p className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">
+                        Contract Number
+                      </p>
+                      <p className="text-sm font-semibold text-slate-700">
+                        {activeClient?.contract_number || "No Contract"}
+                      </p>
+                    </div>
                   </div>
-                  <div className="col-span-2 pt-2 border-t border-slate-200">
-                    <p className="text-[10px] text-slate-400 uppercase font-bold tracking-widest mb-1">
-                      File
-                    </p>
-                    <p className="font-medium text-[#3399cc] truncate">
-                      {uploadedFileName} ({totalRows} rows)
-                    </p>
+                  <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 flex items-center gap-4">
+                    <div className="p-3 bg-white rounded-xl shadow-sm">
+                      <FileText className="w-5 h-5 text-indigo-600" />
+                    </div>
+                    <div>
+                      <p className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">
+                        File Name
+                      </p>
+                      <p className="text-sm font-semibold text-slate-700 max-w-70">
+                        {uploadedFileName}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 flex items-center gap-4">
+                    <div className="p-3 bg-white rounded-xl shadow-sm">
+                      <Hash className="w-5 h-5 text-orange-600" />
+                    </div>
+                    <div>
+                      <p className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">
+                        Total Rows
+                      </p>
+                      <p className="text-sm font-semibold text-slate-700">
+                        {totalRows.toLocaleString()}
+                      </p>
+                    </div>
                   </div>
                 </div>
               ) : (
@@ -447,7 +478,7 @@ export default function PriceListAnalysis() {
                   <div className="flex items-center gap-2 px-1">
                     <CheckCircle className="w-4 h-4 text-emerald-500" />
                     <span className="text-sm font-bold text-slate-700">
-                      Analysis Complete (Job #{uploadResult.job_id})
+                      Analysis Complete (Analysis #{uploadResult.job_id})
                     </span>
                   </div>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -505,7 +536,8 @@ export default function PriceListAnalysis() {
                   >
                     {isAnalyzing ? (
                       <>
-                        <Loader2 className="w-5 h-5 animate-spin" /> Analyzing...
+                        <Loader2 className="w-5 h-5 animate-spin" />{" "}
+                        Analyzing...
                       </>
                     ) : (
                       <>
@@ -550,8 +582,41 @@ export default function PriceListAnalysis() {
         const startIndex = (currentPage - 1) * itemsPerPage;
         const paginatedActions = activeActions.slice(
           startIndex,
-          startIndex + itemsPerPage
+          startIndex + itemsPerPage,
         );
+
+        const getPageNumbers = (totalPages: number) => {
+          const pages: (number | "...")[] = [];
+
+          if (totalPages <= 7) {
+            // Small count: show all
+            for (let i = 1; i <= totalPages; i++) {
+              pages.push(i);
+            }
+            return pages;
+          }
+
+          pages.push(1);
+
+          if (currentPage > 4) {
+            pages.push("...");
+          }
+
+          const start = Math.max(2, currentPage - 1);
+          const end = Math.min(totalPages - 1, currentPage + 1);
+
+          for (let i = start; i <= end; i++) {
+            pages.push(i);
+          }
+
+          if (currentPage < totalPages - 3) {
+            pages.push("...");
+          }
+
+          pages.push(totalPages);
+
+          return pages;
+        };
 
         const tabs = [
           {
@@ -683,7 +748,10 @@ export default function PriceListAnalysis() {
                     </thead>
                     <tbody className="divide-y divide-slate-100">
                       {paginatedActions.map((action: any, i: number) => (
-                        <tr key={i} className="hover:bg-slate-50 transition-colors">
+                        <tr
+                          key={i}
+                          className="hover:bg-slate-50 transition-colors"
+                        >
                           <td className="p-3 font-mono text-xs text-slate-500">
                             {action.manufacturer_part_number || "N/A"}
                           </td>
@@ -705,14 +773,14 @@ export default function PriceListAnalysis() {
                               <td className="p-3 text-right text-slate-400 tabular-nums">
                                 {action.old_price
                                   ? `$${Number(
-                                      action.old_price
+                                      action.old_price,
                                     ).toLocaleString()}`
                                   : "-"}
                               </td>
                               <td className="p-3 text-right font-bold text-slate-900 tabular-nums">
                                 {action.new_price
                                   ? `$${Number(
-                                      action.new_price
+                                      action.new_price,
                                     ).toLocaleString()}`
                                   : "-"}
                               </td>
@@ -764,20 +832,29 @@ export default function PriceListAnalysis() {
                     </button>
 
                     <div className="flex items-center gap-1">
-                      {getPageNumbers(totalPages).map((pageNum, idx) => (
-                        <button
-                          key={idx}
-                          onClick={() => setCurrentPage(pageNum)}
-                          className={`min-w-9 h-9 flex items-center justify-center rounded-lg text-sm font-bold transition-all
-                            ${
-                              currentPage === pageNum
-                                ? "bg-[#3399cc] text-white shadow-md shadow-[#3399cc]/30"
-                                : "text-slate-500 hover:bg-slate-100 hover:text-slate-900"
-                            }`}
-                        >
-                          {pageNum}
-                        </button>
-                      ))}
+                      {getPageNumbers(totalPages).map((page, idx) =>
+                        page === "..." ? (
+                          <span
+                            key={idx}
+                            className="min-w-9 h-9 flex items-center justify-center text-slate-400 font-bold"
+                          >
+                            …
+                          </span>
+                        ) : (
+                          <button
+                            key={idx}
+                            onClick={() => setCurrentPage(page)}
+                            className={`min-w-9 h-9 flex items-center justify-center rounded-lg text-sm font-bold transition-all
+        ${
+          currentPage === page
+            ? "bg-[#3399cc] text-white shadow-md shadow-[#3399cc]/30"
+            : "text-slate-500 hover:bg-slate-100 hover:text-slate-900"
+        }`}
+                          >
+                            {page}
+                          </button>
+                        ),
+                      )}
                     </div>
 
                     <button
@@ -834,10 +911,16 @@ export default function PriceListAnalysis() {
             >
               <div
                 className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold border ${
-                  currentStep === step.id ? "border-white/30" : "border-slate-200"
+                  currentStep === step.id
+                    ? "border-white/30"
+                    : "border-slate-200"
                 }`}
               >
-                {currentStep > step.id ? <Check className="w-3 h-3" /> : step.id}
+                {currentStep > step.id ? (
+                  <Check className="w-3 h-3" />
+                ) : (
+                  step.id
+                )}
               </div>
               <p className="text-xs font-bold uppercase tracking-widest hidden sm:block">
                 {step.title}
