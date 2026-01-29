@@ -5,25 +5,20 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "npm exec vite build",
-    "preview": "vite preview",
-    "start": "serve -s dist -l 8080"
+    "build": "vite build",
+    "preview": "vite preview"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.18",
     "aws-amplify": "^6.15.9",
     "axios": "^1.13.2",
-    "docx": "^9.5.1",
-    "file-saver": "^2.0.5",
-    "filesaver": "^0.0.13",
     "lucide-react": "^0.562.0",
     "qrcode": "^1.5.4",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
     "react-router-dom": "^7.11.0",
     "sonner": "^2.0.7",
-    "xlsx": "^0.18.5",
-    "serve": "^14.2.0"
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@types/node": "^22.14.0",
