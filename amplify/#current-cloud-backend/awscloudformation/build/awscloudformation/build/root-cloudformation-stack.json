@@ -202,7 +202,7 @@
     "authwinvaleanalysisplatfdf4d4edd": {
       "Type": "AWS::CloudFormation::Stack",
       "Properties": {
-        "TemplateURL": "https://s3.amazonaws.com/amplify-winvaleanalysisplatf-dev-90271-deployment/amplify-cfn-templates/auth/winvaleanalysisplatfdf4d4edd-cloudformation-template.json",
+        "TemplateURL": "https://s3.amazonaws.com/amplify-winvaleanalysisplatf-devuseast-540a3-deployment/amplify-cfn-templates/auth/winvaleanalysisplatfdf4d4edd-cloudformation-template.json",
         "Parameters": {
           "identityPoolName": "winvaleanalysisplatfdf4d4edd_identitypool_df4d4edd",
           "allowUnauthenticatedIdentities": false,
@@ -229,9 +229,9 @@
           "sharedId": "df4d4edd",
           "resourceName": "winvaleanalysisplatfdf4d4edd",
           "authSelections": "identityPoolAndUserPool",
-          "useDefault": "default",
+          "useDefault": "manual",
           "usernameAttributes": "email",
-          "userPoolGroupList": "",
+          "userPoolGroupList": "winvaleanalysisuseast",
           "serviceName": "Cognito",
           "usernameCaseSensitive": false,
           "useEnabledMfas": true,
@@ -249,7 +249,62 @@
           },
           "breakCircularDependency": true,
           "dependsOn": "",
-          "env": "dev"
+          "thirdPartyAuth": false,
+          "userPoolGroups": true,
+          "adminQueries": false,
+          "triggers": "{}",
+          "hostedUI": false,
+          "authProviders": "",
+          "parentStack": {
+            "Ref": "AWS::StackId"
+          },
+          "permissions": "",
+          "env": "devuseast"
+        }
+      }
+    },
+    "authuserPoolGroups": {
+      "Type": "AWS::CloudFormation::Stack",
+      "Properties": {
+        "TemplateURL": "https://s3.amazonaws.com/amplify-winvaleanalysisplatf-devuseast-540a3-deployment/amplify-cfn-templates/auth/userPoolGroups-cloudformation-template.json",
+        "Parameters": {
+          "AuthRoleArn": {
+            "Fn::GetAtt": [
+              "AuthRole",
+              "Arn"
+            ]
+          },
+          "UnauthRoleArn": {
+            "Fn::GetAtt": [
+              "UnauthRole",
+              "Arn"
+            ]
+          },
+          "authwinvaleanalysisplatfdf4d4eddUserPoolId": {
+            "Fn::GetAtt": [
+              "authwinvaleanalysisplatfdf4d4edd",
+              "Outputs.UserPoolId"
+            ]
+          },
+          "authwinvaleanalysisplatfdf4d4eddAppClientIDWeb": {
+            "Fn::GetAtt": [
+              "authwinvaleanalysisplatfdf4d4edd",
+              "Outputs.AppClientIDWeb"
+            ]
+          },
+          "authwinvaleanalysisplatfdf4d4eddAppClientID": {
+            "Fn::GetAtt": [
+              "authwinvaleanalysisplatfdf4d4edd",
+              "Outputs.AppClientID"
+            ]
+          },
+          "authwinvaleanalysisplatfdf4d4eddIdentityPoolId": {
+            "Fn::GetAtt": [
+              "authwinvaleanalysisplatfdf4d4edd",
+              "Outputs.IdentityPoolId"
+            ]
+          },
+          "env": "devuseast"
         }
       }
     },
@@ -343,7 +398,7 @@
           }
         },
         "Handler": "index.handler",
-        "Runtime": "nodejs22.x",
+        "Runtime": "nodejs18.x",
         "Timeout": 300,
         "Role": {
           "Fn::GetAtt": [

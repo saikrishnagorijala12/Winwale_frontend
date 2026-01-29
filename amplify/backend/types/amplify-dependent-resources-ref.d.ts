@@ -1,5 +1,8 @@
 export type AmplifyDependentResourcesAttributes = {
   "auth": {
+    "userPoolGroups": {
+      "winvaleanalysisuseastGroupRole": "string"
+    },
     "winvaleanalysisplatfdf4d4edd": {
       "AppClientID": "string",
       "AppClientIDWeb": "string",

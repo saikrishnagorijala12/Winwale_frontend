@@ -1,58 +1,83 @@
 {
   "providers": {
     "awscloudformation": {
-      "AuthRoleName": "amplify-winvaleanalysisplatf-dev-90271-authRole",
-      "UnauthRoleArn": "arn:aws:iam::924665350698:role/amplify-winvaleanalysisplatf-dev-90271-unauthRole",
-      "AuthRoleArn": "arn:aws:iam::924665350698:role/amplify-winvaleanalysisplatf-dev-90271-authRole",
-      "Region": "eu-north-1",
-      "DeploymentBucketName": "amplify-winvaleanalysisplatf-dev-90271-deployment",
-      "UnauthRoleName": "amplify-winvaleanalysisplatf-dev-90271-unauthRole",
-      "StackName": "amplify-winvaleanalysisplatf-dev-90271",
-      "StackId": "arn:aws:cloudformation:eu-north-1:924665350698:stack/amplify-winvaleanalysisplatf-dev-90271/94537770-eadf-11f0-94ce-0a2137945cd1",
-      "AmplifyAppId": "d349hweq875gni"
+      "AuthRoleName": "amplify-winvaleanalysisplatf-devuseast-540a3-authRole",
+      "UnauthRoleArn": "arn:aws:iam::924665350698:role/amplify-winvaleanalysisplatf-devuseast-540a3-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::924665350698:role/amplify-winvaleanalysisplatf-devuseast-540a3-authRole",
+      "Region": "us-east-1",
+      "DeploymentBucketName": "amplify-winvaleanalysisplatf-devuseast-540a3-deployment",
+      "UnauthRoleName": "amplify-winvaleanalysisplatf-devuseast-540a3-unauthRole",
+      "StackName": "amplify-winvaleanalysisplatf-devuseast-540a3",
+      "StackId": "arn:aws:cloudformation:us-east-1:924665350698:stack/amplify-winvaleanalysisplatf-devuseast-540a3/7c1ebef0-fd0c-11f0-930a-0affd0ba2291",
+      "AmplifyAppId": "dkfkm664fi55w"
     }
   },
   "auth": {
     "winvaleanalysisplatfdf4d4edd": {
-      "service": "Cognito",
-      "providerPlugin": "awscloudformation",
-      "dependsOn": [],
       "customAuth": false,
+      "dependsOn": [],
       "frontendAuthConfig": {
-        "socialProviders": [],
-        "usernameAttributes": [
-          "EMAIL"
-        ],
-        "signupAttributes": [
-          "EMAIL"
+        "mfaConfiguration": "OFF",
+        "mfaTypes": [
+          "SMS"
         ],
         "passwordProtectionSettings": {
           "passwordPolicyMinLength": 8,
           "passwordPolicyCharacters": []
         },
-        "mfaConfiguration": "OFF",
-        "mfaTypes": [
-          "SMS"
+        "signupAttributes": [
+          "EMAIL"
+        ],
+        "socialProviders": [],
+        "usernameAttributes": [
+          "EMAIL"
         ],
         "verificationMechanisms": [
           "EMAIL"
         ]
       },
+      "providerPlugin": "awscloudformation",
+      "service": "Cognito",
+      "lastPushTimeStamp": "2026-01-29T12:42:02.127Z",
       "providerMetadata": {
-        "s3TemplateURL": "https://s3.amazonaws.com/amplify-winvaleanalysisplatf-dev-90271-deployment/amplify-cfn-templates/auth/winvaleanalysisplatfdf4d4edd-cloudformation-template.json",
+        "s3TemplateURL": "https://s3.amazonaws.com/amplify-winvaleanalysisplatf-devuseast-540a3-deployment/amplify-cfn-templates/auth/winvaleanalysisplatfdf4d4edd-cloudformation-template.json",
         "logicalId": "authwinvaleanalysisplatfdf4d4edd"
       },
-      "lastPushTimeStamp": "2026-01-06T09:13:46.868Z",
       "output": {
-        "UserPoolId": "eu-north-1_6otZrR1l5",
-        "AppClientIDWeb": "7hk1q4rodihotqbjr8mrqsebmv",
-        "AppClientID": "4uphac3iqnj473tvfva173138o",
-        "IdentityPoolId": "eu-north-1:ef1237d0-a8e5-46e9-9d62-50af93996a5a",
-        "UserPoolArn": "arn:aws:cognito-idp:eu-north-1:924665350698:userpool/eu-north-1_6otZrR1l5",
-        "IdentityPoolName": "winvaleanalysisplatfdf4d4edd_identitypool_df4d4edd__dev",
+        "UserPoolId": "us-east-1_VlZLOv9vf",
+        "AppClientIDWeb": "1ut79rvrmq8pa9jvbbgn79sgd1",
+        "AppClientID": "45f0b36gc4fg0f16qhgarnfm2t",
+        "IdentityPoolId": "us-east-1:7ca8ab53-3d56-41ee-b68e-0c2d306fc2b8",
+        "UserPoolArn": "arn:aws:cognito-idp:us-east-1:924665350698:userpool/us-east-1_VlZLOv9vf",
+        "IdentityPoolName": "winvaleanalysisplatfdf4d4edd_identitypool_df4d4edd__devuseast",
         "UserPoolName": "winvaleanalysisplatfdf4d4edd_userpool_df4d4edd"
       },
-      "lastPushDirHash": "JhX02ZVRFfivRjNR6egmlph0Vso="
+      "lastPushDirHash": "5oe9R5xZcRznLZocHSwCiBRvWEM="
+    },
+    "userPoolGroups": {
+      "service": "Cognito-UserPool-Groups",
+      "providerPlugin": "awscloudformation",
+      "dependsOn": [
+        {
+          "category": "auth",
+          "resourceName": "winvaleanalysisplatfdf4d4edd",
+          "attributes": [
+            "UserPoolId",
+            "AppClientIDWeb",
+            "AppClientID",
+            "IdentityPoolId"
+          ]
+        }
+      ],
+      "lastPushTimeStamp": "2026-01-29T12:42:02.127Z",
+      "providerMetadata": {
+        "s3TemplateURL": "https://s3.amazonaws.com/amplify-winvaleanalysisplatf-devuseast-540a3-deployment/amplify-cfn-templates/auth/userPoolGroups-cloudformation-template.json",
+        "logicalId": "authuserPoolGroups"
+      },
+      "output": {
+        "winvaleanalysisuseastGroupRole": "arn:aws:iam::924665350698:role/us-east-1_VlZLOv9vf-winvaleanalysisuseastGroupRole"
+      },
+      "lastPushDirHash": "nQjYxpAaXbTHMemRjrC7TNoPDJQ="
     }
   }
 }

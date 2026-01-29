@@ -1,5 +1,21 @@
 {
   "auth": {
+    "userPoolGroups": {
+      "dependsOn": [
+        {
+          "attributes": [
+            "UserPoolId",
+            "AppClientIDWeb",
+            "AppClientID",
+            "IdentityPoolId"
+          ],
+          "category": "auth",
+          "resourceName": "winvaleanalysisplatfdf4d4edd"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "Cognito-UserPool-Groups"
+    },
     "winvaleanalysisplatfdf4d4edd": {
       "customAuth": false,
       "dependsOn": [],

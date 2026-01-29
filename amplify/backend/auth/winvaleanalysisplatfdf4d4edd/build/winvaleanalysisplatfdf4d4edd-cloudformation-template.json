@@ -1,5 +1,5 @@
 {
-  "Description": "Amplify Cognito Stack for AWS Amplify CLI",
+  "Description": "{\"createdOn\":\"Linux\",\"createdBy\":\"Amplify\",\"createdWith\":\"12.13.1\",\"stackType\":\"auth-Cognito\",\"metadata\":{\"whyContinueWithGen1\":\"Prefer not to answer\"}}",
   "AWSTemplateFormatVersion": "2010-09-09",
   "Parameters": {
     "env": {
@@ -108,6 +108,30 @@
       "Type": "String"
     },
     "dependsOn": {
+      "Type": "CommaDelimitedList"
+    },
+    "thirdPartyAuth": {
+      "Type": "String"
+    },
+    "userPoolGroups": {
+      "Type": "String"
+    },
+    "adminQueries": {
+      "Type": "String"
+    },
+    "triggers": {
+      "Type": "String"
+    },
+    "hostedUI": {
+      "Type": "String"
+    },
+    "authProviders": {
+      "Type": "CommaDelimitedList"
+    },
+    "parentStack": {
+      "Type": "String"
+    },
+    "permissions": {
       "Type": "CommaDelimitedList"
     }
   },
@@ -348,6 +372,48 @@
         "IdentityPoolId": {
           "Ref": "IdentityPool"
         },
+        "RoleMappings": {
+          "UserPoolClientRoleMapping": {
+            "AmbiguousRoleResolution": "AuthenticatedRole",
+            "IdentityProvider": {
+              "Fn::Sub": [
+                "cognito-idp.${region}.amazonaws.com/${userPool}:${client}",
+                {
+                  "region": {
+                    "Ref": "AWS::Region"
+                  },
+                  "userPool": {
+                    "Ref": "UserPool"
+                  },
+                  "client": {
+                    "Ref": "UserPoolClient"
+                  }
+                }
+              ]
+            },
+            "Type": "Token"
+          },
+          "UserPoolWebClientRoleMapping": {
+            "AmbiguousRoleResolution": "AuthenticatedRole",
+            "IdentityProvider": {
+              "Fn::Sub": [
+                "cognito-idp.${region}.amazonaws.com/${userPool}:${webClient}",
+                {
+                  "region": {
+                    "Ref": "AWS::Region"
+                  },
+                  "userPool": {
+                    "Ref": "UserPool"
+                  },
+                  "webClient": {
+                    "Ref": "UserPoolClientWeb"
+                  }
+                }
+              ]
+            },
+            "Type": "Token"
+          }
+        },
         "Roles": {
           "unauthenticated": {
             "Ref": "unauthRoleArn"
@@ -358,7 +424,9 @@
         }
       },
       "DependsOn": [
-        "IdentityPool"
+        "IdentityPool",
+        "UserPoolClient",
+        "UserPoolClientWeb"
       ]
     }
   },

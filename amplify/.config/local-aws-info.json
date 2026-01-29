@@ -3,5 +3,10 @@
     "configLevel": "project",
     "useProfile": true,
     "profileName": "Winvale"
+  },
+  "devuseast": {
+    "configLevel": "project",
+    "useProfile": true,
+    "profileName": "winvale"
   }
 }

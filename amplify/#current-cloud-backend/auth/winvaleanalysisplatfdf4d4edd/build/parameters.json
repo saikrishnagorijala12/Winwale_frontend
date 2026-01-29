@@ -34,11 +34,13 @@
   "sharedId": "df4d4edd",
   "resourceName": "winvaleanalysisplatfdf4d4edd",
   "authSelections": "identityPoolAndUserPool",
-  "useDefault": "default",
+  "useDefault": "manual",
   "usernameAttributes": [
     "email"
   ],
-  "userPoolGroupList": [],
+  "userPoolGroupList": [
+    "winvaleanalysisuseast"
+  ],
   "serviceName": "Cognito",
   "usernameCaseSensitive": false,
   "useEnabledMfas": true,
@@ -55,5 +57,15 @@
     ]
   },
   "breakCircularDependency": true,
-  "dependsOn": []
+  "dependsOn": [],
+  "thirdPartyAuth": false,
+  "userPoolGroups": true,
+  "adminQueries": false,
+  "triggers": "{}",
+  "hostedUI": false,
+  "authProviders": [],
+  "parentStack": {
+    "Ref": "AWS::StackId"
+  },
+  "permissions": []
 }
