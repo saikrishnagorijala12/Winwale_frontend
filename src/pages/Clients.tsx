@@ -110,7 +110,6 @@ export default function ClientsPage() {
         errorMessage =
           message ||
           "A client with this email or phone number already exists. Please use different contact information.";
-        // Go back to step 1 to show the error
         if (context === "create client") {
           setAddStep(1);
         } else if (context === "update client") {
@@ -301,6 +300,7 @@ export default function ClientsPage() {
       <ClientDetailsModal
         client={selectedClient}
         onClose={() => setSelectedClient(null)}
+        onEdit={openEditDialog}
       />
 
       <ClientFormModal

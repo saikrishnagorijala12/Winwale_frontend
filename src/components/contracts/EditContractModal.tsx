@@ -74,7 +74,6 @@ export default function EditContractModal({
       if (!formData.contract_number?.trim()) {
         newErrors.contract_number = "Contract number is required";
       }
-      // You can add more frontend-specific validations here
     }
 
     setErrors(newErrors);
@@ -99,19 +98,15 @@ export default function EditContractModal({
     setErrors({});
 
     try {
-      // Backend expects: PUT /contracts/{client_id}
       await contractService.updateContract(initialContract.client_id, formData);
       onSuccess();
       handleClose();
     } catch (err: any) {
-      // Handle Backend Error Detail
       const backendError = err?.response?.data?.detail;
       
       if (Array.isArray(backendError)) {
-        // Handle Pydantic validation errors (list of objects)
         setErrors({ submit: backendError[0]?.msg || "Validation error" });
       } else {
-        // Handle custom raised HTTPException strings
         setErrors({ submit: backendError || "An unexpected error occurred" });
       }
       console.error("Update Error:", err);
@@ -136,7 +131,7 @@ export default function EditContractModal({
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-2xl font-bold text-white">Edit Contract</h2>
-              <p className="text-white/80 text-sm">Update profile for {initialContract.client}</p>
+              <p className="text-white/80 text-sm">Update contract details for {initialContract.client}</p>
             </div>
             <button
               type="button"

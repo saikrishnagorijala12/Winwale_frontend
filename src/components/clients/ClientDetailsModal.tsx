@@ -1,15 +1,21 @@
 import React from 'react';
-import { X, Building2, User, Mail, Phone, MapPin, Globe } from 'lucide-react';
+import { X, Building2, User, Mail, Phone, MapPin, Globe, Edit } from 'lucide-react';
 import { Client } from '../../types/client.types';
 import { ContactRow } from './ContactRow';
 
 interface ClientDetailsModalProps {
   client: Client | null;
   onClose: () => void;
+  onEdit: (client: Client) => void;
 }
 
-export const ClientDetailsModal: React.FC<ClientDetailsModalProps> = ({ client, onClose }) => {
+export const ClientDetailsModal: React.FC<ClientDetailsModalProps> = ({ client, onClose ,onEdit}) => {
   if (!client) return null;
+
+  const handleEdit = () => {
+    onEdit(client);
+    onClose();
+  };
 
   return (
     <div className="fixed inset-0 bg-slate-900/60  z-50 flex items-center justify-center p-4">
@@ -95,18 +101,20 @@ export const ClientDetailsModal: React.FC<ClientDetailsModalProps> = ({ client, 
         </div>
 
         {/* Footer Actions */}
-        <div className="bg-slate-50 px-8 py-4 flex justify-end items-center gap-3 border-t border-slate-100">
+        <div className="sticky bottom-0 bg-slate-50 p-6 rounded-b-3xl flex justify-between border-t border-slate-200">
           <button
             onClick={onClose}
-            className="px-6 py-2.5 rounded-xl font-bold text-slate-500 hover:bg-slate-200/50 transition-all active:scale-95 text-sm"
+            className="px-6 py-3 rounded-2xl font-bold text-slate-500 hover:text-slate-700 hover:bg-slate-100 transition-all active:scale-95"
           >
-            Dismiss
+            Close
           </button>
-          {/* <button
-            className="px-6 py-2.5 rounded-xl font-bold bg-[#38A1DB] text-white shadow-md shadow-blue-200 hover:bg-[#2D8BBF] transition-all active:scale-95 text-sm"
+          <button
+            onClick={handleEdit}
+            className="flex items-center gap-2 px-6 py-3 rounded-2xl bg-linear-to-br from-[#38A1DB] to-[#2D8BBF] text-white font-bold shadow-lg hover:shadow-xl transition-all active:scale-95"
           >
+            <Edit className="w-4 h-4" />
             Edit Client
-          </button> */}
+          </button>
         </div>
       </div>
     </div>

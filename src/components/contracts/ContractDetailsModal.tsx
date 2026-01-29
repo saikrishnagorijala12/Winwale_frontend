@@ -8,6 +8,7 @@ import {
   Settings,
   ShieldCheck,
   Info,
+  Edit,
 } from "lucide-react";
 import { ClientContractRead } from "../../types/contract.types";
 
@@ -194,6 +195,7 @@ export default function ContractDetailsModal({
             }}
             className="px-6 py-3 rounded-2xl bg-linear-to-br from-[#38A1DB] to-[#2D8BBF] text-white font-bold shadow-lg hover:shadow-xl transition-all active:scale-95"
           >
+            <Edit className="w-4 h-4" />
             Edit Contract
           </button>
         </div>

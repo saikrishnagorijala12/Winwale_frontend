@@ -148,7 +148,7 @@ export default function AddContractModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+    <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 ">
       <div className="bg-white rounded-3xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-hidden flex flex-col">
         <div className="bg-linear-to-br from-[#38A1DB] to-[#2D8BBF] py-5 px-8 shrink-0">
           <div className="flex items-center justify-between">
