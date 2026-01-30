@@ -7,7 +7,7 @@ import {
   ClientFormErrors,
   EditingClient,
 } from "../types/client.types";
-import { validateStep1, validateAllSteps } from "../utils/validationUtils";
+import { validateStep1, validateStep2 } from "../utils/validationUtils";
 import {
   normalizeClientFromAPI,
   createClientFromResponse,
@@ -80,7 +80,6 @@ export default function ClientsPage() {
       setEditStep(2);
     }
   };
-  
 
   const handleApiError = (err: any, context: string = "operation") => {
     console.error(`Error during ${context}:`, err);
@@ -91,15 +90,18 @@ export default function ClientsPage() {
 
     switch (status) {
       case 400:
-        errorMessage = message || "Invalid data provided. Please check your inputs.";
+        errorMessage =
+          message || "Invalid data provided. Please check your inputs.";
         break;
 
       case 401:
-        errorMessage = message || "You are not authorized. Please log in again.";
+        errorMessage =
+          message || "You are not authorized. Please log in again.";
         break;
 
       case 403:
-        errorMessage = message || "You don't have permission to perform this action.";
+        errorMessage =
+          message || "You don't have permission to perform this action.";
         break;
 
       case 404:
@@ -118,15 +120,18 @@ export default function ClientsPage() {
         break;
 
       case 422:
-        errorMessage = message || "Validation error. Please check all required fields.";
+        errorMessage =
+          message || "Validation error. Please check all required fields.";
         break;
 
       case 500:
-        errorMessage = message || "Server error occurred. Please try again later.";
+        errorMessage =
+          message || "Server error occurred. Please try again later.";
         break;
 
       case 503:
-        errorMessage = message || "Service temporarily unavailable. Please try again later.";
+        errorMessage =
+          message || "Service temporarily unavailable. Please try again later.";
         break;
 
       default:
@@ -139,25 +144,50 @@ export default function ClientsPage() {
     setBackendError(errorMessage);
   };
 
+  const trimClientPayload = <T extends ClientFormData | EditingClient>(
+    data: T,
+  ): T => {
+    const trimmed: any = {};
+
+    Object.entries(data).forEach(([key, value]) => {
+      if (typeof value === "string") {
+        trimmed[key] = value.trim();
+      } else {
+        trimmed[key] = value;
+      }
+    });
+
+    return trimmed;
+  };
+
   const handleAddClient = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!validateAllSteps(newClient, setErrors)) {
-      toast.error("Please fix all validation errors before submitting.");
-      if (!validateStep1(newClient, setErrors)) {
-        setAddStep(1);
-      }
+    const step1Valid = validateStep1(newClient, setErrors);
+    if (!step1Valid) {
+      setAddStep(1);
+      return;
+    }
+
+    const step2Result = validateStep2(newClient);
+    if (!step2Result.isValid) {
+      setErrors((prev) => ({
+        ...prev,
+        ...step2Result.errors,
+      }));
+      setAddStep(2);
       return;
     }
 
     setIsSubmitting(true);
     try {
-      const res = await api.post("/clients", newClient);
+      const payload = trimClientPayload(newClient);
+      const res = await api.post("/clients", payload);
+
       const createdClient = createClientFromResponse(res);
       setClients((prev) => [createdClient, ...prev]);
       setShowAddDialog(false);
       resetAddClientForm();
-      toast.success("Client created successfully");
     } catch (err: any) {
       handleApiError(err, "create client");
     } finally {
@@ -167,22 +197,29 @@ export default function ClientsPage() {
 
   const handleEditClient = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!editingClient) return;
 
-    if (!editingClient) {
+    const step1Valid = validateStep1(editingClient, setErrors);
+    if (!step1Valid) {
+      setEditStep(1);
       return;
     }
 
-    if (!validateAllSteps(editingClient, setErrors)) {
-      toast.error("Please fix all validation errors before submitting.");
-      if (!validateStep1(editingClient, setErrors)) {
-        setEditStep(1);
-      }
+    const step2Result = validateStep2(editingClient);
+    if (!step2Result.isValid) {
+      setErrors((prev) => ({
+        ...prev,
+        ...step2Result.errors,
+      }));
+      setEditStep(2);
       return;
     }
 
     setIsSubmitting(true);
     try {
-      const res = await api.put(`/clients/${editingClient.id}`, editingClient);
+      const payload = trimClientPayload(editingClient);
+
+      const res = await api.put(`/clients/${editingClient.id}`, payload);
       const updatedClient = updateClientFromResponse(
         res,
         editingClient.products || 0,
@@ -190,13 +227,10 @@ export default function ClientsPage() {
       setClients((prev) =>
         prev.map((c) => (c.id === updatedClient.id ? updatedClient : c)),
       );
-      if (selectedClient?.id === updatedClient.id)
-        setSelectedClient(updatedClient);
       setShowEditDialog(false);
       setEditingClient(null);
       setEditStep(1);
       setErrors({});
-      toast.success("Client updated successfully");
     } catch (err: any) {
       handleApiError(err, "update client");
     } finally {

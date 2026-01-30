@@ -66,10 +66,86 @@ export default function AddContractModal({
     const newErrors: FormErrors = {};
 
     if (!contract.client_id) {
-      newErrors.client_id = "You must select a client first";
+      newErrors.client_id = "You must select a client";
     }
+
     if (!contract.contract_number?.trim()) {
       newErrors.contract_number = "Contract number is required";
+    } else if (contract.contract_number.length > 50) {
+      newErrors.contract_number = "Max 50 characters allowed";
+    }
+
+    if (contract.contract_officer_name?.length > 30) {
+      newErrors.contract_officer_name = "Max 30 characters allowed";
+    }
+
+    if (contract.contract_officer_address?.length > 50) {
+      newErrors.contract_officer_address = "Max 50 characters allowed";
+    }
+
+    if (contract.contract_officer_city?.length > 50) {
+      newErrors.contract_officer_city = "Max 50 characters allowed";
+    }
+
+    if (contract.contract_officer_state?.length > 50) {
+      newErrors.contract_officer_state = "Max 50 characters allowed";
+    }
+
+    if (
+      contract.contract_officer_zip &&
+      !/^[A-Za-z0-9]{1,7}$/.test(contract.contract_officer_zip)
+    ) {
+      newErrors.contract_officer_zip =
+        "ZIP must be alphanumeric and max 7 characters";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+  const validateStep2 = (): boolean => {
+    const newErrors: FormErrors = {};
+
+    if (contract.origin_country?.length > 50) {
+      newErrors.origin_country = "Max 50 characters allowed";
+    }
+
+    if (
+      contract.gsa_proposed_discount < 0 ||
+      contract.gsa_proposed_discount > 100.00
+    ) {
+      newErrors.gsa_proposed_discount = "Discount must be between 0 and 100.00";
+    }
+
+    if (contract.q_v_discount?.length > 50) {
+      newErrors.q_v_discount = "Max 50 characters allowed";
+    }
+
+    if (contract.additional_concessions?.length > 50) {
+      newErrors.additional_concessions = "Max 50 characters allowed";
+    }
+
+    if (
+      !Number.isInteger(contract.normal_delivery_time) ||
+      contract.normal_delivery_time < 0
+    ) {
+      newErrors.normal_delivery_time =
+        "Normal delivery time must be a positive number";
+    }
+
+    if (
+      !Number.isInteger(contract.expedited_delivery_time) ||
+      contract.expedited_delivery_time < 0
+    ) {
+      newErrors.expedited_delivery_time =
+        "Expedited delivery time must be a positive number";
+    }
+
+    if (!contract.fob_term) {
+      newErrors.fob_term = "FOB term is required";
+    }
+
+    if (!contract.energy_star_compliance) {
+      newErrors.energy_star_compliance = "Energy Star compliance is required";
     }
 
     setErrors(newErrors);
@@ -83,6 +159,10 @@ export default function AddContractModal({
       if (validateStep1()) {
         setStep(2);
       }
+      return;
+    }
+
+    if (!validateStep2()) {
       return;
     }
 
@@ -101,7 +181,8 @@ export default function AddContractModal({
 
       const formattedPayload = {
         ...payload,
-        origin_country: payload.origin_country || "USA",
+        contract_number: payload.contract_number.trim(),
+        origin_country: payload.origin_country?.trim() || "USA",
         gsa_proposed_discount: Number(payload.gsa_proposed_discount) || 0,
         normal_delivery_time: Number(payload.normal_delivery_time) || 0,
         expedited_delivery_time: Number(payload.expedited_delivery_time) || 0,

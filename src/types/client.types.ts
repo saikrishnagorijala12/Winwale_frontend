@@ -6,6 +6,13 @@ export type ClientFormErrors = Partial<{
   company_city: string;
   company_state: string;
   company_zip: string;
+  contact_officer_name: string;
+  contact_officer_email: string;
+  contact_officer_phone_no: string;
+  contact_officer_address: string;
+  contact_officer_city: string;
+  contact_officer_state: string;
+  contact_officer_zip: string;
 }>;
 
 export interface ClientContact {

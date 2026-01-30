@@ -1,14 +1,18 @@
-import React, { useState } from 'react';
-import { X } from 'lucide-react';
-import { ClientFormData, ClientFormErrors, EditingClient } from '../../types/client.types';
-import { FormStepper } from './FormStepper';
-import { CompanyFormStep } from './CompanyFormStep';
-import { ContactFormStep } from './ContactFormStep';
+import React, { useState } from "react";
+import { X } from "lucide-react";
+import {
+  ClientFormData,
+  ClientFormErrors,
+  EditingClient,
+} from "../../types/client.types";
+import { FormStepper } from "./FormStepper";
+import { CompanyFormStep } from "./CompanyFormStep";
+import { ContactFormStep } from "./ContactFormStep";
 
 interface ClientFormModalProps {
   isOpen: boolean;
   title: string;
-  subtitle:string;
+  subtitle: string;
   formData: ClientFormData | EditingClient;
   errors: ClientFormErrors;
   backendError?: string;
@@ -46,17 +50,14 @@ export const ClientFormModal: React.FC<ClientFormModalProps> = ({
   onClearBackendError,
   submitButtonText = "Create Client Profile",
 }) => {
-  const [isContactFormValid, setIsContactFormValid] = useState(false);
 
   if (!isOpen) return null;
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (currentStep === 2 && isContactFormValid) {
-      onSubmit(e);
-    }
-  };
+  e.preventDefault();
+  onSubmit(e);
+};
+
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-none z-50 flex items-center justify-center p-4">
@@ -65,8 +66,8 @@ export const ClientFormModal: React.FC<ClientFormModalProps> = ({
         <div className="bg-linear-to-br from-[#38A1DB] to-[#2D8BBF] py-4 px-8 shrink-0">
           <div className="flex items-center justify-between">
             <div>
-            <h2 className="text-2xl font-bold text-white">{title}</h2>
-            <p className="text-blue-50 text-sm opacity-80">{subtitle}</p>
+              <h2 className="text-2xl font-bold text-white">{title}</h2>
+              <p className="text-blue-50 text-sm opacity-80">{subtitle}</p>
             </div>
             <button
               type="button"
@@ -117,10 +118,11 @@ export const ClientFormModal: React.FC<ClientFormModalProps> = ({
             )}
 
             {currentStep === 2 && (
-              <ContactFormStep 
-                formData={formData} 
+              <ContactFormStep
+                formData={formData}
                 onChange={onChange}
-                onValidationChange={setIsContactFormValid}
+                errors={errors}
+                onClearError={onClearError}
               />
             )}
           </div>
@@ -147,7 +149,7 @@ export const ClientFormModal: React.FC<ClientFormModalProps> = ({
             ) : (
               <button
                 type="submit"
-                disabled={isSubmitting || !isContactFormValid}
+                disabled={isSubmitting}
                 className="px-8 py-3 rounded-xl bg-[#38A1DB] text-white font-bold hover:bg-[#2D8BBF] transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-[#38A1DB]"
               >
                 {isSubmitting ? "Processing..." : submitButtonText}

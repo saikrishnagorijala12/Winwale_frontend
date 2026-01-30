@@ -13,22 +13,49 @@ const ROLE_MAP: Record<Role, string> = {
   user: "Consultant",
 };
 
+const PHONE_REGEX = /^\+?\d{1,15}$/;
 
-const inputStyles = "w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-[#3498db]/10 focus:border-[#3498db] transition-all bg-slate-50/50 text-slate-700";
-const disabledInputStyles = "w-full px-4 py-2.5 rounded-xl border border-slate-100 bg-slate-100/50 text-slate-500 cursor-not-allowed";
+const inputStyles =
+  "w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-[#3498db]/10 focus:border-[#3498db] transition-all bg-slate-50/50 text-slate-700";
+
+const disabledInputStyles =
+  "w-full px-4 py-2.5 rounded-xl border border-slate-100 bg-slate-100/50 text-slate-500 cursor-not-allowed";
 
 export const ProfileSection = ({ user, onSave, loading }: ProfileSectionProps) => {
-  const [fullName, setFullName] = useState(user?.name || "");
-  const [phone, setPhone] = useState(user?.phone_no !== "NA" ? user?.phone_no : "");
+  const [name, setName] = useState(user?.name || "");
+  const [phoneNo, setPhoneNo] = useState(user?.phone_no !== "NA" ? user?.phone_no : "");
+  const [phoneError, setPhoneError] = useState("");
+
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+
+    if (!/^\+?\d*$/.test(value)) return;
+
+    const digitsCount = value.replace(/\D/g, "").length;
+    if (digitsCount > 15) return;
+
+    setPhoneNo(value);
+    setPhoneError("");
+  };
+
+  const handleSave = async () => {
+    if (phoneNo && !PHONE_REGEX.test(phoneNo)) {
+      setPhoneError("Phone number must be up to 15 digits and may start with +");
+      return;
+    }
+
+    await onSave({
+      fullName: name.trim(),
+      phone: phoneNo || "",
+    });
+  };
 
   return (
     <section className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100/80 overflow-hidden">
       <div className="p-8 space-y-8">
         <div className="flex flex-col sm:flex-row items-center gap-8">
-          <div className="relative">
-            <div className="w-28 h-28 rounded-3xl bg-[#3498db]/10 flex items-center justify-center text-4xl font-bold text-[#3498db] border-4 border-white shadow-xl">
-              {user?.name?.charAt(0) || "U"}
-            </div>
+          <div className="w-28 h-28 rounded-3xl bg-[#3498db]/10 flex items-center justify-center text-4xl font-bold text-[#3498db] border-4 border-white shadow-xl">
+            {user?.name?.charAt(0) || "U"}
           </div>
 
           <div className="text-center sm:text-left">
@@ -47,22 +74,31 @@ export const ProfileSection = ({ user, onSave, loading }: ProfileSectionProps) =
             <label className="text-sm font-bold text-slate-700 ml-1">Full Name</label>
             <input
               className={inputStyles}
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
+              value={name}
+              maxLength={30}
+              onChange={(e) => setName(e.target.value)}
             />
           </div>
+
           <div>
             <label className="text-sm font-bold text-slate-700 ml-1">Email</label>
             <input className={disabledInputStyles} value={user?.email} disabled />
           </div>
+
           <div>
             <label className="text-sm font-bold text-slate-700 ml-1">Phone Number</label>
             <input
-              className={inputStyles}
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
+              className={`${inputStyles} ${phoneError ? "border-red-500" : ""}`}
+              value={phoneNo}
+              onChange={handlePhoneChange}
+              inputMode="numeric"
+              placeholder="+1234567890"
             />
+            {phoneError && (
+              <p className="text-xs text-red-600 mt-1 ml-1">{phoneError}</p>
+            )}
           </div>
+
           <div>
             <label className="text-sm font-bold text-slate-700 ml-1">Status</label>
             <input
@@ -75,7 +111,7 @@ export const ProfileSection = ({ user, onSave, loading }: ProfileSectionProps) =
 
         <div className="flex justify-end pt-4">
           <button
-            onClick={() => onSave({ fullName, phone })}
+            onClick={handleSave}
             disabled={loading}
             className="btn-primary flex items-center gap-2"
           >

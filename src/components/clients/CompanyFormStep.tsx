@@ -19,9 +19,8 @@ export const CompanyFormStep: React.FC<CompanyFormStepProps> = ({
   onClearError,
 }) => {
   const inputClass = (field: keyof ClientFormErrors) =>
-    `w-full mt-2 px-4 py-3 rounded-xl border-2 transition-colors focus:outline-none ${
-      errors[field] ? "border-red-500" : "border-slate-200 focus:border-[#38A1DB]"
-    }`;
+    `w-full mt-2 px-4 py-3 rounded-xl border-2 transition-colors focus:outline-none border-slate-200 focus:border-[#38A1DB]"
+    `;
 
   return (
     <div className="grid md:grid-cols-2 gap-6">
