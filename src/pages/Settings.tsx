@@ -13,7 +13,10 @@ export default function Settings() {
   const { user, refreshUser } = useAuth();
   const [loading, setLoading] = useState(false);
 
-  const handleProfileSave = async (data: { fullName: string; phone: string }) => {
+  const handleProfileSave = async (data: {
+    fullName: string;
+    phone: string;
+  }) => {
     try {
       setLoading(true);
       await updateUserAttributes({
@@ -21,8 +24,11 @@ export default function Settings() {
       });
 
       await axios.put("/users", {
-        name: data.fullName,
-        phone_no: data.phone || "NA",
+        name: data.fullName.trim(),
+        phone_no:
+          data.phone == null || data.phone.trim() === "" || data.phone === "NA"
+            ? null
+            : data.phone.trim(),
       });
 
       await refreshUser();
@@ -36,64 +42,59 @@ export default function Settings() {
   };
 
   const handlePasswordChange = async (
-  current: string,
-  next: string,
-  confirm: string
-) => {
-  try {
-    if (!current || !next || !confirm) {
-      toast.error("All fields are required");
+    current: string,
+    next: string,
+    confirm: string,
+  ) => {
+    try {
+      if (!current || !next || !confirm) {
+        toast.error("All fields are required");
+        return false;
+      }
+
+      const hasFailedRules = Object.values(passwordRules).some(
+        (rule) => !rule.test(next),
+      );
+
+      if (hasFailedRules) {
+        toast.error("New password does not meet all requirements");
+        return false;
+      }
+
+      if (next !== confirm) {
+        toast.error("Passwords do not match");
+        return false;
+      }
+
+      setLoading(true);
+      await updatePassword({
+        oldPassword: current,
+        newPassword: next,
+      });
+
+      toast.success("Password updated successfully");
+      return true;
+    } catch (err: any) {
+      console.error(err);
+      toast.error(err.message || "Password update failed");
       return false;
+    } finally {
+      setLoading(false);
     }
-
-    const hasFailedRules = Object.values(passwordRules).some(
-      (rule) => !rule.test(next)
-    );
-
-    if (hasFailedRules) {
-      toast.error("New password does not meet all requirements");
-      return false;
-    }
-
-    if (next !== confirm) {
-      toast.error("Passwords do not match");
-      return false;
-    }
-
-    setLoading(true);
-    await updatePassword({
-      oldPassword: current,
-      newPassword: next,
-    });
-
-    toast.success("Password updated successfully");
-    return true;
-  } catch (err: any) {
-    console.error(err);
-    toast.error(err.message || "Password update failed");
-    return false;
-  } finally {
-    setLoading(false);
-  }
-};
-
+  };
 
   return (
     <div className="min-h-screen bg-slate-50/50 p-6 lg:p-10 space-y-10">
-      
       <SettingsHeader />
 
       <div className="space-y-6">
-        <ProfileSection 
-          user={user} 
-          onSave={handleProfileSave} 
-          loading={loading} 
+        <ProfileSection
+          user={user}
+          onSave={handleProfileSave}
+          loading={loading}
         />
-        
-        <PasswordSection 
-          onUpdate={handlePasswordChange} 
-          loading={loading} 
-        />
+
+        <PasswordSection onUpdate={handlePasswordChange} loading={loading} />
       </div>
     </div>
   );

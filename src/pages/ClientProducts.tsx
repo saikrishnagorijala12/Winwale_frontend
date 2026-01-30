@@ -7,6 +7,7 @@ import {
   ArrowLeft,
   X,
   ExternalLink,
+  Inbox,
 } from "lucide-react";
 import api from "../lib/axios";
 
@@ -81,14 +82,14 @@ export default function ClientProducts() {
       p.manufacturer.toLowerCase().includes(searchTerm.toLowerCase()) ||
       p.manufacturer_part_number
         .toLowerCase()
-        .includes(searchTerm.toLowerCase())
+        .includes(searchTerm.toLowerCase()),
   );
 
   const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const paginatedProducts = filteredProducts.slice(
     startIndex,
-    startIndex + itemsPerPage
+    startIndex + itemsPerPage,
   );
 
   const formatCurrency = (value?: number) => {
@@ -179,45 +180,72 @@ export default function ClientProducts() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {paginatedProducts.map((product) => (
-                  <tr
-                    key={product.product_id}
-                    className="hover:bg-blue-50/50 cursor-pointer transition-colors"
-                    onClick={() => setSelectedProduct(product)}
-                  >
-                    <td className="px-6 py-4">
-                      <div className="font-semibold text-slate-900">
-                        {product.item_name}
+                {paginatedProducts.length === 0 ? (
+                  <tr>
+                    <td colSpan={6} className="px-6 py-20 text-center">
+                      <div className="flex flex-col items-center justify-center gap-3 text-slate-500">
+                        <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center border border-slate-100">
+                          <Inbox className="w-8 h-8 text-slate-300" />
+                        </div>
+
+                        <h3 className="text-base font-bold text-slate-500">
+                          No products found
+                        </h3>
+
+                        {searchTerm && (
+                          <p className="text-xs text-slate-400">
+                            Try adjusting your search or filters
+                          </p>
+                        )}
                       </div>
-                      <div className="text-xs text-slate-400 truncate max-w-50">
-                        {product.item_description}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      {product.item_type === "B" ? (
-                        <span className="px-2 py-1 rounded text-[10px] font-bold uppercase bg-emerald-100 text-emerald-700">
-                          Base
-                        </span>
-                      ) : (
-                        <span className="px-2 py-1 rounded text-[10px] font-bold uppercase bg-blue-100 text-blue-700">
-                          Accessory
-                        </span>
-                      )}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-slate-600">
-                      {product.manufacturer}
-                    </td>
-                    <td className="px-6 py-4 text-sm font-mono text-slate-500">
-                      {product.manufacturer_part_number}
-                    </td>
-                    <td className="px-6 py-4 text-sm font-bold text-slate-900">
-                      {formatCurrency(product.commercial_list_price)}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-slate-600">
-                      {product.uom || "-"}
                     </td>
                   </tr>
-                ))}
+                ) : (
+                  paginatedProducts.map((product) => (
+                    <tr
+                      key={product.product_id}
+                      className="hover:bg-blue-50/50 cursor-pointer transition-colors"
+                      onClick={() => setSelectedProduct(product)}
+                    >
+                      <td className="px-6 py-4">
+                        <div className="font-semibold text-slate-900">
+                          {product.item_name}
+                        </div>
+                        <div className="text-xs text-slate-400 truncate max-w-50">
+                          {product.item_description}
+                        </div>
+                      </td>
+
+                      <td className="px-6 py-4">
+                        {product.item_type === "B" ? (
+                          <span className="px-2 py-1 rounded text-[10px] font-bold uppercase bg-emerald-100 text-emerald-700">
+                            Base
+                          </span>
+                        ) : (
+                          <span className="px-2 py-1 rounded text-[10px] font-bold uppercase bg-blue-100 text-blue-700">
+                            Accessory
+                          </span>
+                        )}
+                      </td>
+
+                      <td className="px-6 py-4 text-sm text-slate-600">
+                        {product.manufacturer}
+                      </td>
+
+                      <td className="px-6 py-4 text-sm font-mono text-slate-500">
+                        {product.manufacturer_part_number}
+                      </td>
+
+                      <td className="px-6 py-4 text-sm font-bold text-slate-900">
+                        {formatCurrency(product.commercial_list_price)}
+                      </td>
+
+                      <td className="px-6 py-4 text-sm text-slate-600">
+                        {product.uom || "-"}
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
@@ -235,7 +263,7 @@ export default function ClientProducts() {
                   <span className="font-semibold text-slate-900">
                     {Math.min(
                       startIndex + itemsPerPage,
-                      filteredProducts.length
+                      filteredProducts.length,
                     )}
                   </span>{" "}
                   of{" "}

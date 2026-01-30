@@ -11,7 +11,11 @@ import {
 } from "lucide-react";
 import { Client } from "../../types/client.types";
 import { ClientActionsMenu } from "./ClientActionsMenu";
-import { normalizeStatus, STATUS_BADGE_BASE, STATUS_MAP } from "@/src/utils/statusUtils";
+import {
+  normalizeStatus,
+  STATUS_BADGE_BASE,
+  STATUS_MAP,
+} from "@/src/utils/statusUtils";
 
 interface ClientTableProps {
   clients: Client[];
@@ -44,7 +48,9 @@ const getStatusBadge = (status: string) => {
 
   if (slug === "unknown") {
     return (
-      <span className={`${STATUS_BADGE_BASE} bg-slate-100 text-slate-700 border-slate-200`}>
+      <span
+        className={`${STATUS_BADGE_BASE} bg-slate-100 text-slate-700 border-slate-200`}
+      >
         Unknown
       </span>
     );
@@ -59,7 +65,6 @@ const getStatusBadge = (status: string) => {
     </span>
   );
 };
-
 
 export const ClientTable: React.FC<ClientTableProps> = ({
   clients,
@@ -81,7 +86,11 @@ export const ClientTable: React.FC<ClientTableProps> = ({
     const pages = [];
     const delta = 1;
     for (let i = 1; i <= totalPages; i++) {
-      if (i === 1 || i === totalPages || (i >= currentPage - delta && i <= currentPage + delta)) {
+      if (
+        i === 1 ||
+        i === totalPages ||
+        (i >= currentPage - delta && i <= currentPage + delta)
+      ) {
         pages.push(i);
       } else if (pages[pages.length - 1] !== "...") {
         pages.push("...");
@@ -96,7 +105,6 @@ export const ClientTable: React.FC<ClientTableProps> = ({
         <Inbox className="w-8 h-8 text-slate-300" />
       </div>
       <h3 className="text-base font-bold text-slate-500">No clients found</h3>
-      
     </div>
   );
 
@@ -107,11 +115,21 @@ export const ClientTable: React.FC<ClientTableProps> = ({
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="bg-slate-50 border-b border-slate-200">
-              <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Client</th>
-              <th className="px-4 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Status</th>
-              <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Contact</th>
-              <th className="hidden lg:table-cell px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Company Email</th>
-              <th className="hidden xl:table-cell px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Last Modified</th>
+              <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                Client
+              </th>
+              <th className="px-4 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                Status
+              </th>
+              <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                Contact
+              </th>
+              <th className="hidden lg:table-cell px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                Company Email
+              </th>
+              <th className="hidden xl:table-cell px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                Last Modified
+              </th>
               <th className="w-16 p-5"></th>
             </tr>
           </thead>
@@ -121,13 +139,17 @@ export const ClientTable: React.FC<ClientTableProps> = ({
                 <td colSpan={6} className="py-20 text-center">
                   <div className="flex flex-col items-center gap-2">
                     <Loader2 className="w-8 h-8 animate-spin text-[#24578f]" />
-                    <p className="text-sm text-slate-500 font-medium">Loading clients...</p>
+                    <p className="text-sm text-slate-500 font-medium">
+                      Loading clients...
+                    </p>
                   </div>
                 </td>
               </tr>
             ) : clients.length === 0 ? (
               <tr>
-                <td colSpan={6}><EmptyState /></td>
+                <td colSpan={6}>
+                  <EmptyState />
+                </td>
               </tr>
             ) : (
               clients.map((client) => (
@@ -149,19 +171,32 @@ export const ClientTable: React.FC<ClientTableProps> = ({
                   <td className="px-4 py-4">{getStatusBadge(client.status)}</td>
                   <td className="px-6 py-4">
                     {!client.contact ? (
-                      <span className="text-[10px] italic font-medium text-gray-400 uppercase">Not Assigned</span>
+                      <span className="text-[10px] italic font-medium text-gray-400 uppercase">
+                        Not Assigned
+                      </span>
                     ) : (
                       <div className="flex flex-col max-w-37.5">
-                        <span className="text-sm font-semibold text-slate-900 truncate">{client.contact.name}</span>
-                        <span className="hidden lg:block text-xs text-slate-500 truncate">{client.contact.email}</span>
+                        <span className="text-sm font-semibold text-slate-900 truncate">
+                          {client.contact.name}
+                        </span>
+                        <span className="hidden lg:block text-xs text-slate-500 truncate">
+                          {client.contact.email}
+                        </span>
                       </div>
                     )}
                   </td>
-                  <td className="hidden lg:table-cell px-6 py-4 text-sm font-medium text-slate-600 truncate max-w-45">{client.email}</td>
-                  <td className="hidden xl:table-cell px-6 py-4 text-sm text-slate-500">{formatDate(client.lastModification)}</td>
+                  <td className="hidden lg:table-cell px-6 py-4 text-sm font-medium text-slate-600 truncate max-w-45">
+                    {client.email}
+                  </td>
+                  <td className="hidden xl:table-cell px-6 py-4 text-sm text-slate-500">
+                    {formatDate(client.lastModification)}
+                  </td>
                   <td className="p-5 relative text-right">
                     <button
-                      onClick={(e) => { e.stopPropagation(); onMenuToggle(client.id); }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onMenuToggle(client.id);
+                      }}
                       className="p-2 hover:bg-slate-200 rounded-lg transition-colors"
                     >
                       <MoreVertical className="w-5 h-5 text-slate-500" />
@@ -203,13 +238,18 @@ export const ClientTable: React.FC<ClientTableProps> = ({
                     {client.name.substring(0, 2).toUpperCase()}
                   </div>
                   <div>
-                    <h3 className="font-bold text-slate-900 text-lg">{client.name}</h3>
+                    <h3 className="font-bold text-slate-900 text-lg">
+                      {client.name}
+                    </h3>
                     <div className="mt-1">{getStatusBadge(client.status)}</div>
                   </div>
                 </div>
                 <div className="relative">
                   <button
-                    onClick={(e) => { e.stopPropagation(); onMenuToggle(client.id); }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onMenuToggle(client.id);
+                    }}
                     className="p-2 border border-slate-200 rounded-xl bg-white shadow-sm"
                   >
                     <MoreVertical className="w-5 h-5 text-slate-500" />
@@ -226,16 +266,28 @@ export const ClientTable: React.FC<ClientTableProps> = ({
               </div>
               <div className="grid grid-cols-2 gap-4 bg-slate-50 rounded-xl p-4 border border-slate-100">
                 <div>
-                  <p className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Contact</p>
-                  <p className="text-sm font-semibold text-slate-800 truncate">{client.contact?.name || "—"}</p>
+                  <p className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">
+                    Contact
+                  </p>
+                  <p className="text-sm font-semibold text-slate-800 truncate">
+                    {client.contact?.name || "—"}
+                  </p>
                 </div>
                 <div>
-                  <p className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Modified</p>
-                  <p className="text-sm font-semibold text-slate-800">{formatDate(client.lastModification)}</p>
+                  <p className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">
+                    Modified
+                  </p>
+                  <p className="text-sm font-semibold text-slate-800">
+                    {formatDate(client.lastModification)}
+                  </p>
                 </div>
                 <div className="col-span-2">
-                  <p className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Company Email</p>
-                  <p className="text-sm font-semibold text-slate-800">{client.email}</p>
+                  <p className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">
+                    Company Email
+                  </p>
+                  <p className="text-sm font-semibold text-slate-800">
+                    {client.email}
+                  </p>
                 </div>
               </div>
             </div>
@@ -247,11 +299,17 @@ export const ClientTable: React.FC<ClientTableProps> = ({
       {!loading && totalClients > itemsPerPage && (
         <div className="px-6 py-5 bg-white border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="text-sm text-slate-500 font-medium">
-            Showing <span className="text-slate-900 font-semibold">{startIndex + 1}</span> to{" "}
+            Showing{" "}
+            <span className="text-slate-900 font-semibold">
+              {startIndex + 1}
+            </span>{" "}
+            to{" "}
             <span className="text-slate-900 font-semibold">
               {Math.min(startIndex + itemsPerPage, totalClients)}
             </span>{" "}
-            of <span className="text-slate-900 font-semibold">{totalClients}</span> clients
+            of{" "}
+            <span className="text-slate-900 font-semibold">{totalClients}</span>{" "}
+            clients
           </div>
 
           <div className="flex items-center gap-1.5">
