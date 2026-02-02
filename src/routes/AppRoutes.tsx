@@ -30,8 +30,8 @@ import UploadGsa from "../pages/UploadGsa";
 import GsaProducts from "../pages/GsaProducts";
 
 import { ROLES } from "../types/roles.types";
-import PriceListAnalysis from "../pages/PriceListAnalysis";
-// import Analysis from "../pages/Analysis";
+// import PriceListAnalysis from "../pages/PriceListAnalysis";
+import Analysis from "../pages/Analysis";
 // import { DocumentProvider } from "../context/DocumentContext";
 // import { DocumentWorkflowRenderer } from "../pages/DocumentGeneration";
 // import AnalysisHistory from "../pages/AnalysisHistory";
@@ -110,11 +110,11 @@ const AppRoutes: React.FC = () => {
                 element={<ClientProducts />}
               />
               <Route path="/contracts" element={<ContractManagement />} />
-              <Route
+              {/* <Route
                 path="/pricelist-analysis"
                 element={<PriceListAnalysis />}
-              />
-              {/* <Route path="/pricelist-analysis" element={<Analysis />} /> */}
+              /> */}
+              <Route path="/pricelist-analysis" element={<Analysis />} />
               {/* <Route
                 path="/documents"
                 element={
