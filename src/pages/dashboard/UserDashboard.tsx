@@ -12,7 +12,7 @@ import {
   UserPlus
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../../context/AuthContext';
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -156,7 +156,7 @@ export default function Dashboard() {
               {[
                 { label: 'New Analysis', icon: PlusCircle, to: '/pricelist-analysis' },
                 { label: 'Add Client', icon: UserPlus, to: '/clients' },
-                { label: 'View Reports', icon: BarChart3, to: '/dashboard' }
+                { label: 'View Reports', icon: BarChart3, to: '/analysis' }
               ].map((action) => (
                 <button
                   key={action.label}
@@ -199,4 +199,3 @@ export default function Dashboard() {
     </div>
   );
 }
-

@@ -172,11 +172,10 @@ export default function UserActivation() {
   }
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] p-10 font-sans">
-      {/* Header Section */}
-      <div className="mb-10">
-        <h1 className="text-3xl font-bold text-[#0f172a]">User Management</h1>
-        <p className="text-slate-500 mt-1">
+    <div className="min-h-screen bg-linear-to-br from-slate-50 via-blue-50/30 to-slate-100 p-6 lg:p-10 space-y-10">
+      <div className="md:items-center md:justify-between gap-6 mb-12 mx-auto">
+        <h1 className="text-3xl font-extrabold tracking-tight text-slate-800">User Management</h1>
+        <p className="text-slate-500 font-medium mt-1">
           Manage user accounts, approvals, and permissions.
         </p>
       </div>

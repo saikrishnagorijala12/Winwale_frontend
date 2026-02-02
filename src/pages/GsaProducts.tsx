@@ -11,10 +11,11 @@ import {
   Check,
   Building2,
   Loader2,
+  Inbox,
 } from "lucide-react";
 import { ROLES } from "@/src/types/roles.types";
-import { getCurrentUser } from "../api/user";
 import api from "../lib/axios";
+import { useAuth } from "../context/AuthContext";
 
 interface Client {
   client_id: number;
@@ -32,7 +33,7 @@ interface Product {
   item_description?: string;
   manufacturer: string;
   manufacturer_part_number: string;
-  client_part_number?: string; // New
+  client_part_number?: string;
   commercial_list_price?: number;
   uom?: string;
   sin?: string;
@@ -40,11 +41,11 @@ interface Product {
   upc?: string;
   unspsc?: string;
   quantity_per_pack?: number;
-  quantity_unit_uom?: string; // New
+  quantity_unit_uom?: string;
   country_of_origin?: string;
-  recycled_content_percent?: number; // New
-  hazmat?: boolean; // New
-  product_info_code?: string; // New
+  recycled_content_percent?: number;
+  hazmat?: boolean;
+  product_info_code?: string;
   product_url?: string;
   url_508?: string;
   // Dimensions
@@ -60,13 +61,14 @@ interface Product {
 }
 
 export default function ProductsPage() {
+  const { user, status } = useAuth();
+  const userRole = user?.role;
   const navigate = useNavigate();
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const [products, setProducts] = useState<Product[]>([]);
   const [clients, setClients] = useState<Client[]>([]);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-  const [userRole, setUserRole] = useState<string>("");
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -78,27 +80,6 @@ export default function ProductsPage() {
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
 
   const itemsPerPage = 10;
-
-  useEffect(() => {
-    const initData = async () => {
-      try {
-        setLoading(true);
-        const [prodRes, clientRes, user] = await Promise.all([
-          api.get("/products"),
-          api.get("/clients/approved"),
-          getCurrentUser(),
-        ]);
-        setProducts(prodRes.data);
-        setClients(clientRes.data);
-        setUserRole(user.role);
-      } catch (err) {
-        setError("Failed to initialize page data");
-      } finally {
-        setLoading(false);
-      }
-    };
-    initData();
-  }, []);
 
   const handleClientSelect = async (client: Client | null) => {
     setSelectedClient(client);
@@ -132,36 +113,31 @@ export default function ProductsPage() {
     const initData = async () => {
       try {
         setLoading(true);
-        setError(""); 
-        const [prodRes, clientRes, user] = await Promise.allSettled([
+        setError("");
+
+        const [prodRes, clientRes] = await Promise.allSettled([
           api.get("/products"),
           api.get("/clients/approved"),
-          getCurrentUser(),
         ]);
 
         if (prodRes.status === "fulfilled") {
           setProducts(prodRes.value.data);
+        } else if (prodRes.reason?.response?.status === 404) {
+          setProducts([]);
         } else {
-          if (prodRes.reason.response?.status === 404) {
-            setProducts([]);
-          } else {
-            setError("Failed to load products");
-          }
+          setError("Failed to load products");
         }
 
         if (clientRes.status === "fulfilled") {
           setClients(clientRes.value.data);
         }
-
-        if (user.status === "fulfilled") {
-          setUserRole(user.value.role);
-        }
-      } catch (err) {
+      } catch {
         setError("Failed to initialize page data");
       } finally {
         setLoading(false);
       }
     };
+
     initData();
   }, []);
 
@@ -240,15 +216,14 @@ export default function ProductsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-slate-50 to-slate-100 p-6">
-      <div className="mx-auto max-w-400">
-        {/* Header Section */}
-        <div className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-6">
+    <div className="min-h-screen bg-linear-to-br from-slate-50 via-blue-50/30 to-slate-100 p-6 lg:p-10 space-y-10">
+      <div className="mx-auto">
+        <div className="flex flex-col md:flex-row justify-between md:items-center md:justify-between gap-6 mb-12 mx-auto">
           <div>
-            <h1 className="text-3xl font-bold text-slate-900 tracking-tight">
+            <h1 className="text-3xl font-extrabold tracking-tight text-slate-800">
               Products
             </h1>
-            <p className="text-slate-500 mt-1">
+            <p className="text-slate-500 font-medium mt-1">
               Catalog management and inventory overview
             </p>
           </div>
@@ -263,7 +238,6 @@ export default function ProductsPage() {
           )}
         </div>
 
-        {/* Search & Filter Bar */}
         <div className="flex flex-col md:flex-row gap-4 mb-6">
           <div className="relative flex-1">
             <Search
@@ -361,7 +335,6 @@ export default function ProductsPage() {
           </div>
         </div>
 
-        {/* Main Content Table */}
         <div className="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden relative transition-all">
           {loading && (
             <div className="absolute inset-0 bg-white/60 backdrop-blur-[2px] z-10 flex items-center justify-center">
@@ -445,17 +418,22 @@ export default function ProductsPage() {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={7} className="px-6 py-20 text-center">
-                      <div className="flex flex-col items-center gap-3">
-                        <p className="text-slate-500 font-medium">
+                    <td colSpan={7} className="px-6 py-20">
+                      <div className="flex flex-col items-center justify-center text-center">
+                        <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center mb-4 border border-slate-100">
+                          <Inbox className="w-8 h-8 text-slate-300" />
+                        </div>
+
+                        <h3 className="text-base font-bold text-slate-500">
                           {selectedClient
                             ? "No products found for this client"
                             : searchTerm
                               ? "No products match your search"
                               : "No products available"}
-                        </p>
+                        </h3>
+
                         {(selectedClient || searchTerm) && (
-                          <p className="text-sm text-slate-400">
+                          <p className="text-sm text-slate-400 mt-1">
                             Try clearing filters or adjusting your search terms
                           </p>
                         )}
@@ -466,8 +444,6 @@ export default function ProductsPage() {
               </tbody>
             </table>
           </div>
-
-          {/* Pagination */}
 
           {filteredProducts.length > itemsPerPage && (
             <div className="px-6 py-5 bg-white border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
@@ -496,7 +472,6 @@ export default function ProductsPage() {
                   <ChevronLeft size={18} />
                 </button>
 
-                {/* Page Numbers */}
                 <div className="flex items-center gap-1">
                   {getPageNumbers().map((pageNum, idx) => (
                     <React.Fragment key={idx}>
@@ -542,7 +517,6 @@ export default function ProductsPage() {
             onClick={() => setSelectedProduct(null)}
           />
           <div className="relative w-full max-w-lg bg-white h-full shadow-2xl flex flex-col animate-in slide-in-from-right duration-300">
-            {/* Drawer Header */}
             <div className="p-6 border-b border-slate-100 flex items-start justify-between bg-white sticky top-0 z-10">
               <div className="pr-8">
                 <div className="flex items-center gap-2 mb-1">
@@ -698,7 +672,6 @@ export default function ProductsPage() {
                 </div>
               </DrawerSection>
 
-              {/* System Metadata */}
               <div className="pt-6 border-t border-slate-100">
                 <div className="flex justify-between text-[10px] font-medium text-slate-400 uppercase tracking-tighter">
                   <span>

@@ -12,7 +12,7 @@ import awsExports from "../aws-exports";
 import Login from "../pages/auth/Login";
 import Signup from "../pages/auth/Signup";
 import ForgotPassword from "../pages/auth/ForgotPassword";
-import Dashboard from "../pages/Dashboard";
+// import Dashboard from "../pages/Dashboard";
 import Settings from "../pages/Settings";
 import NotFound from "../pages/NotFound";
 import PendingApproval from "../pages/PendingApproval";
@@ -36,6 +36,7 @@ import { DocumentProvider } from "../context/DocumentContext";
 import { DocumentWorkflowRenderer } from "../pages/DocumentGeneration";
 import AnalysisHistory from "../pages/AnalysisHistory";
 import DownloadHistory from "../pages/DownloadHistory";
+import Dashboard from "../pages/dashboard/Dashboard";
 
 try {
   Amplify.configure(awsExports);
@@ -109,12 +110,12 @@ const AppRoutes: React.FC = () => {
                 element={<ClientProducts />}
               />
               <Route path="/contracts" element={<ContractManagement />} />
-              <Route
+              {/* <Route
                 path="/pricelist-analysis"
                 element={<PriceListAnalysis />}
-              />
-              {/* <Route path="/pricelist-analysis" element={<Analysis />} />
-              <Route
+              /> */}
+              <Route path="/pricelist-analysis" element={<Analysis />} />
+              {/* <Route
                 path="/documents"
                 element={
                   <DocumentProvider>

@@ -301,9 +301,6 @@ import AuthLayout from "../../components/auth/AuthLayout";
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-/**
- * Cognito-aligned password rules
- */
 const passwordRules = {
   length: {
     test: (p: string) => p.length >= 8,

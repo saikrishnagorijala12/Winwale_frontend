@@ -1,3 +1,6 @@
+.env
+node_modules
+
 document
 templates
 
@@ -9,7 +12,3 @@ src/context/DocumentContext.tsx
 
 src/types/document.types.ts
 src/types/documentConfigs.ts
-
-.env
-
-.gitignore

@@ -38,14 +38,12 @@ const ClientActivation = () => {
     fetchClients();
   }, []);
 
-  // Approve / Reject
   const handleStatusUpdate = async (clientId, action) => {
     try {
       await api.patch(`/clients/${clientId}/approve`, null, {
         params: { action },
       });
 
-      // Refresh clients after action
       await fetchClients();
     } catch (err) {
       console.error(err);
@@ -53,7 +51,6 @@ const ClientActivation = () => {
     }
   };
 
-  // Filter clients by status
   const pendingClients = clients.filter(
     (c) => !["approved", "rejected"].includes(c.status)
   );
@@ -62,7 +59,6 @@ const ClientActivation = () => {
 
   const rejectedClients = clients.filter((c) => c.status === "rejected");
 
-  // Get filtered clients based on active tab
   const getFilteredClients = () => {
     let clientList = [];
     switch (activeTab) {
@@ -154,11 +150,11 @@ const ClientActivation = () => {
     );
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] p-10 font-sans text-slate-900">
+    <div className="min-h-screen bg-linear-to-br from-slate-50 via-blue-50/30 to-slate-100 p-6 lg:p-10 space-y-10">
       {/* Header */}
-      <div className="mb-10">
-        <h1 className="text-3xl font-bold text-[#0f172a]">Client Management</h1>
-        <p className="text-slate-500 mt-1">
+      <div className="md:items-center md:justify-between gap-6 mb-12 mx-auto">
+        <h1 className="text-3xl font-extrabold tracking-tight text-slate-800">Client Management</h1>
+        <p className="text-slate-500 font-medium mt-1">
           Manage client registrations, approvals, and accounts.
         </p>
       </div>

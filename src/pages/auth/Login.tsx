@@ -1,15 +1,14 @@
 import React, { useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import { signIn } from "aws-amplify/auth";
-import {
-  Mail,
-  Lock,
-  Eye,
-  EyeOff,
-  Loader2,
-} from "lucide-react";
+import { Mail, Lock, Eye, EyeOff, Loader2 } from "lucide-react";
 import AuthLayout from "../../components/auth/AuthLayout";
 import { useAuth } from "../../context/AuthContext";
+
+interface FormErrors {
+  email?: string;
+  password?: string;
+}
 
 const Login: React.FC = () => {
   const { refreshUser } = useAuth();
@@ -19,15 +18,34 @@ const Login: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [errors, setErrors] = useState<FormErrors>({});
 
   const isAuthProcessed = useRef(false);
+
+  const validate = (): boolean => {
+    const newErrors: FormErrors = {};
+
+    if (!email.trim()) {
+      newErrors.email = "Email is required";
+    }
+
+    if (!password.trim()) {
+      newErrors.password = "Password is required";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (loading || isAuthProcessed.current) return;
 
-    setLoading(true);
     setError(null);
+
+    if (!validate()) return;
+
+    setLoading(true);
 
     try {
       await signIn({
@@ -52,18 +70,14 @@ const Login: React.FC = () => {
   };
 
   return (
-    <AuthLayout
-      title="Welcome back"
-      subtitle="Sign in to access your dashboard"
-    >
+    <AuthLayout title="Welcome back" subtitle="Sign in to access your dashboard">
       {error && (
         <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 text-sm">
           {error}
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Email */}
+      <form onSubmit={handleSubmit} className="space-y-6" noValidate>
         <div>
           <label className="block text-sm font-semibold text-slate-700 mb-2">
             Email
@@ -74,16 +88,20 @@ const Login: React.FC = () => {
             </div>
             <input
               type="email"
-              required
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="block w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+              onChange={(e) => {
+                setEmail(e.target.value);
+                setErrors((prev) => ({ ...prev, email: undefined }));
+              }}
+              className="block w-full pl-11 pr-4 py-3 rounded-xl outline-none transition-all bg-slate-50 border border-slate-200 focus:ring-blue-500"
               placeholder="name@winvale.com"
             />
           </div>
+          {errors.email && (
+            <p className="mt-1 text-sm text-red-600">{errors.email}</p>
+          )}
         </div>
 
-        {/* Password */}
         <div>
           <label className="block text-sm font-semibold text-slate-700 mb-2">
             Password
@@ -94,10 +112,12 @@ const Login: React.FC = () => {
             </div>
             <input
               type={showPassword ? "text" : "password"}
-              required
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="block w-full pl-11 pr-11 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+              onChange={(e) => {
+                setPassword(e.target.value);
+                setErrors((prev) => ({ ...prev, password: undefined }));
+              }}
+              className="block w-full pl-11 pr-11 py-3 rounded-xl outline-none transition-all bg-slate-50 border border-slate-200 focus:ring-blue-500"
               placeholder="••••••••"
             />
             <button
@@ -112,9 +132,11 @@ const Login: React.FC = () => {
               )}
             </button>
           </div>
+          {errors.password && (
+            <p className="mt-1 text-sm text-red-600">{errors.password}</p>
+          )}
         </div>
 
-        {/* Forgot password */}
         <div className="flex items-center justify-end">
           <Link
             to="/forgot-password"
@@ -124,7 +146,6 @@ const Login: React.FC = () => {
           </Link>
         </div>
 
-        {/* Submit */}
         <button
           type="submit"
           disabled={loading}
@@ -138,7 +159,6 @@ const Login: React.FC = () => {
         </button>
       </form>
 
-      {/* Signup */}
       <div className="mt-8 text-center text-sm border-t border-slate-100 pt-6">
         Don't have an account?{" "}
         <Link

@@ -5,8 +5,15 @@ import { Mail, Lock, Loader2, ArrowRight, ArrowLeft } from "lucide-react";
 import AuthLayout from "../../components/auth/AuthLayout";
 import { passwordRules } from "../../utils/passwordRules";
 
+interface FormErrors {
+  email?: string;
+  otp?: string;
+  newPassword?: string;
+}
+
 const ForgotPassword: React.FC = () => {
   const navigate = useNavigate();
+
   const [step, setStep] = useState<"request" | "confirm">("request");
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
@@ -14,41 +21,57 @@ const ForgotPassword: React.FC = () => {
   const [passwordFocused, setPasswordFocused] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [errors, setErrors] = useState<FormErrors>({});
 
   const hasFailedRules = Object.values(passwordRules).some(
-    (rule) => !rule.test(newPassword)
+    (rule) => !rule.test(newPassword),
   );
 
+  const validateRequest = () => {
+    const newErrors: FormErrors = {};
+    if (!email.trim()) newErrors.email = "Email is required";
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const validateConfirm = () => {
+    const newErrors: FormErrors = {};
+
+    if (!otp.trim()) newErrors.otp = "Recovery code is required";
+    if (!newPassword.trim()) newErrors.newPassword = "New password is required";
+    else if (hasFailedRules)
+      newErrors.newPassword = "Password does not meet requirements";
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleRequest = async (e: React.FormEvent) => {
-  e.preventDefault();
-  setLoading(true);
-  setError(null);
+    e.preventDefault();
+    setError(null);
 
-  try {
-    await resetPassword({ username: email });
-    setStep("confirm");
-  } catch (err: any) {
-    if (
-      err?.name === "UserNotFoundException" 
-    ) {
-      setError("Email does not exist");
-    } else {
-      setError("Unable to process your request. Please try again.");
+    if (!validateRequest()) return;
+
+    setLoading(true);
+    try {
+      await resetPassword({ username: email });
+      setStep("confirm");
+    } catch (err: any) {
+      if (err?.name === "UserNotFoundException") {
+        setError("Email does not exist");
+      } else {
+        setError("Unable to process your request. Please try again.");
+      }
+    } finally {
+      setLoading(false);
     }
-  } finally {
-    setLoading(false);
-  }
-};
-
+  };
 
   const handleConfirm = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
 
-    if (hasFailedRules) {
-      setError("Password does not meet all requirements");
-      return;
-    }
+    if (!validateConfirm()) return;
 
     setLoading(true);
     try {
@@ -59,7 +82,7 @@ const ForgotPassword: React.FC = () => {
       });
       navigate("/login");
     } catch (err: any) {
-      setError(err.message || "Reset failed");
+      setError(err?.message || "Reset failed");
     } finally {
       setLoading(false);
     }
@@ -80,7 +103,7 @@ const ForgotPassword: React.FC = () => {
       )}
 
       {step === "request" ? (
-        <form onSubmit={handleRequest} className="space-y-6">
+        <form onSubmit={handleRequest} className="space-y-6" noValidate>
           <div>
             <label className="block text-sm font-semibold text-slate-700 mb-2">
               Email Address
@@ -91,14 +114,18 @@ const ForgotPassword: React.FC = () => {
               </div>
               <input
                 type="email"
-                required
-                autoComplete="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="block w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  setErrors((p) => ({ ...p, email: undefined }));
+                }}
+                className="block w-full pl-11 pr-4 py-3 rounded-xl outline-none transition-all bg-slate-50 border border-slate-200 focus:ring-blue-500"
                 placeholder="name@winvale.com"
               />
             </div>
+            {errors.email && (
+              <p className="mt-1 text-sm text-red-600">{errors.email}</p>
+            )}
           </div>
 
           <button
@@ -106,25 +133,35 @@ const ForgotPassword: React.FC = () => {
             disabled={loading}
             className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-[#3498db] hover:bg-[#2980b9] text-white font-semibold rounded-xl shadow-lg shadow-blue-500/30 transition-all active:scale-[0.98] disabled:opacity-70"
           >
-            {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : "Send Code"}
+            {loading ? (
+              <Loader2 className="h-5 w-5 animate-spin" />
+            ) : (
+              "Send Code"
+            )}
             {!loading && <ArrowRight className="h-5 w-5" />}
           </button>
         </form>
       ) : (
-        <form onSubmit={handleConfirm} className="space-y-6">
+        <form onSubmit={handleConfirm} className="space-y-6" noValidate>
           <div>
             <label className="block text-sm font-semibold text-slate-700 mb-2">
               Recovery Code
             </label>
             <input
               type="text"
-              required
               maxLength={6}
-              className="block w-full text-center text-2xl tracking-[0.5em] font-mono py-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 transition-all outline-none"
-              placeholder="000000"
               value={otp}
-              onChange={(e) => setOtp(e.target.value)}
+              onChange={(e) => {
+                setOtp(e.target.value);
+                setErrors((p) => ({ ...p, otp: undefined }));
+              }}
+              className="block w-full text-center text-2xl tracking-[0.5em] font-mono py-4 rounded-xl outline-none transition-all
+              bg-slate-50 border border-slate-200 focus:ring-blue-500"
+              placeholder="000000"
             />
+            {errors.otp && (
+              <p className="mt-1 text-sm text-red-600">{errors.otp}</p>
+            )}
           </div>
 
           <div>
@@ -137,24 +174,26 @@ const ForgotPassword: React.FC = () => {
               </div>
               <input
                 type="password"
-                required
-                autoComplete="new-password"
-                name="new-password"
                 value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
+                onChange={(e) => {
+                  setNewPassword(e.target.value);
+                  setErrors((p) => ({ ...p, newPassword: undefined }));
+                }}
                 onFocus={() => setPasswordFocused(true)}
                 onBlur={() => setPasswordFocused(false)}
-                className="block w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
+                className="block w-full pl-11 pr-4 py-3 rounded-xl outline-none transition-all
+                  bg-slate-50 border border-slate-200 focus:ring-blue-500"
                 placeholder="Min. 8 characters"
               />
             </div>
 
-            {/* Animated checklist */}
+            {errors.newPassword && (
+              <p className="mt-1 text-sm text-red-600">{errors.newPassword}</p>
+            )}
+
             <div
-              className={`overflow-hidden transition-all duration-300 ease-in-out ${
-                passwordFocused &&
-                newPassword.length > 0 &&
-                hasFailedRules
+              className={`overflow-hidden transition-all duration-300 ${
+                passwordFocused && newPassword.length > 0 && hasFailedRules
                   ? "max-h-40 opacity-100"
                   : "max-h-0 opacity-0"
               }`}
