@@ -30,12 +30,12 @@ import UploadGsa from "../pages/UploadGsa";
 import GsaProducts from "../pages/GsaProducts";
 
 import { ROLES } from "../types/roles.types";
-import PriceListAnalysis from "../pages/PriceListAnalysis";
+// import PriceListAnalysis from "../pages/PriceListAnalysis";
 import Analysis from "../pages/Analysis";
-import { DocumentProvider } from "../context/DocumentContext";
-import { DocumentWorkflowRenderer } from "../pages/DocumentGeneration";
-import AnalysisHistory from "../pages/AnalysisHistory";
-import DownloadHistory from "../pages/DownloadHistory";
+// import { DocumentProvider } from "../context/DocumentContext";
+// import { DocumentWorkflowRenderer } from "../pages/DocumentGeneration";
+// import AnalysisHistory from "../pages/AnalysisHistory";
+// import DownloadHistory from "../pages/DownloadHistory";
 import Dashboard from "../pages/dashboard/Dashboard";
 
 try {
