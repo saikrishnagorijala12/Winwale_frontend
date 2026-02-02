@@ -156,7 +156,7 @@ export default function Dashboard() {
               {[
                 { label: 'New Analysis', icon: PlusCircle, to: '/pricelist-analysis' },
                 { label: 'Add Client', icon: UserPlus, to: '/clients' },
-                { label: 'View Reports', icon: BarChart3, to: '/analysis' }
+                { label: 'View Reports', icon: BarChart3, to: '/dashboard' }
               ].map((action) => (
                 <button
                   key={action.label}
