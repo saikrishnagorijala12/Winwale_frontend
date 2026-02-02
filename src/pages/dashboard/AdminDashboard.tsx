@@ -111,11 +111,9 @@ export default function AdminDashboard() {
             System-wide management of users, client profiles, and GSA catalogs.
           </p>
         </div>
-        <button
-          className="btn-primary"
-        >
+        <button className="btn-primary" onClick={() => navigate("/upload-gsa")}>
           <UploadCloud className="w-4 h-4" />
-          Bulk Upload GSA Data
+          Upload GSA Data
         </button>
       </div>
 
@@ -201,9 +199,7 @@ export default function AdminDashboard() {
                   style={{ borderColor: colors.border }}
                 >
                   {item.type === "User Request" ? (
-                    <UserPlus
-                      className="w-5 h-5 text-[#24548f]"
-                    />
+                    <UserPlus className="w-5 h-5 text-[#24548f]" />
                   ) : (
                     <Building2
                       className="w-5 h-5"
@@ -264,9 +260,7 @@ export default function AdminDashboard() {
         {/* Right Sidebar */}
         <div className="space-y-8 animate-slide-in-right">
           {/* Catalog Upload Card */}
-          <div
-            className="rounded-4xl p-8 shadow-xl text-white bg-[#24548f]"
-          >
+          <div className="rounded-4xl p-8 shadow-xl text-white bg-[#24548f]">
             <h2 className="text-xl font-bold mb-1">GSA Product Import</h2>
             <p className="text-xs font-medium mb-6 opacity-70">
               Update master price lists

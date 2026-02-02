@@ -17,6 +17,7 @@ import { useNavigate } from "react-router-dom";
 interface Client {
   client_id: string;
   company_name: string;
+  contract_number?: string | null;
 }
 
 interface UploadResult {
@@ -53,7 +54,9 @@ const UploadGsa: React.FC = () => {
     }
   };
 
-  const handleFileChange = async (e: ChangeEvent<HTMLInputElement>): Promise<void> => {
+  const handleFileChange = async (
+    e: ChangeEvent<HTMLInputElement>,
+  ): Promise<void> => {
     const selectedFile = e.target.files?.[0] ?? null;
 
     if (!selectedFile) {
@@ -109,7 +112,7 @@ const UploadGsa: React.FC = () => {
       const response = await api.post<UploadResult>(
         `/upload/${selectedClient}`,
         formData,
-        { headers: { "Content-Type": "multipart/form-data" } }
+        { headers: { "Content-Type": "multipart/form-data" } },
       );
 
       setUploadResult(response.data);
@@ -134,47 +137,59 @@ const UploadGsa: React.FC = () => {
   return (
     <div className="min-h-screen bg-linear-to-br from-slate-50 to-slate-100 p-6 md:p-10">
       <div className=" mx-auto">
-        
         {/* Navigation & Header */}
-        <button 
+        <button
           onClick={() => navigate(-1)}
           className="flex items-center gap-2 text-slate-500 hover:text-slate-800 transition-colors mb-6 font-medium group"
         >
-          <ChevronLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
+          <ChevronLeft
+            size={20}
+            className="group-hover:-translate-x-1 transition-transform"
+          />
           Back to Products
         </button>
 
         <div className="mb-10">
-          <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Upload GSA Price List</h1>
-          <p className="text-slate-500 mt-1">Update your product catalog by uploading an Excel spreadsheet.</p>
+          <h1 className="text-3xl font-bold text-slate-900 tracking-tight">
+            Upload GSA Price List
+          </h1>
+          <p className="text-slate-500 mt-1">
+            Update your product catalog by uploading an Excel spreadsheet.
+          </p>
         </div>
 
         <div className="grid grid-cols-1 gap-8">
-          
           {/* Main Upload Form Card */}
           <div className="bg-white rounded-4xl shadow-sm border border-slate-200 p-8 md:p-10 relative overflow-hidden">
-            
             <div className="absolute top-0 right-0 p-8 pointer-events-none opacity-5">
-               <FileSpreadsheet size={120} />
+              <FileSpreadsheet size={120} />
             </div>
 
             <div className="space-y-8 relative">
-              
               {/* Step 1: Select Client */}
               <div className="space-y-3">
                 <div className="flex items-center gap-2 mb-2">
-                    <span className="w-6 h-6 rounded-full bg-[#3399cc] text-white flex items-center justify-center text-xs font-bold">1</span>
-                    <label className="text-sm font-bold text-slate-700 uppercase tracking-wider">Select Client</label>
+                  <span className="w-6 h-6 rounded-full bg-[#3399cc] text-white flex items-center justify-center text-xs font-bold">
+                    1
+                  </span>
+                  <label className="text-sm font-bold text-slate-700 uppercase tracking-wider">
+                    Select Client
+                  </label>
                 </div>
-                
+
                 {loadingClients ? (
                   <div className="flex items-center gap-3 p-4 bg-slate-50 rounded-2xl">
                     <Loader2 className="w-5 h-5 animate-spin text-[#24578f]" />
-                    <span className="text-slate-500 text-sm font-medium">Fetching approved clients...</span>
+                    <span className="text-slate-500 text-sm font-medium">
+                      Fetching approved clients...
+                    </span>
                   </div>
                 ) : (
                   <div className="relative">
-                    <Building2 className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                    <Building2
+                      className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
+                      size={18}
+                    />
                     <select
                       value={selectedClient}
                       onChange={(e) => setSelectedClient(e.target.value)}
@@ -184,6 +199,9 @@ const UploadGsa: React.FC = () => {
                       {clients.map((client) => (
                         <option key={client.client_id} value={client.client_id}>
                           {client.company_name}
+                          {client.contract_number
+                            ? ` (${client.contract_number})`
+                            : "(No contract)"}
                         </option>
                       ))}
                     </select>
@@ -195,20 +213,34 @@ const UploadGsa: React.FC = () => {
               {/* Step 2: File Dropzone */}
               <div className="space-y-3">
                 <div className="flex items-center gap-2 mb-2">
-                    <span className="w-6 h-6 rounded-full bg-[#3399cc] text-white flex items-center justify-center text-xs font-bold">2</span>
-                    <label className="text-sm font-bold text-slate-700 uppercase tracking-wider">Upload Spreadsheet</label>
+                  <span className="w-6 h-6 rounded-full bg-[#3399cc] text-white flex items-center justify-center text-xs font-bold">
+                    2
+                  </span>
+                  <label className="text-sm font-bold text-slate-700 uppercase tracking-wider">
+                    Upload Spreadsheet
+                  </label>
                 </div>
 
                 {!file ? (
                   <label className="group flex flex-col items-center justify-center w-full h-56 border-2 border-dashed border-slate-200 rounded-4xl cursor-pointer hover:border-[#3399cc] hover:bg-blue-50/30 transition-all bg-slate-50/50">
                     <div className="flex flex-col items-center justify-center p-6 text-center">
                       <div className="w-16 h-16 bg-white rounded-2xl shadow-sm flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                         <Upload className="w-8 h-8 text-[#3399cc]" />
+                        <Upload className="w-8 h-8 text-[#3399cc]" />
                       </div>
-                      <p className="text-base font-bold text-slate-700 mb-1">Click to browse and upload</p>
-                      <p className="text-sm text-slate-400">Microsoft Excel (.xlsx) files only</p>
+                      <p className="text-base font-bold text-slate-700 mb-1">
+                        Click to browse and upload
+                      </p>
+                      <p className="text-sm text-slate-400">
+                        Microsoft Excel (.xlsx) files only
+                      </p>
                     </div>
-                    <input id="file-input" type="file" accept=".xlsx" onChange={handleFileChange} className="hidden" />
+                    <input
+                      id="file-input"
+                      type="file"
+                      accept=".xlsx"
+                      onChange={handleFileChange}
+                      className="hidden"
+                    />
                   </label>
                 ) : (
                   <div className="flex items-center justify-between p-6 bg-blue-50 border border-blue-100 rounded-2xl">
@@ -217,13 +249,20 @@ const UploadGsa: React.FC = () => {
                         <FileSpreadsheet size={24} />
                       </div>
                       <div>
-                        <p className="text-sm font-bold text-slate-900 truncate max-w-50 md:max-w-xs">{file.name}</p>
-                        <p className="text-xs text-slate-500">{(file.size / 1024).toFixed(1)} KB • Ready to upload</p>
+                        <p className="text-sm font-bold text-slate-900 truncate max-w-50 md:max-w-xs">
+                          {file.name}
+                        </p>
+                        <p className="text-xs text-slate-500">
+                          {(file.size / 1024).toFixed(1)} KB • Ready to upload
+                        </p>
                       </div>
                     </div>
-                    <button 
-                        onClick={() => { setFile(null); setPreviewData(null); }}
-                        className="p-2 hover:bg-white rounded-full text-slate-400 hover:text-red-500 transition-all"
+                    <button
+                      onClick={() => {
+                        setFile(null);
+                        setPreviewData(null);
+                      }}
+                      className="p-2 hover:bg-white rounded-full text-slate-400 hover:text-red-500 transition-all"
                     >
                       <X size={20} />
                     </button>
@@ -238,9 +277,15 @@ const UploadGsa: React.FC = () => {
                   className="w-full bg-[#3399cc] text-white py-4 rounded-2xl font-bold flex items-center justify-center gap-3 transition-all hover:bg-[#2b82ad] disabled:opacity-40 disabled:grayscale shadow-lg shadow-blue-200 hover:shadow-xl active:scale-[0.98]"
                 >
                   {loading ? (
-                    <><Loader2 className="w-5 h-5 animate-spin" /> Processing Upload...</>
+                    <>
+                      <Loader2 className="w-5 h-5 animate-spin" /> Processing
+                      Upload...
+                    </>
                   ) : (
-                    <><Upload size={20} /> Start Product Import <ArrowRight size={18} /></>
+                    <>
+                      <Upload size={20} /> Start Product Import{" "}
+                      <ArrowRight size={18} />
+                    </>
                   )}
                 </button>
               </div>
@@ -258,13 +303,21 @@ const UploadGsa: React.FC = () => {
                     <CheckCircle className="w-6 h-6 text-white" />
                   </div>
                   <div className="text-sm text-emerald-800">
-                    <p className="font-black text-base uppercase tracking-tight">Upload Successful</p>
+                    <p className="font-black text-base uppercase tracking-tight">
+                      Upload Successful
+                    </p>
                     <div className="flex gap-4 mt-1 font-medium opacity-80">
-                        <span>Inserted: <strong>{uploadResult.inserted}</strong></span>
-                        <span className="w-1 h-1 bg-emerald-300 rounded-full my-auto" />
-                        <span>Updated: <strong>{uploadResult.updated}</strong></span>
+                      <span>
+                        Inserted: <strong>{uploadResult.inserted}</strong>
+                      </span>
+                      <span className="w-1 h-1 bg-emerald-300 rounded-full my-auto" />
+                      <span>
+                        Updated: <strong>{uploadResult.updated}</strong>
+                      </span>
                     </div>
-                    <p className="mt-3 text-xs opacity-60 italic font-medium">Redirecting to catalog...</p>
+                    <p className="mt-3 text-xs opacity-60 italic font-medium">
+                      Redirecting to catalog...
+                    </p>
                   </div>
                 </div>
               )}
@@ -275,8 +328,12 @@ const UploadGsa: React.FC = () => {
           {previewData && previewData.length > 0 && (
             <div className="bg-white rounded-4xl shadow-sm border border-slate-200 overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
               <div className="p-6 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
-                <h2 className="text-sm font-black text-slate-400 uppercase tracking-[0.2em]">Data Preview (First 10 Rows)</h2>
-                <span className="text-[10px] font-bold bg-slate-200 text-slate-600 px-2 py-0.5 rounded uppercase">Read Only</span>
+                <h2 className="text-sm font-black text-slate-400 uppercase tracking-[0.2em]">
+                  Data Preview (First 10 Rows)
+                </h2>
+                <span className="text-[10px] font-bold bg-slate-200 text-slate-600 px-2 py-0.5 rounded uppercase">
+                  Read Only
+                </span>
               </div>
 
               <div className="overflow-x-auto">
@@ -284,7 +341,10 @@ const UploadGsa: React.FC = () => {
                   <thead>
                     <tr className="bg-white">
                       {getTableHeaders().map((header) => (
-                        <th key={header} className="px-6 py-4 text-left text-[10px] font-black text-slate-400 uppercase tracking-wider border-b border-slate-100">
+                        <th
+                          key={header}
+                          className="px-6 py-4 text-left text-[10px] font-black text-slate-400 uppercase tracking-wider border-b border-slate-100"
+                        >
                           {header}
                         </th>
                       ))}
@@ -292,9 +352,15 @@ const UploadGsa: React.FC = () => {
                   </thead>
                   <tbody className="divide-y divide-slate-50">
                     {previewData.map((row, i) => (
-                      <tr key={i} className="hover:bg-slate-50/50 transition-colors">
+                      <tr
+                        key={i}
+                        className="hover:bg-slate-50/50 transition-colors"
+                      >
                         {getTableHeaders().map((header) => (
-                          <td key={header} className="px-6 py-4 text-xs font-semibold text-slate-600 whitespace-nowrap">
+                          <td
+                            key={header}
+                            className="px-6 py-4 text-xs font-semibold text-slate-600 whitespace-nowrap"
+                          >
                             {row[header] != null ? String(row[header]) : "—"}
                           </td>
                         ))}
@@ -312,11 +378,23 @@ const UploadGsa: React.FC = () => {
 };
 
 const ChevronDownIcon = () => (
-    <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
-        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-        </svg>
-    </div>
+  <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+    <svg
+      width="12"
+      height="12"
+      viewBox="0 0 12 12"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M2.5 4.5L6 8L9.5 4.5"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  </div>
 );
 
 export default UploadGsa;
