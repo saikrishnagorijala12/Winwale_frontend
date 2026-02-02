@@ -1,4 +1,4 @@
-import React,{ ChangeEvent, useEffect, useState } from "react";
+import React, { ChangeEvent, useEffect, useState } from "react";
 import {
   Plus,
   Minus,
@@ -297,15 +297,15 @@ export default function PriceListAnalysis() {
                   </div>
                 ) : (
                   <div className="space-y-3">
-                    <div className="w-16 h-16 mx-auto rounded-xl bg-slate-100 flex items-center justify-center">
-                      <Upload className="w-8 h-8 text-slate-400" />
+                    <div className="w-16 h-16 bg-white rounded-2xl shadow-sm flex items-center justify-center mx-auto">
+                      <Upload className="w-8 h-8 text-[#3399cc]" />
                     </div>
                     <div>
-                      <p className="font-medium text-slate-900">
-                        Click to upload or drag and drop
+                      <p className="font-bold text-slate-900">
+                        Click to browse and upload
                       </p>
                       <p className="text-sm text-slate-500">
-                        Excel files (.xlsx) up to 50MB
+                        Excel files (.xlsx)
                       </p>
                     </div>
                   </div>
@@ -656,6 +656,12 @@ export default function PriceListAnalysis() {
           },
         ];
 
+        const isDescChange = activeTab === "descriptionChanges";
+        const isPriceChange =
+          activeTab === "priceIncreases" || activeTab === "priceDecreases";
+        const isAddOrDelete =
+          activeTab === "additions" || activeTab === "deletions";
+
         return (
           <div className="space-y-6">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
@@ -716,7 +722,7 @@ export default function PriceListAnalysis() {
 
               <div className="p-6">
                 <div className="border border-slate-100 rounded-xl overflow-hidden">
-                  <table className="w-full text-sm">
+                  <table className="w-full text-sm table-fixed">
                     <thead className="bg-slate-50/50">
                       <tr>
                         <th className="text-left p-3 font-bold text-slate-700">
@@ -725,16 +731,19 @@ export default function PriceListAnalysis() {
                         <th className="text-left p-3 font-bold text-slate-700">
                           Product Name
                         </th>
-                        {activeTab === "descriptionChanges" ? (
+
+                        {isDescChange && (
                           <>
                             <th className="text-left p-3 font-bold text-slate-700">
-                              Old Desc
+                              Old Description
                             </th>
                             <th className="text-left p-3 font-bold text-slate-700">
-                              New Desc
+                              New Description
                             </th>
                           </>
-                        ) : (
+                        )}
+
+                        {isPriceChange && (
                           <>
                             <th className="text-right p-3 font-bold text-slate-700">
                               Old Price
@@ -744,8 +753,20 @@ export default function PriceListAnalysis() {
                             </th>
                           </>
                         )}
+
+                        {isAddOrDelete && (
+                          <>
+                            <th className="text-left p-3 font-bold text-slate-700">
+                              Description
+                            </th>
+                            <th className="text-right p-3 font-bold text-slate-700">
+                              Price
+                            </th>
+                          </>
+                        )}
                       </tr>
                     </thead>
+
                     <tbody className="divide-y divide-slate-100">
                       {paginatedActions.map((action: any, i: number) => (
                         <tr
@@ -759,28 +780,43 @@ export default function PriceListAnalysis() {
                             {action.product_name || "Unknown Product"}
                           </td>
 
-                          {activeTab === "descriptionChanges" ? (
+                          {isDescChange && (
                             <>
-                              <td className="p-3 text-xs text-slate-400 truncate max-w-50">
-                                {action.old_description}
+                              <td className="p-3 text-xs text-slate-400 truncate max-w-60">
+                                {action.old_description || "-"}
                               </td>
                               <td className="p-3 text-xs text-slate-700">
-                                {action.new_description}
+                                {action.new_description || "-"}
                               </td>
                             </>
-                          ) : (
+                          )}
+
+                          {isPriceChange && (
                             <>
                               <td className="p-3 text-right text-slate-400 tabular-nums">
                                 {action.old_price
-                                  ? `$${Number(
-                                      action.old_price,
-                                    ).toLocaleString()}`
+                                  ? `$${Number(action.old_price).toLocaleString()}`
                                   : "-"}
                               </td>
                               <td className="p-3 text-right font-bold text-slate-900 tabular-nums">
                                 {action.new_price
+                                  ? `$${Number(action.new_price).toLocaleString()}`
+                                  : "-"}
+                              </td>
+                            </>
+                          )}
+
+                          {isAddOrDelete && (
+                            <>
+                              <td className="p-3 text-xs text-slate-700 truncate max-w-60">
+                                {action.description ||
+                                  action.new_description ||
+                                  "-"}
+                              </td>
+                              <td className="p-3 text-right font-bold text-slate-900 tabular-nums">
+                                {(action.price ?? action.new_price)
                                   ? `$${Number(
-                                      action.new_price,
+                                      action.price ?? action.new_price,
                                     ).toLocaleString()}`
                                   : "-"}
                               </td>

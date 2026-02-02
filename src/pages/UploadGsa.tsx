@@ -231,7 +231,7 @@ const UploadGsa: React.FC = () => {
                         Click to browse and upload
                       </p>
                       <p className="text-sm text-slate-400">
-                        Microsoft Excel (.xlsx) files only
+                        Excel (.xlsx) files only
                       </p>
                     </div>
                     <input
