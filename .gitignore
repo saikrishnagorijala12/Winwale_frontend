@@ -1,14 +1,14 @@
 .env
 node_modules
 
-document
-templates
+# document
+# templates
 
-src/pages/AnalysisHistory.tsx
-src/pages/DocumentGeneration.tsx
-src/pages/DownloadHistory.tsx
+# src/pages/AnalysisHistory.tsx
+# src/pages/DocumentGeneration.tsx
+# src/pages/DownloadHistory.tsx
 
-src/context/DocumentContext.tsx
+# src/context/DocumentContext.tsx
 
-src/types/document.types.ts
-src/types/documentConfigs.ts
+# src/types/document.types.ts
+# src/types/documentConfigs.ts

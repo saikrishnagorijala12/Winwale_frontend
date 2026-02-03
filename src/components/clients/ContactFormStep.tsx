@@ -66,11 +66,7 @@ export const ContactFormStep: React.FC<ContactFormStepProps> = ({
             const value = e.target.value;
             onChange("contact_officer_email", value);
 
-            if (
-              value.trim() &&
-              EMAIL_REGEX.test(value) &&
-              value.length <= 50
-            ) {
+            if (value.trim() && EMAIL_REGEX.test(value) && value.length <= 50) {
               onClearError("contact_officer_email");
             }
           }}
@@ -141,6 +137,11 @@ export const ContactFormStep: React.FC<ContactFormStepProps> = ({
               }
             }}
           />
+          {errors[field] && (
+            <p className="mt-1 text-xs text-red-600 font-medium">
+              {errors[field]}
+            </p>
+          )}
         </div>
       ))}
     </div>

@@ -42,12 +42,12 @@ export const navItems = [
     label: "Contracts",
     roles: [ROLES.USER],
   },
-  // {
-  //   to: "/analysis",
-  //   icon: History,
-  //   label: "Analysis History",
-  //   roles: [ROLES.USER],
-  // },
+  {
+    to: "/analysis",
+    icon: History,
+    label: "Analysis History",
+    roles: [ROLES.USER],
+  },
   {
     to: "/user-activation",
     icon: UserCheck,
@@ -64,7 +64,7 @@ export const navItems = [
     to: "/gsa-products",
     icon: ListCheckIcon,
     label: "GSA Products",
-    roles: [ROLES.ADMIN],
+    roles: [ROLES.USER],
   },
   {
     to: "/settings",

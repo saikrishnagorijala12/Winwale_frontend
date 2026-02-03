@@ -8,6 +8,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Inbox,
+  Calendar,
 } from "lucide-react";
 import { Client } from "../../types/client.types";
 import { ClientActionsMenu } from "./ClientActionsMenu";
@@ -189,7 +190,10 @@ export const ClientTable: React.FC<ClientTableProps> = ({
                     {client.email}
                   </td>
                   <td className="hidden xl:table-cell px-6 py-4 text-sm text-slate-500">
-                    {formatDate(client.lastModification)}
+                    <div className="flex items-center gap-1.5 text-slate-500">
+                      <Calendar className="w-3.5 h-3.5 text-slate-400" />
+                      {formatDate(client.lastModification)}
+                    </div>
                   </td>
                   <td className="p-5 relative text-right">
                     <button

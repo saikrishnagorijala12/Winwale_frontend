@@ -227,15 +227,13 @@ export default function ProductsPage() {
               Catalog management and inventory overview
             </p>
           </div>
-          {userRole === ROLES.ADMIN && (
             <button
-              onClick={() => navigate("/upload-gsa")}
+              onClick={() => navigate("/gsa-products/upload")}
               className="flex items-center justify-center gap-2 bg-[#3399cc] text-white px-6 py-2.5 rounded-xl font-semibold hover:bg-[#2b82ad] transition-all shadow-md hover:shadow-lg active:scale-95"
             >
               <Upload size={18} />
               Upload GSA
             </button>
-          )}
         </div>
 
         <div className="flex flex-col md:flex-row gap-4 mb-6">

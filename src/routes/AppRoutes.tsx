@@ -30,12 +30,12 @@ import UploadGsa from "../pages/UploadGsa";
 import GsaProducts from "../pages/GsaProducts";
 
 import { ROLES } from "../types/roles.types";
-// import PriceListAnalysis from "../pages/PriceListAnalysis";
-import Analysis from "../pages/Analysis";
-// import { DocumentProvider } from "../context/DocumentContext";
-// import { DocumentWorkflowRenderer } from "../pages/DocumentGeneration";
-// import AnalysisHistory from "../pages/AnalysisHistory";
-// import DownloadHistory from "../pages/DownloadHistory";
+import PriceListAnalysis from "../pages/PriceListAnalysis";
+// import Analysis from "../pages/Analysis";
+import { DocumentProvider } from "../context/DocumentContext";
+import { DocumentWorkflowRenderer } from "../pages/DocumentGeneration";
+import AnalysisHistory from "../pages/AnalysisHistory";
+import DownloadHistory from "../pages/DownloadHistory";
 import Dashboard from "../pages/dashboard/Dashboard";
 
 try {
@@ -110,12 +110,14 @@ const AppRoutes: React.FC = () => {
                 element={<ClientProducts />}
               />
               <Route path="/contracts" element={<ContractManagement />} />
-              {/* <Route
+              <Route
                 path="/pricelist-analysis"
                 element={<PriceListAnalysis />}
-              /> */}
-              <Route path="/pricelist-analysis" element={<Analysis />} />
-              {/* <Route
+              />
+              <Route path="/gsa-products" element={<GsaProducts />} />
+              <Route path="/gsa-products/upload" element={<UploadGsa />} />
+              {/* <Route path="/pricelist-analysis" element={<Analysis />} /> */}
+              <Route
                 path="/documents"
                 element={
                   <DocumentProvider>
@@ -126,7 +128,7 @@ const AppRoutes: React.FC = () => {
 
               <Route path="/analysis" element={<AnalysisHistory />} />
 
-              <Route path="/downloads" element={<DownloadHistory />} /> */}
+              <Route path="/downloads" element={<DownloadHistory />} />
             </Route>
 
             <Route
@@ -139,8 +141,8 @@ const AppRoutes: React.FC = () => {
             >
               <Route path="/client-activation" element={<ClientActivation />} />
               <Route path="/user-activation" element={<UserActivation />} />
-              <Route path="/gsa-products" element={<GsaProducts />} />
-              <Route path="/upload-gsa" element={<UploadGsa />} />
+              {/* <Route path="/gsa-products" element={<GsaProducts />} />
+              <Route path="/upload-gsa" element={<UploadGsa />} /> */}
             </Route>
           </Route>
         </Route>

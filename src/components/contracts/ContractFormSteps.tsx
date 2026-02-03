@@ -31,7 +31,6 @@ export function Step1({
   const clientDropdownRef = useRef<HTMLDivElement>(null);
   const isClientSelected = Boolean(contract.client_id);
 
-
   useClickOutside(
     clientDropdownRef,
     () => setShowClientDropdown(false),
@@ -60,7 +59,7 @@ export function Step1({
           }
         />
         {errors.contract_number && (
-          <div className="flex items-center gap-2 mt-2 text-red-600 text-sm">
+          <div className="mt-1 text-xs text-red-600">
             <span>{errors.contract_number}</span>
           </div>
         )}
@@ -109,7 +108,7 @@ export function Step1({
         </div>
 
         {errors.client_id && (
-          <div className="flex items-center gap-2 mt-2 text-red-600 text-sm">
+          <div className="mt-1 text-xs text-red-600">
             <span>{errors.client_id}</span>
           </div>
         )}
@@ -129,9 +128,7 @@ export function Step1({
                   className="w-full px-4 py-3 text-left hover:bg-blue-50 flex justify-between items-center"
                   onClick={() => {
                     onChange({ ...contract, client_id: client.client_id });
-                    setClientSearch(
-                      `${client.company_name}`,
-                    );
+                    setClientSearch(`${client.company_name}`);
                     setShowClientDropdown(false);
                   }}
                 >
@@ -155,7 +152,13 @@ export function Step1({
             onChange({ ...contract, contract_officer_name: e.target.value })
           }
         />
+        {errors.contract_officer_name && (
+          <p className="mt-1 text-xs text-red-600">
+            {errors.contract_officer_name}
+          </p>
+        )}
       </div>
+
       <div>
         <label className="text-sm font-bold text-slate-700">
           Officer Address
@@ -168,7 +171,13 @@ export function Step1({
             onChange({ ...contract, contract_officer_address: e.target.value })
           }
         />
+        {errors.contract_officer_address && (
+          <p className="mt-1 text-xs text-red-600">
+            {errors.contract_officer_address}
+          </p>
+        )}
       </div>
+
       <div>
         <label className="text-sm font-bold text-slate-700">City</label>
         <input
@@ -179,7 +188,13 @@ export function Step1({
             onChange({ ...contract, contract_officer_city: e.target.value })
           }
         />
+        {errors.contract_officer_city && (
+          <p className="mt-1 text-xs text-red-600">
+            {errors.contract_officer_city}
+          </p>
+        )}
       </div>
+
       <div className="grid grid-cols-2 gap-2">
         <div>
           <label className="text-sm font-bold text-slate-700">State</label>
@@ -191,6 +206,11 @@ export function Step1({
               onChange({ ...contract, contract_officer_state: e.target.value })
             }
           />
+          {errors.contract_officer_state && (
+            <p className="mt-1 text-xs text-red-600">
+              {errors.contract_officer_state}
+            </p>
+          )}
         </div>
         <div>
           <label className="text-sm font-bold text-slate-700">ZIP</label>
@@ -202,6 +222,11 @@ export function Step1({
               onChange({ ...contract, contract_officer_zip: e.target.value })
             }
           />
+          {errors.contract_officer_zip && (
+            <p className="mt-1 text-xs text-red-600">
+              {errors.contract_officer_zip}
+            </p>
+          )}
         </div>
       </div>
     </div>
@@ -260,6 +285,11 @@ export function Step2({ contract, onChange, errors }: Step2Props) {
             })
           }
         />
+        {errors.normal_delivery_time && (
+          <p className="mt-1 text-xs text-red-600">
+            {errors.normal_delivery_time}
+          </p>
+        )}
       </div>
       <div>
         <label className="text-sm font-bold text-slate-700">
@@ -276,19 +306,26 @@ export function Step2({ contract, onChange, errors }: Step2Props) {
             })
           }
         />
+        {errors.expedited_delivery_time && (
+          <p className="mt-1 text-xs text-red-600">
+            {errors.expedited_delivery_time}
+          </p>
+        )}
       </div>
       <div className="md:col-span-2">
         <label className="text-sm font-bold text-slate-700">
           Quantity/Volume Discounts
         </label>
-        <textarea
-          rows={2}
+        <input
           className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] outline-none resize-none"
           value={contract.q_v_discount || ""}
           onChange={(e) =>
             onChange({ ...contract, q_v_discount: e.target.value })
           }
         />
+        {errors.q_v_discount && (
+          <p className="mt-1 text-xs text-red-600">{errors.q_v_discount}</p>
+        )}
       </div>
       <div className="md:col-span-2">
         <label className="text-sm font-bold text-slate-700">
@@ -302,6 +339,11 @@ export function Step2({ contract, onChange, errors }: Step2Props) {
             onChange({ ...contract, additional_concessions: e.target.value })
           }
         />
+        {errors.additional_concessions && (
+          <p className="mt-1 text-xs text-red-600">
+            {errors.additional_concessions}
+          </p>
+        )}
       </div>
     </div>
   );
