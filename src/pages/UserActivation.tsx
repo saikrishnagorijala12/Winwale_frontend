@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, JSX } from "react";
 import {
   UserCheck,
   UserX,
@@ -11,9 +11,15 @@ import {
   Clock,
   Loader2,
   Users,
+  AlertTriangle,
+  MoreVertical,
+  RefreshCw,
+  User,
+  Phone,
 } from "lucide-react";
 import api from "../lib/axios";
 import { Role } from "../types/roles.types";
+import { toast } from "sonner";
 
 const ROLE_MAP: Record<Role, string> = {
   admin: "Administrator",
@@ -22,21 +28,376 @@ const ROLE_MAP: Record<Role, string> = {
 
 type TabType = "all" | "pending" | "approved" | "rejected";
 
+interface ConfirmationModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+  user: any;
+  action: "approve" | "reject";
+  isSubmitting: boolean;
+}
+
+const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
+  isOpen,
+  onClose,
+  onConfirm,
+  user,
+  action,
+  isSubmitting, 
+}) => {
+  if (!isOpen) return null;
+
+  const isApprove = action === "approve";
+
+  return (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 h-full">
+      <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full overflow-hidden">
+        <div className="p-8">
+          <p className="text-slate-500 mb-6">
+            Are you sure you want to {isApprove ? "approve" : "reject"}{" "}
+            <span className="font-bold text-slate-700">{user?.name}</span>?
+          </p>
+
+          <div className="bg-slate-50 rounded-2xl p-4 mb-6 space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-slate-500">Email:</span>
+              <span className="text-sm font-semibold text-slate-700">
+                {user?.email}
+              </span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-slate-500">Role:</span>
+              <span className="text-sm font-semibold text-slate-700">
+                {ROLE_MAP[user?.role] || "User"}
+              </span>
+            </div>
+          </div>
+
+          {!isApprove && (
+            <div className="flex items-start gap-3 bg-rose-50 border border-rose-100 rounded-2xl p-4 mb-6">
+              <AlertTriangle className="w-5 h-5 text-rose-500 shrink-0 mt-0.5" />
+              <p className="text-xs text-rose-700">
+                This action will reject the user's account. They won't be able
+                to access the system.
+              </p>
+            </div>
+          )}
+
+          <div className="flex gap-3">
+            <button
+              onClick={onClose}
+              className="flex-1 px-6 py-3 bg-white border border-slate-200 text-slate-700 rounded-xl font-bold text-sm hover:bg-slate-50 transition-all"
+            >
+              Cancel
+            </button>
+            <button
+              disabled={isSubmitting}
+              onClick={onConfirm}
+              className={`flex-1 px-6 py-3 rounded-xl font-bold text-sm text-white transition-all shadow-sm flex items-center justify-center gap-2 ${
+                isApprove
+                  ? "bg-emerald-500 hover:bg-emerald-600"
+                  : "bg-rose-500 hover:bg-rose-600"
+              } disabled:opacity-70`}
+            >
+              {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
+              {isApprove ? "Approve" : "Reject"}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+interface RoleChangeModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+  user: any;
+  isSubmitting: boolean;
+}
+
+const RoleChangeModal: React.FC<RoleChangeModalProps> = ({
+  isOpen,
+  onClose,
+  onConfirm,
+  user,
+  isSubmitting,
+}) => {
+  if (!isOpen) return null;
+
+  const currentRole = ROLE_MAP[user?.role] || "User";
+  const newRole = user?.role === "admin" ? "Consultant" : "Administrator";
+
+  return (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 h-full">
+      <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full overflow-hidden">
+        <div className="p-8">
+          <h3 className="text-xl font-bold text-slate-800 mb-2">Change User Role</h3>
+          <p className="text-slate-500 mb-6">
+            Are you sure you want to change the role of{" "}
+            <span className="font-bold text-slate-700">{user?.name}</span>?
+          </p>
+
+          <div className="bg-slate-50 rounded-2xl p-4 mb-6 space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-slate-500">Current Role:</span>
+              <span className="text-sm font-semibold text-slate-700">
+                {currentRole}
+              </span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-slate-500">New Role:</span>
+              <span className="text-sm font-semibold text-[#3399cc]">
+                {newRole}
+              </span>
+            </div>
+          </div>
+
+          <div className="flex items-start gap-3 bg-yellow-50 border border-yellow-100 rounded-2xl p-4 mb-6">
+            <AlertTriangle className="w-5 h-5 text-yellow-600 shrink-0 mt-0.5" />
+            <p className="text-xs text-yellow-700">
+              This will change the user's permissions and access level in the system.
+            </p>
+          </div>
+
+          <div className="flex gap-3">
+            <button
+              onClick={onClose}
+              disabled={isSubmitting}
+              className="flex-1 px-6 py-3 bg-white border border-slate-200 text-slate-700 rounded-xl font-bold text-sm hover:bg-slate-50 transition-all disabled:opacity-70"
+            >
+              Cancel
+            </button>
+            <button
+              disabled={isSubmitting}
+              onClick={onConfirm}
+              className="flex-1 px-6 py-3 rounded-xl font-bold text-sm text-white transition-all shadow-sm flex items-center justify-center gap-2 bg-[#3399cc] hover:bg-[#2980b9] disabled:opacity-70"
+            >
+              {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
+              Change Role
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+interface ActionDropdownProps {
+  user: any;
+  onApprove: () => void;
+  onReject: () => void;
+  onChangeRole: () => void;
+}
+
+const ActionDropdown: React.FC<ActionDropdownProps> = ({
+  user,
+  onApprove,
+  onReject,
+  onChangeRole,
+}) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isOpen]);
+
+  const isPending = !user.is_active && !user.is_deleted;
+  const isApproved = user.is_active && !user.is_deleted;
+
+  return (
+    <div className="relative" ref={dropdownRef}>
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          setIsOpen(!isOpen);
+        }}
+        className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
+      >
+        <MoreVertical className="w-5 h-5 text-slate-600" />
+      </button>
+
+      {isOpen && (
+        <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-slate-200 py-2 z-10">
+          {isPending && (
+            <>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onApprove();
+                  setIsOpen(false);
+                }}
+                className="w-full px-4 py-2 text-left text-sm font-medium text-emerald-600 hover:bg-emerald-50 flex items-center gap-2 transition-colors"
+              >
+                <UserCheck className="w-4 h-4" />
+                Approve
+              </button>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onReject();
+                  setIsOpen(false);
+                }}
+                className="w-full px-4 py-2 text-left text-sm font-medium text-rose-600 hover:bg-rose-50 flex items-center gap-2 transition-colors"
+              >
+                <UserX className="w-4 h-4" />
+                Reject
+              </button>
+            </>
+          )}
+
+          {isApproved && (
+            <>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onChangeRole();
+                  setIsOpen(false);
+                }}
+                className="w-full px-4 py-2 text-left text-sm  text-slate-700 font-medium  hover:bg-slate-50 flex items-center gap-2 transition-colors"
+              >
+                <RefreshCw className="w-4 h-4 text-[#3399cc]" />
+                Change Role
+              </button>
+              <div className="border-t border-slate-100 my-2"></div>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onReject();
+                  setIsOpen(false);
+                }}
+                className="w-full px-4 py-2 text-left text-sm font-medium text-rose-600 hover:bg-rose-50 flex items-center gap-2 transition-colors"
+              >
+                <UserX className="w-4 h-4" />
+                Reject
+              </button>
+            </>
+          )}
+
+          {user.is_deleted && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onApprove();
+                setIsOpen(false);
+              }}
+              className="w-full px-4 py-2 text-left text-sm font-medium text-emerald-600 hover:bg-emerald-50 flex items-center gap-2 transition-colors"
+            >
+              <UserCheck className="w-4 h-4" />
+              Approve
+            </button>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+
+interface UserCardProps {
+  user: any;
+  onApprove: () => void;
+  onReject: () => void;
+  onChangeRole: () => void;
+  getStatusBadge: (user: any) => JSX.Element;
+  getRoleStyle: (roleId: string) => string;
+}
+
+const UserCard: React.FC<UserCardProps> = ({
+  user,
+  onApprove,
+  onReject,
+  onChangeRole,
+  getStatusBadge,
+  getRoleStyle,
+}) => {
+  return (
+    <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-5 hover:shadow-md transition-all">
+      <div className="flex items-start justify-between mb-4">
+        <div className="flex items-center gap-3 flex-1 min-w-0">
+          <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center text-blue-500 font-bold text-sm uppercase shrink-0">
+            {user.name.charAt(0)}
+          </div>
+          <div className="flex-1 min-w-0">
+            <h3 className="font-bold text-slate-800 text-base truncate">
+              {user.name}
+            </h3>
+            <p className="text-xs text-slate-400 truncate">{user.email}</p>
+          </div>
+        </div>
+        <div onClick={(e) => e.stopPropagation()}>
+          <ActionDropdown
+            user={user}
+            onApprove={onApprove}
+            onReject={onReject}
+            onChangeRole={onChangeRole}
+          />
+        </div>
+      </div>
+
+      <div className="space-y-2.5 mb-4">
+        <div className="flex items-center gap-2 text-sm text-slate-600">
+          <Phone className="w-4 h-4 text-slate-400 shrink-0" />
+          <span className="truncate">{user.phone_no || "No Phone"}</span>
+        </div>
+        <div className="flex items-center gap-2 text-sm">
+          <Shield className="w-4 h-4 text-slate-400 shrink-0" />
+          <span
+            className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold border capitalize ${getRoleStyle(
+              user.role
+            )}`}
+          >
+            {ROLE_MAP[user.role] || "User"}
+          </span>
+        </div>
+        <div className="flex items-center gap-2 text-sm text-slate-600">
+          <Calendar className="w-4 h-4 text-slate-400 shrink-0" />
+          <span>{new Date(user.created_time).toLocaleDateString()}</span>
+        </div>
+      </div>
+
+      <div className="flex items-center justify-between pt-3 border-t border-slate-100">
+        {getStatusBadge(user)}
+      </div>
+    </div>
+  );
+};
+
 export default function UserActivation() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isActionLoading, setIsActionLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState<TabType>("pending");
+  const [confirmModal, setConfirmModal] = useState({
+    isOpen: false,
+    user: null,
+    action: "approve" as "approve" | "reject",
+  });
+  const [roleChangeModal, setRoleChangeModal] = useState({
+    isOpen: false,
+    user: null,
+  });
 
-  // Fetch Users from Backend
   const fetchUsers = async () => {
     try {
       setLoading(true);
       const response = await api.get("/users/all");
       const data = response.data;
-
-      const userList = Array.isArray(data) ? data : [data];
-      setUsers(userList);
+      setUsers(Array.isArray(data) ? data : [data]);
     } catch (error) {
       console.error("Error fetching users:", error);
     } finally {
@@ -44,30 +405,100 @@ export default function UserActivation() {
     }
   };
 
-  const pendingUsers = users.filter((u) => !u.is_active && !u.is_deleted);
-  const approvedUsers = users.filter((u) => u.is_active && !u.is_deleted);
-  const rejectedUsers = users.filter((u) => u.is_deleted);
-
   useEffect(() => {
     fetchUsers();
   }, []);
 
-  // Approve/Reject User Action
+  const pendingUsers = users.filter((u) => !u.is_active && !u.is_deleted);
+  const approvedUsers = users.filter((u) => u.is_active && !u.is_deleted);
+  const rejectedUsers = users.filter((u) => u.is_deleted);
+
+  const openConfirmModal = (user, action: "approve" | "reject") => {
+    setConfirmModal({
+      isOpen: true,
+      user,
+      action,
+    });
+  };
+
+  const closeConfirmModal = () => {
+    setConfirmModal({
+      isOpen: false,
+      user: null,
+      action: "approve",
+    });
+  };
+
+  const openRoleChangeModal = (user) => {
+    setRoleChangeModal({
+      isOpen: true,
+      user,
+    });
+  };
+
+  const closeRoleChangeModal = () => {
+    setRoleChangeModal({
+      isOpen: false,
+      user: null,
+    });
+  };
+
   const handleApprove = async (userId, action) => {
     try {
+      setIsActionLoading(true);
+      
       await api.patch(`/users/${userId}/approve`, null, {
         params: { action },
       });
-
-      // Refresh users after action
-      await fetchUsers();
+      setUsers((prevUsers) =>
+        prevUsers.map((user) => {
+          if (user.user_id === userId) {
+            return {
+              ...user,
+              is_active: action === "approve",
+              is_deleted: action === "reject",
+            };
+          }
+          return user;
+        })
+      );
+      toast.success(`Client ${action === "approve" ? "approved" : "rejected"} successfully`);
+      closeConfirmModal();
     } catch (error) {
       console.error(error);
-      alert(`Failed to ${action} user`);
+      toast.error(`Failed to ${action} user`);
+    } finally {
+      setIsActionLoading(false); 
     }
   };
 
-  // Get filtered users based on active tab
+  const confirmStatusChange = () => {
+    if (confirmModal.user) {
+      handleApprove(confirmModal.user.user_id, confirmModal.action);
+    }
+  };
+
+  const handleRoleChange = async () => {
+    if (!roleChangeModal.user) return;
+    
+    try {
+      setIsActionLoading(true);
+      await api.put(`/users/change_role/${roleChangeModal.user.user_id}`);
+      
+      // Refresh the full user list to ensure UI is in sync
+      await fetchUsers();
+      
+      toast.success("User role changed successfully");
+      closeRoleChangeModal();
+    } catch (error: any) {
+      console.error(error);
+      const errorMessage = error.response?.data?.detail || "Failed to change user role";
+      toast.error(errorMessage);
+    } finally {
+      setIsActionLoading(false);
+    }
+  };
+
   const getFilteredUsers = () => {
     let userList = [];
     switch (activeTab) {
@@ -172,121 +603,83 @@ export default function UserActivation() {
   }
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-slate-50 via-blue-50/30 to-slate-100 p-6 lg:p-10 space-y-10">
-      <div className="md:items-center md:justify-between gap-6 mb-12 mx-auto">
-        <h1 className="text-3xl font-extrabold tracking-tight text-slate-800">User Management</h1>
+    <div className="min-h-screen bg-linear-to-br from-slate-50 via-blue-50/30 to-slate-100 p-4 sm:p-6 lg:p-10 space-y-6 sm:space-y-8 lg:space-y-10">
+      <ConfirmationModal
+        isOpen={confirmModal.isOpen}
+        onClose={closeConfirmModal}
+        onConfirm={confirmStatusChange}
+        user={confirmModal.user}
+        action={confirmModal.action}
+        isSubmitting={isActionLoading}
+      />
+
+      <RoleChangeModal
+        isOpen={roleChangeModal.isOpen}
+        onClose={closeRoleChangeModal}
+        onConfirm={handleRoleChange}
+        user={roleChangeModal.user}
+        isSubmitting={isActionLoading}
+      />
+
+      <div className="mx-auto">
+        <h1 className="text-3xl font-extrabold tracking-tight text-slate-800">
+          User Management
+        </h1>
         <p className="text-slate-500 font-medium mt-1">
           Manage user accounts, approvals, and permissions.
         </p>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
-        <div className="bg-white p-8 rounded-3xl shadow-sm flex items-center gap-5 border border-slate-100">
-          <div className="w-14 h-14 bg-blue-50 rounded-full flex items-center justify-center">
-            <Users className="w-7 h-7 text-blue-400" />
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
+        {[
+          { label: "Total Users", count: users.length, icon: Users, color: "blue" },
+          { label: "Pending Approvals", count: pendingUsers.length, icon: Clock, color: "orange" },
+          { label: "Approved", count: approvedUsers.length, icon: CheckCircle2, color: "emerald" },
+          { label: "Rejected", count: rejectedUsers.length, icon: XCircle, color: "rose" },
+        ].map((stat) => (
+          <div key={stat.label} className="bg-white p-4 sm:p-6 lg:p-8 rounded-2xl sm:rounded-3xl shadow-sm flex items-center gap-3 sm:gap-5 border border-slate-100">
+            <div className={`w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 bg-${stat.color}-50 rounded-full flex items-center justify-center shrink-0`}>
+              <stat.icon className={`w-5 h-5 sm:w-6 sm:h-6 lg:w-7 lg:h-7 text-${stat.color}-400`} />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-slate-400 truncate">
+                {stat.label}
+              </p>
+              <p className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900">{stat.count}</p>
+            </div>
           </div>
-          <div>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
-              Total Users
-            </p>
-            <p className="text-4xl font-bold text-slate-900">{users.length}</p>
-          </div>
-        </div>
-
-        <div className="bg-white p-8 rounded-3xl shadow-sm flex items-center gap-5 border border-slate-100">
-          <div className="w-14 h-14 bg-orange-50 rounded-full flex items-center justify-center">
-            <Clock className="w-7 h-7 text-orange-400" />
-          </div>
-          <div>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
-              Pending Approvals
-            </p>
-            <p className="text-4xl font-bold text-slate-900">
-              {pendingUsers.length}
-            </p>
-          </div>
-        </div>
-
-        <div className="bg-white p-8 rounded-3xl shadow-sm flex items-center gap-5 border border-slate-100">
-          <div className="w-14 h-14 bg-emerald-50 rounded-full flex items-center justify-center">
-            <CheckCircle2 className="w-7 h-7 text-emerald-400" />
-          </div>
-          <div>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
-              Approved
-            </p>
-            <p className="text-4xl font-bold text-slate-900">
-              {approvedUsers.length}
-            </p>
-          </div>
-        </div>
-
-        <div className="bg-white p-8 rounded-3xl shadow-sm flex items-center gap-5 border border-slate-100">
-          <div className="w-14 h-14 bg-rose-50 rounded-full flex items-center justify-center">
-            <XCircle className="w-7 h-7 text-rose-400" />
-          </div>
-          <div>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
-              Rejected
-            </p>
-            <p className="text-4xl font-bold text-slate-900">
-              {rejectedUsers.length}
-            </p>
-          </div>
-        </div>
+        ))}
       </div>
 
       {/* Main Table Card */}
-      <div className="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
+      <div className="bg-white rounded-2xl sm:rounded-3xl shadow-sm border border-slate-100 ">
         {/* Tabs */}
-        <div className="border-b border-slate-100 px-8 pt-6">
-          <div className="flex gap-2">
-            <button
-              onClick={() => setActiveTab("all")}
-              className={`px-6 py-3 rounded-t-xl font-bold text-sm transition-all ${
-                activeTab === "all"
-                  ? "bg-blue-50 text-blue-600 border-b-2 border-blue-600"
-                  : "text-slate-500 hover:text-slate-700 hover:bg-slate-50"
-              }`}
-            >
-              All Users ({users.length})
-            </button>
-            <button
-              onClick={() => setActiveTab("pending")}
-              className={`px-6 py-3 rounded-t-xl font-bold text-sm transition-all ${
-                activeTab === "pending"
-                  ? "bg-orange-50 text-orange-600 border-b-2 border-orange-600"
-                  : "text-slate-500 hover:text-slate-700 hover:bg-slate-50"
-              }`}
-            >
-              Pending ({pendingUsers.length})
-            </button>
-            <button
-              onClick={() => setActiveTab("approved")}
-              className={`px-6 py-3 rounded-t-xl font-bold text-sm transition-all ${
-                activeTab === "approved"
-                  ? "bg-emerald-50 text-emerald-600 border-b-2 border-emerald-600"
-                  : "text-slate-500 hover:text-slate-700 hover:bg-slate-50"
-              }`}
-            >
-              Approved ({approvedUsers.length})
-            </button>
-            <button
-              onClick={() => setActiveTab("rejected")}
-              className={`px-6 py-3 rounded-t-xl font-bold text-sm transition-all ${
-                activeTab === "rejected"
-                  ? "bg-rose-50 text-rose-600 border-b-2 border-rose-600"
-                  : "text-slate-500 hover:text-slate-700 hover:bg-slate-50"
-              }`}
-            >
-              Rejected ({rejectedUsers.length})
-            </button>
+        <div className="border-b border-slate-100 px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6 ">
+          <div className="flex gap-1 sm:gap-2 min-w-max">
+            {[
+              { id: "all", label: "All Users", count: users.length, color: "blue" },
+              { id: "pending", label: "Pending", count: pendingUsers.length, color: "orange" },
+              { id: "approved", label: "Approved", count: approvedUsers.length, color: "emerald" },
+              { id: "rejected", label: "Rejected", count: rejectedUsers.length, color: "rose" },
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id as TabType)}
+                className={`px-4 sm:px-6 py-2 sm:py-3 rounded-t-xl font-bold text-xs sm:text-sm transition-all whitespace-nowrap ${
+                  activeTab === tab.id
+                    ? `bg-${tab.color}-50 text-${tab.color}-600 border-b-2 border-${tab.color}-600`
+                    : "text-slate-500 hover:text-slate-700 hover:bg-slate-50"
+                }`}
+              >
+                {tab.label} ({tab.count})
+              </button>
+            ))}
           </div>
         </div>
 
         {/* Table Header Area */}
-        <div className="p-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="p-4 sm:p-6 lg:p-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <h2 className="text-xl font-bold text-slate-900">
               {getTabTitle()}
@@ -306,8 +699,28 @@ export default function UserActivation() {
           </div>
         </div>
 
-        {/* Table Content */}
-        <div className="overflow-x-auto px-6 pb-6">
+        {/* Mobile Card View  */}
+        <div className="lg:hidden px-4 sm:px-6 pb-4 sm:pb-6 space-y-3 sm:space-y-4">
+          {filteredUsers.map((user) => (
+            <UserCard
+              key={user.user_id}
+              user={user}
+              onApprove={() => openConfirmModal(user, "approve")}
+              onReject={() => openConfirmModal(user, "reject")}
+              onChangeRole={() => openRoleChangeModal(user)}
+              getStatusBadge={getStatusBadge}
+              getRoleStyle={getRoleStyle}
+            />
+          ))}
+          {filteredUsers.length === 0 && (
+            <div className="py-16 text-center text-slate-400 text-sm">
+              No users found.
+            </div>
+          )}
+        </div>
+
+        {/* Desktop Table View */}
+        <div className="hidden lg:block  px-6 pb-6">
           <table className="w-full border-collapse">
             <thead>
               <tr className="border-b border-slate-50">
@@ -375,39 +788,13 @@ export default function UserActivation() {
                     </div>
                   </td>
                   <td className="px-4 py-5">
-                    <div className="flex items-center justify-end gap-3">
-                      {!user.is_active && !user.is_deleted && (
-                        <>
-                          <button
-                            onClick={() =>
-                              handleApprove(user.user_id, "approve")
-                            }
-                            className="flex items-center gap-2 bg-[#10b981] hover:bg-emerald-600 text-white px-5 py-2 rounded-xl text-sm font-bold transition-all shadow-sm"
-                          >
-                            <UserCheck className="w-4 h-4" />
-                            Approve
-                          </button>
-                          <button
-                            onClick={() =>
-                              handleApprove(user.user_id, "reject")
-                            }
-                            className="flex items-center gap-2 bg-white border border-rose-100 text-rose-500 hover:bg-rose-50 px-5 py-2 rounded-xl text-sm font-bold transition-all"
-                          >
-                            <UserX className="w-4 h-4" />
-                            Reject
-                          </button>
-                        </>
-                      )}
-                      {user.is_active && (
-                        <span className="text-xs text-slate-400 italic">
-                          Active Account
-                        </span>
-                      )}
-                      {user.is_deleted && (
-                        <span className="text-xs text-slate-400 italic">
-                          Account Rejected
-                        </span>
-                      )}
+                    <div className="flex items-center justify-end">
+                      <ActionDropdown
+                        user={user}
+                        onApprove={() => openConfirmModal(user, "approve")}
+                        onReject={() => openConfirmModal(user, "reject")}
+                        onChangeRole={() => openRoleChangeModal(user)}
+                      />
                     </div>
                   </td>
                 </tr>

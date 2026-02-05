@@ -212,11 +212,11 @@ export default function EditContractModal({
     <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-3xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-hidden flex flex-col">
         {/* HEADER */}
-        <div className="bg-linear-to-br from-[#38A1DB] to-[#2D8BBF] py-4 px-8 shrink-0">
+        <div className="bg-slate-50 py-4 px-8 shrink-0">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-2xl font-bold text-white">Edit Contract</h2>
-              <p className="text-white/80 text-sm">
+              <h2 className="text-2xl font-bold  text-slate-700">Edit Contract</h2>
+              <p className="text-slate-500 text-sm">
                 Update contract details for {initialContract.client}
               </p>
             </div>
@@ -226,13 +226,12 @@ export default function EditContractModal({
               className="p-2 hover:bg-white/20 rounded-full transition-colors"
               disabled={isSubmitting}
             >
-              <X className="w-6 h-6 text-white" />
+              <X className="w-6 h-6 text-slate-700" />
             </button>
           </div>
         </div>
 
-        {/* STEP INDICATOR */}
-        <div className="flex items-center justify-center gap-4 p-4 bg-slate-50 border-b border-slate-200 shrink-0">
+        <div className="flex items-center justify-center gap-4 p-4 shrink-0">
           {["Contract & Officer", "Terms & Delivery"].map((label, i) => {
             const stepNum = (i + 1) as 1 | 2;
             const isActive = step >= stepNum;
@@ -269,7 +268,6 @@ export default function EditContractModal({
           })}
         </div>
 
-        {/* FORM CONTENT */}
         <form
           onSubmit={handleFormSubmit}
           noValidate
@@ -284,7 +282,6 @@ export default function EditContractModal({
             )}
 
             {step === 1 ? (
-              /* STEP 1: OFFICER INFO */
               <div className="grid md:grid-cols-2 gap-6">
                 <div className="md:col-span-2">
                   <label className="text-sm font-bold text-slate-700">
@@ -399,7 +396,6 @@ export default function EditContractModal({
                 </div>
               </div>
             ) : (
-              /* STEP 2: LOGISTICS & TERMS */
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
                   <label className="text-sm font-bold text-slate-700">
@@ -488,8 +484,7 @@ export default function EditContractModal({
             )}
           </div>
 
-          {/* FOOTER */}
-          <div className="sticky bottom-0 bg-slate-50 p-6 flex justify-between border-t border-slate-200 shrink-0">
+          <div className="sticky bottom-0 bg-slate-50 p-6 flex justify-between border-t border-slate-100 shrink-0">
             <button
               type="button"
               onClick={() => (step === 1 ? handleClose() : setStep(1))}
@@ -502,7 +497,7 @@ export default function EditContractModal({
             <button
               type="submit"
               disabled={isSubmitting}
-              className="px-8 py-3 rounded-xl bg-[#38A1DB] text-white font-bold hover:bg-[#2D8BBF] shadow-lg shadow-blue-200 flex items-center gap-2 transition-all disabled:opacity-50"
+              className="px-6 py-3 rounded-xl bg-linear-to-br from-[#38A1DB] to-[#2D8BBF] text-white font-bold shadow-lg hover:shadow-xl transition-all active:scale-95"
             >
               {isSubmitting ? (
                 <>

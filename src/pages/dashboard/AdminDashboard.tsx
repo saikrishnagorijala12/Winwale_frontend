@@ -2,16 +2,13 @@ import React from "react";
 import {
   Users,
   ShieldCheck,
-  Package,
-  UploadCloud,
   CheckCircle2,
   XCircle,
-  Clock,
   UserPlus,
   Building2,
-  FileSpreadsheet,
   ChevronRight,
   ShieldAlert,
+  UserCheck,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
@@ -33,63 +30,62 @@ export default function AdminDashboard() {
 
   const stats = [
     {
-      label: "Pending Approvals",
-      value: "14",
-      change: "5 users, 9 clients",
+      label: "User Approvals",
+      value: "5",
+      change: "2 urgent requests",
       trend: "warning",
-      icon: ShieldAlert,
+      icon: UserPlus,
     },
     {
-      label: "Total Active Users",
+      label: "Client Approvals",
+      value: "9",
+      change: "4 new profiles",
+      trend: "up",
+      icon: Building2,
+    },
+    {
+      label: "Active Users",
       value: "182",
       change: "+12 this month",
       trend: "up",
       icon: Users,
     },
     {
-      label: "GSA Products",
-      value: "12.4k",
-      change: "Last update: 2d ago",
-      trend: "up",
-      icon: Package,
-    },
-    {
-      label: "System Status",
-      value: "Optimal",
-      change: "All services live",
+      label: "Verified Clients",
+      value: "64",
+      change: "All profiles active",
       trend: "up",
       icon: ShieldCheck,
     },
   ];
 
-  const pendingQueue = [
+  const userRequests = [
     {
       id: "1",
       name: "James Wilson",
-      type: "User Request",
       detail: "Senior Consultant",
       date: "10m ago",
     },
     {
+      id: "4",
+      name: "Sarah Chen",
+      detail: "Junior Analyst",
+      date: "Yesterday",
+    },
+  ];
+
+  const clientRequests = [
+    {
       id: "2",
       name: "Global Logistics Inc",
-      type: "Client Profile",
       detail: "New GSA Schedule",
       date: "1h ago",
     },
     {
       id: "3",
       name: "Enterprise Solutions",
-      type: "Client Profile",
       detail: "Profile Update",
       date: "3h ago",
-    },
-    {
-      id: "4",
-      name: "Sarah Chen",
-      type: "User Request",
-      detail: "Junior Analyst",
-      date: "Yesterday",
     },
   ];
 
@@ -105,19 +101,15 @@ export default function AdminDashboard() {
             className="text-3xl font-extrabold tracking-tight"
             style={{ color: colors.fg }}
           >
-            Welcome, {user?.name?.split(" ")[0] || "Sarah"}
+            Welcome, {user?.name?.split(" ")[0] || "Admin"}
           </h1>
           <p className="font-medium" style={{ color: colors.muted }}>
-            System-wide management of users, client profiles, and GSA catalogs.
+            Reviewing pending user access and client profile verifications.
           </p>
         </div>
-        <button className="btn-primary" onClick={() => navigate("/upload-gsa")}>
-          <UploadCloud className="w-4 h-4" />
-          Upload GSA Data
-        </button>
       </div>
 
-      {/* Admin Stats Grid */}
+      {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 animate-slide-up">
         {stats.map((stat) => (
           <div
@@ -161,34 +153,25 @@ export default function AdminDashboard() {
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-        {/* Left: Pending Approvals Queue */}
-        <div className="lg:col-span-2 bg-white p-8 rounded-2xl animate-slide-up shadow-sm">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+        {/* User Requests Column */}
+        <div className="bg-white p-8 rounded-2xl animate-slide-up shadow-sm">
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h2
-                className="text-xl font-extrabold"
-                style={{ color: colors.fg }}
-              >
-                Verification Queue
+              <h2 className="text-xl font-extrabold" style={{ color: colors.fg }}>
+                User Access Requests
               </h2>
-              <p
-                className="text-sm font-medium"
-                style={{ color: colors.muted }}
-              >
-                Review requests requiring administrative action
+              <p className="text-sm font-medium" style={{ color: colors.muted }}>
+                Account registration approvals
               </p>
             </div>
-            <button
-              className="text-sm font-bold"
-              style={{ color: colors.muted }}
-            >
-              View All
-            </button>
+            <span className="bg-blue-50 text-[#24548f] text-[10px] font-black px-2 py-1 rounded">
+              {userRequests.length} PENDING
+            </span>
           </div>
 
           <div className="space-y-3">
-            {pendingQueue.map((item) => (
+            {userRequests.map((item) => (
               <div
                 key={item.id}
                 className="group flex items-center gap-4 p-4 rounded-2xl border border-transparent hover:shadow-sm transition-all"
@@ -198,128 +181,80 @@ export default function AdminDashboard() {
                   className="w-12 h-12 rounded-xl bg-white border flex items-center justify-center shrink-0 shadow-sm"
                   style={{ borderColor: colors.border }}
                 >
-                  {item.type === "User Request" ? (
-                    <UserPlus className="w-5 h-5 text-[#24548f]" />
-                  ) : (
-                    <Building2
-                      className="w-5 h-5"
-                      style={{ color: colors.success }}
-                    />
-                  )}
+                  <UserCheck className="w-5 h-5 text-[#24548f]" />
                 </div>
 
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <h4
-                      className="font-bold truncate"
-                      style={{ color: colors.fg }}
-                    >
-                      {item.name}
-                    </h4>
-                    <span
-                      className="text-[9px] font-black uppercase px-2 py-0.5 rounded-md"
-                      style={{
-                        backgroundColor: colors.border,
-                        color: colors.muted,
-                      }}
-                    >
-                      {item.type}
-                    </span>
-                  </div>
-                  <p
-                    className="text-xs font-bold"
-                    style={{ color: colors.muted }}
-                  >
+                  <h4 className="font-bold truncate" style={{ color: colors.fg }}>
+                    {item.name}
+                  </h4>
+                  <p className="text-xs font-bold" style={{ color: colors.muted }}>
                     {item.detail} • {item.date}
                   </p>
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <button
-                    className="p-2 rounded-xl transition-colors hover:bg-red-50"
-                    style={{ color: colors.destructive }}
-                  >
+                  <button className="p-2 rounded-xl hover:bg-red-50" style={{ color: colors.destructive }}>
                     <XCircle className="w-6 h-6" />
                   </button>
-                  <button
-                    className="p-2 rounded-xl transition-colors hover:bg-green-50"
-                    style={{ color: colors.success }}
-                  >
+                  <button className="p-2 rounded-xl hover:bg-green-50" style={{ color: colors.success }}>
                     <CheckCircle2 className="w-6 h-6" />
                   </button>
-                  <ChevronRight
-                    className="w-4 h-4 ml-2"
-                    style={{ color: colors.border }}
-                  />
                 </div>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Right Sidebar */}
-        <div className="space-y-8 animate-slide-in-right">
-          {/* Catalog Upload Card */}
-          <div className="rounded-4xl p-8 shadow-xl text-white bg-[#24548f]">
-            <h2 className="text-xl font-bold mb-1">GSA Product Import</h2>
-            <p className="text-xs font-medium mb-6 opacity-70">
-              Update master price lists
-            </p>
-
-            <div className="space-y-4">
-              <div className="border-2 border-dashed border-white/20 rounded-2xl p-6 text-center">
-                <FileSpreadsheet className="w-10 h-10 mx-auto mb-3 opacity-50" />
-                <p className="text-xs font-bold">Drop CSV/Excel file here</p>
-              </div>
-
-              <button className="w-full flex items-center justify-center gap-2 p-4 rounded-xl transition-all font-bold text-sm bg-white text-slate-900 hover:bg-slate-100">
-                <UploadCloud className="w-4 h-4" />
-                Start Processing
-              </button>
+        {/* Client Requests Column */}
+        <div className="bg-white p-8 rounded-2xl animate-slide-up shadow-sm">
+          <div className="flex items-center justify-between mb-8">
+            <div>
+              <h2 className="text-xl font-extrabold" style={{ color: colors.fg }}>
+                Client Profile Reviews
+              </h2>
+              <p className="text-sm font-medium" style={{ color: colors.muted }}>
+                Company profile & GSA updates
+              </p>
             </div>
+            <span className="bg-green-50 text-green-700 text-[10px] font-black px-2 py-1 rounded">
+              {clientRequests.length} PENDING
+            </span>
           </div>
 
-          {/* User Management Quick Links */}
-          <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-50">
-            <h3
-              className="text-xs font-black uppercase tracking-widest mb-6"
-              style={{ color: colors.muted }}
-            >
-              Admin Actions
-            </h3>
-            <div className="space-y-5">
-              {[
-                {
-                  label: "Role Permissions",
-                  val: "Edit",
-                  color: "#24548f",
-                },
-                { label: "Audit Logs", val: "View", color: colors.muted },
-                {
-                  label: "Export System Data",
-                  val: "Run",
-                  color: colors.success,
-                },
-              ].map((item) => (
+          <div className="space-y-3">
+            {clientRequests.map((item) => (
+              <div
+                key={item.id}
+                className="group flex items-center gap-4 p-4 rounded-2xl border border-transparent hover:shadow-sm transition-all"
+                style={{ backgroundColor: `${colors.bg}80` }}
+              >
                 <div
-                  key={item.label}
-                  className="flex items-center justify-between cursor-pointer group"
+                  className="w-12 h-12 rounded-xl bg-white border flex items-center justify-center shrink-0 shadow-sm"
+                  style={{ borderColor: colors.border }}
                 >
-                  <span
-                    className="text-sm font-bold group-hover:underline"
-                    style={{ color: colors.fg }}
-                  >
-                    {item.label}
-                  </span>
-                  <span
-                    className="text-[10px] font-black uppercase px-2 py-1 rounded bg-slate-100"
-                    style={{ color: item.color }}
-                  >
-                    {item.val}
-                  </span>
+                  <Building2 className="w-5 h-5" style={{ color: colors.success }} />
                 </div>
-              ))}
-            </div>
+
+                <div className="flex-1 min-w-0">
+                  <h4 className="font-bold truncate" style={{ color: colors.fg }}>
+                    {item.name}
+                  </h4>
+                  <p className="text-xs font-bold" style={{ color: colors.muted }}>
+                    {item.detail} • {item.date}
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <button className="p-2 rounded-xl hover:bg-red-50" style={{ color: colors.destructive }}>
+                    <XCircle className="w-6 h-6" />
+                  </button>
+                  <button className="p-2 rounded-xl hover:bg-green-50" style={{ color: colors.success }}>
+                    <CheckCircle2 className="w-6 h-6" />
+                  </button>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>

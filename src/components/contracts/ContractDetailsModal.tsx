@@ -40,20 +40,21 @@ export default function ContractDetailsModal({
       <div className="absolute inset-0" onClick={onClose} />
 
       <div className="relative bg-white rounded-3xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-        <div className="sticky top-0 bg-linear-to-br from-[#38A1DB] to-[#2D8BBF] px-8 py-6 rounded-t-3xl z-10">
+        <div className="sticky top-0 bg-linear-to-br px-8 py-6 rounded-t-3xl z-10">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-5">
               <div className="relative">
-                <div className="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center shadow-inner text-white">
+                <div className="w-18 h-18 rounded-2xl bg-[#38A1DB]/20 backdrop-blur flex items-center justify-center shadow-inner text-[#38A1DB]">
                   <FileText className="w-7 h-7" />
                 </div>
               </div>
               <div>
-                <h2 className="text-2xl md:text-3xl font-extrabold text-white leading-tight">
-                  Contract {contract.contract_number}
-                </h2>
+                <p className="text-blue-400 text-sm font-medium uppercase tracking-widest mb-1">
+                  Contract Details
+                </p>
+                <h2 className="text-2xl font-bold text-slate-700 tracking-tight">{contract.contract_number}</h2>
                 <p className="text-sm md:text-base text-blue-100 font-medium mt-1">
-                  <span className="font-semibold text-white/90">
+                  <span className="font-semibold text-slate-500">
                     {contract.client || "—"}
                   </span>
                 </p>
@@ -61,9 +62,9 @@ export default function ContractDetailsModal({
             </div>
             <button
               onClick={onClose}
-              className="p-3 rounded-full hover:bg-white/20 transition-colors"
+              className="p-3 rounded-full hover:bg-white/20 transition-colors text-slate-700"
             >
-              <X className="w-6 h-6 text-white" />
+              <X className="w-6 h-6 text-slate-700" />
             </button>
           </div>
         </div>
@@ -189,12 +190,12 @@ export default function ContractDetailsModal({
           </div>
         </div>
 
-        <div className="sticky bottom-0 bg-slate-50 p-6 rounded-b-3xl flex justify-between border-t border-slate-200 z-10">
+        <div className="sticky bottom-0 bg-slate-50 p-6 rounded-b-3xl flex justify-between border-t border-slate-100 z-10">
           <button
             onClick={onClose}
             className="px-6 py-3 rounded-2xl font-bold text-slate-500 hover:text-slate-700 hover:bg-slate-100 transition-all active:scale-95"
           >
-            Dismiss
+            Close
           </button>
           <button
             onClick={() => {

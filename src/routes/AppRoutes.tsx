@@ -37,6 +37,7 @@ import { DocumentWorkflowRenderer } from "../pages/DocumentGeneration";
 import AnalysisHistory from "../pages/AnalysisHistory";
 import DownloadHistory from "../pages/DownloadHistory";
 import Dashboard from "../pages/dashboard/Dashboard";
+import AnalysisDetails from "../pages/AnalysisDetails";
 
 try {
   Amplify.configure(awsExports);
@@ -126,8 +127,8 @@ const AppRoutes: React.FC = () => {
                 }
               />
 
-              <Route path="/analysis" element={<AnalysisHistory />} />
-
+              <Route path="/analyses" element={<AnalysisHistory />} />
+              <Route path="/analyses/:jobId" element={<AnalysisDetails />} />
               <Route path="/downloads" element={<DownloadHistory />} />
             </Route>
 

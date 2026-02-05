@@ -48,7 +48,6 @@ interface Product {
   product_info_code?: string;
   product_url?: string;
   url_508?: string;
-  // Dimensions
   length?: number;
   width?: number;
   height?: number;

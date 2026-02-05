@@ -18,22 +18,20 @@ export const ClientDetailsModal: React.FC<ClientDetailsModalProps> = ({ client, 
   };
 
   return (
-    <div className="fixed inset-0 bg-slate-900/60  z-50 flex items-center justify-center p-4">
-      {/* Click-away backdrop */}
+    <div className="fixed inset-0 bg-slate-900/60  z-50 flex items-center justify-center p-4 h-full">
       <div className="absolute inset-0" onClick={onClose} />
 
       <div className="relative bg-white rounded-2xl shadow-xl max-w-4xl w-full max-h-[90vh] flex flex-col overflow-hidden">
-        {/* Header Section */}
-        <div className="relative bg-linear-to-br from-[#38A1DB] to-[#2D8BBF] p-8">
+        <div className="relative bg-linear-to-br p-8">
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-colors"
+            className="absolute top-4 right-4 p-3 rounded-full hover:bg-white/20 text-slate-700 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
 
           <div className="flex items-center gap-6">
-            <div className="w-20 h-20 rounded-2xl bg-white shadow-lg flex items-center justify-center text-[#38A1DB] font-black text-2xl border-4 border-white/20">
+            <div className="w-20 h-20 rounded-2xl bg-[#38A1DB] shadow-lg flex items-center justify-center text-white font-black text-2xl border-4 border-white/20">
               {client.name
                 .split(" ")
                 .map((w) => w[0])
@@ -42,8 +40,8 @@ export const ClientDetailsModal: React.FC<ClientDetailsModalProps> = ({ client, 
                 .toUpperCase()}
             </div>
             <div>
-              <p className="text-blue-100 text-sm font-medium uppercase tracking-widest mb-1">Client Profile</p>
-              <h2 className="text-3xl font-bold text-white tracking-tight">
+              <p className="text-blue-400 text-sm font-medium uppercase tracking-widest mb-1">Client Profile</p>
+              <h2 className="text-3xl font-bold text-slate-700 tracking-tight">
                 {client.name}
               </h2>
             </div>
@@ -101,7 +99,7 @@ export const ClientDetailsModal: React.FC<ClientDetailsModalProps> = ({ client, 
         </div>
 
         {/* Footer Actions */}
-        <div className="sticky bottom-0 bg-slate-50 p-6 rounded-b-3xl flex justify-between border-t border-slate-200">
+        <div className="sticky bottom-0 bg-slate-50 p-6 rounded-b-3xl flex justify-between border-t border-slate-100">
           <button
             onClick={onClose}
             className="px-6 py-3 rounded-2xl font-bold text-slate-500 hover:text-slate-700 hover:bg-slate-100 transition-all active:scale-95"

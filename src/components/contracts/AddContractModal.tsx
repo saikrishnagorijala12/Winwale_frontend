@@ -231,11 +231,11 @@ export default function AddContractModal({
   return (
     <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 ">
       <div className="bg-white rounded-3xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-hidden flex flex-col">
-        <div className="bg-linear-to-br from-[#38A1DB] to-[#2D8BBF] py-5 px-8 shrink-0">
+        <div className="bg-slate-50 py-5 px-8 shrink-0">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-2xl font-bold text-white">Create Contract</h2>
-              <p className="text-blue-50 text-sm opacity-80">
+              <h2 className="text-2xl font-bold text-slate-700">Create Contract</h2>
+              <p className="text-slate-500 text-sm opacity-80">
                 Setup a new contract profile for your client
               </p>
             </div>
@@ -245,12 +245,12 @@ export default function AddContractModal({
               className="p-2 hover:bg-white/20 rounded-full transition-colors"
               disabled={isSubmitting}
             >
-              <X className="w-6 h-6 text-white" />
+              <X className="w-6 h-6 text-slate-700" />
             </button>
           </div>
         </div>
 
-        <div className="flex items-center justify-center gap-4 p-4 bg-slate-50 border-b border-slate-200 shrink-0">
+        <div className="flex items-center justify-center gap-4 p-4 shrink-0">
           {["Client & Officer", "Terms & Delivery"].map((label, i) => {
             const stepNum = (i + 1) as 1 | 2;
             const active = step >= stepNum;
@@ -322,7 +322,7 @@ export default function AddContractModal({
           </div>
 
           {/* FOOTER ACTIONS */}
-          <div className="sticky bottom-0 bg-slate-50 p-6 flex justify-between border-t border-slate-200 shrink-0">
+          <div className="sticky bottom-0 bg-slate-50 p-6 flex justify-between border-t border-slate-100 shrink-0">
             <button
               type="button"
               onClick={() => {
@@ -338,7 +338,7 @@ export default function AddContractModal({
             <button
               type="submit"
               disabled={isSubmitting}
-              className="px-8 py-3 rounded-xl bg-[#38A1DB] text-white font-bold hover:bg-[#2D8BBF] shadow-lg shadow-blue-200 flex items-center gap-2 transition-all disabled:opacity-50 active:scale-95"
+              className="px-6 py-3 rounded-xl bg-linear-to-br from-[#38A1DB] to-[#2D8BBF] text-white font-bold shadow-lg hover:shadow-xl transition-all active:scale-95"
             >
               {isSubmitting ? (
                 <>
@@ -346,7 +346,7 @@ export default function AddContractModal({
                   Processing...
                 </>
               ) : step === 1 ? (
-                "Next Step"
+                "Next"
               ) : (
                 "Create Contract Profile"
               )}

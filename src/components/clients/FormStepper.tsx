@@ -8,7 +8,7 @@ interface FormStepperProps {
 
 export const FormStepper: React.FC<FormStepperProps> = ({ currentStep, steps }) => {
   return (
-    <div className="flex items-center justify-center gap-4 p-4 bg-slate-50 border-b border-slate-200 shrink-0">
+    <div className="flex items-center justify-center gap-4 p-4  border-slate-100 shrink-0">
       {steps.map((label, i) => {
         const stepNum = i + 1;
         const active = currentStep >= stepNum;

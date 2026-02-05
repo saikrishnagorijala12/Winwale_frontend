@@ -27,6 +27,7 @@ import {
 import api from "../lib/axios";
 import * as XLSX from "xlsx";
 import { toast } from "sonner";
+import { exportAnalysisToExcel } from "../utils/exportAnalysisUtils";
 
 interface Client {
   client_id: string;
@@ -180,12 +181,6 @@ export default function PriceListAnalysis() {
     setError(null);
     setActiveTab("additions");
     setCurrentPage(1);
-  };
-
-  const getPageNumbers = (totalPages: number) => {
-    const pages = [];
-    for (let i = 1; i <= totalPages; i++) pages.push(i);
-    return pages;
   };
 
   const renderStepContent = () => {
@@ -589,7 +584,6 @@ export default function PriceListAnalysis() {
           const pages: (number | "...")[] = [];
 
           if (totalPages <= 7) {
-            // Small count: show all
             for (let i = 1; i <= totalPages; i++) {
               pages.push(i);
             }
@@ -677,18 +671,19 @@ export default function PriceListAnalysis() {
             </div>
 
             <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
-              <div className="px-6 py-5 border-b border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between gap-4">
                 <h3 className="text-xl font-bold text-slate-900">
                   Analysis Results
                 </h3>
-                {/* <div className="flex items-center gap-2">
-                  <button className="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-50 text-slate-700 text-sm font-bold border border-slate-200 hover:bg-slate-100 transition-all">
-                    <FileSearch size={16} /> Generate Cover Letter
-                  </button>
-                  <button className="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-50 text-slate-700 text-sm font-bold border border-slate-200 hover:bg-slate-100 transition-all">
-                    <Download size={16} /> Export All
-                  </button>
-                </div> */}
+
+                <button
+                  onClick={() =>
+                    exportAnalysisToExcel(uploadResult.job_id, categorized)
+                  }
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-50 text-slate-700 text-sm font-bold border border-slate-200 hover:bg-slate-100 transition-all"
+                >
+                  <Download size={16} /> Export All
+                </button>
               </div>
 
               {/* Tab Bar */}

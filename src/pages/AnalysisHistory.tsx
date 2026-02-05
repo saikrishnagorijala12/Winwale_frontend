@@ -166,7 +166,6 @@ export default function AnalysisHistory() {
 
   const filteredAndSortedHistory = [...analysisHistory]
     .filter((item) => {
-      /* -------- Search -------- */
       const q = searchQuery.toLowerCase();
 
       const matchesSearch =
@@ -176,15 +175,12 @@ export default function AnalysisHistory() {
         item.user?.toLowerCase().includes(q) ||
         item.contract?.toLowerCase().includes(q);
 
-      /* -------- Client -------- */
       const matchesClient =
         clientFilter === "All" || item.client === clientFilter;
 
-      /* -------- Status -------- */
       const matchesStatus =
         statusFilter === "All" || normalizeStatus(item.status) === statusFilter;
 
-      /* -------- Date range -------- */
       const createdAt = new Date(item.created_time).getTime();
 
       const matchesDateFrom =
@@ -338,8 +334,7 @@ export default function AnalysisHistory() {
                 Date Range
               </label>
 
-              <div className="flex gap-2">
-                {/* From */}
+              <div className="flex flex-col gap-2 sm:flex-row">
                 <div className="relative flex-1">
                   <input
                     type="date"
@@ -353,7 +348,6 @@ export default function AnalysisHistory() {
                   />
                 </div>
 
-                {/* To */}
                 <div className="relative flex-1">
                   <input
                     type="date"
@@ -439,7 +433,8 @@ export default function AnalysisHistory() {
                   paginatedHistory.map((item) => (
                     <tr
                       key={item.job_id}
-                      className="group border-b border-slate-50 hover:bg-slate-50/50 transition-colors"
+                      onClick={() => navigate(`/analyses/${item.job_id}`)}
+                      className="cursor-pointer group border-b border-slate-50 hover:bg-slate-50/50 transition-colors"
                     >
                       <td className="p-4">
                         <span className="font-bold text-slate-800 text-sm group-hover:text-[#38A1DB] transition-colors">
@@ -457,7 +452,7 @@ export default function AnalysisHistory() {
                               {item.client || "—"}
                             </span>
                             <span className="text-xs font-medium text-slate-500">
-                              ({item.contract || "No Contract"})
+                              ({item.contract_number || "No Contract"})
                             </span>
                           </div>
                         </div>
@@ -522,15 +517,21 @@ export default function AnalysisHistory() {
                           )}
                         </div>
                       </td>
-                      <td className="p-4">
-                        <span className="text-sm text-slate-600">
-                          {formatDate(item.created_time)}
-                        </span>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center gap-1.5 text-slate-500">
+                          <Calendar className="w-3.5 h-3.5 text-slate-400" />
+                          <span className="text-sm">
+                            {formatDate(item.created_time)}
+                          </span>
+                        </div>
                       </td>
 
                       <td className="p-4 flex items-center">
                         <button
-                          onClick={() => handleGenerate(item.job_id)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleGenerate(item.job_id);
+                          }}
                           className="btn-primary text-sm px-4 py-1.5 shadow-md rounded-md"
                         >
                           Generate
