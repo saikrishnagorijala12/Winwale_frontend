@@ -296,7 +296,7 @@ export default function ProductsPage() {
                     className="px-4 py-3 text-sm hover:bg-slate-50 cursor-pointer flex items-center justify-between transition-colors"
                   >
                     <span className="font-medium text-slate-600">
-                      Show All Clients
+                      Show All
                     </span>
                     {!selectedClient && (
                       <Check size={16} className="text-[#3399cc]" />
@@ -334,7 +334,7 @@ export default function ProductsPage() {
 
         <div className="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden relative transition-all">
           {loading && (
-            <div className="absolute inset-0 bg-white/60 backdrop-blur-[2px] z-10 flex items-center justify-center">
+            <div className="absolute inset-0 bg-white/60  z-10 flex items-center justify-center">
               <div className="flex flex-col items-center gap-3">
                 <Loader2 className="w-10 h-10 animate-spin text-[#24578f]" />
                 <span className="text-slate-400 font-medium">

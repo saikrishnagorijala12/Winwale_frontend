@@ -1,5 +1,4 @@
-
-import { jsPDF } from "jspdf";
+import React from "react";
 import { Paragraph } from "docx";
 export type FieldType =
   | "text"
@@ -11,30 +10,30 @@ export type FieldType =
   | "currency"
   | "textarea"
   | "select";
-
+ 
 export type FieldBehavior = "readonly" | "editable" | "manual";
-
+ 
 export interface ValidationRule {
   type:
-    | "required"
-    | "email"
-    | "phone"
-    | "minLength"
-    | "maxLength"
-    | "min"
-    | "max"
-    | "pattern"
-    | "date";
+  | "required"
+  | "email"
+  | "phone"
+  | "minLength"
+  | "maxLength"
+  | "min"
+  | "max"
+  | "pattern"
+  | "date";
   value?: string | number;
   message: string;
 }
-
+ 
 export interface DocumentTypeCardProps {
   config: DocumentConfig;
   isSelected: boolean;
   onSelect: () => void;
 }
-
+ 
 export interface DocumentField {
   id: string;
   label: string;
@@ -45,8 +44,9 @@ export interface DocumentField {
   options?: { value: string; label: string }[];
   validation?: ValidationRule[];
   defaultValue?: string | number;
+  width?: string;
 }
-
+ 
 export interface DocumentConfig {
   id: string;
   name: string;
@@ -54,7 +54,7 @@ export interface DocumentConfig {
   icon: string;
   fields: DocumentField[];
 }
-
+ 
 export interface DocumentMetadata {
   id: string;
   documentType: string;
@@ -63,7 +63,7 @@ export interface DocumentMetadata {
   generatedAt: string;
   data: Record<string, string | number>;
 }
-
+ 
 export type WorkflowStep =
   | "select-type"
   | "load-config"
@@ -71,82 +71,82 @@ export type WorkflowStep =
   | "validation"
   | "preview"
   | "generate";
-
+ 
 export type DocumentTemplateType =
   | "addition"
   | "deletion"
   | "price-increase"
   | "price-decrease"
   | "description-change";
-
+ 
 export const resolveTemplateType = (documentId: string) => {
   switch (documentId) {
     case "addition":
     case "add-product":
     case "add-product-modification":
       return "addition";
-
+ 
     case "deletion":
     case "delete-product":
       return "deletion";
-
+ 
     case "price-increase":
       return "price-increase";
-
+ 
     case "price-decrease":
       return "price-decrease";
-
+ 
     case "description-change":
       return "description-change";
-
+ 
     default:
       console.error("No template mapped for documentId:", documentId);
       return null;
   }
 };
-
+ 
 export interface ValidationError {
   fieldId: string;
   message: string;
 }
-
+ 
 export interface DocumentContextType {
   currentStep: WorkflowStep;
   setCurrentStep: (step: WorkflowStep) => void;
-
+ 
   selectedDocumentType: string | null;
   setSelectedDocumentType: (type: string | null) => void;
   documentConfig: DocumentConfig | null;
-
+ 
   formData: Record<string, string | number>;
   setFormData: React.Dispatch<
     React.SetStateAction<Record<string, string | number>>
   >;
   updateField: (fieldId: string, value: string | number) => void;
-
+ 
   validationErrors: ValidationError[];
   setValidationErrors: (errors: ValidationError[]) => void;
   validateForm: () => boolean;
-
+ 
   documentHistory: DocumentMetadata[];
   addToHistory: (doc: DocumentMetadata) => void;
-
-  loadDocumentConfig: (typeId: string) => Promise<void>;
+ 
+  loadDocumentConfig: (typeId: string, jobId?: string) => Promise<void>;
   resetWorkflow: () => void;
   generateDocument: () => DocumentMetadata;
+  analysisSummary: any | null;
 }
-
+ 
 export interface Step {
   id: WorkflowStep;
   label: string;
   description: string;
 }
-
-
+ 
+ 
 export interface DocumentTemplate {
   id: string;
   name: string;
-  renderPreview: (data: any) => JSX.Element;
-  renderPDF: (pdf: jsPDF, data: any) => void;
+  renderPreview: (data: any) => React.JSX.Element;
   renderDOCX: (data: any) => Paragraph[];
 }

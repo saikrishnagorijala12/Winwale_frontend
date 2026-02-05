@@ -1,22 +1,23 @@
 import React, { useMemo } from "react";
-import { 
-  ChevronLeft, 
-  ChevronRight, 
-  AlertTriangle, 
-  FileText, 
-  CheckCircle2 
+import {
+  ChevronLeft,
+  ChevronRight,
+  AlertTriangle,
+  FileText,
+  CheckCircle2
 } from "lucide-react";
 import { useDocument } from "@/src/context/DocumentContext";
 
 export default function DocumentFormRenderer() {
   const {
     documentConfig,
+    formData,
+    updateField,
     validateForm,
     setCurrentStep,
     validationErrors,
   } = useDocument();
 
-  // Unified color palette from your Dashboard
   const colors = {
     bg: "#f5f7f9",
     fg: "#1b2531",
@@ -41,18 +42,18 @@ export default function DocumentFormRenderer() {
   `;
 
   const fieldsBySection = useMemo(() => {
-    if (!documentConfig) return {};
+    if (!documentConfig) return {} as Record<string, typeof documentConfig.fields>;
     return documentConfig.fields.reduce((acc, field) => {
       const section = field.section || "General Information";
       if (!acc[section]) acc[section] = [];
       acc[section].push(field);
       return acc;
-    }, {});
+    }, {} as Record<string, typeof documentConfig.fields>);
   }, [documentConfig]);
 
   const handleProceedToValidation = () => {
     const isValid = validateForm();
-    // if (!isValid) return;
+    if (!isValid) return;
     setCurrentStep("preview");
   };
 
@@ -68,7 +69,7 @@ export default function DocumentFormRenderer() {
     );
   }
 
-  const getInputType = (type) => {
+  const getInputType = (type: string) => {
     switch (type) {
       case "number": case "email": case "password": case "date": return type;
       default: return "text";
@@ -76,55 +77,8 @@ export default function DocumentFormRenderer() {
   };
 
   return (
-    <div className="min-h-screen p-6 lg:p-10 animate-fade-in" style={{ backgroundColor: colors.bg }}>
-      
-      {/* Header Section */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10 animate-slide-up">
-        <div className="space-y-1">
-          <div className="flex items-center gap-3 mb-1">
-             <div className="p-2 rounded-lg bg-white shadow-sm border" style={{borderColor: colors.border}}>
-                <FileText className="w-5 h-5" style={{color: colors.primary}} />
-             </div>
-             <h1 className="text-3xl font-extrabold tracking-tight" style={{ color: colors.fg }}>
-                {documentConfig.name}
-             </h1>
-          </div>
-          <p className="font-medium" style={{ color: colors.muted }}>
-            Complete the required fields. Locked fields are system-generated.
-          </p>
-        </div>
-        
-        <div className="flex items-center gap-3">
-            <button
-                onClick={handleBack}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-xl border bg-white text-sm font-bold transition-all hover:bg-gray-50 active:scale-95"
-                style={{ color: colors.fg, borderColor: colors.border }}
-            >
-                <ChevronLeft className="w-4 h-4" />
-                Back
-            </button>
-        </div>
-      </div>
+    <div className="animate-fade-in">
 
-      {/* Error State Alert */}
-      {validationErrors.length > 0 && (
-        <div 
-          className="flex items-center gap-4 p-4 mb-8 rounded-2xl border animate-slide-up" 
-          style={{ backgroundColor: `${colors.destructive}0D`, borderColor: `${colors.destructive}40` }}
-        >
-          <div className="p-2 rounded-xl bg-white shadow-sm">
-            <AlertTriangle className="w-5 h-5" style={{ color: colors.destructive }} strokeWidth={2.5} />
-          </div>
-          <div>
-            <p className="text-sm font-black uppercase tracking-wider" style={{ color: colors.destructive }}>
-              Validation Required
-            </p>
-            <p className="text-sm font-bold" style={{ color: colors.fg }}>
-              Please correct the highlighted fields below to proceed.
-            </p>
-          </div>
-        </div>
-      )}
 
       {/* Form Sections */}
       <div className="space-y-8 animate-slide-up">
@@ -136,44 +90,75 @@ export default function DocumentFormRenderer() {
               </h3>
             </div>
 
-            <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+            <div className="p-8 flex flex-wrap -mx-4 gap-y-6">
               {fields.map((field) => {
                 const isReadOnly = field.behavior === "readonly";
                 const hasError = validationErrors.some((err) => err.fieldId === field.id);
+                const widthClass = field.width || (field.type === "textarea" ? "w-full" : "w-full md:w-1/2");
 
                 return (
-                  <div key={field.id} className={field.type === "textarea" ? "md:col-span-2" : ""}>
+                  <div key={field.id} className={`${widthClass} px-4`}>
                     <label className="text-[11px] font-black uppercase tracking-widest ml-1" style={{ color: colors.muted }}>
+                      {field.required && <span className="text-red-500 mr-1">*</span>}
                       {field.label}
-                      {field.required && <span className="text-red-500 ml-1">*</span>}
                     </label>
 
                     {field.type === "textarea" ? (
                       <textarea
+                        value={formData[field.id] || ""}
+                        onChange={(e) => updateField(field.id, e.target.value)}
                         disabled={isReadOnly}
                         placeholder={field.placeholder}
                         className={`${isReadOnly ? disabledInputStyles : inputStyles} min-h-[120px] resize-none`}
-                        style={{ 
-                            borderColor: hasError ? colors.destructive : colors.border,
-                            backgroundColor: isReadOnly ? colors.secondaryBg : 'white'
+                        style={{
+                          borderColor: hasError ? colors.destructive : colors.border,
+                          backgroundColor: isReadOnly ? colors.secondaryBg : 'white'
                         }}
                       />
+
+                    ) : field.type === "select" ? (
+                      <div className="relative">
+                        <select
+                          value={formData[field.id] || ""}
+                          onChange={(e) => updateField(field.id, e.target.value)}
+                          disabled={isReadOnly}
+                          className={`${isReadOnly ? disabledInputStyles : inputStyles} appearance-none pr-8`}
+                          style={{
+                            borderColor: hasError ? colors.destructive : colors.border,
+                            backgroundColor: isReadOnly ? colors.secondaryBg : 'white'
+                          }}
+                        >
+                          <option value="" disabled>Select {field.label}</option>
+                          {field.options?.map((option) => (
+                            <option key={option.value} value={option.value}>
+                              {option.label}
+                            </option>
+                          ))}
+                        </select>
+                        <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                          <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                          </svg>
+                        </div>
+                      </div>
                     ) : (
                       <input
                         type={getInputType(field.type)}
+                        value={formData[field.id] || ""}
+                        onChange={(e) => updateField(field.id, e.target.value)}
                         disabled={isReadOnly}
                         placeholder={field.placeholder}
                         className={isReadOnly ? disabledInputStyles : inputStyles}
-                        style={{ 
-                            borderColor: hasError ? colors.destructive : colors.border,
-                            backgroundColor: isReadOnly ? colors.secondaryBg : 'white'
+                        style={{
+                          borderColor: hasError ? colors.destructive : colors.border,
+                          backgroundColor: isReadOnly ? colors.secondaryBg : 'white'
                         }}
                       />
                     )}
                     {hasError && (
-                        <p className="text-[10px] font-bold mt-1.5 ml-1" style={{color: colors.destructive}}>
-                            This field is required
-                        </p>
+                      <p className="text-[10px] font-bold mt-1.5 ml-1" style={{ color: colors.destructive }}>
+                        This field is required
+                      </p>
                     )}
                   </div>
                 );

@@ -8,36 +8,39 @@ export const PriceIncreaseEpaTemplate = ({ data }: { data: any }) => (
       />
     </div>
 
-    <p className="mb-4">[{data.submissionDate}]</p>
+    <p className="mb-4"><strong>[{data.submissionDate}]</strong></p>
+
 
     <div className="mb-4">
-Attn: Jane M. Doe (CO-12345)      <p>General Services Administration</p>
-      <p>{data.gsaOfficeAddressLine}</p>
-      <p>{data.gsaOfficeCityStateZip}</p>
+      Attn: <strong>{data.contractorName}</strong> (<strong>{data.contractNumber}</strong>) <p>General Services Administration</p>
+      <p><strong>{data.gsaOfficeAddressLine}</strong></p>
+      <p><strong>{data.gsaOfficeCityStateZip}</strong></p>
     </div>
 
     <div className="mb-4">
       <p>
-        <strong>Re:</strong> {data.companyName}
+        <strong>Re:</strong> <strong>{data.companyName}</strong>
         <br />
         <strong>
           EPA Modification Based on a Commercial Price List to GSA Contract{" "}
-          {data.contractNumber}
+          <strong>{data.contractNumber}</strong>
         </strong>
       </p>
     </div>
 
-    <p className="mb-3">Dear Mr. John A. Smith</p>
+    <p className="mb-3">
+      Dear <strong>{data.salutation}</strong> <strong>{data.contractorName}</strong>
+    </p>
 
 
     <p className="mb-4">
       The purpose of this letter is to request your approval of an Economic Price
       Adjustment (EPA) increase based on a Commercial Price List to GSA Schedule
-      Contract {data.contractNumber} under SIN {data.sin}. This request is
+      Contract <strong>{data.contractNumber}</strong> under SIN <strong>{data.sin}</strong>. This request is
       submitted in accordance with EPA Clause GSAM 538.270-4(a)(3). The proposed
       modification consists of a price increase of{" "}
-      {data.priceIncreasePercent || "[#%]"} for{" "}
-      {data.numberOfItemsAffected || "[#]"} item(s).
+      <strong>{data.requestedIncrease || data.priceIncreasePercent}</strong> for{" "}
+      <strong>{data.numberOfItemsAffected}</strong> item(s).
     </p>
 
     <p className="mb-4">
@@ -54,22 +57,22 @@ Attn: Jane M. Doe (CO-12345)      <p>General Services Administration</p>
 
     <ul className="list-disc ml-6 mb-4 space-y-2">
       <li>
-        {data.backgroundInfo ||
-          "Current commercial pricing reflects increased labor, operational, and supply chain costs. Supporting documentation, including updated commercial price lists and applicable escalation data, is included with this modification."}
+        <strong>{data.backgroundInfo ||
+          "Current commercial pricing reflects increased labor, operational, and supply chain costs. Supporting documentation, including updated commercial price lists and applicable escalation data, is included with this modification."}</strong>
       </li>
       <li>
-        {data.justification ||
-          "The requested EPA is calculated in accordance with the contractually approved EPA clause and methodology. The increase does not exceed the contract ceiling, and all required supporting documentation has been provided within eMod."}
+        <strong>{data.justification ||
+          "The requested EPA is calculated in accordance with the contractually approved EPA clause and methodology. The increase does not exceed the contract ceiling, and all required supporting documentation has been provided within eMod."}</strong>
       </li>
       <li>
-        {data.companyName} acknowledges that the proposed price increase will not
+        <strong>{data.companyName}</strong> acknowledges that the proposed price increase will not
         become effective until the Contracting Officer executes the completed
         modification.
       </li>
       <li>All prices offered to GSA include the current Industrial Funding Fee (IFF).</li>
       <li>
-        {data.cspStatement ||
-          "For non-TDR contracts only: Commercial Sales Practices (CSP) information previously submitted remains accurate and unchanged. If CSP information has changed, an updated CSP-1 has been provided with this modification."}
+        <strong>{data.cspStatement ||
+          "For non-TDR contracts only: Commercial Sales Practices (CSP) information previously submitted remains accurate and unchanged. If CSP information has changed, an updated CSP-1 has been provided with this modification."}</strong>
       </li>
       <li>
         Statement confirming:{" "}
@@ -87,19 +90,19 @@ Attn: Jane M. Doe (CO-12345)      <p>General Services Administration</p>
 
     <p className="mb-4">
       If you have any questions regarding this request, please contact{" "}
-      {data.consultantName} at {data.consultantPhone} or{" "}
-      {data.consultantEmail}.
+      <strong>{data.consultantName}</strong> at <strong>{data.consultantPhone}</strong> or{" "}
+      <strong>{data.consultantEmail}</strong>.
     </p>
 
     <p className="mb-6">Respectfully,</p>
 
     <div>
       <p className="font-semibold">
-        {data.authorizedNegotiatorName || "John R. Doe"}
+        <strong>{data.authorizedNegotiatorName || "John R. Doe"}</strong>
       </p>
       <p>
-        {data.authorizedNegotiatorTitle || "Director of Contracts"} – Authorized
-        to sign on behalf of {data.companyName || "COMPANY NAME"}
+        <strong>{data.authorizedNegotiatorTitle || "Director of Contracts"}</strong> – Authorized
+        to sign on behalf of <strong>{data.companyName || "COMPANY NAME"}</strong>
       </p>
     </div>
   </div>

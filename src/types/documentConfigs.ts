@@ -3,7 +3,7 @@ import { DocumentConfig } from "./document.types";
 export const documentConfigs: DocumentConfig[] = [
   {
     id: "add-product",
-    name: "Add Product Modification",
+    name: "Additions",
     description: "Request to add new products to an existing GSA contract",
     icon: "Plus",
     fields: [
@@ -13,6 +13,21 @@ export const documentConfigs: DocumentConfig[] = [
         type: "text",
         behavior: "readonly",
         section: "Contract Information",
+        width: "w-full",
+      },
+      {
+        id: "salutation",
+        label: "Salutation",
+        type: "select",
+        behavior: "manual",
+        section: "Contract Information",
+        options: [
+          { value: "Mr.", label: "Mr." },
+          { value: "Ms.", label: "Ms." },
+          { value: "Mrs.", label: "Mrs." },
+        ],
+        validation: [{ type: "required", message: "Required" }],
+        width: "w-1/4"
       },
       {
         id: "contractorName",
@@ -20,18 +35,11 @@ export const documentConfigs: DocumentConfig[] = [
         type: "text",
         behavior: "readonly",
         section: "Contract Information",
+        width: "w-3/4"
       },
       {
         id: "companyName",
         label: "Company Name",
-        type: "text",
-        behavior: "readonly",
-        section: "Contract Information",
-      },
-
-      {
-        id: "contractorAddress",
-        label: "Contractor Address",
         type: "text",
         behavior: "readonly",
         section: "Contract Information",
@@ -82,14 +90,14 @@ export const documentConfigs: DocumentConfig[] = [
         id: "coo",
         label: "Country of Origin",
         type: "text",
-        behavior: "readonly",
+        behavior: "manual",
         section: "Pricing & Discounts",
       },
       {
         id: "basicDiscount",
         label: "GSA Basic Discount",
-        type: "percentage",
-        behavior: "readonly",
+        type: "text",
+        behavior: "manual",
         section: "Pricing & Discounts",
       },
       {
@@ -140,15 +148,17 @@ export const documentConfigs: DocumentConfig[] = [
         id: "solicitationNumber",
         label: "Solicitation Number",
         type: "text",
-        behavior: "readonly",
+        behavior: "manual",
         section: "Additional Information",
+        validation: [{ type: "required", message: "Required" }],
       },
       {
         id: "refresh",
         label: "Refresh Number",
         type: "text",
-        behavior: "readonly",
+        behavior: "manual",
         section: "Additional Information",
+        validation: [{ type: "required", message: "Required" }],
       },
       {
         id: "additionRationale",
@@ -171,6 +181,14 @@ export const documentConfigs: DocumentConfig[] = [
         ],
       },
 
+
+      {
+        id: "consultantName",
+        label: "Consultant Name",
+        type: "text",
+        behavior: "readonly",
+        section: "Consultant Information",
+      },
       {
         id: "consultantEmail",
         label: "Consultant Email",
@@ -182,14 +200,16 @@ export const documentConfigs: DocumentConfig[] = [
         id: "consultantPhone",
         label: "Consultant Phone",
         type: "text",
-        behavior: "readonly",
+        behavior: "manual",
         section: "Consultant Information",
+        validation: [{ type: "required", message: "Required" }],
+
       },
     ],
   },
   {
     id: "delete-product",
-    name: "Delete Product Modification",
+    name: "Deletions",
     description: "Request to remove products from an existing GSA contract",
     icon: "Trash2",
     fields: [
@@ -199,6 +219,21 @@ export const documentConfigs: DocumentConfig[] = [
         type: "text",
         behavior: "readonly",
         section: "Contract Information",
+        width: "w-full",
+      },
+      {
+        id: "salutation",
+        label: "Salutation",
+        type: "select",
+        behavior: "manual",
+        section: "Contract Information",
+        options: [
+          { value: "Mr.", label: "Mr." },
+          { value: "Ms.", label: "Ms." },
+          { value: "Mrs.", label: "Mrs." },
+        ],
+        validation: [{ type: "required", message: "Required" }],
+        width: "w-1/4"
       },
       {
         id: "contractorName",
@@ -206,6 +241,7 @@ export const documentConfigs: DocumentConfig[] = [
         type: "text",
         behavior: "readonly",
         section: "Contract Information",
+        width: "w-3/4"
       },
       {
         id: "companyName",
@@ -220,7 +256,7 @@ export const documentConfigs: DocumentConfig[] = [
         type: "text",
         behavior: "manual",
         section: "Contract Information",
-                validation: [{ type: "required", message: "Required" }],
+        validation: [{ type: "required", message: "Required" }],
 
       },
 
@@ -265,7 +301,21 @@ export const documentConfigs: DocumentConfig[] = [
         section: "Additional Information",
         validation: [{ type: "required", message: "Required" }],
       },
+      {
+        id: "numberOfProductsDeleted",
+        label: "Number of Products Deleted",
+        type: "number",
+        behavior: "readonly",
+        section: "Pricing & Discounts",
+      },
 
+      {
+        id: "consultantName",
+        label: "Consultant Name",
+        type: "text",
+        behavior: "readonly",
+        section: "Consultant Information",
+      },
       {
         id: "consultantEmail",
         label: "Consultant Email",
@@ -287,7 +337,7 @@ export const documentConfigs: DocumentConfig[] = [
 
   {
     id: "price-increase",
-    name: "EPA Price Increase Modification",
+    name: "Price Increase",
     description:
       "Economic Price Adjustment for price increases based on index changes",
     icon: "TrendingUp",
@@ -298,6 +348,21 @@ export const documentConfigs: DocumentConfig[] = [
         type: "text",
         behavior: "readonly",
         section: "Contract Information",
+        width: "w-full",
+      },
+      {
+        id: "salutation",
+        label: "Salutation",
+        type: "select",
+        behavior: "manual",
+        section: "Contract Information",
+        options: [
+          { value: "Mr.", label: "Mr." },
+          { value: "Ms.", label: "Ms." },
+          { value: "Mrs.", label: "Mrs." },
+        ],
+        validation: [{ type: "required", message: "Required" }],
+        width: "w-1/4"
       },
       {
         id: "contractorName",
@@ -305,6 +370,7 @@ export const documentConfigs: DocumentConfig[] = [
         type: "text",
         behavior: "readonly",
         section: "Contract Information",
+        width: "w-3/4"
       },
       {
         id: "companyName",
@@ -319,7 +385,7 @@ export const documentConfigs: DocumentConfig[] = [
         type: "text",
         behavior: "manual",
         section: "Contract Information",
-                validation: [{ type: "required", message: "Required" }],
+        validation: [{ type: "required", message: "Required" }],
 
       },
       {
@@ -372,6 +438,13 @@ export const documentConfigs: DocumentConfig[] = [
         validation: [{ type: "required", message: "Required" }],
       },
       {
+        id: "consultantName",
+        label: "Consultant Name",
+        type: "text",
+        behavior: "readonly",
+        section: "Consultant Information",
+      },
+      {
         id: "consultantEmail",
         label: "Consultant Email",
         type: "email",
@@ -391,10 +464,10 @@ export const documentConfigs: DocumentConfig[] = [
   },
   {
     id: "decrease-decrease",
-    name: "EPA Price Decrease Modification",
+    name: "Price Decrease",
     description:
       "Economic Price Adjustment for price decreases based on index changes",
-    icon: "TrendingUp",
+    icon: "TrendingDown",
     fields: [
       {
         id: "contractNumber",
@@ -402,6 +475,21 @@ export const documentConfigs: DocumentConfig[] = [
         type: "text",
         behavior: "readonly",
         section: "Contract Information",
+        width: "w-full",
+      },
+      {
+        id: "salutation",
+        label: "Salutation",
+        type: "select",
+        behavior: "manual",
+        section: "Contract Information",
+        options: [
+          { value: "Mr.", label: "Mr." },
+          { value: "Ms.", label: "Ms." },
+          { value: "Mrs.", label: "Mrs." },
+        ],
+        validation: [{ type: "required", message: "Required" }],
+        width: "w-1/4"
       },
       {
         id: "contractorName",
@@ -409,6 +497,7 @@ export const documentConfigs: DocumentConfig[] = [
         type: "text",
         behavior: "readonly",
         section: "Contract Information",
+        width: "w-3/4"
       },
       {
         id: "companyName",
@@ -423,7 +512,7 @@ export const documentConfigs: DocumentConfig[] = [
         type: "text",
         behavior: "manual",
         section: "Contract Information",
-                validation: [{ type: "required", message: "Required" }],
+        validation: [{ type: "required", message: "Required" }],
 
       },
       {
@@ -476,6 +565,13 @@ export const documentConfigs: DocumentConfig[] = [
         validation: [{ type: "required", message: "Required" }],
       },
       {
+        id: "consultantName",
+        label: "Consultant Name",
+        type: "text",
+        behavior: "readonly",
+        section: "Consultant Information",
+      },
+      {
         id: "consultantEmail",
         label: "Consultant Email",
         type: "email",
@@ -495,7 +591,7 @@ export const documentConfigs: DocumentConfig[] = [
   },
   {
     id: "description-change",
-    name: "Product Description Change Modification",
+    name: "Description Changes",
     description: "Request to modify product descriptions without price changes",
     icon: "FileEdit",
     fields: [
@@ -505,6 +601,21 @@ export const documentConfigs: DocumentConfig[] = [
         type: "text",
         behavior: "readonly",
         section: "Contract Information",
+        width: "w-full",
+      },
+      {
+        id: "salutation",
+        label: "Salutation",
+        type: "select",
+        behavior: "manual",
+        section: "Contract Information",
+        options: [
+          { value: "Mr.", label: "Mr." },
+          { value: "Ms.", label: "Ms." },
+          { value: "Mrs.", label: "Mrs." },
+        ],
+        validation: [{ type: "required", message: "Required" }],
+        width: "w-1/4"
       },
       {
         id: "contractorName",
@@ -512,6 +623,7 @@ export const documentConfigs: DocumentConfig[] = [
         type: "text",
         behavior: "readonly",
         section: "Contract Information",
+        width: "w-3/4"
       },
       {
         id: "companyName",
@@ -561,14 +673,28 @@ export const documentConfigs: DocumentConfig[] = [
         validation: [{ type: "required", message: "Required" }],
       },
       {
-        id: "Rationale",
+        id: "modificationRationale",
         label: "Description Change Rationale",
         type: "textarea",
         behavior: "manual",
         section: "Additional Information",
         validation: [{ type: "required", message: "Required" }],
       },
+      {
+        id: "descriptionChanged",
+        label: "Number of Products Changed",
+        type: "number",
+        behavior: "readonly",
+        section: "Pricing & Discounts",
+      },
 
+      {
+        id: "consultantName",
+        label: "Consultant Name",
+        type: "text",
+        behavior: "readonly",
+        section: "Consultant Information",
+      },
       {
         id: "consultantEmail",
         label: "Consultant Email",

@@ -7,110 +7,142 @@ import {
   WorkflowStep,
 } from "../types/document.types";
 import { getDocumentConfig } from "../types/documentConfigs";
+import api from "../lib/axios";
+import { useAuth } from "./AuthContext";
 
-const API_BASE = "http://localhost:5000";
-
-const fetchClientProfile = async () => {
-  const res = await fetch(`${API_BASE}/clients`);
-  if (!res.ok) throw new Error("Failed to fetch client profile");
-  return res.json();
+const fetchJobDetails = async (jobId: string) => {
+  const response = await api.get(`/jobs/${jobId}/details`);
+  return response.data;
 };
 
-const mapClientProfileToForm = (api: any) => ({
-  contractNumber: api.contract_number,
-  contractorName: api.contracting_officer_name,
-  contractorAddress: api.contracting_officer_address,
+const mapJobDetailsToForm = (api: any) => {
+  const client = api.client || {};
+  const contract = api.client_contract || {};
+  const modificationSummary = api.modification_summary || {};
 
-  companyName: api.company_name,
-  companyLogoUrl: api.company_logo_url,
+  const discounts = contract.discounts || {};
+  const delivery = contract.delivery || {};
+  const address = contract.address || contract.addres || {};
+  const other = contract.other || {};
 
-  coo: api.coo,
+  return {
+    companyName: client.company_name,
+    contractNumber: contract.contract_number,
 
-  quantityVolumeDiscount: api.quantity_volume_discount,
-  otherDiscounts: api.additional_concessions,
-  basicDiscount: api.basicdiscount,
+    contractorName: contract.contract_officer_name,
+    contractorAddress: address.contract_officer_address,
+    contractorCity: address.contract_officer_city,
+    contractorState: address.contract_officer_state,
+    contractorZip: address.contract_officer_zip,
 
-  deliveryAroNormal: api.delivery_time_normal,
-  deliveryAroExpedited: api.delivery_time_expedited,
+    gsaOfficeAddressLine: address.contract_officer_address,
+    gsaOfficeCity: address.contract_officer_city,
+    gsaOfficeState: address.contract_officer_state,
+    gsaOfficeZip: address.contract_officer_zip,
+    gsaOfficeCityStateZip:
+      `${address.contract_officer_city || ""}, ${address.contract_officer_state || ""} ${address.contract_officer_zip || ""}`.trim(),
 
-  fobTerms: api.fob_term,
+    deliveryAroNormal: delivery.normal_delivery_time,
+    deliveryAroExpedited: delivery.expedited_delivery_time,
 
-  energyStarCompliance: (() => {
-    const value = api.energy_star_compliance?.toLowerCase();
+    fobTerms: other.fob_term,
 
-    if (value === "yes") return "yes";
-    if (value === "no") return "no";
-    if (value === "applicable" || value === "not applicable" || value === "n/a")
-      return "na";
+    coo: contract.origin_country,
+    basicDiscount: discounts.gsa_proposed_discount,
+    quantityVolumeDiscount: discounts.q_v_discount,
+    otherDiscounts: other.additional_concessions,
 
-    return "";
-  })(),
-  energyCompliance: api.energy_compliance,
+    energyStarCompliance: (() => {
+      const value = other.energy_star_compliance?.toLowerCase();
+      if (value === "yes") return "yes";
+      if (value === "no") return "no";
+      if (
+        value === "applicable" ||
+        value === "not applicable" ||
+        value === "n/a"
+      )
+        return "na";
+      return "";
+    })(),
 
-  refresh: api.refresh_number,
-
-  consultantName: api.consultant_name,
-  consultantEmail: api.consultant_email,
-  consultantPhone: api.consultant_phone,
-
-  placeOfPerformance: api.place_of_performance,
-  solicitationNumber: api.gsa_mas_solicitation_number,
-
-  salutationName: api.salutation_name,
-  signatoryName: api.signatory_name,
-  signatoryTitle: api.signatory_title,
-});
+    numberOfProductsAdded: modificationSummary.products_added,
+    numberOfProductsDeleted: modificationSummary.products_deleted,
+    descriptionChanged: modificationSummary.description_changed,
+    numberOfItemsChanged: modificationSummary.description_changed,
+    requestedIncrease: modificationSummary.price_increased > 0 ? "" : undefined,
+    requestedDecrease: modificationSummary.price_decreased > 0 ? "" : undefined,
+  };
+};
 
 const DocumentContext = createContext<DocumentContextType | undefined>(
-  undefined
+  undefined,
 );
 
 export const DocumentProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
+  const { user } = useAuth();
   const [currentStep, setCurrentStep] = useState<WorkflowStep>("select-type");
   const [selectedDocumentType, setSelectedDocumentType] = useState<
     string | null
   >(null);
   const [documentConfig, setDocumentConfig] = useState<DocumentConfig | null>(
-    null
+    null,
   );
   const [formData, setFormData] = useState<Record<string, string | number>>({});
   const [validationErrors, setValidationErrors] = useState<ValidationError[]>(
-    []
+    [],
   );
   const [documentHistory, setDocumentHistory] = useState<DocumentMetadata[]>(
-    []
+    [],
   );
+  const [analysisSummary, setAnalysisSummary] = useState<any | null>(null);
 
-  const loadDocumentConfig = useCallback(async (typeId: string) => {
-    const config = getDocumentConfig(typeId);
-    if (!config) return;
+  const loadDocumentConfig = useCallback(
+    async (typeId: string, jobId?: string) => {
+      const config = getDocumentConfig(typeId);
+      if (!config) return;
 
-    setDocumentConfig(config);
-    setSelectedDocumentType(typeId);
-    setCurrentStep("load-config");
+      setDocumentConfig(config);
+      setSelectedDocumentType(typeId);
+      setCurrentStep("load-config");
 
-    try {
-      const clientProfile = await fetchClientProfile();
-      const mappedData = mapClientProfileToForm(clientProfile);
+      try {
+        let mappedData: Record<string, any> = {};
 
-      const initialData: Record<string, string | number> = {};
+        const jobDetails = jobId ? await fetchJobDetails(jobId) : null;
 
-      config.fields.forEach((field) => {
-        if (mappedData[field.id] !== undefined) {
-          initialData[field.id] = mappedData[field.id];
-        } else if (field.defaultValue !== undefined) {
-          initialData[field.id] = field.defaultValue;
+        if (jobDetails) {
+          console.log("Received job details:", jobDetails);
+          mappedData = mapJobDetailsToForm(jobDetails);
+          setAnalysisSummary(jobDetails.modification_summary);
         }
-      });
 
-      setFormData(initialData);
-    } catch (error) {
-      console.error("Prefill failed:", error);
-      setFormData({});
-    }
-  }, []);
+        if (user) {
+          mappedData.consultantName = user.name;
+          mappedData.consultantEmail = user.email;
+          mappedData.consultantPhone = user.phone_no;
+        }
+
+        const initialData: Record<string, string | number> = {};
+
+        config.fields.forEach((field) => {
+          if (mappedData[field.id] !== undefined) {
+            initialData[field.id] = mappedData[field.id];
+          } else if (field.defaultValue !== undefined) {
+            initialData[field.id] = field.defaultValue;
+          }
+        });
+
+        console.log("Final initialData to set:", initialData);
+        setFormData(initialData);
+      } catch (error) {
+        console.error("Prefill failed:", error);
+        setFormData({});
+      }
+    },
+    [user],
+  );
 
   const updateField = useCallback((fieldId: string, value: string | number) => {
     setFormData((prev) => ({ ...prev, [fieldId]: value }));
@@ -165,23 +197,24 @@ export const DocumentProvider: React.FC<{ children: React.ReactNode }> = ({
     setDocumentConfig(null);
     setFormData({});
     setValidationErrors([]);
+    setAnalysisSummary(null);
   }, []);
 
   const generateDocument = useCallback((): DocumentMetadata => {
     const docId = `DOC-${Date.now().toString(36).toUpperCase()}`;
     const versionCount = documentHistory.filter(
-      (d) => d.documentType === selectedDocumentType
+      (d) => d.documentType === selectedDocumentType,
     ).length;
 
     return {
       id: docId,
       documentType: documentConfig?.name || "",
       version: `v1.${versionCount}`,
-      generatedBy: "Michael J. Thompson",
+      generatedBy: user?.name || "Unknown User",
       generatedAt: new Date().toISOString(),
       data: { ...formData },
     };
-  }, [documentConfig, documentHistory, formData, selectedDocumentType]);
+  }, [documentConfig, documentHistory, formData, selectedDocumentType,user]);
 
   const addToHistory = useCallback((doc: DocumentMetadata) => {
     setDocumentHistory((prev) => [doc, ...prev]);
@@ -206,6 +239,7 @@ export const DocumentProvider: React.FC<{ children: React.ReactNode }> = ({
         loadDocumentConfig,
         resetWorkflow,
         generateDocument,
+        analysisSummary,
       }}
     >
       {children}

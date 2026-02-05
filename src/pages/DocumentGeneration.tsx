@@ -1,35 +1,122 @@
 import { useDocument } from "@/src/context/DocumentContext";
-import { DocumentTypeSelector } from "../components/document/DocumentTypeSelector";
+import { DocumentTypeCard } from "../components/document/DocumentTypeSelector";
 import DocumentFormRenderer from "../components/document/DocumentFormRenderer";
 import { DocumentPreview } from "../components/document/DocumentPreview";
 import { GenerationConfirmation } from "../components/document/GenerationConfirmation";
-import { WorkflowStepper } from "../components/document/WorkflowStepper";
 import { Loader2 } from "lucide-react";
+import { documentConfigs } from "../types/documentConfigs";
+import { useSearchParams } from "react-router-dom";
+import { useEffect } from "react";
 
 export const DocumentWorkflowRenderer = () => {
-  const { currentStep } = useDocument();
+  const {
+    currentStep,
+    selectedDocumentType,
+    loadDocumentConfig,
+    setCurrentStep,
+    analysisSummary,
+  } = useDocument();
 
-  switch (currentStep) {
-    case "select-type":
-      return <DocumentTypeSelector />;
+  const [searchParams] = useSearchParams();
+  const jobId = searchParams.get("job_id");
 
-    case "load-config":
-      return (
-            <div className="py-20 text-center">
-            <Loader2 className="w-8 h-8 animate-spin m-auto top-50 text-[#38A1DB]" />
-          </div>
-      );
+  useEffect(() => {
+    if (!selectedDocumentType && documentConfigs.length > 0) {
+      loadDocumentConfig(documentConfigs[0].id, jobId || undefined);
+      setCurrentStep("form-entry");
+    }
+  }, [selectedDocumentType, loadDocumentConfig, jobId, setCurrentStep]);
 
-    case "form-entry":
-      return <DocumentFormRenderer />;
+  const handleSelect = (configId: string) => {
+    loadDocumentConfig(configId, jobId || undefined);
+    setCurrentStep("form-entry");
+  };
 
-    case "preview":
-      return <DocumentPreview />;
+  const getModificationMessage = () => {
+    if (!jobId || !selectedDocumentType || !analysisSummary) return null;
 
-    case "generate":
-      return <GenerationConfirmation />;
+    const counts: Record<string, number> = {
+      "add-product": Number(analysisSummary.products_added || 0),
+      "delete-product": Number(analysisSummary.products_deleted || 0),
+      "price-increase": Number(analysisSummary.price_increased || 0),
+      "decrease-decrease": Number(analysisSummary.price_decreased || 0),
+      "description-change": Number(analysisSummary.description_changed || 0),
+    };
 
-    default:
-      return <DocumentTypeSelector />;
+    const count = counts[selectedDocumentType];
+    if (count === 0) {
+      const names: Record<string, string> = {
+        "add-product": "additions",
+        "delete-product": "deletions",
+        "price-increase": "price increases",
+        "decrease-decrease": "price decreases",
+        "description-change": "description changes",
+      };
+      return `No ${names[selectedDocumentType] || "modifications"} were detected in the analysis for this document type.`;
+    }
+    return null;
+  };
+
+  const modificationMessage = getModificationMessage();
+
+  if (currentStep === "preview") {
+    return <DocumentPreview />;
   }
+
+  if (currentStep === "generate") {
+    return <GenerationConfirmation />;
+  }
+
+  return (
+    <div className="min-h-screen bg-slate-50/50 p-6 lg:p-10 space-y-8 animate-fade-in">
+      <div className="mx-auto  space-y-10">
+        {/* Header */}
+        <div className="space-y-1">
+          <h1 className="text-3xl font-bold tracking-tight text-slate-900">
+            Generate Documents
+          </h1>
+          <p className="text-slate-500 font-medium">
+            Select a document type to pre-fill and generate
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+          {documentConfigs.map((config) => (
+            <DocumentTypeCard
+              key={config.id}
+              config={config}
+              isSelected={selectedDocumentType === config.id}
+              onSelect={() => handleSelect(config.id)}
+              variant="horizontal"
+            />
+          ))}
+        </div>
+
+        <div className="pt-2">
+          {currentStep === "load-config" ? (
+            <div className="py-20 text-center bg-white rounded-3xl border border-slate-200">
+              <Loader2 className="w-8 h-8 animate-spin m-auto text-[#24548f]" />
+              <p className="mt-4 text-slate-500 font-medium">
+                Loading configuration...
+              </p>
+            </div>
+          ) : modificationMessage ? (
+            <div className="py-24 text-center bg-white rounded-3xl border border-slate-200 shadow-sm animate-fade-in">
+              {/* <div className="w-20 h-20 bg-slate-50 rounded-3xl flex items-center justify-center m-auto mb-6 border border-slate-100 shadow-inner">
+                <span className="text-3xl">info</span>
+              </div> */}
+              <h3 className="text-xl font-bold text-slate-900 mb-2">
+                No Modifications Found
+              </h3>
+              <p className="text-slate-500 font-medium max-w-md m-auto px-6 whitespace-pre-line">
+                {modificationMessage}
+              </p>
+            </div>
+          ) : (
+            <DocumentFormRenderer />
+          )}
+        </div>
+      </div>
+    </div>
+  );
 };

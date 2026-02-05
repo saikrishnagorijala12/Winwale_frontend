@@ -65,14 +65,11 @@ export const GenerationConfirmation = () => {
 
   const templateType = resolveTemplateType(documentConfig.id);
 
-  /* -------------------------------
-     Handlers
-  -------------------------------- */
+
 
   const handleGenerate = async () => {
     setIsGenerating(true);
     await new Promise((r) => setTimeout(r, 2000));
-
     const doc = generateDocument();
     setGeneratedDoc(doc);
     addToHistory(doc);

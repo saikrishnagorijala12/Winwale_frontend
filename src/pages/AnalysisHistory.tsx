@@ -24,6 +24,7 @@ import {
   Loader2,
   SortAsc,
   SortDesc,
+  MoreVertical,
 } from "lucide-react";
 import {
   normalizeStatus,
@@ -56,6 +57,7 @@ export default function AnalysisHistory() {
   const itemsPerPage = 10;
 
   const [analysisHistory, setAnalysisHistory] = useState<any[]>([]);
+  const [updatingId, setUpdatingId] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [sortConfig, setSortConfig] = useState({
     key: "date",
@@ -65,6 +67,13 @@ export default function AnalysisHistory() {
   const clientOptions = Array.from(
     new Set(analysisHistory.map((a) => a.client).filter(Boolean)),
   );
+  const [openMenuId, setOpenMenuId] = useState<number | null>(null);
+
+  useEffect(() => {
+    const handleClickOutside = () => setOpenMenuId(null);
+    window.addEventListener("click", handleClickOutside);
+    return () => window.removeEventListener("click", handleClickOutside);
+  }, []);
 
   const processModifications = (actions: any[]) => {
     const summary = {
@@ -151,6 +160,34 @@ export default function AnalysisHistory() {
   useEffect(() => {
     setCurrentPage(1);
   }, [searchQuery, selectedClient, dateFrom, dateTo]);
+
+  const handleUpdateStatus = async (
+    jobId: number,
+    action: "approve" | "reject",
+  ) => {
+    try {
+      setUpdatingId(jobId);
+
+      await api.post(`/jobs/${jobId}/status?action=${action}`);
+
+      toast.success(
+        `Analysis ${action === "approve" ? "approved" : "rejected"} successfully`,
+      );
+
+      setAnalysisHistory((prev) =>
+        prev.map((job) =>
+          job.job_id === jobId
+            ? { ...job, status: action === "approve" ? "approved" : "rejected" }
+            : job,
+        ),
+      );
+    } catch (error: any) {
+      console.error("Status update failed:", error);
+      toast.error(error.response?.data?.detail || "Failed to update status");
+    } finally {
+      setUpdatingId(null);
+    }
+  };
 
   const handleSort = (key: string) => {
     setSortConfig((prev) => {
@@ -400,7 +437,7 @@ export default function AnalysisHistory() {
                         ))}
                     </div>
                   </th>
-                  <th className="text-left px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                  <th className="text-right px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                     Actions
                   </th>
                 </tr>
@@ -526,16 +563,91 @@ export default function AnalysisHistory() {
                         </div>
                       </td>
 
-                      <td className="p-4 flex items-center">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleGenerate(item.job_id);
-                          }}
-                          className="btn-primary text-sm px-4 py-1.5 shadow-md rounded-md"
-                        >
-                          Generate
-                        </button>
+                      <td className="p-4 relative">
+                        <div className="flex justify-end">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation(); 
+                              setOpenMenuId(
+                                openMenuId === item.job_id ? null : item.job_id,
+                              );
+                            }}
+                            className="p-2 hover:bg-slate-100 rounded-full transition-colors text-slate-500"
+                          >
+                            <MoreVertical className="w-5 h-5" />
+                          </button>
+
+                          {/* Dropdown Menu */}
+                          {openMenuId === item.job_id && (
+                            <div
+                              className="absolute right-12 top-4 w-48 bg-white border border-slate-200 rounded-xl shadow-xl z-50 py-2 animate-in fade-in zoom-in duration-100"
+                              onClick={(e) => e.stopPropagation()} 
+                            >
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleGenerate(item.job_id);
+                                }}
+                                className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors font-medium"
+                              >
+                                <FileText className="w-4 h-4 text-slate-400" />
+                                Generate Docs
+                              </button>
+
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  navigate(`/analyses/${item.job_id}`);
+                                }}
+                                className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors font-medium"
+                              >
+                                <Eye className="w-4 h-4 text-slate-400" />
+                                View Details
+                              </button>
+
+                              {normalizeStatus(item.status) === "pending" && (
+                                <>
+                                  <div className="my-1 border-t border-slate-100" />
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleUpdateStatus(
+                                        item.job_id,
+                                        "approve",
+                                      );
+                                      setOpenMenuId(null);
+                                    }}
+                                    disabled={updatingId === item.job_id}
+                                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-emerald-600 hover:bg-emerald-50 transition-colors font-semibold disabled:opacity-50"
+                                  >
+                                    {updatingId === item.job_id ? (
+                                      <Loader2 className="w-4 h-4 animate-spin" />
+                                    ) : (
+                                      <CheckCircle2 className="w-4 h-4" />
+                                    )}
+                                    Approve Analysis
+                                  </button>
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleUpdateStatus(item.job_id, "reject");
+                                      setOpenMenuId(null);
+                                    }}
+                                    disabled={updatingId === item.job_id}
+                                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-rose-600 hover:bg-rose-50 transition-colors font-semibold disabled:opacity-50"
+                                  >
+                                    {updatingId === item.job_id ? (
+                                      <Loader2 className="w-4 h-4 animate-spin" />
+                                    ) : (
+                                      <XCircle className="w-4 h-4" />
+                                    )}
+                                    Reject Analysis
+                                  </button>
+                                </>
+                              )}
+                            </div>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   ))

@@ -27,10 +27,7 @@ export const DocumentBodyRenderer = ({
             return <ProductDescriptiveChangeTemplate data={data} />;
 
           case "price-increase":
-            return <PriceIncreaseEpaTemplate data={data} />;
-          
-
-          
+            return <PriceIncreaseEpaTemplate data={data} />
 
           default:
             return null;

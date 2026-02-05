@@ -159,7 +159,7 @@ export const DocumentPreview = () => {
             </h3>
           </div>
 
-          <div className="p-6 max-h-[700px] overflow-y-auto">
+          <div className="p-6 max-h-[1155px] overflow-y-auto">
             <div className="space-y-4">
               {documentConfig.fields.map((field) => (
                 <div key={field.id} className="group">
@@ -188,7 +188,7 @@ export const DocumentPreview = () => {
           <div className="p-8 bg-slate-100/50">
             <div
               ref={previewRef}
-              className="bg-white shadow-2xl mx-auto rounded-sm border border-slate-200 p-12 min-h-[800px] w-full max-w-[800px] text-slate-800"
+              className="bg-white  mx-auto rounded-sm border border-slate-200 p-12 min-h-[800px] w-full max-w-[900px] text-slate-800"
               style={{ fontFamily: "'Times New Roman', serif" }}
             >
               <DocumentBodyRenderer

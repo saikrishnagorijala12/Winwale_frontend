@@ -10,40 +10,40 @@ export const DeletionTemplate = ({ data }: { data: any }) => (
     </div>
 
     {/* Date */}
-    <p className="mb-4">[{data.submissionDate || "DATE"}]</p>
+    <p className="mb-4"><strong>[{data.submissionDate || "DATE"}]</strong></p>
 
     {/* Address Block */}
-    <div className="mb-4">
-Attn: Jane M. Doe (CO-12345)
-      <p>General Services Administration</p>
-      <p>{data.gsaOfficeAddressLine}</p>
-      <p>{data.gsaOfficeCityStateZip}</p>
-    </div>
 
+    <div className="mb-4">
+      Attn: <strong>{data.contractorName}</strong> (<strong>{data.contractNumber}</strong>) <p>General Services Administration</p>
+      <p><strong>{data.gsaOfficeAddressLine}</strong></p>
+      <p><strong>{data.gsaOfficeCityStateZip}</strong></p>
+    </div>
     {/* Subject */}
     <div className="mb-4">
       <p>
-        <strong>Re:</strong> {data.companyName}
+        <strong>Re:</strong> <strong>{data.companyName}</strong>
         <br />
         <strong>
-          Deletion Modification to GSA Contract {data.contractNumber}
+          Deletion Modification to GSA Contract <strong>{data.contractNumber}</strong>
         </strong>
       </p>
     </div>
-    <p className="mb-3">Dear Mr. John A. Smith</p>
+    <p className="mb-3">
+      Dear <strong>{data.salutation}</strong> <strong>{data.contractorName}</strong>
+    </p>
 
     {/* Body */}
     <p className="mb-3">
       The purpose of this letter is to request your approval of a Deletion
-      Modification to GSA Schedule Contract {data.contractNumber}. The
+      Modification to GSA Schedule Contract <strong>{data.contractNumber}</strong>. The
       modification consists of the deletion of{" "}
-      {data.numberOfProductsDeleted || "1"} item(s) listed under SIN{" "}
-      {data.sin || "SIN"} for{" "}
-      {data.manufacturerName || "manufacturer name"} (if applicable). These
-      products are being removed because {data.deletionRationale || "RATIONALE"}.
+      <strong>{data.numberOfProductsDeleted}</strong> item(s) listed under SIN{" "}
+      <strong>{data.sin}</strong>. These
+      products are being removed because <strong>{data.deletionRationale}</strong>.
     </p>
 
-    <p className="mb-3">{data.companyName} states the following:</p>
+    <p className="mb-3"><strong>{data.companyName}</strong> states the following:</p>
 
     {/* Certification */}
     <ul className="list-disc ml-6 mb-4 space-y-1">
@@ -62,8 +62,8 @@ Attn: Jane M. Doe (CO-12345)
     {/* Contact */}
     <p className="mb-4">
       If you have any questions regarding this request, please contact{" "}
-      {data.consultantName} of The Winvale Group at{" "}
-      {data.consultantPhone} or {data.consultantEmail}.
+      <strong>{data.consultantName}</strong> of The Winvale Group at{" "}
+      <strong>{data.consultantPhone}</strong> or <strong>{data.consultantEmail}</strong>.
     </p>
 
     {/* Signature */}
@@ -71,11 +71,11 @@ Attn: Jane M. Doe (CO-12345)
 
     <div>
       <p className="font-semibold">
-        {data.authorizedNegotiatorName || "John R. Doe"}
+        <strong>{data.authorizedNegotiatorName || "John R. Doe"}</strong>
       </p>
       <p>
-        {data.authorizedNegotiatorTitle || "Director of Contracts"} – Authorized
-        to sign on behalf of {data.companyName || "COMPANY NAME"}
+        <strong>{data.authorizedNegotiatorTitle || "Director of Contracts"}</strong> – Authorized
+        to sign on behalf of <strong>{data.companyName || "COMPANY NAME"}</strong>
       </p>
     </div>
   </div>

@@ -76,7 +76,7 @@ export default function Dashboard() {
                 {stat.label}
               </span>
               <div className="p-2.5 rounded-xl" style={{ backgroundColor: colors.secondaryBg }}>
-                <stat.icon className="w-5 h-5" style={{ color: colors.fg }} strokeWidth={2.5} />
+                <stat.icon className="w-5 h-5 text-[#24548f]" strokeWidth={2.5} />
               </div>
             </div>
             <div>
@@ -147,7 +147,6 @@ export default function Dashboard() {
         {/* Right Sidebar */}
         <div className="space-y-8 animate-slide-in-right">
 
-          {/* Quick Actions Card */}
           <div className="rounded-4xl p-8 shadow-xl text-white" style={{ backgroundColor: colors.primary }}>
             <h2 className="text-xl font-bold mb-1">Quick Actions</h2>
             <p className="text-xs font-medium mb-6 opacity-70">Execute common tasks</p>
@@ -156,7 +155,7 @@ export default function Dashboard() {
               {[
                 { label: 'New Analysis', icon: PlusCircle, to: '/pricelist-analysis' },
                 { label: 'Add Client', icon: UserPlus, to: '/clients' },
-                { label: 'View Reports', icon: BarChart3, to: '/dashboard' }
+                { label: 'View Reports', icon: BarChart3, to: '/analyses' }
               ].map((action) => (
                 <button
                   key={action.label}

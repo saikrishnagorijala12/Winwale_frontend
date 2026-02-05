@@ -6,7 +6,7 @@ import AdminDashboard from "./AdminDashboard";
 export default function Dashboard() {
   const { user } = useAuth();
 
-  if (!user) return null; // or spinner
+  if (!user) return null;
 
   if (!user || !user.is_active || user.is_deleted) {
     return (
