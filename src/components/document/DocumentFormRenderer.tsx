@@ -93,7 +93,7 @@ export default function DocumentFormRenderer() {
 
   if (!documentConfig) {
     return (
-      <div className="min-h-[400px] flex items-center justify-center text-slate-500 font-bold">
+      <div className="min-h-100 flex items-center justify-center text-slate-500 font-bold">
         Please select a document type first.
       </div>
     );
@@ -140,7 +140,7 @@ export default function DocumentFormRenderer() {
       </div>
 
       {/* Active Tab Content */}
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden min-h-[400px] animate-slide-up">
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden min-h-100 animate-slide-up">
         <div className="p-8 flex flex-wrap -mx-4 gap-y-6">
           {fieldsBySection[activeTab]?.map((field) => {
             const isReadOnly = field.behavior === "readonly";
@@ -160,7 +160,7 @@ export default function DocumentFormRenderer() {
                     onChange={(e) => updateField(field.id, e.target.value)}
                     disabled={isReadOnly}
                     placeholder={field.placeholder}
-                    className={`${isReadOnly ? disabledInputStyles : inputStyles} min-h-[120px] resize-none`}
+                    className={`${isReadOnly ? disabledInputStyles : inputStyles} min-h-30 resize-none`}
                     style={{
                       borderColor: hasError ? colors.destructive : colors.border,
                       backgroundColor: isReadOnly ? colors.secondaryBg : 'white'

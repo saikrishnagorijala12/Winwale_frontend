@@ -13,7 +13,7 @@ const ROLE_MAP: Record<Role, string> = {
   user: "Consultant",
 };
 
-const PHONE_REGEX = /^\+?\d{1,15}$/;
+const PHONE_REGEX = /^\+?\d{1,14}$/;
 
 const inputStyles =
   "w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-[#3498db]/10 focus:border-[#3498db] transition-all bg-slate-50/50 text-slate-700";
@@ -60,15 +60,13 @@ export const ProfileSection = ({
       return;
     }
 
-    // Phone validation
     if (trimmedPhone && !PHONE_REGEX.test(trimmedPhone)) {
       setPhoneError(
-        "Phone number must be up to 15 digits and may start with +",
+        "Phone number must be up to 14 digits and may start with +",
       );
       return;
     }
 
-    // No changes check
     if (
       trimmedName === user?.name &&
       (trimmedPhone || null) === (user?.phone_no || null)

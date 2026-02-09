@@ -5,7 +5,7 @@ import {
 } from "../types/client.types";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const PHONE_REGEX = /^\+?\d{1,15}$/;
+const PHONE_REGEX = /^\+?\d{1,14}$/;
 const ZIP_REGEX = /^[A-Za-z0-9]{1,7}$/;
 
 
@@ -33,7 +33,7 @@ export const validateStep1 = (
     newErrors.company_phone_no = "Company Phone is required";
   } else if (!PHONE_REGEX.test(clientData.company_phone_no)) {
     newErrors.company_phone_no =
-      "Phone number must be up to 15 digits and may start with +";
+      "Phone number must be up to 14 digits and may start with +";
   }
 
   if (!clientData.company_address?.trim()) {

@@ -127,7 +127,7 @@ export default function DownloadHistory() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-100 p-6 lg:p-10 space-y-8">
+    <div className="min-h-screen bg-linear-to-br from-slate-50 via-blue-50/30 to-slate-100 p-6 lg:p-10 space-y-8">
       {/* Toast */}
       {toast && (
         <div className="fixed top-4 right-4 px-6 py-3 bg-slate-900 text-white rounded-xl shadow-2xl z-50 flex items-center gap-2 animate-in fade-in slide-in-from-top-4">
@@ -167,7 +167,7 @@ export default function DownloadHistory() {
       </div>
 
       {/* Filters Card */}
-      <div className="bg-white/80  border border-white shadow-sm rounded-[24px] p-6">
+      <div className="bg-white/80  border border-white shadow-sm rounded-3xl p-6">
         <div className="flex flex-col md:flex-row gap-4">
           <div className="flex-1 relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
@@ -183,7 +183,7 @@ export default function DownloadHistory() {
       </div>
 
       {/* Documents Table */}
-      <div className="bg-white/80  border border-white shadow-sm rounded-[32px] overflow-hidden">
+      <div className="bg-white/80  border border-white shadow-sm rounded-4xl overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
