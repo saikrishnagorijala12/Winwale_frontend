@@ -107,7 +107,7 @@ export default function ContractsPage() {
         </button>
       </div>
 
-      <div className="mx-auto bg-white p-5 rounded-3xl shadow-sm border border-slate-100 mb-8 flex flex-col lg:flex-row gap-6 items-center">
+      <div className="mx-auto bg-white p-4 rounded-4xl shadow-sm border border-slate-100 mb-8 flex flex-col lg:flex-row gap-4 items-center">
         <div className="relative flex-1 w-full">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
           <input

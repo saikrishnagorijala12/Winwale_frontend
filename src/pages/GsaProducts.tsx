@@ -13,7 +13,6 @@ import {
   Loader2,
   Inbox,
 } from "lucide-react";
-import { ROLES } from "@/src/types/roles.types";
 import api from "../lib/axios";
 import { useAuth } from "../context/AuthContext";
 
@@ -60,8 +59,6 @@ interface Product {
 }
 
 export default function ProductsPage() {
-  const { user, status } = useAuth();
-  const userRole = user?.role;
   const navigate = useNavigate();
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -226,17 +223,17 @@ export default function ProductsPage() {
               Catalog management and inventory overview
             </p>
           </div>
-            <button
-              onClick={() => navigate("/gsa-products/upload")}
-              className="flex items-center justify-center gap-2 bg-[#3399cc] text-white px-6 py-2.5 rounded-xl font-semibold hover:bg-[#2b82ad] transition-all shadow-md hover:shadow-lg active:scale-95"
-            >
-              <Upload size={18} />
-              Upload GSA
-            </button>
+          <button
+            onClick={() => navigate("/gsa-products/upload")}
+            className="flex items-center justify-center gap-2 bg-[#3399cc] text-white px-6 py-2.5 rounded-xl font-semibold hover:bg-[#2b82ad] transition-all shadow-md hover:shadow-lg active:scale-95"
+          >
+            <Upload size={18} />
+            Upload GSA
+          </button>
         </div>
 
-        <div className="flex flex-col md:flex-row gap-4 mb-6">
-          <div className="relative flex-1">
+        <div className="mx-auto bg-white p-4 rounded-4xl shadow-sm border border-slate-100 mb-8 flex flex-col lg:flex-row gap-4 items-center">
+        <div className="relative flex-1 w-full">
             <Search
               className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
               size={20}
@@ -249,14 +246,14 @@ export default function ProductsPage() {
                 setSearchTerm(e.target.value);
                 setCurrentPage(1);
               }}
-              className="w-full pl-12 pr-4 py-3.5 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-[#3399cc]/10 focus:border-[#3399cc] outline-none transition-all bg-white shadow-sm placeholder:text-slate-400"
+              className="w-full pl-14 pr-6 py-3.5 rounded-2xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20  bg-slate-50/50 text-slate-700 placeholder:text-slate-400 transition-all font-medium"
             />
           </div>
 
           <div className="relative w-full md:w-80" ref={dropdownRef}>
             <div
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-              className={`w-full flex items-center justify-between px-4 py-3.5 bg-white border rounded-2xl cursor-pointer transition-all shadow-sm hover:border-slate-300 ${isDropdownOpen ? "border-[#3399cc] ring-4 ring-[#3399cc]/10" : "border-slate-200"}`}
+              className={`w-full flex items-center justify-between px-4 py-3.5 bg-slate-50/50 border rounded-2xl cursor-pointer transition-all hover:border-slate-300 ${isDropdownOpen ? "border-[#3399cc] ring-4 ring-[#3399cc]/10" : "border-slate-200"}`}
             >
               <div className="flex items-center gap-3 overflow-hidden text-slate-700">
                 <Building2 size={18} className="text-slate-400 shrink-0" />
@@ -295,9 +292,7 @@ export default function ProductsPage() {
                     onClick={() => handleClientSelect(null)}
                     className="px-4 py-3 text-sm hover:bg-slate-50 cursor-pointer flex items-center justify-between transition-colors"
                   >
-                    <span className="font-medium text-slate-600">
-                      Show All
-                    </span>
+                    <span className="font-medium text-slate-600">Show All</span>
                     {!selectedClient && (
                       <Check size={16} className="text-[#3399cc]" />
                     )}
@@ -360,15 +355,15 @@ export default function ProductsPage() {
                   </th>
                 </tr>
               </thead>
-               <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-slate-100">
                 {loading ? (
                   <tr>
                     <td colSpan={7} className="px-6 py-32">
-                      <div className="flex flex-col items-center justify-center gap-3">
-                        <Loader2 className="w-12 h-12 animate-spin text-[#24578f]" />
-                        <span className="text-slate-400 font-bold tracking-widest text-[10px]">
+                      <div className="flex flex-col items-center gap-2">
+                        <Loader2 className="w-8 h-8 animate-spin text-[#24578f]" />
+                        <p className="text-sm text-slate-500 font-medium">
                           Loading Products...
-                        </span>
+                        </p>
                       </div>
                     </td>
                   </tr>
@@ -396,11 +391,21 @@ export default function ProductsPage() {
                           {product.item_type === "A" ? "Accessory" : "Base"}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-sm text-slate-600 font-semibold">{product.client_name}</td>
-                      <td className="px-6 py-4 text-sm text-slate-600">{product.manufacturer}</td>
-                      <td className="px-6 py-4 text-sm font-mono text-slate-600 font-medium">{product.manufacturer_part_number}</td>
-                      <td className="px-6 py-4 text-sm font-black text-slate-900">{formatCurrency(product.commercial_list_price)}</td>
-                      <td className="px-6 py-4 text-sm font-mono text-slate-600">{product.uom}</td>
+                      <td className="px-6 py-4 text-sm text-slate-600 font-semibold">
+                        {product.client_name}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-slate-600">
+                        {product.manufacturer}
+                      </td>
+                      <td className="px-6 py-4 text-sm font-mono text-slate-600 font-medium">
+                        {product.manufacturer_part_number}
+                      </td>
+                      <td className="px-6 py-4 text-sm font-black text-slate-900">
+                        {formatCurrency(product.commercial_list_price)}
+                      </td>
+                      <td className="px-6 py-4 text-sm font-mono text-slate-600">
+                        {product.uom}
+                      </td>
                     </tr>
                   ))
                 ) : (
@@ -411,7 +416,9 @@ export default function ProductsPage() {
                           <Inbox className="w-8 h-8 text-slate-300" />
                         </div>
                         <h3 className="text-base font-bold text-slate-500">
-                          {selectedClient ? "No products found for this client" : "No products match your search"}
+                          {selectedClient
+                            ? "No products found for this client"
+                            : "No products match your search"}
                         </h3>
                       </div>
                     </td>

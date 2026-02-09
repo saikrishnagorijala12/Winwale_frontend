@@ -8,6 +8,7 @@ import {
   X,
   ExternalLink,
   Inbox,
+  Loader2,
 } from "lucide-react";
 import api from "../lib/axios";
 
@@ -103,9 +104,9 @@ export default function ClientProducts() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-slate-50">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 border-4 border-[#24578f] border-t-transparent rounded-full animate-spin" />
-          <p className="text-slate-600 font-medium">Loading catalog...</p>
+        <div className="flex flex-col items-center justify-center gap-3">
+          <Loader2 className="w-12 h-12 animate-spin text-[#24578f]" />
+          <span className="text-slate-400 font-bold">Loading Products...</span>
         </div>
       </div>
     );

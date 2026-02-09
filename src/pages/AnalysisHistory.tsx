@@ -442,6 +442,9 @@ export default function AnalysisHistory() {
                         ))}
                     </div>
                   </th>
+                  <th className="text-left px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                    Analyzed By
+                  </th>
                   <th className="text-right px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                     Actions
                   </th>
@@ -567,6 +570,11 @@ export default function AnalysisHistory() {
                               </div>
                             </div>
                           </div>
+                        </td>
+                         <td className="p-4">
+                          <span className="font-bold px-2 text-slate-500 text-sm transition-colors">
+                            {item.user}
+                          </span>
                         </td>
 
                         <td className="p-4 relative">

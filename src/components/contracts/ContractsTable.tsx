@@ -19,7 +19,6 @@ interface ContractTableProps {
   onView: (contract: ClientContractRead) => void;
   onEdit: (contract: ClientContractRead) => void;
   onDelete: (clientId: number) => void;
-  // Pagination Props
   currentPage: number;
   totalContracts: number;
   itemsPerPage: number;
@@ -288,7 +287,6 @@ export default function ContractTable({
         )}
       </div>
 
-      {/* ===================== PAGINATION ===================== */}
       {!loading && totalContracts > itemsPerPage && (
         <div className="px-6 py-5 bg-white border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="text-sm text-slate-500 font-medium">
@@ -352,7 +350,6 @@ export default function ContractTable({
   );
 }
 
-// Internal Action Menu Component to keep the main table cleaner
 const ContractActionMenu = ({ onView, onEdit, onDelete, onClose }: any) => (
   <>
     <div
