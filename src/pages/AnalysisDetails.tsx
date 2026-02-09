@@ -96,7 +96,7 @@ export default function AnalysisDetails() {
   if (isFetchingJob) {
     return (
       <div className="py-120 text-center">
-        <Loader2 className="w-10 h-10 animate-spin mx-auto text-[#3399cc]" />
+        <Loader2 className="w-10 h-10 animate-spin mx-auto text-[#24578f]" />
         <p className="mt-4 text-slate-500">Fetching modification details...</p>
       </div>
     );

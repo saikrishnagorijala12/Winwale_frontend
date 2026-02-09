@@ -70,7 +70,6 @@ export default function ContractTable({
 
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-slate-200 ">
-      {/*DESKTOP TABLE  */}
       <div className="hidden md:block">
         <table className="w-full border-collapse">
           <thead>
@@ -93,7 +92,7 @@ export default function ContractTable({
               <th className="w-16 px-6 py-4"></th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100">
+          <tbody className="divide-slate-100 divide-y">
             {loading ? (
               <tr>
                 <td colSpan={6} className="py-20 text-center">

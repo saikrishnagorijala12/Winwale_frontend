@@ -186,6 +186,7 @@ export default function ClientsPage() {
 
       const createdClient = createClientFromResponse(res);
       setClients((prev) => [createdClient, ...prev]);
+      fetchClients();
       setShowAddDialog(false);
       resetAddClientForm();
     } catch (err: any) {
@@ -288,19 +289,20 @@ export default function ClientsPage() {
     setErrors((prev) => ({ ...prev, [field]: undefined }));
   };
 
+  const fetchClients = async () => {
+    try {
+      setLoading(true);
+      const res = await api.get("/clients");
+      const normalized = res.data.map(normalizeClientFromAPI);
+      setClients(normalized);
+    } catch (err: any) {
+      handleApiError(err, "load clients");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchClients = async () => {
-      try {
-        setLoading(true);
-        const res = await api.get("/clients");
-        const normalized = res.data.map(normalizeClientFromAPI);
-        setClients(normalized);
-      } catch (err: any) {
-        handleApiError(err, "load clients");
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchClients();
   }, []);
 

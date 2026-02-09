@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Users,
   ShieldCheck,
@@ -9,13 +9,40 @@ import {
   ChevronRight,
   ShieldAlert,
   UserCheck,
+  Loader2,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import api from "@/src/lib/axios";
+
+interface User {
+  user_id: number;
+  name: string;
+  email: string;
+  phone_no: string | null;
+  is_active: boolean;
+  is_deleted: boolean;
+  role: string;
+  created_time: string;
+}
+
+interface Client {
+  client_id: number;
+  company_name: string;
+  company_email: string;
+  contact_officer_name: string;
+  status: string;
+  created_time: string;
+  updated_time: string;
+}
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
   const { user } = useAuth();
+
+  const [users, setUsers] = useState<User[]>([]);
+  const [clients, setClients] = useState<Client[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const colors = {
     bg: "#f5f7f9",
@@ -28,66 +55,101 @@ export default function AdminDashboard() {
     secondaryBg: "#f8fafc",
   };
 
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    try {
+      const [usersResponse, clientsResponse] = await Promise.all([
+        api.get(`/users/all`),
+        api.get(`/clients`),
+      ]);
+
+      setUsers(usersResponse.data);
+      setClients(clientsResponse.data);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleUserAction = async (userId: number, action: "approve" | "reject") => {
+    try {
+      await api.patch(
+        `/users/${userId}/approve?action=${action}`
+      );
+      fetchData();
+    } catch (error) {
+      console.error(`Error ${action}ing user:`, error);
+    }
+  };
+
+  const handleClientAction = async (clientId: number, action: "approve" | "reject") => {
+    try {
+      await api.patch(
+        `/clients/${clientId}/approve?action=${action}`
+      );
+      fetchData();
+    } catch (error) {
+      console.error(`Error ${action}ing client:`, error);
+    }
+  };
+
+  const totalUsers = users.filter(u => !u.is_deleted);
+  const pendingUsers = users.filter(u => !u.is_active && !u.is_deleted);
+  const pendingClients = clients.filter(c => c.status === "pending");
+  const activeUsers = users.filter(u => u.is_active && !u.is_deleted);
+  const approvedClients = clients.filter(c => c.status === "approved");
+
+  // Limit to 5 items for display
+  const displayUsers = pendingUsers.slice(0, 5);
+  const displayClients = pendingClients.slice(0, 5);
+
   const stats = [
     {
-      label: "User Approvals",
-      value: "5",
-      change: "2 urgent requests",
-      trend: "warning",
+      label: "Total Users",
+      value: totalUsers.length.toString(),
       icon: UserPlus,
     },
     {
       label: "Client Approvals",
-      value: "9",
-      change: "4 new profiles",
-      trend: "up",
+      value: pendingClients.length.toString(),
       icon: Building2,
     },
     {
       label: "Active Users",
-      value: "182",
-      change: "+12 this month",
-      trend: "up",
+      value: activeUsers.length.toString(),
       icon: Users,
     },
     {
       label: "Verified Clients",
-      value: "64",
-      change: "All profiles active",
-      trend: "up",
+      value: approvedClients.length.toString(),
       icon: ShieldCheck,
     },
   ];
 
-  const userRequests = [
-    {
-      id: "1",
-      name: "James Wilson",
-      detail: "Senior Consultant",
-      date: "10m ago",
-    },
-    {
-      id: "4",
-      name: "Sarah Chen",
-      detail: "Junior Analyst",
-      date: "Yesterday",
-    },
-  ];
+  const getTimeAgo = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
 
-  const clientRequests = [
-    {
-      id: "2",
-      name: "Global Logistics Inc",
-      detail: "New GSA Schedule",
-      date: "1h ago",
-    },
-    {
-      id: "3",
-      name: "Enterprise Solutions",
-      detail: "Profile Update",
-      date: "3h ago",
-    },
-  ];
+    if (seconds < 60) return "Just now";
+    if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
+    if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
+    if (seconds < 604800) return `${Math.floor(seconds / 86400)}d ago`;
+    return date.toLocaleDateString();
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center gap-3">
+        <Loader2 className="w-10 h-10 animate-spin text-[#24578f]" />
+        <p className="text-sm text-slate-500 font-medium">Loading...</p>
+      </div>
+    );
+  }
 
   return (
     <div
@@ -114,7 +176,7 @@ export default function AdminDashboard() {
         {stats.map((stat) => (
           <div
             key={stat.label}
-            className="bg-white p-6 h-40 flex flex-col justify-between rounded-2xl transition-all hover:shadow-lg shadow-sm"
+            className="bg-white p-6 flex flex-col justify-between rounded-2xl transition-all hover:shadow-lg shadow-sm"
           >
             <div className="flex justify-between items-start">
               <span
@@ -140,14 +202,6 @@ export default function AdminDashboard() {
               >
                 {stat.value}
               </div>
-              <div
-                className="flex items-center gap-1.5 text-[11px] font-bold"
-                style={{
-                  color: stat.trend === "up" ? colors.success : colors.warning,
-                }}
-              >
-                {stat.change}
-              </div>
             </div>
           </div>
         ))}
@@ -166,43 +220,74 @@ export default function AdminDashboard() {
               </p>
             </div>
             <span className="bg-blue-50 text-[#24548f] text-[10px] font-black px-2 py-1 rounded">
-              {userRequests.length} PENDING
+              {pendingUsers.length} PENDING
             </span>
           </div>
 
           <div className="space-y-3">
-            {userRequests.map((item) => (
-              <div
-                key={item.id}
-                className="group flex items-center gap-4 p-4 rounded-2xl border border-transparent hover:shadow-sm transition-all"
-                style={{ backgroundColor: `${colors.bg}80` }}
-              >
-                <div
-                  className="w-12 h-12 rounded-xl bg-white border flex items-center justify-center shrink-0 shadow-sm"
-                  style={{ borderColor: colors.border }}
-                >
-                  <UserCheck className="w-5 h-5 text-[#24548f]" />
-                </div>
-
-                <div className="flex-1 min-w-0">
-                  <h4 className="font-bold truncate" style={{ color: colors.fg }}>
-                    {item.name}
-                  </h4>
-                  <p className="text-xs font-bold" style={{ color: colors.muted }}>
-                    {item.detail} • {item.date}
-                  </p>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <button className="p-2 rounded-xl hover:bg-red-50" style={{ color: colors.destructive }}>
-                    <XCircle className="w-6 h-6" />
-                  </button>
-                  <button className="p-2 rounded-xl hover:bg-green-50" style={{ color: colors.success }}>
-                    <CheckCircle2 className="w-6 h-6" />
-                  </button>
-                </div>
+            {displayUsers.length === 0 ? (
+              <div className="text-center py-8">
+                <p className="font-medium" style={{ color: colors.muted }}>
+                  No pending user requests
+                </p>
               </div>
-            ))}
+            ) : (
+              <>
+                {displayUsers.map((item) => (
+                  <div
+                    key={item.user_id}
+                    className="group flex items-center gap-4 p-4 rounded-2xl border border-transparent hover:shadow-sm transition-all"
+                    style={{ backgroundColor: `${colors.bg}80` }}
+                  >
+                    <div
+                      className="w-12 h-12 rounded-xl bg-white border flex items-center justify-center shrink-0 shadow-sm"
+                      style={{ borderColor: colors.border }}
+                    >
+                      <UserCheck className="w-5 h-5 text-[#24548f]" />
+                    </div>
+
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-bold truncate" style={{ color: colors.fg }}>
+                        {item.name}
+                      </h4>
+                      <p className="text-xs font-bold" style={{ color: colors.muted }}>
+                        {item.role} • {getTimeAgo(item.created_time)}
+                      </p>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <button 
+                        className="p-2 rounded-xl hover:bg-red-50 transition-colors" 
+                        style={{ color: colors.destructive }}
+                        onClick={() => handleUserAction(item.user_id, "reject")}
+                      >
+                        <XCircle className="w-6 h-6" />
+                      </button>
+                      <button 
+                        className="p-2 rounded-xl hover:bg-green-50 transition-colors" 
+                        style={{ color: colors.success }}
+                        onClick={() => handleUserAction(item.user_id, "approve")}
+                      >
+                        <CheckCircle2 className="w-6 h-6" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+                {pendingUsers.length > 5 && (
+                  <button
+                    onClick={() => navigate("/user-activation")}
+                    className="w-full mt-4 py-3 px-4 rounded-xl font-bold text-sm transition-all hover:shadow-md flex items-center justify-center gap-2"
+                    style={{ 
+                      backgroundColor: colors.secondaryBg,
+                      color: colors.fg 
+                    }}
+                  >
+                    View All Users
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                )}
+              </>
+            )}
           </div>
         </div>
 
@@ -214,47 +299,78 @@ export default function AdminDashboard() {
                 Client Profile Reviews
               </h2>
               <p className="text-sm font-medium" style={{ color: colors.muted }}>
-                Company profile & GSA updates
+                Company profile approvals
               </p>
             </div>
             <span className="bg-green-50 text-green-700 text-[10px] font-black px-2 py-1 rounded">
-              {clientRequests.length} PENDING
+              {pendingClients.length} PENDING
             </span>
           </div>
 
           <div className="space-y-3">
-            {clientRequests.map((item) => (
-              <div
-                key={item.id}
-                className="group flex items-center gap-4 p-4 rounded-2xl border border-transparent hover:shadow-sm transition-all"
-                style={{ backgroundColor: `${colors.bg}80` }}
-              >
-                <div
-                  className="w-12 h-12 rounded-xl bg-white border flex items-center justify-center shrink-0 shadow-sm"
-                  style={{ borderColor: colors.border }}
-                >
-                  <Building2 className="w-5 h-5" style={{ color: colors.success }} />
-                </div>
-
-                <div className="flex-1 min-w-0">
-                  <h4 className="font-bold truncate" style={{ color: colors.fg }}>
-                    {item.name}
-                  </h4>
-                  <p className="text-xs font-bold" style={{ color: colors.muted }}>
-                    {item.detail} • {item.date}
-                  </p>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <button className="p-2 rounded-xl hover:bg-red-50" style={{ color: colors.destructive }}>
-                    <XCircle className="w-6 h-6" />
-                  </button>
-                  <button className="p-2 rounded-xl hover:bg-green-50" style={{ color: colors.success }}>
-                    <CheckCircle2 className="w-6 h-6" />
-                  </button>
-                </div>
+            {displayClients.length === 0 ? (
+              <div className="text-center py-8">
+                <p className="font-medium" style={{ color: colors.muted }}>
+                  No pending client requests
+                </p>
               </div>
-            ))}
+            ) : (
+              <>
+                {displayClients.map((item) => (
+                  <div
+                    key={item.client_id}
+                    className="group flex items-center gap-4 p-4 rounded-2xl border border-transparent hover:shadow-sm transition-all"
+                    style={{ backgroundColor: `${colors.bg}80` }}
+                  >
+                    <div
+                      className="w-12 h-12 rounded-xl bg-white border flex items-center justify-center shrink-0 shadow-sm"
+                      style={{ borderColor: colors.border }}
+                    >
+                      <Building2 className="w-5 h-5" style={{ color: colors.success }} />
+                    </div>
+
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-bold truncate" style={{ color: colors.fg }}>
+                        {item.company_name}
+                      </h4>
+                      <p className="text-xs font-bold" style={{ color: colors.muted }}>
+                        {item.contact_officer_name} • {getTimeAgo(item.created_time)}
+                      </p>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <button 
+                        className="p-2 rounded-xl hover:bg-red-50 transition-colors" 
+                        style={{ color: colors.destructive }}
+                        onClick={() => handleClientAction(item.client_id, "reject")}
+                      >
+                        <XCircle className="w-6 h-6" />
+                      </button>
+                      <button 
+                        className="p-2 rounded-xl hover:bg-green-50 transition-colors" 
+                        style={{ color: colors.success }}
+                        onClick={() => handleClientAction(item.client_id, "approve")}
+                      >
+                        <CheckCircle2 className="w-6 h-6" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+                {pendingClients.length > 5 && (
+                  <button
+                    onClick={() => navigate("/client-activation")}
+                    className="w-full mt-4 py-3 px-4 rounded-xl font-bold text-sm transition-all hover:shadow-md flex items-center justify-center gap-2"
+                    style={{ 
+                      backgroundColor: colors.secondaryBg,
+                      color: colors.fg 
+                    }}
+                  >
+                    View All Clients
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                )}
+              </>
+            )}
           </div>
         </div>
       </div>

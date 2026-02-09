@@ -32,15 +32,19 @@ import {
   STATUS_MAP,
 } from "../utils/statusUtils";
 
-const formatDate = (dateString: string) => {
+const formatDateTime = (dateString: string) => {
   if (!dateString) return "—";
+
   const date = new Date(dateString);
-  const options: Intl.DateTimeFormatOptions = {
+
+  return date.toLocaleTimeString("en-US", {
     month: "short",
     day: "numeric",
     year: "numeric",
-  };
-  return date.toLocaleDateString("en-US", options);
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
 };
 
 export default function AnalysisHistory() {
@@ -428,7 +432,7 @@ export default function AnalysisHistory() {
                     onClick={() => handleSort("date")}
                   >
                     <div className="flex items-center gap-1">
-                      Date
+                      Date & Time
                       {sortConfig.key === "date" &&
                         (sortConfig.direction === "asc" ? (
                           <SortAsc className="w-3 h-3 stroke-[2.5px] text-slate-400" />
@@ -467,123 +471,126 @@ export default function AnalysisHistory() {
                     </td>
                   </tr>
                 ) : (
-                  paginatedHistory.map((item) => (
-                    <tr
-                      key={item.job_id}
-                      onClick={() => navigate(`/analyses/${item.job_id}`)}
-                      className="cursor-pointer group border-b border-slate-50 hover:bg-slate-50/50 transition-colors"
-                    >
-                      <td className="p-4">
-                        <span className="font-bold text-slate-800 text-sm group-hover:text-[#38A1DB] transition-colors">
-                          ANAL-JOB-{item.job_id}
-                        </span>
-                      </td>
-                      <td className="p-4">
-                        <div className="flex items-center gap-3">
-                          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-600/10">
-                            <Building2 className="h-4 w-4 text-[#24578f]" />
-                          </div>
+                  paginatedHistory.map((item) => {
+                    const hasModifications =
+                      item.summary.additions > 0 ||
+                      item.summary.deletions > 0 ||
+                      item.summary.priceIncreases > 0 ||
+                      item.summary.priceDecreases > 0 ||
+                      item.summary.descriptionChanges > 0;
 
-                          <div className="leading-tight">
-                            <span className="block font-semibold text-slate-800">
-                              {item.client || "—"}
-                            </span>
-                            <span className="text-xs font-medium text-slate-500">
-                              ({item.contract_number || "No Contract"})
-                            </span>
-                          </div>
-                        </div>
-                      </td>
-
-                      <td className="p-4">
-                        <span className="text-slate-500 font-medium text-sm">
-                          {getStatusBadge(item.status)}
-                        </span>
-                      </td>
-                      <td className="p-4">
-                        <div className="flex items-center gap-2 text-xs flex-wrap">
-                          {item.summary.additions > 0 && (
-                            <span
-                              className="flex items-center gap-1 text-emerald-600 font-bold"
-                              title="Additions"
-                            >
-                              <Plus className="w-3 h-3" />
-                              {item.summary.additions}
-                            </span>
-                          )}
-                          {item.summary.deletions > 0 && (
-                            <span
-                              className="flex items-center gap-1 text-rose-500 font-bold"
-                              title="Deletions"
-                            >
-                              <Minus className="w-3 h-3" />
-                              {item.summary.deletions}
-                            </span>
-                          )}
-                          {item.summary.priceIncreases > 0 && (
-                            <span
-                              className="flex items-center gap-1 text-amber-600 font-bold"
-                              title="Price Increases"
-                            >
-                              <TrendingUp className="w-3 h-3" />
-                              {item.summary.priceIncreases}
-                            </span>
-                          )}
-                          {item.summary.priceDecreases > 0 && (
-                            <span
-                              className="flex items-center gap-1 text-blue-600 font-bold"
-                              title="Price Decreases"
-                            >
-                              <TrendingDown className="w-3 h-3" />
-                              {item.summary.priceDecreases}
-                            </span>
-                          )}
-                          {item.summary.descriptionChanges > 0 && (
-                            <span
-                              className="flex items-center gap-1 text-indigo-600 font-bold"
-                              title="Description Changes"
-                            >
-                              <FileEdit className="w-3 h-3" />
-                              {item.summary.descriptionChanges}
-                            </span>
-                          )}
-                          {item.modifications_actions.length === 0 && (
-                            <span className="text-slate-400 text-xs">
-                              No modifications
-                            </span>
-                          )}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center gap-1.5 text-slate-500">
-                          <Calendar className="w-3.5 h-3.5 text-slate-400" />
-                          <span className="text-sm">
-                            {formatDate(item.created_time)}
+                    return (
+                      <tr
+                        key={item.job_id}
+                        onClick={() => navigate(`/analyses/${item.job_id}`)}
+                        className="cursor-pointer group border-b border-slate-50 hover:bg-slate-50/50 transition-colors"
+                      >
+                        <td className="p-4">
+                          <span className="font-bold text-slate-800 text-sm group-hover:text-[#38A1DB] transition-colors">
+                            ANAL-JOB-{item.job_id}
                           </span>
-                        </div>
-                      </td>
+                        </td>
+                        <td className="p-4">
+                          <div className="flex items-center gap-3">
+                            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-600/10">
+                              <Building2 className="h-4 w-4 text-[#24578f]" />
+                            </div>
 
-                      <td className="p-4 relative">
-                        <div className="flex justify-end">
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation(); 
-                              setOpenMenuId(
-                                openMenuId === item.job_id ? null : item.job_id,
-                              );
-                            }}
-                            className="p-2 hover:bg-slate-100 rounded-full transition-colors text-slate-500"
-                          >
-                            <MoreVertical className="w-5 h-5" />
-                          </button>
+                            <div className="leading-tight">
+                              <span className="block font-semibold text-slate-800">
+                                {item.client || "—"}
+                              </span>
+                              <span className="text-xs font-medium text-slate-500">
+                                ({item.contract_number || "No Contract"})
+                              </span>
+                            </div>
+                          </div>
+                        </td>
 
-                          {/* Dropdown Menu */}
-                          {openMenuId === item.job_id && (
-                            <div
-                              className="absolute right-12 top-4 w-48 bg-white border border-slate-200 rounded-xl shadow-xl z-50 py-2 animate-in fade-in zoom-in duration-100"
-                              onClick={(e) => e.stopPropagation()} 
+                        <td className="p-4">
+                          <span className="text-slate-500 font-medium text-sm">
+                            {getStatusBadge(item.status)}
+                          </span>
+                        </td>
+                        <td className="p-4">
+                          <div className="flex items-center gap-2 text-xs flex-wrap">
+                            {item.summary.additions > 0 && (
+                              <span className="flex items-center gap-1 text-emerald-600 font-bold">
+                                <Plus className="w-3 h-3" />
+                                {item.summary.additions}
+                              </span>
+                            )}
+
+                            {item.summary.deletions > 0 && (
+                              <span className="flex items-center gap-1 text-rose-500 font-bold">
+                                <Minus className="w-3 h-3" />
+                                {item.summary.deletions}
+                              </span>
+                            )}
+
+                            {item.summary.priceIncreases > 0 && (
+                              <span className="flex items-center gap-1 text-amber-600 font-bold">
+                                <TrendingUp className="w-3 h-3" />
+                                {item.summary.priceIncreases}
+                              </span>
+                            )}
+
+                            {item.summary.priceDecreases > 0 && (
+                              <span className="flex items-center gap-1 text-blue-600 font-bold">
+                                <TrendingDown className="w-3 h-3" />
+                                {item.summary.priceDecreases}
+                              </span>
+                            )}
+
+                            {item.summary.descriptionChanges > 0 && (
+                              <span className="flex items-center gap-1 text-indigo-600 font-bold">
+                                <FileEdit className="w-3 h-3" />
+                                {item.summary.descriptionChanges}
+                              </span>
+                            )}
+
+                            {!hasModifications && (
+                              <span className="text-slate-400 text-xs italic">
+                                No modifications
+                              </span>
+                            )}
+                          </div>
+                        </td>
+
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex items-center gap-1.5 text-slate-500">
+                            <Clock className="w-3.5 h-3.5 text-slate-400" />
+                            <div className="leading-tight">
+                              <div className="text-sm font-medium">
+                                {formatDateTime(item.created_time)}
+                              </div>
+                            </div>
+                          </div>
+                        </td>
+
+                        <td className="p-4 relative">
+                          <div className="flex justify-end">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setOpenMenuId(
+                                  openMenuId === item.job_id
+                                    ? null
+                                    : item.job_id,
+                                );
+                              }}
+                              className="p-2 hover:bg-slate-100 rounded-full transition-colors text-slate-500"
                             >
-                              <button
+                              <MoreVertical className="w-5 h-5" />
+                            </button>
+
+                            {/* Dropdown Menu */}
+                            {openMenuId === item.job_id && (
+                              <div
+                                className="absolute right-12 top-4 w-48 bg-white border border-slate-200 rounded-xl shadow-xl z-50 py-2 animate-in fade-in zoom-in duration-100"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                {/* <button
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   handleGenerate(item.job_id);
@@ -592,65 +599,69 @@ export default function AnalysisHistory() {
                               >
                                 <FileText className="w-4 h-4 text-slate-400" />
                                 Generate Docs
-                              </button>
+                              </button> */}
 
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  navigate(`/analyses/${item.job_id}`);
-                                }}
-                                className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors font-medium"
-                              >
-                                <Eye className="w-4 h-4 text-slate-400" />
-                                View Details
-                              </button>
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    navigate(`/analyses/${item.job_id}`);
+                                  }}
+                                  className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors font-medium"
+                                >
+                                  <Eye className="w-4 h-4 text-slate-400" />
+                                  View Details
+                                </button>
 
-                              {normalizeStatus(item.status) === "pending" && (
-                                <>
-                                  <div className="my-1 border-t border-slate-100" />
-                                  <button
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      handleUpdateStatus(
-                                        item.job_id,
-                                        "approve",
-                                      );
-                                      setOpenMenuId(null);
-                                    }}
-                                    disabled={updatingId === item.job_id}
-                                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-emerald-600 hover:bg-emerald-50 transition-colors font-semibold disabled:opacity-50"
-                                  >
-                                    {updatingId === item.job_id ? (
-                                      <Loader2 className="w-4 h-4 animate-spin" />
-                                    ) : (
-                                      <CheckCircle2 className="w-4 h-4" />
-                                    )}
-                                    Approve Analysis
-                                  </button>
-                                  <button
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      handleUpdateStatus(item.job_id, "reject");
-                                      setOpenMenuId(null);
-                                    }}
-                                    disabled={updatingId === item.job_id}
-                                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-rose-600 hover:bg-rose-50 transition-colors font-semibold disabled:opacity-50"
-                                  >
-                                    {updatingId === item.job_id ? (
-                                      <Loader2 className="w-4 h-4 animate-spin" />
-                                    ) : (
-                                      <XCircle className="w-4 h-4" />
-                                    )}
-                                    Reject Analysis
-                                  </button>
-                                </>
-                              )}
-                            </div>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  ))
+                                {normalizeStatus(item.status) === "pending" && (
+                                  <>
+                                    <div className="my-1 border-t border-slate-100" />
+                                    <button
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleUpdateStatus(
+                                          item.job_id,
+                                          "approve",
+                                        );
+                                        setOpenMenuId(null);
+                                      }}
+                                      disabled={updatingId === item.job_id}
+                                      className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-emerald-600 hover:bg-emerald-50 transition-colors font-semibold disabled:opacity-50"
+                                    >
+                                      {updatingId === item.job_id ? (
+                                        <Loader2 className="w-4 h-4 animate-spin" />
+                                      ) : (
+                                        <CheckCircle2 className="w-4 h-4" />
+                                      )}
+                                      Approve Analysis
+                                    </button>
+                                    <button
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleUpdateStatus(
+                                          item.job_id,
+                                          "reject",
+                                        );
+                                        setOpenMenuId(null);
+                                      }}
+                                      disabled={updatingId === item.job_id}
+                                      className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-rose-600 hover:bg-rose-50 transition-colors font-semibold disabled:opacity-50"
+                                    >
+                                      {updatingId === item.job_id ? (
+                                        <Loader2 className="w-4 h-4 animate-spin" />
+                                      ) : (
+                                        <XCircle className="w-4 h-4" />
+                                      )}
+                                      Reject Analysis
+                                    </button>
+                                  </>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })
                 )}
               </tbody>
             </table>

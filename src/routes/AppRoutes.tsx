@@ -118,18 +118,18 @@ const AppRoutes: React.FC = () => {
               <Route path="/gsa-products" element={<GsaProducts />} />
               <Route path="/gsa-products/upload" element={<UploadGsa />} />
               {/* <Route path="/pricelist-analysis" element={<Analysis />} /> */}
-              <Route
+              {/* <Route
                 path="/documents"
                 element={
                   <DocumentProvider>
                     <DocumentWorkflowRenderer />
                   </DocumentProvider>
                 }
-              />
+              /> */}
 
               <Route path="/analyses" element={<AnalysisHistory />} />
               <Route path="/analyses/:jobId" element={<AnalysisDetails />} />
-              <Route path="/downloads" element={<DownloadHistory />} />
+              {/* <Route path="/downloads" element={<DownloadHistory />} /> */}
             </Route>
 
             <Route

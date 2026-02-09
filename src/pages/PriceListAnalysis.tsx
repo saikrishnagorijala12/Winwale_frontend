@@ -1,4 +1,5 @@
 import React, { ChangeEvent, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Plus,
   Minus,
@@ -43,12 +44,12 @@ const steps = [
 ];
 
 export default function PriceListAnalysis() {
+  const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
   const [selectedClient, setSelectedClient] = useState("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [activeTab, setActiveTab] = useState("additions");
 
-  // Pagination State
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
@@ -138,6 +139,7 @@ export default function PriceListAnalysis() {
 
       setUploadResult(response.data);
       await fetchJobDetails(response.data.job_id);
+      setCurrentStep(4);
       setIsAnalyzing(false);
     } catch (err: any) {
       setIsAnalyzing(false);
@@ -413,7 +415,6 @@ export default function PriceListAnalysis() {
             </div>
 
             <div className="p-6 space-y-6">
-              {!uploadResult ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full mb-10">
                   <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 flex items-center gap-4">
                     <div className="p-3 bg-white rounded-xl shadow-sm">
@@ -468,42 +469,6 @@ export default function PriceListAnalysis() {
                     </div>
                   </div>
                 </div>
-              ) : (
-                <div className="space-y-4 animate-in fade-in zoom-in-95">
-                  <div className="flex items-center gap-2 px-1">
-                    <CheckCircle className="w-4 h-4 text-emerald-500" />
-                    <span className="text-sm font-bold text-slate-700">
-                      Analysis Complete (Analysis #{uploadResult.job_id})
-                    </span>
-                  </div>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <StatCard
-                      label="Additions"
-                      value={uploadResult.summary.new_products}
-                      icon={<Plus className="w-4 h-4" />}
-                      variant="emerald"
-                    />
-                    <StatCard
-                      label="Deletions"
-                      value={uploadResult.summary.removed_products}
-                      icon={<Minus className="w-4 h-4" />}
-                      variant="red"
-                    />
-                    <StatCard
-                      label="Increases"
-                      value={uploadResult.summary.price_increase}
-                      icon={<TrendingUp className="w-4 h-4" />}
-                      variant="amber"
-                    />
-                    <StatCard
-                      label="Decreases"
-                      value={uploadResult.summary.price_decrease}
-                      icon={<TrendingDown className="w-4 h-4" />}
-                      variant="cyan"
-                    />
-                  </div>
-                </div>
-              )}
 
               {error && (
                 <div className="p-4 bg-red-50 text-red-700 rounded-xl flex items-center gap-2">
@@ -523,7 +488,6 @@ export default function PriceListAnalysis() {
                 >
                   <ChevronLeft className="w-4 h-4" /> Back
                 </button>
-                {!uploadResult ? (
                   <button
                     onClick={handleRunAnalysis}
                     disabled={isAnalyzing}
@@ -540,17 +504,6 @@ export default function PriceListAnalysis() {
                       </>
                     )}
                   </button>
-                ) : (
-                  <button
-                    onClick={() => {
-                      setCurrentStep(4);
-                      setError(null);
-                    }}
-                    className="btn-primary"
-                  >
-                    Review Details <ArrowRight className="w-4 h-4" />
-                  </button>
-                )}
               </div>
             </div>
           </div>
@@ -571,7 +524,6 @@ export default function PriceListAnalysis() {
         const activeActions =
           categorized[activeTab as keyof typeof categorized] || [];
 
-        // Pagination logic
         const totalItems = activeActions.length;
         const totalPages = Math.ceil(totalItems / itemsPerPage);
         const startIndex = (currentPage - 1) * itemsPerPage;
@@ -907,8 +859,13 @@ export default function PriceListAnalysis() {
               >
                 Start New Analysis
               </button>
-              <button className="btn-primary">
-                Generate All Documents <ArrowRight className="w-4 h-4" />
+              <button
+                // onClick={() =>
+                //   navigate(`/documents?job_id=${uploadResult.job_id}`)
+                // }
+                className="btn-primary"
+              >
+                Generate Documents <ArrowRight className="w-4 h-4" />
               </button>
             </div>
           </div>

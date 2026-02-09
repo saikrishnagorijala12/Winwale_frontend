@@ -333,17 +333,6 @@ export default function ProductsPage() {
         </div>
 
         <div className="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden relative transition-all">
-          {loading && (
-            <div className="absolute inset-0 bg-white/60  z-10 flex items-center justify-center">
-              <div className="flex flex-col items-center gap-3">
-                <Loader2 className="w-10 h-10 animate-spin text-[#24578f]" />
-                <span className="text-slate-400 font-medium">
-                  Loading Products...
-                </span>
-              </div>
-            </div>
-          )}
-
           <div className="overflow-x-auto">
             <table className="w-full border-collapse">
               <thead>
@@ -371,8 +360,19 @@ export default function ProductsPage() {
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
-                {paginatedProducts.length > 0 ? (
+               <tbody className="divide-y divide-slate-100">
+                {loading ? (
+                  <tr>
+                    <td colSpan={7} className="px-6 py-32">
+                      <div className="flex flex-col items-center justify-center gap-3">
+                        <Loader2 className="w-12 h-12 animate-spin text-[#24578f]" />
+                        <span className="text-slate-400 font-bold uppercase tracking-widest text-[10px]">
+                          Loading Products...
+                        </span>
+                      </div>
+                    </td>
+                  </tr>
+                ) : paginatedProducts.length > 0 ? (
                   paginatedProducts.map((product) => (
                     <tr
                       key={product.product_id}
@@ -396,21 +396,11 @@ export default function ProductsPage() {
                           {product.item_type === "A" ? "Accessory" : "Base"}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-sm text-slate-600 font-semibold">
-                        {product.client_name}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-slate-600">
-                        {product.manufacturer}
-                      </td>
-                      <td className="px-6 py-4 text-sm font-mono text-slate-600 font-medium">
-                        {product.manufacturer_part_number}
-                      </td>
-                      <td className="px-6 py-4 text-sm font-black text-slate-900">
-                        {formatCurrency(product.commercial_list_price)}
-                      </td>
-                      <td className="px-6 py-4 text-sm font-mono text-slate-600">
-                        {product.uom}
-                      </td>
+                      <td className="px-6 py-4 text-sm text-slate-600 font-semibold">{product.client_name}</td>
+                      <td className="px-6 py-4 text-sm text-slate-600">{product.manufacturer}</td>
+                      <td className="px-6 py-4 text-sm font-mono text-slate-600 font-medium">{product.manufacturer_part_number}</td>
+                      <td className="px-6 py-4 text-sm font-black text-slate-900">{formatCurrency(product.commercial_list_price)}</td>
+                      <td className="px-6 py-4 text-sm font-mono text-slate-600">{product.uom}</td>
                     </tr>
                   ))
                 ) : (
@@ -420,20 +410,9 @@ export default function ProductsPage() {
                         <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center mb-4 border border-slate-100">
                           <Inbox className="w-8 h-8 text-slate-300" />
                         </div>
-
                         <h3 className="text-base font-bold text-slate-500">
-                          {selectedClient
-                            ? "No products found for this client"
-                            : searchTerm
-                              ? "No products match your search"
-                              : "No products available"}
+                          {selectedClient ? "No products found for this client" : "No products match your search"}
                         </h3>
-
-                        {(selectedClient || searchTerm) && (
-                          <p className="text-sm text-slate-400 mt-1">
-                            Try clearing filters or adjusting your search terms
-                          </p>
-                        )}
                       </div>
                     </td>
                   </tr>

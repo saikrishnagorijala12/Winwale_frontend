@@ -11,7 +11,7 @@ import api from "../lib/axios";
 import { useAuth } from "./AuthContext";
 
 const fetchJobDetails = async (jobId: string) => {
-  const response = await api.get(`/jobs/${jobId}/details`);
+  const response = await api.get(`/generate/${jobId}`);
   return response.data;
 };
 

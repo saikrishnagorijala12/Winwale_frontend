@@ -16,6 +16,8 @@ import {
   RefreshCw,
   User,
   Phone,
+  ChevronRight,
+  ChevronLeft,
 } from "lucide-react";
 import api from "../lib/axios";
 import { Role } from "../types/roles.types";
@@ -391,6 +393,8 @@ export default function UserActivation() {
     isOpen: false,
     user: null,
   });
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8;
 
   const fetchUsers = async () => {
     try {
@@ -408,6 +412,10 @@ export default function UserActivation() {
   useEffect(() => {
     fetchUsers();
   }, []);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [activeTab, searchQuery]);
 
   const pendingUsers = users.filter((u) => !u.is_active && !u.is_deleted);
   const approvedUsers = users.filter((u) => u.is_active && !u.is_deleted);
@@ -484,8 +492,6 @@ export default function UserActivation() {
     try {
       setIsActionLoading(true);
       await api.put(`/users/change_role/${roleChangeModal.user.user_id}`);
-      
-      // Refresh the full user list to ensure UI is in sync
       await fetchUsers();
       
       toast.success("User role changed successfully");
@@ -526,6 +532,11 @@ export default function UserActivation() {
   };
 
   const filteredUsers = getFilteredUsers();
+
+  const totalItems = filteredUsers.length;
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedUsers = filteredUsers.slice(startIndex, startIndex + itemsPerPage);
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
 
   const getRoleStyle = (roleId) => {
     const role = ROLE_MAP[roleId] || "default";
@@ -701,7 +712,7 @@ export default function UserActivation() {
 
         {/* Mobile Card View  */}
         <div className="lg:hidden px-4 sm:px-6 pb-4 sm:pb-6 space-y-3 sm:space-y-4">
-          {filteredUsers.map((user) => (
+          {paginatedUsers.map((user) => (
             <UserCard
               key={user.user_id}
               user={user}
@@ -712,7 +723,7 @@ export default function UserActivation() {
               getRoleStyle={getRoleStyle}
             />
           ))}
-          {filteredUsers.length === 0 && (
+          {paginatedUsers.length === 0 && (
             <div className="py-16 text-center text-slate-400 text-sm">
               No users found.
             </div>
@@ -721,31 +732,31 @@ export default function UserActivation() {
 
         {/* Desktop Table View */}
         <div className="hidden lg:block  px-6 pb-6">
-          <table className="w-full border-collapse">
+          <table className="w-full border-collapse bg-white rounded-2xl shadow-sm">
             <thead>
-              <tr className="border-b border-slate-50">
-                <th className="px-4 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">
+              <tr className="bg-slate-50 border-b border-slate-200">
+                <th className="text-left px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                   User
                 </th>
-                <th className="px-4 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">
+                <th className="text-left px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                   Role
                 </th>
-                <th className="px-4 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">
+                <th className="text-left px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                   Phone
                 </th>
-                <th className="px-4 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">
+                <th className="text-left px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                   Status
                 </th>
-                <th className="px-4 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">
-                  Created Date
+                <th className="text-left px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                  Request Date
                 </th>
-                <th className="px-4 py-4 text-right text-xs font-bold text-slate-500 uppercase tracking-wider">
+                <th className="text-right px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
-              {filteredUsers.map((user) => (
+              {paginatedUsers.map((user) => (
                 <tr
                   key={user.user_id}
                   className="group hover:bg-slate-50/30 transition-colors"
@@ -801,12 +812,73 @@ export default function UserActivation() {
               ))}
             </tbody>
           </table>
-          {filteredUsers.length === 0 && (
+          {paginatedUsers.length === 0 && (
             <div className="py-20 text-center text-slate-400">
               No users found.
             </div>
           )}
         </div>
+        {totalItems > itemsPerPage && (
+          <div className="px-6 py-5 bg-white border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="text-sm text-slate-500 font-medium">
+              Showing <span className="text-slate-900 font-semibold">{startIndex + 1}</span> to{" "}
+              <span className="text-slate-900 font-semibold">
+                {Math.min(startIndex + itemsPerPage, totalItems)}
+              </span> of{" "}
+              <span className="text-slate-900 font-semibold">{totalItems}</span> users
+            </div>
+
+            <div className="flex items-center gap-1.5">
+              <button
+                disabled={currentPage === 1}
+                onClick={() => setCurrentPage(currentPage - 1)}
+                className="p-2 rounded-lg border border-slate-200 text-slate-400 hover:bg-slate-50 hover:text-slate-600 disabled:opacity-30 disabled:hover:bg-transparent transition-all mr-2"
+              >
+                <ChevronLeft size={18} />
+              </button>
+
+              <div className="flex items-center gap-1">
+                {(() => {
+                  const pages = [];
+                  const delta = 1;
+                  for (let i = 1; i <= totalPages; i++) {
+                    if (i === 1 || i === totalPages || (i >= currentPage - delta && i <= currentPage + delta)) {
+                      pages.push(i);
+                    } else if (pages[pages.length - 1] !== "...") {
+                      pages.push("...");
+                    }
+                  }
+                  return pages.map((pageNum, idx) => (
+                    <React.Fragment key={idx}>
+                      {pageNum === "..." ? (
+                        <span className="px-2 text-slate-400 font-medium">...</span>
+                      ) : (
+                        <button
+                          onClick={() => setCurrentPage(Number(pageNum))}
+                          className={`min-w-9 h-9 flex items-center justify-center rounded-lg text-sm font-bold transition-all
+                            ${currentPage === pageNum
+                              ? "bg-[#3399cc] text-white shadow-md shadow-[#3399cc]/30"
+                              : "text-slate-500 hover:bg-slate-100 hover:text-slate-900"
+                            }`}
+                        >
+                          {pageNum}
+                        </button>
+                      )}
+                    </React.Fragment>
+                  ));
+                })()}
+              </div>
+
+              <button
+                disabled={currentPage === totalPages}
+                onClick={() => setCurrentPage(currentPage + 1)}
+                className="p-2 rounded-lg border border-slate-200 text-slate-400 hover:bg-slate-50 hover:text-slate-600 disabled:opacity-30 disabled:hover:bg-transparent transition-all ml-2"
+              >
+                <ChevronRight size={18} />
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

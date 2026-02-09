@@ -16,6 +16,8 @@ import {
   Mail,
   Phone,
   User,
+  ChevronRight,
+  ChevronLeft,
 } from "lucide-react";
 import { toast } from "sonner";
 import api from "../lib/axios";
@@ -61,7 +63,8 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
             Are you sure you want to {isApprove ? "approve" : "reject"}{" "}
             <span className="font-bold text-slate-700">
               {client?.company_name}
-            </span>?
+            </span>
+            ?
           </p>
 
           <div className="bg-slate-50 rounded-2xl p-4 mb-6 space-y-2">
@@ -122,7 +125,10 @@ const ActionDropdown: React.FC<ActionDropdownProps> = ({
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setIsOpen(false);
       }
     };
@@ -267,7 +273,9 @@ const ClientCard: React.FC<ClientCardProps> = ({
             <h3 className="font-bold text-slate-800 text-base truncate">
               {client.company_name}
             </h3>
-            <p className="text-xs text-slate-400 truncate">{client.company_email}</p>
+            <p className="text-xs text-slate-400 truncate">
+              {client.company_email}
+            </p>
           </div>
         </div>
         <div onClick={(e) => e.stopPropagation()}>
@@ -284,7 +292,9 @@ const ClientCard: React.FC<ClientCardProps> = ({
       <div className="space-y-2.5 mb-4">
         <div className="flex items-center gap-2 text-sm text-slate-600">
           <User className="w-4 h-4 text-slate-400 shrink-0" />
-          <span className="truncate">{client.contact_officer_name || "N/A"}</span>
+          <span className="truncate">
+            {client.contact_officer_name || "N/A"}
+          </span>
         </div>
         <div className="flex items-center gap-2 text-sm text-slate-600">
           <MapPin className="w-4 h-4 text-slate-400 shrink-0" />
@@ -320,11 +330,15 @@ const ClientActivation = () => {
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [editingClient, setEditingClient] = useState<EditingClient | null>(null);
+  const [editingClient, setEditingClient] = useState<EditingClient | null>(
+    null,
+  );
   const [editErrors, setEditErrors] = useState<ClientFormErrors>({});
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [backendError, setBackendError] = useState<string>("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8;
 
   const fetchClients = async () => {
     try {
@@ -341,6 +355,10 @@ const ClientActivation = () => {
   useEffect(() => {
     fetchClients();
   }, []);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [activeTab, searchQuery]);
 
   const handleApiError = (err: any, context: string = "operation") => {
     const status = err.response?.status;
@@ -380,7 +398,9 @@ const ClientActivation = () => {
       await api.patch(`/clients/${client_id}/approve`, null, {
         params: { action },
       });
-      toast.success(`Client ${action === "approve" ? "approved" : "rejected"} successfully`);
+      toast.success(
+        `Client ${action === "approve" ? "approved" : "rejected"} successfully`,
+      );
       await fetchClients();
       closeConfirmModal();
     } catch (err) {
@@ -462,7 +482,9 @@ const ClientActivation = () => {
     handleViewClient(client);
   };
 
-  const pendingClients = clients.filter((c) => !["approved", "rejected"].includes(c.status));
+  const pendingClients = clients.filter(
+    (c) => !["approved", "rejected"].includes(c.status),
+  );
   const approvedClients = clients.filter((c) => c.status === "approved");
   const rejectedClients = clients.filter((c) => c.status === "rejected");
 
@@ -476,11 +498,21 @@ const ClientActivation = () => {
     return list.filter(
       (c) =>
         c.company_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        c.contact_officer_name?.toLowerCase().includes(searchQuery.toLowerCase())
+        c.contact_officer_name
+          ?.toLowerCase()
+          .includes(searchQuery.toLowerCase()),
     );
   };
 
   const filteredClients = getFilteredClients();
+
+  const totalItems = filteredClients.length;
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedClients = filteredClients.slice(
+    startIndex,
+    startIndex + itemsPerPage,
+  );
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
 
   const getStatusBadge = (status: string) => {
     if (status === "rejected") {
@@ -575,9 +607,12 @@ const ClientActivation = () => {
           onBack={() => setCurrentStep(1)}
           onChange={(field, value) => {
             setEditingClient({ ...editingClient, [field]: value });
-            if (editErrors[field]) setEditErrors({ ...editErrors, [field]: "" });
+            if (editErrors[field])
+              setEditErrors({ ...editErrors, [field]: "" });
           }}
-          onClearError={(field) => setEditErrors({ ...editErrors, [field]: "" })}
+          onClearError={(field) =>
+            setEditErrors({ ...editErrors, [field]: "" })
+          }
           onClearBackendError={() => setBackendError("")}
           submitButtonText="Update Client"
         />
@@ -596,20 +631,49 @@ const ClientActivation = () => {
       {/* Stats Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
         {[
-          { label: "Total Clients", count: clients.length, icon: Building2, color: "blue" },
-          { label: "Pending Requests", count: pendingClients.length, icon: Clock, color: "orange" },
-          { label: "Approved Clients", count: approvedClients.length, icon: CheckCircle2, color: "emerald" },
-          { label: "Rejected", count: rejectedClients.length, icon: XCircle, color: "rose" },
+          {
+            label: "Total Clients",
+            count: clients.length,
+            icon: Building2,
+            color: "blue",
+          },
+          {
+            label: "Pending Requests",
+            count: pendingClients.length,
+            icon: Clock,
+            color: "orange",
+          },
+          {
+            label: "Approved Clients",
+            count: approvedClients.length,
+            icon: CheckCircle2,
+            color: "emerald",
+          },
+          {
+            label: "Rejected",
+            count: rejectedClients.length,
+            icon: XCircle,
+            color: "rose",
+          },
         ].map((stat) => (
-          <div key={stat.label} className="bg-white p-4 sm:p-6 lg:p-8 rounded-2xl sm:rounded-3xl shadow-sm flex items-center gap-3 sm:gap-5 border border-slate-100">
-            <div className={`w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 bg-${stat.color}-50 rounded-full flex items-center justify-center shrink-0`}>
-              <stat.icon className={`w-5 h-5 sm:w-6 sm:h-6 lg:w-7 lg:h-7 text-${stat.color}-600`} />
+          <div
+            key={stat.label}
+            className="bg-white p-4 sm:p-6 lg:p-8 rounded-2xl sm:rounded-3xl shadow-sm flex items-center gap-3 sm:gap-5 border border-slate-100"
+          >
+            <div
+              className={`w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 bg-${stat.color}-50 rounded-full flex items-center justify-center shrink-0`}
+            >
+              <stat.icon
+                className={`w-5 h-5 sm:w-6 sm:h-6 lg:w-7 lg:h-7 text-${stat.color}-600`}
+              />
             </div>
             <div className="min-w-0 flex-1">
               <p className="text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-slate-400 truncate">
                 {stat.label}
               </p>
-              <p className="text-2xl sm:text-3xl lg:text-4xl font-bold">{stat.count}</p>
+              <p className="text-2xl sm:text-3xl lg:text-4xl font-bold">
+                {stat.count}
+              </p>
             </div>
           </div>
         ))}
@@ -620,10 +684,30 @@ const ClientActivation = () => {
         <div className="border-b border-slate-100 px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6 ">
           <div className="flex gap-1 sm:gap-2 min-w-max">
             {[
-              { id: "all", label: "All Clients", count: clients.length, color: "blue" },
-              { id: "pending", label: "Pending", count: pendingClients.length, color: "orange" },
-              { id: "approved", label: "Approved", count: approvedClients.length, color: "emerald" },
-              { id: "rejected", label: "Rejected", count: rejectedClients.length, color: "rose" },
+              {
+                id: "all",
+                label: "All Clients",
+                count: clients.length,
+                color: "blue",
+              },
+              {
+                id: "pending",
+                label: "Pending",
+                count: pendingClients.length,
+                color: "orange",
+              },
+              {
+                id: "approved",
+                label: "Approved",
+                count: approvedClients.length,
+                color: "emerald",
+              },
+              {
+                id: "rejected",
+                label: "Rejected",
+                count: rejectedClients.length,
+                color: "rose",
+              },
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -661,7 +745,7 @@ const ClientActivation = () => {
 
         {/* Mobile Card View (< lg) */}
         <div className="lg:hidden px-4 sm:px-6 pb-4 sm:pb-6 space-y-3 sm:space-y-4">
-          {filteredClients.map((client) => (
+          {paginatedClients.map((client) => (
             <ClientCard
               key={client.client_id}
               client={client}
@@ -672,7 +756,7 @@ const ClientActivation = () => {
               getStatusBadge={getStatusBadge}
             />
           ))}
-          {filteredClients.length === 0 && (
+          {paginatedClients.length === 0 && (
             <div className="py-16 text-center text-slate-400 text-sm">
               No clients found.
             </div>
@@ -680,20 +764,32 @@ const ClientActivation = () => {
         </div>
 
         {/* Desktop Table View  */}
-        <div className="hidden lg:block  px-6 pb-6">
-          <table className="w-full border-collapse">
+        <div className="hidden lg:block  px-6 pb-6 ">
+          <table className="w-full border-collapse bg-white rounded-2xl shadow-sm">
             <thead>
-              <tr className="border-b border-slate-50">
-                <th className="px-4 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Company</th>
-                <th className="px-4 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Contact Officer</th>
-                <th className="px-4 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Location</th>
-                <th className="px-4 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Status</th>
-                <th className="px-4 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Request Date</th>
-                <th className="px-4 py-4 text-right text-xs font-bold text-slate-500 uppercase tracking-wider">Actions</th>
+              <tr className="bg-slate-50 border-b border-slate-200">
+                <th className="text-left px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-widerral Information">
+                  Company
+                </th>
+                <th className="text-left px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-widerral Information">
+                  Contact Officer
+                </th>
+                <th className="text-left px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-widerral Information">
+                  Location
+                </th>
+                <th className="text-left px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-widerral Information">
+                  Status
+                </th>
+                <th className="text-left px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-widerral Information">
+                  Request Date
+                </th>
+                <th className="text-right px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
-              {filteredClients.map((client) => (
+              {paginatedClients.map((client) => (
                 <tr
                   key={client.client_id}
                   onClick={() => handleRowClick(client)}
@@ -705,13 +801,19 @@ const ClientActivation = () => {
                         <Building2 className="w-5 h-5 text-blue-500" />
                       </div>
                       <div>
-                        <p className="font-bold text-sm text-slate-800">{client.company_name}</p>
-                        <p className="text-xs text-slate-400">{client.company_email}</p>
+                        <p className="font-bold text-sm text-slate-800">
+                          {client.company_name}
+                        </p>
+                        <p className="text-xs text-slate-400">
+                          {client.company_email}
+                        </p>
                       </div>
                     </div>
                   </td>
                   <td className="px-4 py-5">
-                    <p className="text-sm font-semibold text-slate-700">{client.contact_officer_name || "N/A"}</p>
+                    <p className="text-sm font-semibold text-slate-700">
+                      {client.contact_officer_name || "N/A"}
+                    </p>
                   </td>
                   <td className="px-4 py-5">
                     <div className="text-sm text-slate-600 flex items-center gap-1">
@@ -731,7 +833,9 @@ const ClientActivation = () => {
                       <ActionDropdown
                         client={client}
                         onView={() => handleViewClient(client)}
-                        onEdit={() => handleEditClient(normalizeClientFromAPI(client))}
+                        onEdit={() =>
+                          handleEditClient(normalizeClientFromAPI(client))
+                        }
                         onApprove={() => openConfirmModal(client, "approve")}
                         onReject={() => openConfirmModal(client, "reject")}
                       />
@@ -741,15 +845,76 @@ const ClientActivation = () => {
               ))}
             </tbody>
           </table>
-          {filteredClients.length === 0 && (
+          {paginatedClients.length === 0 && (
             <div className="py-20 text-center text-slate-400">
               No clients found.
             </div>
           )}
         </div>
+        {totalItems > itemsPerPage && (
+          <div className="px-6 py-5 bg-white border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="text-sm text-slate-500 font-medium">
+              Showing <span className="text-slate-900 font-semibold">{startIndex + 1}</span> to{" "}
+              <span className="text-slate-900 font-semibold">
+                {Math.min(startIndex + itemsPerPage, totalItems)}
+              </span> of{" "}
+              <span className="text-slate-900 font-semibold">{totalItems}</span> users
+            </div>
+
+            <div className="flex items-center gap-1.5">
+              <button
+                disabled={currentPage === 1}
+                onClick={() => setCurrentPage(currentPage - 1)}
+                className="p-2 rounded-lg border border-slate-200 text-slate-400 hover:bg-slate-50 hover:text-slate-600 disabled:opacity-30 disabled:hover:bg-transparent transition-all mr-2"
+              >
+                <ChevronLeft size={18} />
+              </button>
+
+              <div className="flex items-center gap-1">
+                {(() => {
+                  const pages = [];
+                  const delta = 1;
+                  for (let i = 1; i <= totalPages; i++) {
+                    if (i === 1 || i === totalPages || (i >= currentPage - delta && i <= currentPage + delta)) {
+                      pages.push(i);
+                    } else if (pages[pages.length - 1] !== "...") {
+                      pages.push("...");
+                    }
+                  }
+                  return pages.map((pageNum, idx) => (
+                    <React.Fragment key={idx}>
+                      {pageNum === "..." ? (
+                        <span className="px-2 text-slate-400 font-medium">...</span>
+                      ) : (
+                        <button
+                          onClick={() => setCurrentPage(Number(pageNum))}
+                          className={`min-w-9 h-9 flex items-center justify-center rounded-lg text-sm font-bold transition-all
+                            ${currentPage === pageNum
+                              ? "bg-[#3399cc] text-white shadow-md shadow-[#3399cc]/30"
+                              : "text-slate-500 hover:bg-slate-100 hover:text-slate-900"
+                            }`}
+                        >
+                          {pageNum}
+                        </button>
+                      )}
+                    </React.Fragment>
+                  ));
+                })()}
+              </div>
+
+              <button
+                disabled={currentPage === totalPages}
+                onClick={() => setCurrentPage(currentPage + 1)}
+                className="p-2 rounded-lg border border-slate-200 text-slate-400 hover:bg-slate-50 hover:text-slate-600 disabled:opacity-30 disabled:hover:bg-transparent transition-all ml-2"
+              >
+                <ChevronRight size={18} />
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
-};
+}
 
 export default ClientActivation;

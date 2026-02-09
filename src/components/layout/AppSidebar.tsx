@@ -1,4 +1,4 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { useState, useEffect } from "react";
 import {
@@ -16,7 +16,6 @@ import {
 } from "lucide-react";
 import { Role, ROLES } from "@/src/types/roles.types";
 
-/*  NAV CONFIG ORGANIZED BY SECTIONS  */
 export const navSections = [
   {
     label: "Overview",
@@ -104,6 +103,7 @@ export default function AppSidebar() {
   const { user, logout } = useAuth();
   const [open, setOpen] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const navigate = useNavigate();
 
   const ROLE_MAP: Record<Role, string> = {
     admin: "Administrator",
@@ -159,7 +159,13 @@ export default function AppSidebar() {
         `}
       >
         <div className="p-6 border-b border-slate-200 flex items-center justify-between">
-          <div className="flex items-center gap-3">
+          <div
+            onClick={() => {
+              navigate("/dashboard");
+              setOpen(false);
+            }}
+            className="flex items-center gap-3 cursor-pointer"
+          >
             <img
               src="logo.png"
               alt="Winvale Logo"
@@ -180,12 +186,10 @@ export default function AppSidebar() {
 
         <nav className="flex-1 overflow-y-auto custom-scrollbar py-4">
           {navSections.map((section) => {
-            // Filter items in this section based on the user's role
             const visibleItems = section.items.filter(
-              (item) => user && item.roles.includes(user.role as Role)
+              (item) => user && item.roles.includes(user.role as Role),
             );
 
-            // If no items in this section are visible to the user, don't render the section at all
             if (visibleItems.length === 0) return null;
 
             return (
