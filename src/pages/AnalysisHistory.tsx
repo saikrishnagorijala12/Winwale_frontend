@@ -257,6 +257,7 @@ export default function AnalysisHistory() {
   const clearFilters = () => {
     setSearchQuery("");
     setSelectedClient("All Clients");
+    setStatusFilter("All");
     setDateFrom(undefined);
     setDateTo(undefined);
   };
@@ -408,9 +409,9 @@ export default function AnalysisHistory() {
       </div>
 
       {/* Results Table */}
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-200">
         <div className="p-0">
-          <div className="overflow-x-auto">
+          <div className="">
             <table className="w-full">
               <thead>
                 <tr className="bg-slate-50 border-b border-slate-200">

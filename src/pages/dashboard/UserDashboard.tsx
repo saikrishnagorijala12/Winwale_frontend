@@ -1,19 +1,17 @@
 import React, { useEffect, useState } from "react";
 import {
   FileSearch,
-  Users,
   TrendingUp,
   Clock,
   FileText,
-  AlertCircle,
   BarChart3,
   ChevronRight,
-  PlusCircle,
   UserPlus,
   Loader2,
   TrendingDown,
   FileEdit,
   Upload,
+  Building2,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
@@ -161,7 +159,7 @@ export default function Dashboard() {
     {
       label: "All Clients",
       value: stats_data.totalClients.toString(),
-      icon: Users,
+      icon: Building2,
     },
     {
       label: "Analyses Completed",

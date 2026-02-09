@@ -366,7 +366,7 @@ export default function ProductsPage() {
                     <td colSpan={7} className="px-6 py-32">
                       <div className="flex flex-col items-center justify-center gap-3">
                         <Loader2 className="w-12 h-12 animate-spin text-[#24578f]" />
-                        <span className="text-slate-400 font-bold uppercase tracking-widest text-[10px]">
+                        <span className="text-slate-400 font-bold tracking-widest text-[10px]">
                           Loading Products...
                         </span>
                       </div>

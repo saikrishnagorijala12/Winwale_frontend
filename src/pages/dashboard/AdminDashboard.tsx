@@ -4,10 +4,8 @@ import {
   ShieldCheck,
   CheckCircle2,
   XCircle,
-  UserPlus,
   Building2,
   ChevronRight,
-  ShieldAlert,
   UserCheck,
   Loader2,
 } from "lucide-react";
@@ -103,7 +101,6 @@ export default function AdminDashboard() {
   const activeUsers = users.filter(u => u.is_active && !u.is_deleted);
   const approvedClients = clients.filter(c => c.status === "approved");
 
-  // Limit to 5 items for display
   const displayUsers = pendingUsers.slice(0, 5);
   const displayClients = pendingClients.slice(0, 5);
 
@@ -111,7 +108,7 @@ export default function AdminDashboard() {
     {
       label: "Total Users",
       value: totalUsers.length.toString(),
-      icon: UserPlus,
+      icon: Users,
     },
     {
       label: "Client Approvals",
@@ -121,7 +118,7 @@ export default function AdminDashboard() {
     {
       label: "Active Users",
       value: activeUsers.length.toString(),
-      icon: Users,
+      icon:UserCheck,
     },
     {
       label: "Verified Clients",
