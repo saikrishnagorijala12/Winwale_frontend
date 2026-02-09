@@ -98,19 +98,26 @@ export default function DownloadHistory() {
     (doc) =>
       doc.fileName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       doc.client.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      doc.analysisId.toLowerCase().includes(searchQuery.toLowerCase())
+      doc.analysisId.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   const totalItems = filteredDownloads.length;
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedDownloads = filteredDownloads.slice(startIndex, startIndex + itemsPerPage);
+  const paginatedDownloads = filteredDownloads.slice(
+    startIndex,
+    startIndex + itemsPerPage,
+  );
 
   const getPageNumbers = () => {
     const totalPages = Math.ceil(totalItems / itemsPerPage);
     const pages = [];
     const delta = 1;
     for (let i = 1; i <= totalPages; i++) {
-      if (i === 1 || i === totalPages || (i >= currentPage - delta && i <= currentPage + delta)) {
+      if (
+        i === 1 ||
+        i === totalPages ||
+        (i >= currentPage - delta && i <= currentPage + delta)
+      ) {
         pages.push(i);
       } else if (pages[pages.length - 1] !== "...") {
         pages.push("...");
@@ -155,7 +162,6 @@ export default function DownloadHistory() {
               <Trash2 className="w-4 h-4" />
               Clear History
             </button>
-
           </div>
         </div>
       </div>
@@ -173,7 +179,6 @@ export default function DownloadHistory() {
               className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 focus:border-blue-600 focus:outline-none focus:ring-4 focus:ring-blue-600/5 transition-all"
             />
           </div>
-
         </div>
       </div>
 
@@ -183,18 +188,28 @@ export default function DownloadHistory() {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="border-b border-slate-100">
-                <th className="p-5 text-xs font-bold uppercase tracking-wider text-slate-400">Document Info</th>
-                <th className="p-5 text-xs font-bold uppercase tracking-wider text-slate-400">Analysis ID</th>
-                <th className="p-5 text-xs font-bold uppercase tracking-wider text-slate-400">Date Generated</th>
-
+                <th className="p-5 text-xs font-bold uppercase tracking-wider text-slate-400">
+                  Document Info
+                </th>
+                <th className="p-5 text-xs font-bold uppercase tracking-wider text-slate-400">
+                  Analysis ID
+                </th>
+                <th className="p-5 text-xs font-bold uppercase tracking-wider text-slate-400">
+                  Date Generated
+                </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-50">
+            <tbody className="divide-y divide-slate-100">
               {paginatedDownloads.map((doc) => (
-                <tr key={doc.id} className="hover:bg-blue-50/30 transition-colors group">
+                <tr
+                  key={doc.id}
+                  className="hover:bg-blue-50/30 transition-colors group"
+                >
                   <td className="p-5">
                     <div className="flex items-center gap-4">
-                      <div className={`p-2.5 rounded-xl border ${fileTypeStyles[doc.type] || "bg-slate-50"}`}>
+                      <div
+                        className={`p-2.5 rounded-xl border ${fileTypeStyles[doc.type] || "bg-slate-50"}`}
+                      >
                         {doc.type === "Excel" || doc.type === "CSV" ? (
                           <FileSpreadsheet className="w-5 h-5" />
                         ) : (
@@ -221,7 +236,6 @@ export default function DownloadHistory() {
                   <td className="p-5 text-sm text-slate-600">
                     {formatDate(doc.date)}
                   </td>
-
                 </tr>
               ))}
             </tbody>
@@ -231,11 +245,19 @@ export default function DownloadHistory() {
           {totalItems > itemsPerPage && (
             <div className="px-6 py-5 bg-white border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
               <div className="text-sm text-slate-500 font-medium">
-                Showing <span className="text-slate-900 font-semibold">{startIndex + 1}</span> to{" "}
+                Showing{" "}
+                <span className="text-slate-900 font-semibold">
+                  {startIndex + 1}
+                </span>{" "}
+                to{" "}
                 <span className="text-slate-900 font-semibold">
                   {Math.min(startIndex + itemsPerPage, totalItems)}
                 </span>{" "}
-                of <span className="text-slate-900 font-semibold">{totalItems}</span> documents
+                of{" "}
+                <span className="text-slate-900 font-semibold">
+                  {totalItems}
+                </span>{" "}
+                documents
               </div>
 
               <div className="flex items-center gap-1.5">
@@ -251,14 +273,17 @@ export default function DownloadHistory() {
                   {getPageNumbers().map((pageNum, idx) => (
                     <React.Fragment key={idx}>
                       {pageNum === "..." ? (
-                        <span className="px-2 text-slate-400 font-medium">...</span>
+                        <span className="px-2 text-slate-400 font-medium">
+                          ...
+                        </span>
                       ) : (
                         <button
                           onClick={() => setCurrentPage(Number(pageNum))}
                           className={`min-w-9 h-9 flex items-center justify-center rounded-lg text-sm font-bold transition-all
-                            ${currentPage === pageNum
-                              ? "bg-[#3399cc] text-white shadow-md shadow-[#3399cc]/30"
-                              : "text-slate-500 hover:bg-slate-100 hover:text-slate-900"
+                            ${
+                              currentPage === pageNum
+                                ? "bg-[#3399cc] text-white shadow-md shadow-[#3399cc]/30"
+                                : "text-slate-500 hover:bg-slate-100 hover:text-slate-900"
                             }`}
                         >
                           {pageNum}
@@ -269,7 +294,9 @@ export default function DownloadHistory() {
                 </div>
 
                 <button
-                  disabled={currentPage === Math.ceil(totalItems / itemsPerPage)}
+                  disabled={
+                    currentPage === Math.ceil(totalItems / itemsPerPage)
+                  }
                   onClick={() => setCurrentPage(currentPage + 1)}
                   className="p-2 rounded-lg border border-slate-200 text-slate-400 hover:bg-slate-50 hover:text-slate-600 disabled:opacity-30 disabled:hover:bg-transparent transition-all ml-2"
                 >
@@ -290,8 +317,8 @@ export default function DownloadHistory() {
               </div>
 
               <p className="text-sm text-slate-600">
-                This action will permanently delete all generated document history.
-                This cannot be undone.
+                This action will permanently delete all generated document
+                history. This cannot be undone.
               </p>
 
               <div className="flex justify-end gap-3 pt-4">
@@ -317,14 +344,17 @@ export default function DownloadHistory() {
           </div>
         )}
 
-
         {filteredDownloads.length === 0 && (
           <div className="py-20 text-center">
             <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
               <FileText className="w-8 h-8 text-slate-300" />
             </div>
-            <h3 className="text-lg font-bold text-slate-900">No documents found</h3>
-            <p className="text-slate-500">Try adjusting your search or filters</p>
+            <h3 className="text-lg font-bold text-slate-900">
+              No documents found
+            </h3>
+            <p className="text-slate-500">
+              Try adjusting your search or filters
+            </p>
           </div>
         )}
       </div>

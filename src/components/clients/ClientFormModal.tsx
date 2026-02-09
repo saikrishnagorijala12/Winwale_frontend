@@ -50,17 +50,15 @@ export const ClientFormModal: React.FC<ClientFormModalProps> = ({
   onClearBackendError,
   submitButtonText = "Create Client Profile",
 }) => {
-
   if (!isOpen) return null;
 
   const handleSubmit = (e: React.FormEvent) => {
-  e.preventDefault();
-  onSubmit(e);
-};
-
+    e.preventDefault();
+    onSubmit(e);
+  };
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-none z-50 flex items-center justify-center p-4 h-full">
+    <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-none z-50 flex items-center justify-center p-4 h-full">
       <div className="relative bg-white rounded-3xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-hidden flex flex-col">
         {/* Header */}
         <div className="bg-linear-to-br bg-slate-50 py-4 px-8 shrink-0">

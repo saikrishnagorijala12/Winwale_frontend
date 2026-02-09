@@ -572,7 +572,7 @@ export default function AnalysisHistory() {
                           </div>
                         </td>
                          <td className="p-4">
-                          <span className="font-bold px-2 text-slate-500 text-sm transition-colors">
+                          <span className="px-2 text-slate-500 text-sm transition-colors">
                             {item.user}
                           </span>
                         </td>

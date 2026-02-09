@@ -1,7 +1,16 @@
-import React from 'react';
-import { X, Building2, User, Mail, Phone, MapPin, Globe, Edit } from 'lucide-react';
-import { Client } from '../../types/client.types';
-import { ContactRow } from './ContactRow';
+import React from "react";
+import {
+  X,
+  Building2,
+  User,
+  Mail,
+  Phone,
+  MapPin,
+  Globe,
+  Edit,
+} from "lucide-react";
+import { Client } from "../../types/client.types";
+import { ContactRow } from "./ContactRow";
 
 interface ClientDetailsModalProps {
   client: Client | null;
@@ -9,7 +18,11 @@ interface ClientDetailsModalProps {
   onEdit: (client: Client) => void;
 }
 
-export const ClientDetailsModal: React.FC<ClientDetailsModalProps> = ({ client, onClose ,onEdit}) => {
+export const ClientDetailsModal: React.FC<ClientDetailsModalProps> = ({
+  client,
+  onClose,
+  onEdit,
+}) => {
   if (!client) return null;
 
   const handleEdit = () => {
@@ -18,7 +31,7 @@ export const ClientDetailsModal: React.FC<ClientDetailsModalProps> = ({ client, 
   };
 
   return (
-    <div className="fixed inset-0 bg-slate-900/60  z-50 flex items-center justify-center p-4 h-full">
+    <div className="fixed inset-0 bg-slate-900/40  z-50 flex items-center justify-center p-4 h-full">
       <div className="absolute inset-0" onClick={onClose} />
 
       <div className="relative bg-white rounded-2xl shadow-xl max-w-4xl w-full max-h-[90vh] flex flex-col overflow-hidden">
@@ -40,7 +53,9 @@ export const ClientDetailsModal: React.FC<ClientDetailsModalProps> = ({ client, 
                 .toUpperCase()}
             </div>
             <div>
-              <p className="text-blue-400 text-sm font-medium uppercase tracking-widest mb-1">Client Profile</p>
+              <p className="text-blue-400 text-sm font-medium uppercase tracking-widest mb-1">
+                Client Profile
+              </p>
               <h2 className="text-3xl font-bold text-slate-700 tracking-tight">
                 {client.name}
               </h2>
@@ -51,14 +66,15 @@ export const ClientDetailsModal: React.FC<ClientDetailsModalProps> = ({ client, 
         {/* Main Content Body */}
         <div className="flex-1 overflow-y-auto p-8">
           <div className="grid md:grid-cols-2 gap-8">
-            
             {/* Left Column: Company Info */}
             <div className="space-y-6">
               <div className="flex items-center gap-2 pb-2 border-b border-slate-100">
                 <Building2 className="w-5 h-5 text-[#38A1DB]" />
-                <h3 className="font-bold text-slate-800 uppercase text-sm tracking-wider">Company Details</h3>
+                <h3 className="font-bold text-slate-800 uppercase text-sm tracking-wider">
+                  Company Details
+                </h3>
               </div>
-              
+
               <div className="bg-slate-50/50 rounded-xl p-5 border border-slate-100 space-y-4">
                 <ContactRow icon={Mail} value={client.email} />
                 <ContactRow icon={Phone} value={client.phone} />
@@ -70,18 +86,24 @@ export const ClientDetailsModal: React.FC<ClientDetailsModalProps> = ({ client, 
             <div className="space-y-6">
               <div className="flex items-center gap-2 pb-2 border-b border-slate-100">
                 <User className="w-5 h-5 text-[#38A1DB]" />
-                <h3 className="font-bold text-slate-800 uppercase text-sm tracking-wider">Primary Contact</h3>
+                <h3 className="font-bold text-slate-800 uppercase text-sm tracking-wider">
+                  Primary Contact
+                </h3>
               </div>
 
               <div className="bg-blue-50/30 rounded-xl p-5 border border-blue-100/50">
                 {!client.contact ? (
                   <div className="text-center py-6">
-                    <p className="text-slate-400 italic text-sm">No primary contact assigned</p>
+                    <p className="text-slate-400 italic text-sm">
+                      No primary contact assigned
+                    </p>
                   </div>
                 ) : (
                   <div className="space-y-4">
                     <div>
-                      <span className="text-[10px] font-bold text-[#38A1DB] uppercase tracking-tighter">Full Name</span>
+                      <span className="text-[10px] font-bold text-[#38A1DB] uppercase tracking-tighter">
+                        Full Name
+                      </span>
                       <p className="text-slate-900 font-bold text-lg leading-none mt-1">
                         {client.contact.name || "—"}
                       </p>
@@ -94,7 +116,6 @@ export const ClientDetailsModal: React.FC<ClientDetailsModalProps> = ({ client, 
                 )}
               </div>
             </div>
-
           </div>
         </div>
 

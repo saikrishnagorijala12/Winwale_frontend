@@ -45,14 +45,14 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   onConfirm,
   user,
   action,
-  isSubmitting, 
+  isSubmitting,
 }) => {
   if (!isOpen) return null;
 
   const isApprove = action === "approve";
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 h-full">
+    <div className="fixed inset-0 bg-slate-900/40 flex items-center justify-center z-50 p-4 h-full">
       <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full overflow-hidden">
         <div className="p-8">
           <p className="text-slate-500 mb-6">
@@ -132,10 +132,12 @@ const RoleChangeModal: React.FC<RoleChangeModalProps> = ({
   const newRole = user?.role === "admin" ? "Consultant" : "Administrator";
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 h-full">
+    <div className="fixed inset-0 bg-slate-900/40 flex items-center justify-center z-50 p-4 h-full">
       <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full overflow-hidden">
         <div className="p-8">
-          <h3 className="text-xl font-bold text-slate-800 mb-2">Change User Role</h3>
+          <h3 className="text-xl font-bold text-slate-800 mb-2">
+            Change User Role
+          </h3>
           <p className="text-slate-500 mb-6">
             Are you sure you want to change the role of{" "}
             <span className="font-bold text-slate-700">{user?.name}</span>?
@@ -159,7 +161,8 @@ const RoleChangeModal: React.FC<RoleChangeModalProps> = ({
           <div className="flex items-start gap-3 bg-yellow-50 border border-yellow-100 rounded-2xl p-4 mb-6">
             <AlertTriangle className="w-5 h-5 text-yellow-600 shrink-0 mt-0.5" />
             <p className="text-xs text-yellow-700">
-              This will change the user's permissions and access level in the system.
+              This will change the user's permissions and access level in the
+              system.
             </p>
           </div>
 
@@ -204,7 +207,10 @@ const ActionDropdown: React.FC<ActionDropdownProps> = ({
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setIsOpen(false);
       }
     };
@@ -359,7 +365,7 @@ const UserCard: React.FC<UserCardProps> = ({
           <Shield className="w-4 h-4 text-slate-400 shrink-0" />
           <span
             className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold border capitalize ${getRoleStyle(
-              user.role
+              user.role,
             )}`}
           >
             {ROLE_MAP[user.role] || "User"}
@@ -454,7 +460,7 @@ export default function UserActivation() {
   const handleApprove = async (userId, action) => {
     try {
       setIsActionLoading(true);
-      
+
       await api.patch(`/users/${userId}/approve`, null, {
         params: { action },
       });
@@ -468,15 +474,17 @@ export default function UserActivation() {
             };
           }
           return user;
-        })
+        }),
       );
-      toast.success(`Client ${action === "approve" ? "approved" : "rejected"} successfully`);
+      toast.success(
+        `Client ${action === "approve" ? "approved" : "rejected"} successfully`,
+      );
       closeConfirmModal();
     } catch (error) {
       console.error(error);
       toast.error(`Failed to ${action} user`);
     } finally {
-      setIsActionLoading(false); 
+      setIsActionLoading(false);
     }
   };
 
@@ -488,17 +496,18 @@ export default function UserActivation() {
 
   const handleRoleChange = async () => {
     if (!roleChangeModal.user) return;
-    
+
     try {
       setIsActionLoading(true);
       await api.put(`/users/change_role/${roleChangeModal.user.user_id}`);
       await fetchUsers();
-      
+
       toast.success("User role changed successfully");
       closeRoleChangeModal();
     } catch (error: any) {
       console.error(error);
-      const errorMessage = error.response?.data?.detail || "Failed to change user role";
+      const errorMessage =
+        error.response?.data?.detail || "Failed to change user role";
       toast.error(errorMessage);
     } finally {
       setIsActionLoading(false);
@@ -527,7 +536,7 @@ export default function UserActivation() {
     return userList.filter(
       (user) =>
         user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        user.email.toLowerCase().includes(searchQuery.toLowerCase())
+        user.email.toLowerCase().includes(searchQuery.toLowerCase()),
     );
   };
 
@@ -535,7 +544,10 @@ export default function UserActivation() {
 
   const totalItems = filteredUsers.length;
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedUsers = filteredUsers.slice(startIndex, startIndex + itemsPerPage);
+  const paginatedUsers = filteredUsers.slice(
+    startIndex,
+    startIndex + itemsPerPage,
+  );
   const totalPages = Math.ceil(totalItems / itemsPerPage);
 
   const getRoleStyle = (roleId) => {
@@ -644,20 +656,49 @@ export default function UserActivation() {
       {/* Stats Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
         {[
-          { label: "Total Users", count: users.length, icon: Users, color: "blue" },
-          { label: "Pending Approvals", count: pendingUsers.length, icon: Clock, color: "orange" },
-          { label: "Approved", count: approvedUsers.length, icon: CheckCircle2, color: "emerald" },
-          { label: "Rejected", count: rejectedUsers.length, icon: XCircle, color: "rose" },
+          {
+            label: "Total Users",
+            count: users.length,
+            icon: Users,
+            color: "blue",
+          },
+          {
+            label: "Pending Approvals",
+            count: pendingUsers.length,
+            icon: Clock,
+            color: "orange",
+          },
+          {
+            label: "Approved",
+            count: approvedUsers.length,
+            icon: CheckCircle2,
+            color: "emerald",
+          },
+          {
+            label: "Rejected",
+            count: rejectedUsers.length,
+            icon: XCircle,
+            color: "rose",
+          },
         ].map((stat) => (
-          <div key={stat.label} className="bg-white p-4 sm:p-6 lg:p-8 rounded-2xl sm:rounded-3xl shadow-sm flex items-center gap-3 sm:gap-5 border border-slate-100">
-            <div className={`w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 bg-${stat.color}-50 rounded-full flex items-center justify-center shrink-0`}>
-              <stat.icon className={`w-5 h-5 sm:w-6 sm:h-6 lg:w-7 lg:h-7 text-${stat.color}-600`} />
+          <div
+            key={stat.label}
+            className="bg-white p-4 sm:p-6 lg:p-8 rounded-2xl sm:rounded-3xl shadow-sm flex items-center gap-3 sm:gap-5 border border-slate-100"
+          >
+            <div
+              className={`w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 bg-${stat.color}-50 rounded-full flex items-center justify-center shrink-0`}
+            >
+              <stat.icon
+                className={`w-5 h-5 sm:w-6 sm:h-6 lg:w-7 lg:h-7 text-${stat.color}-600`}
+              />
             </div>
             <div className="min-w-0 flex-1">
               <p className="text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-slate-400 truncate">
                 {stat.label}
               </p>
-              <p className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900">{stat.count}</p>
+              <p className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900">
+                {stat.count}
+              </p>
             </div>
           </div>
         ))}
@@ -669,10 +710,30 @@ export default function UserActivation() {
         <div className="border-b border-slate-100 px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6 ">
           <div className="flex gap-1 sm:gap-2 min-w-max">
             {[
-              { id: "all", label: "All Users", count: users.length, color: "blue" },
-              { id: "pending", label: "Pending", count: pendingUsers.length, color: "orange" },
-              { id: "approved", label: "Approved", count: approvedUsers.length, color: "emerald" },
-              { id: "rejected", label: "Rejected", count: rejectedUsers.length, color: "rose" },
+              {
+                id: "all",
+                label: "All Users",
+                count: users.length,
+                color: "blue",
+              },
+              {
+                id: "pending",
+                label: "Pending",
+                count: pendingUsers.length,
+                color: "orange",
+              },
+              {
+                id: "approved",
+                label: "Approved",
+                count: approvedUsers.length,
+                color: "emerald",
+              },
+              {
+                id: "rejected",
+                label: "Rejected",
+                count: rejectedUsers.length,
+                color: "rose",
+              },
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -755,7 +816,7 @@ export default function UserActivation() {
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-50">
+            <tbody className="divide-y divide-slate-100">
               {paginatedUsers.map((user) => (
                 <tr
                   key={user.user_id}
@@ -779,7 +840,7 @@ export default function UserActivation() {
                   <td className="px-4 py-5">
                     <span
                       className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold border capitalize ${getRoleStyle(
-                        user.role
+                        user.role,
                       )}`}
                     >
                       <Shield className="w-3 h-3" />
@@ -821,11 +882,17 @@ export default function UserActivation() {
         {totalItems > itemsPerPage && (
           <div className="px-6 py-5 bg-white border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="text-sm text-slate-500 font-medium">
-              Showing <span className="text-slate-900 font-semibold">{startIndex + 1}</span> to{" "}
+              Showing{" "}
+              <span className="text-slate-900 font-semibold">
+                {startIndex + 1}
+              </span>{" "}
+              to{" "}
               <span className="text-slate-900 font-semibold">
                 {Math.min(startIndex + itemsPerPage, totalItems)}
-              </span> of{" "}
-              <span className="text-slate-900 font-semibold">{totalItems}</span> users
+              </span>{" "}
+              of{" "}
+              <span className="text-slate-900 font-semibold">{totalItems}</span>{" "}
+              users
             </div>
 
             <div className="flex items-center gap-1.5">
@@ -842,7 +909,11 @@ export default function UserActivation() {
                   const pages = [];
                   const delta = 1;
                   for (let i = 1; i <= totalPages; i++) {
-                    if (i === 1 || i === totalPages || (i >= currentPage - delta && i <= currentPage + delta)) {
+                    if (
+                      i === 1 ||
+                      i === totalPages ||
+                      (i >= currentPage - delta && i <= currentPage + delta)
+                    ) {
                       pages.push(i);
                     } else if (pages[pages.length - 1] !== "...") {
                       pages.push("...");
@@ -851,14 +922,17 @@ export default function UserActivation() {
                   return pages.map((pageNum, idx) => (
                     <React.Fragment key={idx}>
                       {pageNum === "..." ? (
-                        <span className="px-2 text-slate-400 font-medium">...</span>
+                        <span className="px-2 text-slate-400 font-medium">
+                          ...
+                        </span>
                       ) : (
                         <button
                           onClick={() => setCurrentPage(Number(pageNum))}
                           className={`min-w-9 h-9 flex items-center justify-center rounded-lg text-sm font-bold transition-all
-                            ${currentPage === pageNum
-                              ? "bg-[#3399cc] text-white shadow-md shadow-[#3399cc]/30"
-                              : "text-slate-500 hover:bg-slate-100 hover:text-slate-900"
+                            ${
+                              currentPage === pageNum
+                                ? "bg-[#3399cc] text-white shadow-md shadow-[#3399cc]/30"
+                                : "text-slate-500 hover:bg-slate-100 hover:text-slate-900"
                             }`}
                         >
                           {pageNum}

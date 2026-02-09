@@ -112,7 +112,7 @@ export default function EditContractModal({
 
     if (
       formData.gsa_proposed_discount < 0 ||
-      formData.gsa_proposed_discount > 100.00
+      formData.gsa_proposed_discount > 100.0
     ) {
       newErrors.gsa_proposed_discount = "Discount must be between 0 and 100.00";
     }
@@ -209,13 +209,15 @@ export default function EditContractModal({
   if (!isOpen || !initialContract) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 bg-slate-900/40 z-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-3xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-hidden flex flex-col">
         {/* HEADER */}
         <div className="bg-slate-50 py-4 px-8 shrink-0">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-2xl font-bold  text-slate-700">Edit Contract</h2>
+              <h2 className="text-2xl font-bold  text-slate-700">
+                Edit Contract
+              </h2>
               <p className="text-slate-500 text-sm">
                 Update contract details for {initialContract.client}
               </p>

@@ -350,7 +350,7 @@ const UploadGsa: React.FC = () => {
                       ))}
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-50">
+                  <tbody className="divide-y divide-slate-100">
                     {previewData.map((row, i) => (
                       <tr
                         key={i}

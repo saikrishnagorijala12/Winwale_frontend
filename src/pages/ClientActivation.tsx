@@ -788,7 +788,7 @@ const ClientActivation = () => {
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-50">
+            <tbody className="divide-y divide-slate-100">
               {paginatedClients.map((client) => (
                 <tr
                   key={client.client_id}
@@ -854,11 +854,17 @@ const ClientActivation = () => {
         {totalItems > itemsPerPage && (
           <div className="px-6 py-5 bg-white border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="text-sm text-slate-500 font-medium">
-              Showing <span className="text-slate-900 font-semibold">{startIndex + 1}</span> to{" "}
+              Showing{" "}
+              <span className="text-slate-900 font-semibold">
+                {startIndex + 1}
+              </span>{" "}
+              to{" "}
               <span className="text-slate-900 font-semibold">
                 {Math.min(startIndex + itemsPerPage, totalItems)}
-              </span> of{" "}
-              <span className="text-slate-900 font-semibold">{totalItems}</span> users
+              </span>{" "}
+              of{" "}
+              <span className="text-slate-900 font-semibold">{totalItems}</span>{" "}
+              users
             </div>
 
             <div className="flex items-center gap-1.5">
@@ -875,7 +881,11 @@ const ClientActivation = () => {
                   const pages = [];
                   const delta = 1;
                   for (let i = 1; i <= totalPages; i++) {
-                    if (i === 1 || i === totalPages || (i >= currentPage - delta && i <= currentPage + delta)) {
+                    if (
+                      i === 1 ||
+                      i === totalPages ||
+                      (i >= currentPage - delta && i <= currentPage + delta)
+                    ) {
                       pages.push(i);
                     } else if (pages[pages.length - 1] !== "...") {
                       pages.push("...");
@@ -884,14 +894,17 @@ const ClientActivation = () => {
                   return pages.map((pageNum, idx) => (
                     <React.Fragment key={idx}>
                       {pageNum === "..." ? (
-                        <span className="px-2 text-slate-400 font-medium">...</span>
+                        <span className="px-2 text-slate-400 font-medium">
+                          ...
+                        </span>
                       ) : (
                         <button
                           onClick={() => setCurrentPage(Number(pageNum))}
                           className={`min-w-9 h-9 flex items-center justify-center rounded-lg text-sm font-bold transition-all
-                            ${currentPage === pageNum
-                              ? "bg-[#3399cc] text-white shadow-md shadow-[#3399cc]/30"
-                              : "text-slate-500 hover:bg-slate-100 hover:text-slate-900"
+                            ${
+                              currentPage === pageNum
+                                ? "bg-[#3399cc] text-white shadow-md shadow-[#3399cc]/30"
+                                : "text-slate-500 hover:bg-slate-100 hover:text-slate-900"
                             }`}
                         >
                           {pageNum}
@@ -915,6 +928,6 @@ const ClientActivation = () => {
       </div>
     </div>
   );
-}
+};
 
 export default ClientActivation;

@@ -265,7 +265,7 @@ export default function AppSidebar() {
 
       {/*  Logout Modal */}
       {showLogoutConfirm && (
-        <div className="fixed inset-0 z-100 flex items-center justify-center bg-black/50">
+        <div className="fixed inset-0 z-100 flex items-center justify-center bg-slate-900/40">
           <div className="bg-white rounded-xl p-6 w-full max-w-sm shadow-xl mx-4">
             <h2 className="text-lg font-semibold text-slate-800">
               Confirm Signout

@@ -28,39 +28,64 @@ export const ProfileSection = ({
 }: ProfileSectionProps) => {
   const [name, setName] = useState(user?.name || "");
 
-  // Normalize backend value ("" / null / "NA" → "")
   const [phoneNo, setPhoneNo] = useState(
-    user?.phone_no && user.phone_no !== "NA" ? user.phone_no : ""
+    user?.phone_no && user.phone_no !== "NA" ? user.phone_no : "",
   );
+  const [nameError, setNameError] = useState("");
+  const [formError, setFormError] = useState("");
 
   const [phoneError, setPhoneError] = useState("");
-
-  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-
-    // Allow only digits and optional +
-    if (!/^\+?\d*$/.test(value)) return;
-
-    const digitsCount = value.replace(/\D/g, "").length;
-    if (digitsCount > 15) return;
-
-    setPhoneNo(value);
-    setPhoneError("");
-  };
 
   const handleSave = async () => {
     const trimmedName = name.trim();
     const trimmedPhone = phoneNo.trim();
 
+    setNameError("");
+    setPhoneError("");
+    setFormError("");
+
+    // Full name validation
+    if (!trimmedName) {
+      setNameError("Full name is required");
+      return;
+    }
+
+    if (trimmedName.length < 3) {
+      setNameError("Full name must be at least 3 characters");
+      return;
+    }
+
+    if (trimmedName.length > 30) {
+      setNameError("Full name must be under 30 characters");
+      return;
+    }
+
+    // Phone validation
     if (trimmedPhone && !PHONE_REGEX.test(trimmedPhone)) {
-      setPhoneError("Phone number must be up to 15 digits and may start with +");
+      setPhoneError(
+        "Phone number must be up to 15 digits and may start with +",
+      );
+      return;
+    }
+
+    // No changes check
+    if (
+      trimmedName === user?.name &&
+      (trimmedPhone || null) === (user?.phone_no || null)
+    ) {
+      setFormError("No changes to save");
       return;
     }
 
     await onSave({
       fullName: trimmedName,
-      phone: trimmedPhone === "" ? null : trimmedPhone, // ✅ key fix
+      phone: trimmedPhone === "" ? null : trimmedPhone,
     });
+  };
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPhoneNo(e.target.value);
+    setPhoneError("");
+    setFormError("");
   };
 
   return (
@@ -73,9 +98,7 @@ export const ProfileSection = ({
           </div>
 
           <div className="text-center sm:text-left">
-            <h3 className="text-2xl font-bold text-slate-900">
-              {user?.name}
-            </h3>
+            <h3 className="text-2xl font-bold text-slate-900">{user?.name}</h3>
             <div className="inline-flex items-center gap-2 mt-2 px-3 py-1 bg-slate-100 rounded-full">
               <Shield className="w-3.5 h-3.5 text-[#3498db]" />
               <span className="text-xs font-bold uppercase tracking-wider text-slate-600">
@@ -93,11 +116,17 @@ export const ProfileSection = ({
               Full Name
             </label>
             <input
-              className={inputStyles}
+              className={`${inputStyles} ${nameError ? "border-red-500" : ""}`}
               value={name}
-              maxLength={30}
-              onChange={(e) => setName(e.target.value)}
+              onChange={(e) => {
+                setName(e.target.value);
+                setNameError("");
+                setFormError("");
+              }}
             />
+            {nameError && (
+              <p className="text-sm text-red-600 mt-1 ml-1">{nameError}</p>
+            )}
           </div>
 
           {/* Email */}
@@ -106,6 +135,9 @@ export const ProfileSection = ({
               Email
             </label>
             <input
+              type="email"
+              autoComplete="email"
+              name="email"
               className={disabledInputStyles}
               value={user?.email || ""}
               disabled
@@ -118,18 +150,17 @@ export const ProfileSection = ({
               Phone Number
             </label>
             <input
-              className={`${inputStyles} ${
-                phoneError ? "border-red-500" : ""
-              }`}
+              type="tel"
+              autoComplete="tel"
+              name="phone"
+              className={`${inputStyles} ${phoneError ? "border-red-500" : ""}`}
               value={phoneNo}
               onChange={handlePhoneChange}
-              inputMode="numeric"
               placeholder="+1234567890"
             />
+
             {phoneError && (
-              <p className="text-xs text-red-600 mt-1 ml-1">
-                {phoneError}
-              </p>
+              <p className="text-sm text-red-600 mt-1 ml-1">{phoneError}</p>
             )}
           </div>
 
@@ -145,7 +176,11 @@ export const ProfileSection = ({
             />
           </div>
         </div>
-
+        {formError && (
+          <div className="w-full bg-red-50 p-4 border-l-4 border-red-600">
+            <p className="text-sm text-red-600">{formError}</p>
+          </div>
+        )}
         {/* Actions */}
         <div className="flex justify-end pt-4">
           <button

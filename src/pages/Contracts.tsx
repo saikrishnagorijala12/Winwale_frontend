@@ -6,19 +6,26 @@ import ContractTable from "../components/contracts/ContractsTable";
 import ContractDetailsModal from "../components/contracts/ContractDetailsModal";
 import AddContractModal from "../components/contracts/AddContractModal";
 import EditContractModal from "../components/contracts/EditContractModal";
+import DeleteConfirmationModal from "../components/contracts/DeleteConfirmationModal";
 
 export default function ContractsPage() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedContract, setSelectedContract] = useState<ClientContractRead | null>(null);
+  const [selectedContract, setSelectedContract] =
+    useState<ClientContractRead | null>(null);
   const [contracts, setContracts] = useState<ClientContractRead[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
-  const [contractToEdit, setContractToEdit] = useState<ClientContractRead | null>(null);
+  const [contractToEdit, setContractToEdit] =
+    useState<ClientContractRead | null>(null);
+
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [contractToDelete, setContractToDelete] = useState<number | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 8; 
+  const itemsPerPage = 8;
 
   useEffect(() => {
     fetchContracts();
@@ -55,19 +62,36 @@ export default function ContractsPage() {
 
   const totalContracts = filteredContracts.length;
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedContracts = filteredContracts.slice(startIndex, startIndex + itemsPerPage);
+  const paginatedContracts = filteredContracts.slice(
+    startIndex,
+    startIndex + itemsPerPage,
+  );
 
-  const handleDelete = async (clientId: number) => {
-    if (!window.confirm("Are you sure you want to delete this contract?")) return;
+  const handleDeleteRequest = (clientId: number) => {
+    setContractToDelete(clientId);
+    setShowDeleteDialog(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!contractToDelete) return;
 
     try {
-      await contractService.deleteContract(clientId);
+      setDeleting(true);
+      await contractService.deleteContract(contractToDelete);
+
       setContracts((prev) =>
-        prev.map((c) => (c.client_id === clientId ? { ...c, is_deleted: true } : c))
+        prev.map((c) =>
+          c.client_id === contractToDelete ? { ...c, is_deleted: true } : c,
+        ),
       );
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to delete contract");
-      console.error("Error deleting contract:", err);
+      setError(
+        err instanceof Error ? err.message : "Failed to delete contract",
+      );
+    } finally {
+      setDeleting(false);
+      setShowDeleteDialog(false);
+      setContractToDelete(null);
     }
   };
 
@@ -84,7 +108,10 @@ export default function ContractsPage() {
           <div className="flex-1">
             <p className="text-sm font-semibold text-red-800">{error}</p>
           </div>
-          <button onClick={() => setError(null)} className="text-red-400 hover:text-red-600">
+          <button
+            onClick={() => setError(null)}
+            className="text-red-400 hover:text-red-600"
+          >
             <X className="w-4 h-4" />
           </button>
         </div>
@@ -92,7 +119,9 @@ export default function ContractsPage() {
 
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-12 mx-auto ">
         <div>
-          <h1 className="text-3xl font-extrabold tracking-tight text-slate-800">Contracts</h1>
+          <h1 className="text-3xl font-extrabold tracking-tight text-slate-800">
+            Contracts
+          </h1>
           <p className="text-slate-500 font-medium mt-1">
             Manage your GSA contract profiles and logistics information
           </p>
@@ -122,11 +151,11 @@ export default function ContractsPage() {
 
       <div className="mx-auto ">
         <ContractTable
-          contracts={paginatedContracts} 
+          contracts={paginatedContracts}
           loading={loading}
           onView={setSelectedContract}
           onEdit={handleEdit}
-          onDelete={handleDelete}
+          onDelete={handleDeleteRequest}
           currentPage={currentPage}
           totalContracts={totalContracts}
           itemsPerPage={itemsPerPage}
@@ -154,6 +183,15 @@ export default function ContractsPage() {
           setContractToEdit(null);
         }}
         onSuccess={fetchContracts}
+      />
+      <DeleteConfirmationModal
+        isOpen={showDeleteDialog}
+        loading={deleting}
+        onCancel={() => {
+          setShowDeleteDialog(false);
+          setContractToDelete(null);
+        }}
+        onConfirm={confirmDelete}
       />
     </div>
   );

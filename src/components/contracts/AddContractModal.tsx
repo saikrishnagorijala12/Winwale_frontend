@@ -111,7 +111,7 @@ export default function AddContractModal({
 
     if (
       contract.gsa_proposed_discount < 0 ||
-      contract.gsa_proposed_discount > 100.00
+      contract.gsa_proposed_discount > 100.0
     ) {
       newErrors.gsa_proposed_discount = "Discount must be between 0 and 100.00";
     }
@@ -229,12 +229,14 @@ export default function AddContractModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 ">
+    <div className="fixed inset-0 bg-slate-900/40 z-50 flex items-center justify-center p-4 ">
       <div className="bg-white rounded-3xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-hidden flex flex-col">
         <div className="bg-slate-50 py-5 px-8 shrink-0">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-2xl font-bold text-slate-700">Create Contract</h2>
+              <h2 className="text-2xl font-bold text-slate-700">
+                Create Contract
+              </h2>
               <p className="text-slate-500 text-sm opacity-80">
                 Setup a new contract profile for your client
               </p>

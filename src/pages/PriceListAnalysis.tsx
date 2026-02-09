@@ -19,7 +19,6 @@ import {
   Loader2,
   ChevronDownIcon,
   AlertCircle,
-  CheckCircle,
   X,
   Play,
   FileSearch,
@@ -27,7 +26,6 @@ import {
 } from "lucide-react";
 import api from "../lib/axios";
 import * as XLSX from "xlsx";
-import { toast } from "sonner";
 import { exportAnalysisToExcel } from "../utils/exportAnalysisUtils";
 
 interface Client {
@@ -116,6 +114,13 @@ export default function PriceListAnalysis() {
     const workbook = XLSX.read(data, { type: "array" });
     const sheet = workbook.Sheets[workbook.SheetNames[0]];
     const jsonData = XLSX.utils.sheet_to_json(sheet, { defval: "" });
+    if (jsonData.length === 0) {
+      setError("The uploaded Excel file contains no data rows.");
+      setFile(null);
+      setPreviewData(null);
+      setTotalRows(0);
+      return;
+    }
     setTotalRows(jsonData.length);
     setPreviewData(jsonData);
   };
@@ -309,7 +314,7 @@ export default function PriceListAnalysis() {
                 )}
               </div>
 
-              {previewData && (
+              {previewData && previewData.length > 0 && (
                 <div className="mt-6 border border-slate-200 rounded-xl overflow-hidden">
                   <div className="bg-slate-50 px-4 py-2 border-b border-slate-200 flex justify-between items-center">
                     <span className="text-[10px] font-bold text-slate-500 uppercase">
@@ -415,60 +420,60 @@ export default function PriceListAnalysis() {
             </div>
 
             <div className="p-6 space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full mb-10">
-                  <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 flex items-center gap-4">
-                    <div className="p-3 bg-white rounded-xl shadow-sm">
-                      <Building2 className="w-5 h-5 text-[#3399cc]" />
-                    </div>
-                    <div>
-                      <p className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">
-                        Client Name
-                      </p>
-                      <p className="text-sm font-semibold text-slate-700">
-                        {activeClient?.company_name || "N/A"}
-                      </p>
-                    </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full mb-10">
+                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 flex items-center gap-4">
+                  <div className="p-3 bg-white rounded-xl shadow-sm">
+                    <Building2 className="w-5 h-5 text-[#3399cc]" />
                   </div>
-                  <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 flex items-center gap-4">
-                    <div className="p-3 bg-white rounded-xl shadow-sm">
-                      <FileSearch className="w-5 h-5 text-emerald-600" />
-                    </div>
-                    <div>
-                      <p className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">
-                        Contract Number
-                      </p>
-                      <p className="text-sm font-semibold text-slate-700">
-                        {activeClient?.contract_number || "No Contract"}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 flex items-center gap-4">
-                    <div className="p-3 bg-white rounded-xl shadow-sm">
-                      <FileText className="w-5 h-5 text-indigo-600" />
-                    </div>
-                    <div>
-                      <p className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">
-                        File Name
-                      </p>
-                      <p className="text-sm font-semibold text-slate-700 max-w-70">
-                        {uploadedFileName}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 flex items-center gap-4">
-                    <div className="p-3 bg-white rounded-xl shadow-sm">
-                      <Hash className="w-5 h-5 text-orange-600" />
-                    </div>
-                    <div>
-                      <p className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">
-                        Total Rows
-                      </p>
-                      <p className="text-sm font-semibold text-slate-700">
-                        {totalRows.toLocaleString()}
-                      </p>
-                    </div>
+                  <div>
+                    <p className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">
+                      Client Name
+                    </p>
+                    <p className="text-sm font-semibold text-slate-700">
+                      {activeClient?.company_name || "N/A"}
+                    </p>
                   </div>
                 </div>
+                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 flex items-center gap-4">
+                  <div className="p-3 bg-white rounded-xl shadow-sm">
+                    <FileSearch className="w-5 h-5 text-emerald-600" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">
+                      Contract Number
+                    </p>
+                    <p className="text-sm font-semibold text-slate-700">
+                      {activeClient?.contract_number || "No Contract"}
+                    </p>
+                  </div>
+                </div>
+                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 flex items-center gap-4">
+                  <div className="p-3 bg-white rounded-xl shadow-sm">
+                    <FileText className="w-5 h-5 text-indigo-600" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">
+                      File Name
+                    </p>
+                    <p className="text-sm font-semibold text-slate-700 max-w-70">
+                      {uploadedFileName}
+                    </p>
+                  </div>
+                </div>
+                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 flex items-center gap-4">
+                  <div className="p-3 bg-white rounded-xl shadow-sm">
+                    <Hash className="w-5 h-5 text-orange-600" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">
+                      Total Rows
+                    </p>
+                    <p className="text-sm font-semibold text-slate-700">
+                      {totalRows.toLocaleString()}
+                    </p>
+                  </div>
+                </div>
+              </div>
 
               {error && (
                 <div className="p-4 bg-red-50 text-red-700 rounded-xl flex items-center gap-2">
@@ -488,22 +493,21 @@ export default function PriceListAnalysis() {
                 >
                   <ChevronLeft className="w-4 h-4" /> Back
                 </button>
-                  <button
-                    onClick={handleRunAnalysis}
-                    disabled={isAnalyzing}
-                    className="btn-primary"
-                  >
-                    {isAnalyzing ? (
-                      <>
-                        <Loader2 className="w-5 h-5 animate-spin" />{" "}
-                        Analyzing...
-                      </>
-                    ) : (
-                      <>
-                        <Play className="w-4 h-4 fill-current" /> Run Analysis
-                      </>
-                    )}
-                  </button>
+                <button
+                  onClick={handleRunAnalysis}
+                  disabled={isAnalyzing}
+                  className="btn-primary"
+                >
+                  {isAnalyzing ? (
+                    <>
+                      <Loader2 className="w-5 h-5 animate-spin" /> Analyzing...
+                    </>
+                  ) : (
+                    <>
+                      <Play className="w-4 h-4 fill-current" /> Run Analysis
+                    </>
+                  )}
+                </button>
               </div>
             </div>
           </div>
