@@ -1,50 +1,45 @@
 import React, { useEffect, useState } from "react";
 import {
   Users,
-  ShieldCheck,
   CheckCircle2,
   XCircle,
+  UserPlus,
   Building2,
   ChevronRight,
-  UserCheck,
+  FileSearch,
+  Clock,
+  TrendingUp,
+  FileText,
+  TrendingDown,
+  FileEdit,
   Loader2,
+  UserCheck,
+  Upload,
+  File,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import api from "@/src/lib/axios";
+import {
+  normalizeStatus,
+  STATUS_BADGE_BASE,
+  STATUS_MAP,
+} from "@/src/utils/statusUtils";
 
-interface User {
-  user_id: number;
-  name: string;
-  email: string;
-  phone_no: string | null;
-  is_active: boolean;
-  is_deleted: boolean;
-  role: string;
-  created_time: string;
-}
-
-interface Client {
-  client_id: number;
-  company_name: string;
-  company_email: string;
-  contact_officer_name: string;
-  status: string;
-  created_time: string;
-  updated_time: string;
-}
-
-export default function AdminDashboard() {
+export default function UnifiedAdminDashboard() {
   const navigate = useNavigate();
   const { user } = useAuth();
 
-  const [users, setUsers] = useState<User[]>([]);
-  const [clients, setClients] = useState<Client[]>([]);
+  const [usersList, setUsersList] = useState([]);
+  const [clients, setClients] = useState([]);
+  const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [adminTab, setAdminTab] = useState<"users" | "clients">("users");
 
   const colors = {
     bg: "#f5f7f9",
     fg: "#1b2531",
+    primary: "#24548f",
     muted: "#627383",
     border: "#d9e0e8",
     success: "#33b17d",
@@ -59,85 +54,98 @@ export default function AdminDashboard() {
 
   const fetchData = async () => {
     try {
-      const [usersResponse, clientsResponse] = await Promise.all([
-        api.get(`/users/all`),
-        api.get(`/clients`),
+      setLoading(true);
+      const [usersRes, clientsRes, jobsRes] = await Promise.all([
+        api.get("/users/all"),
+        api.get("/clients"),
+        api.get("/jobs"),
       ]);
 
-      setUsers(usersResponse.data);
-      setClients(clientsResponse.data);
+      setUsersList(Array.isArray(usersRes.data) ? usersRes.data : []);
+      setClients(Array.isArray(clientsRes.data) ? clientsRes.data : []);
+      setJobs(Array.isArray(jobsRes.data) ? jobsRes.data : []);
     } catch (error) {
-      console.error("Error fetching data:", error);
+      console.error("Error fetching dashboard data:", error);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleUserAction = async (userId: number, action: "approve" | "reject") => {
-    try {
-      await api.patch(
-        `/users/${userId}/approve?action=${action}`
-      );
-      fetchData();
-    } catch (error) {
-      console.error(`Error ${action}ing user:`, error);
-    }
-  };
+  const pendingUsers = usersList
+    .filter((u) => !u.is_active && !u.is_deleted)
+    .slice(0, 2);
+  const pendingClients = clients
+    .filter((c) => c.status === "pending")
+    .slice(0, 2);
 
-  const handleClientAction = async (clientId: number, action: "approve" | "reject") => {
-    try {
-      await api.patch(
-        `/clients/${clientId}/approve?action=${action}`
-      );
-      fetchData();
-    } catch (error) {
-      console.error(`Error ${action}ing client:`, error);
-    }
-  };
-
-  const totalUsers = users.filter(u => !u.is_deleted);
-  const pendingUsers = users.filter(u => !u.is_active && !u.is_deleted);
-  const pendingClients = clients.filter(c => c.status === "pending");
-  const activeUsers = users.filter(u => u.is_active && !u.is_deleted);
-  const approvedClients = clients.filter(c => c.status === "approved");
-
-  const displayUsers = pendingUsers.slice(0, 5);
-  const displayClients = pendingClients.slice(0, 5);
+  const pendingJobs = jobs.filter((job) => job.status === "pending").length;
+  const completedJobs = jobs.filter((job) => job.status === "approved").length;
 
   const stats = [
     {
-      label: "Total Users",
-      value: totalUsers.length.toString(),
-      icon: Users,
+      label: "User Requests",
+      value: usersList
+        .filter((u) => !u.is_active && !u.is_deleted)
+        .length.toString(),
+      icon: UserPlus,
     },
     {
-      label: "Client Approvals",
-      value: pendingClients.length.toString(),
+      label: "Client Reviews",
+      value: clients.filter((c) => c.status === "pending").length.toString(),
       icon: Building2,
     },
     {
-      label: "Active Users",
-      value: activeUsers.length.toString(),
-      icon:UserCheck,
+      label: "Pending Analyses",
+      value: pendingJobs.toString(),
+      icon: Clock,
     },
     {
-      label: "Verified Clients",
-      value: approvedClients.length.toString(),
-      icon: ShieldCheck,
+      label: "Active Clients",
+      value: clients.filter((c) => c.status === "approved").length.toString(),
+      icon: CheckCircle2,
     },
   ];
 
-  const getTimeAgo = (dateString: string) => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+  const recentAnalyses = jobs
+    .sort(
+      (a, b) =>
+        new Date(b.created_time).getTime() - new Date(a.created_time).getTime(),
+    )
+    .slice(0, 5)
+    .map((job) => {
+      const addActions =
+        job.modifications_actions?.filter(
+          (a) => a.action_type === "NEW_PRODUCT",
+        ).length || 0;
+      const delActions =
+        job.modifications_actions?.filter(
+          (a) => a.action_type === "REMOVED_PRODUCT",
+        ).length || 0;
+      const priceIncrActions =
+        job.modifications_actions?.filter(
+          (a) => a.action_type === "PRICE_INCREASE",
+        ).length || 0;
+      const priceDecrActions =
+        job.modifications_actions?.filter(
+          (a) => a.action_type === "PRICE_DECREASE",
+        ).length || 0;
+      const DescChanges =
+        job.modifications_actions?.filter(
+          (a) => a.action_type === "DESCRIPTION_CHANGE",
+        ).length || 0;
 
-    if (seconds < 60) return "Just now";
-    if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
-    if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
-    if (seconds < 604800) return `${Math.floor(seconds / 86400)}d ago`;
-    return date.toLocaleDateString();
-  };
+      return {
+        id: job.job_id,
+        client: job.client,
+        contract: job.contract_number,
+        status: job.status,
+        add: addActions,
+        del: delActions,
+        incr: priceIncrActions,
+        decr: priceDecrActions,
+        desc: DescChanges,
+      };
+    });
 
   if (loading) {
     return (
@@ -160,12 +168,19 @@ export default function AdminDashboard() {
             className="text-3xl font-extrabold tracking-tight"
             style={{ color: colors.fg }}
           >
-            Welcome, {user?.name?.split(" ")[0] || "Admin"}
+            Welcome, {user?.name?.split(" ")[0] || "Guest"}
           </h1>
           <p className="font-medium" style={{ color: colors.muted }}>
-            Reviewing pending user access and client profile verifications.
+            Overview of platform users and recent analyses.
           </p>
         </div>
+        <button
+          onClick={() => navigate("/pricelist-analysis")}
+          className="btn-primary"
+        >
+          <FileSearch className="w-4 h-4" />
+          New Analysis
+        </button>
       </div>
 
       {/* Stats Grid */}
@@ -173,7 +188,7 @@ export default function AdminDashboard() {
         {stats.map((stat) => (
           <div
             key={stat.label}
-            className="bg-white p-6 flex flex-col justify-between rounded-2xl transition-all hover:shadow-lg shadow-sm"
+            className="bg-white p-6 flex flex-col justify-between rounded-2xl transition-all hover:shadow-lg "
           >
             <div className="flex justify-between items-start">
               <span
@@ -204,170 +219,347 @@ export default function AdminDashboard() {
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
-        {/* User Requests Column */}
-        <div className="bg-white p-8 rounded-2xl animate-slide-up shadow-sm">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+        {/* Left:  Analysis History */}
+        <div className="lg:col-span-2 bg-white p-8 rounded-2xl animate-slide-up shadow-sm ">
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h2 className="text-xl font-extrabold" style={{ color: colors.fg }}>
-                User Access Requests
+              <h2
+                className="text-xl font-extrabold"
+                style={{ color: colors.fg }}
+              >
+                Recent Analyses
               </h2>
-              <p className="text-sm font-medium" style={{ color: colors.muted }}>
-                Account registration approvals
+              <p
+                className="text-sm font-medium"
+                style={{ color: colors.muted }}
+              >
+                Latest price modifications tracked
               </p>
             </div>
-            <span className="bg-blue-50 text-[#24548f] text-[10px] font-black px-2 py-1 rounded">
-              {pendingUsers.length} PENDING
-            </span>
+            <button
+              onClick={() => navigate("/analyses")}
+              className="text-sm font-bold transition-colors"
+              style={{ color: colors.muted }}
+            >
+              View all
+            </button>
           </div>
 
           <div className="space-y-3">
-            {displayUsers.length === 0 ? (
-              <div className="text-center py-8">
-                <p className="font-medium" style={{ color: colors.muted }}>
-                  No pending user requests
-                </p>
-              </div>
-            ) : (
-              <>
-                {displayUsers.map((item) => (
-                  <div
-                    key={item.user_id}
-                    className="group flex items-center gap-4 p-4 rounded-2xl border border-transparent hover:shadow-sm transition-all"
-                    style={{ backgroundColor: `${colors.bg}80` }}
-                  >
-                    <div
-                      className="w-12 h-12 rounded-xl bg-white border flex items-center justify-center shrink-0 shadow-sm"
-                      style={{ borderColor: colors.border }}
-                    >
-                      <UserCheck className="w-5 h-5 text-[#24548f]" />
-                    </div>
+            {recentAnalyses.map((item) => {
+              const slug = normalizeStatus(item.status);
+              const config = slug === "unknown" ? null : STATUS_MAP[slug];
 
-                    <div className="flex-1 min-w-0">
-                      <h4 className="font-bold truncate" style={{ color: colors.fg }}>
-                        {item.name}
-                      </h4>
-                      <p className="text-xs font-bold" style={{ color: colors.muted }}>
-                        {item.role} • {getTimeAgo(item.created_time)}
+              return (
+                <div
+                  key={item.id}
+                  onClick={() => navigate(`/analyses/${item.id}`)}
+                  className="group flex items-center gap-4 p-4 rounded-2xl border border-transparent hover:shadow-sm transition-all cursor-pointer"
+                  style={{ backgroundColor: `${colors.bg}80` }}
+                >
+                  <div
+                    className="w-12 h-12 rounded-xl bg-white border flex items-center justify-center shrink-0 shadow-sm group-hover:scale-105 transition-transform"
+                    style={{ borderColor: colors.border }}
+                  >
+                    <FileText
+                      className="w-5 h-5"
+                      style={{ color: colors.primary }}
+                    />
+                  </div>
+
+                  <div className="flex-1 min-w-0">
+                    <h4
+                      className="font-bold truncate"
+                      style={{ color: colors.fg }}
+                    >
+                      {item.client}
+                    </h4>
+                    <p
+                      className="text-xs font-bold"
+                      style={{ color: colors.muted }}
+                    >
+                      {item.contract}
+                    </p>
+                  </div>
+
+                  <div className="hidden sm:flex items-center gap-6 px-4">
+                    <div className="text-center">
+                      <p
+                        className="text-[9px] font-black uppercase"
+                        style={{ color: colors.muted }}
+                      >
+                        Add
+                      </p>
+                      <p
+                        className="text-sm font-black"
+                        style={{ color: colors.success }}
+                      >
+                        +{item.add}
                       </p>
                     </div>
 
-                    <div className="flex items-center gap-2">
-                      <button 
-                        className="p-2 rounded-xl hover:bg-red-50 transition-colors" 
+                    <div className="text-center">
+                      <p
+                        className="text-[9px] font-black uppercase"
+                        style={{ color: colors.muted }}
+                      >
+                        Del
+                      </p>
+                      <p
+                        className="text-sm font-black"
                         style={{ color: colors.destructive }}
-                        onClick={() => handleUserAction(item.user_id, "reject")}
                       >
-                        <XCircle className="w-6 h-6" />
-                      </button>
-                      <button 
-                        className="p-2 rounded-xl hover:bg-green-50 transition-colors" 
-                        style={{ color: colors.success }}
-                        onClick={() => handleUserAction(item.user_id, "approve")}
+                        -{item.del}
+                      </p>
+                    </div>
+
+                    <div className="text-center">
+                      <p
+                        className="text-[9px] font-black uppercase"
+                        style={{ color: colors.muted }}
                       >
-                        <CheckCircle2 className="w-6 h-6" />
-                      </button>
+                        Incr
+                      </p>
+                      <p className="flex items-center gap-1 text-amber-600 text-sm font-bold">
+                        <TrendingUp className="w-3 h-3" />
+                        {item.incr}
+                      </p>
+                    </div>
+
+                    <div className="text-center">
+                      <p
+                        className="text-[9px] font-black uppercase"
+                        style={{ color: colors.muted }}
+                      >
+                        Decr
+                      </p>
+                      <p className="flex items-center gap-1 text-blue-600 text-sm font-bold">
+                        <TrendingDown className="w-3 h-3" />
+                        {item.decr}
+                      </p>
+                    </div>
+
+                    <div className="text-center">
+                      <p
+                        className="text-[9px] font-black uppercase"
+                        style={{ color: colors.muted }}
+                      >
+                        Desc
+                      </p>
+                      <p className="flex items-center gap-1 text-indigo-600 text-sm font-bold">
+                        <FileEdit className="w-3 h-3" />
+                        {item.desc}
+                      </p>
                     </div>
                   </div>
-                ))}
-                {pendingUsers.length > 5 && (
-                  <button
-                    onClick={() => navigate("/user-activation")}
-                    className="w-full mt-4 py-3 px-4 rounded-xl font-bold text-sm transition-all hover:shadow-md flex items-center justify-center gap-2"
-                    style={{ 
-                      backgroundColor: colors.secondaryBg,
-                      color: colors.fg 
-                    }}
-                  >
-                    View All Users
-                    <ChevronRight className="w-4 h-4" />
-                  </button>
-                )}
-              </>
+
+                  {/* Status */}
+                  <div className="flex items-center gap-3">
+                    <span
+                      className={`${STATUS_BADGE_BASE} ${
+                        config
+                          ? config.styles
+                          : "bg-slate-100 text-slate-700 border-slate-200"
+                      }`}
+                    >
+                      {config && (
+                        <config.icon className="w-3 h-3 stroke-[2.5px]" />
+                      )}
+                      <span>{config ? config.label : "Unknown"}</span>
+                    </span>
+
+                    <ChevronRight
+                      className="w-4 h-4"
+                      style={{ color: colors.border }}
+                    />
+                  </div>
+                </div>
+              );
+            })}
+            {recentAnalyses.length === 0 && (
+              <p className="text-center py-8" style={{ color: colors.muted }}>
+                No analyses found
+              </p>
             )}
           </div>
         </div>
 
-        {/* Client Requests Column */}
-        <div className="bg-white p-8 rounded-2xl animate-slide-up shadow-sm">
-          <div className="flex items-center justify-between mb-8">
-            <div>
-              <h2 className="text-xl font-extrabold" style={{ color: colors.fg }}>
-                Client Profile Reviews
-              </h2>
-              <p className="text-sm font-medium" style={{ color: colors.muted }}>
-                Company profile approvals
-              </p>
+        {/* Right: Administrative Sidebar and quick actions */}
+        <div className="space-y-8">
+          <div
+            className="rounded-4xl p-8 shadow-xl text-white"
+            style={{ backgroundColor: colors.primary }}
+          >
+            <h2 className="text-xl font-bold mb-1">Quick Actions</h2>
+            <p className="text-xs font-medium mb-6 opacity-70">
+              Perform common tasks
+            </p>
+
+            <div className="space-y-3">
+              {[
+                { label: "Add Client", icon: Building2, to: "/clients" },
+                { label: "Manage Contracts", icon: File, to: "/contracts" },
+                {
+                  label: "Upload Product Catalog",
+                  icon: Upload,
+                  to: "/gsa-products/upload",
+                },
+              ].map((action) => (
+                <button
+                  key={action.label}
+                  onClick={() => navigate(action.to)}
+                  className="w-full flex items-center gap-3 p-4 rounded-xl transition-all group font-bold text-sm text-left border border-white/10 bg-white/10 hover:bg-white hover:text-slate-900"
+                >
+                  <div className="p-1.5 rounded-lg bg-white/10">
+                    <action.icon className="w-4 h-4" />
+                  </div>
+                  {action.label}
+                </button>
+              ))}
             </div>
-            <span className="bg-green-50 text-green-700 text-[10px] font-black px-2 py-1 rounded">
-              {pendingClients.length} PENDING
-            </span>
           </div>
+          {/* User Requests Queue */}
 
-          <div className="space-y-3">
-            {displayClients.length === 0 ? (
-              <div className="text-center py-8">
-                <p className="font-medium" style={{ color: colors.muted }}>
-                  No pending client requests
-                </p>
-              </div>
-            ) : (
-              <>
-                {displayClients.map((item) => (
-                  <div
-                    key={item.client_id}
-                    className="group flex items-center gap-4 p-4 rounded-2xl border border-transparent hover:shadow-sm transition-all"
-                    style={{ backgroundColor: `${colors.bg}80` }}
-                  >
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+            {/* Tab Headers */}
+            <div className="flex border-b border-slate-50">
+              <button
+                onClick={() => setAdminTab("users")}
+                className={`flex-1 py-4 text-[10px] font-black uppercase tracking-widest transition-all relative ${
+                  adminTab === "users"
+                    ? "text-[#24548f]"
+                    : "text-slate-400 hover:text-slate-600"
+                }`}
+              >
+                User Approvals
+                {pendingUsers.length > 0 && (
+                  <span className="ml-2 bg-blue-50 text-[#24548f] px-1.5 py-0.5 rounded-md text-[9px]">
+                    {pendingUsers.length}
+                  </span>
+                )}
+                {adminTab === "users" && (
+                  <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#24548f]" />
+                )}
+              </button>
+              <button
+                onClick={() => setAdminTab("clients")}
+                className={`flex-1 py-4 text-[10px] font-black uppercase tracking-widest transition-all relative ${
+                  adminTab === "clients"
+                    ? "text-emerald-600"
+                    : "text-slate-400 hover:text-slate-600"
+                }`}
+              >
+                Client Reviews
+                {pendingClients.length > 0 && (
+                  <span className="ml-2 bg-emerald-50 text-emerald-600 px-1.5 py-0.5 rounded-md text-[9px]">
+                    {pendingClients.length}
+                  </span>
+                )}
+                {adminTab === "clients" && (
+                  <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-emerald-600" />
+                )}
+              </button>
+            </div>
+
+            {/* Tab Content */}
+            <div className="p-6">
+              {adminTab === "users" ? (
+                <div className="space-y-4 animate-fade-in">
+                  {pendingUsers.map((item) => (
                     <div
-                      className="w-12 h-12 rounded-xl bg-white border flex items-center justify-center shrink-0 shadow-sm"
-                      style={{ borderColor: colors.border }}
+                      key={item.user_id}
+                      className="flex items-center justify-between group"
                     >
-                      <Building2 className="w-5 h-5" style={{ color: colors.success }} />
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-[10px] font-bold text-slate-500">
+                          {item.name.charAt(0)}
+                        </div>
+                        <div>
+                          <p className="text-xs font-bold text-slate-800">
+                            {item.name}
+                          </p>
+                          <p className="text-[10px] text-slate-400">
+                            {new Date(item.created_time).toLocaleDateString()}
+                          </p>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => navigate("/user-activation")}
+                        className="p-1.5 hover:bg-blue-50 rounded-lg transition-colors text-[#24548f]"
+                      >
+                        <ChevronRight className="w-4 h-4" />
+                      </button>
                     </div>
-
-                    <div className="flex-1 min-w-0">
-                      <h4 className="font-bold truncate" style={{ color: colors.fg }}>
-                        {item.company_name}
-                      </h4>
-                      <p className="text-xs font-bold" style={{ color: colors.muted }}>
-                        {item.contact_officer_name} • {getTimeAgo(item.created_time)}
+                  ))}
+                  {pendingUsers.length === 0 && (
+                    <div className="flex flex-col items-center justify-center py-10 text-center">
+                      <div className="w-10 h-10 bg-slate-50 rounded-full flex items-center justify-center mb-2">
+                        <UserCheck className="w-5 h-5 text-slate-300" />
+                      </div>
+                      <p className="text-[11px] text-slate-400 italic">
+                        No pending user requests
                       </p>
                     </div>
-
-                    <div className="flex items-center gap-2">
-                      <button 
-                        className="p-2 rounded-xl hover:bg-red-50 transition-colors" 
-                        style={{ color: colors.destructive }}
-                        onClick={() => handleClientAction(item.client_id, "reject")}
+                  )}
+                </div>
+              ) : (
+                <div className="space-y-4 animate-fade-in">
+                  {pendingClients.map((item) => (
+                    <div
+                      key={item.client_id}
+                      className="flex items-center justify-between group"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-600">
+                          <Building2 className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <p className="text-xs font-bold text-slate-800">
+                            {item.company_name}
+                          </p>
+                          <p className="text-[10px] text-slate-400">
+                            Review Required
+                          </p>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => navigate("/client-activation")}
+                        className="p-1.5 hover:bg-emerald-50 rounded-lg transition-colors text-emerald-600"
                       >
-                        <XCircle className="w-6 h-6" />
-                      </button>
-                      <button 
-                        className="p-2 rounded-xl hover:bg-green-50 transition-colors" 
-                        style={{ color: colors.success }}
-                        onClick={() => handleClientAction(item.client_id, "approve")}
-                      >
-                        <CheckCircle2 className="w-6 h-6" />
+                        <ChevronRight className="w-4 h-4" />
                       </button>
                     </div>
-                  </div>
-                ))}
-                {pendingClients.length > 5 && (
-                  <button
-                    onClick={() => navigate("/client-activation")}
-                    className="w-full mt-4 py-3 px-4 rounded-xl font-bold text-sm transition-all hover:shadow-md flex items-center justify-center gap-2"
-                    style={{ 
-                      backgroundColor: colors.secondaryBg,
-                      color: colors.fg 
-                    }}
-                  >
-                    View All Clients
-                    <ChevronRight className="w-4 h-4" />
-                  </button>
-                )}
-              </>
-            )}
+                  ))}
+                  {pendingClients.length === 0 && (
+                    <div className="flex flex-col items-center justify-center py-10 text-center">
+                      <div className="w-10 h-10 bg-slate-50 rounded-full flex items-center justify-center mb-2">
+                        <Building2 className="w-5 h-5 text-slate-300" />
+                      </div>
+                      <p className="text-[11px] text-slate-400 italic">
+                        No pending client reviews
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Footer Action */}
+            <div className="px-6 py-2.5 bg-slate-50/50 border-t border-slate-100">
+              <button
+                onClick={() =>
+                  navigate(
+                    adminTab === "users"
+                      ? "/user-activation"
+                      : "/client-activation",
+                  )
+                }
+                className="w-full text-center text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-[#24548f] transition-colors"
+              >
+                View All
+              </button>
+            </div>
           </div>
         </div>
       </div>

@@ -4,6 +4,7 @@ import { signIn } from "aws-amplify/auth";
 import { Mail, Lock, Eye, EyeOff, Loader2 } from "lucide-react";
 import AuthLayout from "../../components/auth/AuthLayout";
 import { useAuth } from "../../context/AuthContext";
+import { validateEmail, validateRequired } from "@/src/utils/validators";
 
 interface FormErrors {
   email?: string;
@@ -23,19 +24,22 @@ const Login: React.FC = () => {
   const isAuthProcessed = useRef(false);
 
   const validate = (): boolean => {
-    const newErrors: FormErrors = {};
+  const newErrors: FormErrors = {};
 
-    if (!email.trim()) {
-      newErrors.email = "Email is required";
-    }
+  const emailError = validateEmail(email);
+  if (emailError) {
+    newErrors.email = emailError;
+  }
 
-    if (!password.trim()) {
-      newErrors.password = "Password is required";
-    }
+  const passwordError = validateRequired(password, "Password");
+  if (passwordError) {
+    newErrors.password = passwordError;
+  }
 
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
+  setErrors(newErrors);
+  return Object.keys(newErrors).length === 0;
+};
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

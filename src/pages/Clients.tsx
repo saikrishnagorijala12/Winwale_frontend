@@ -7,7 +7,7 @@ import {
   ClientFormErrors,
   EditingClient,
 } from "../types/client.types";
-import { validateStep1, validateStep2 } from "../utils/validationUtils";
+import { validateStep1, validateStep2 } from "../utils/clientValidations";
 import {
   normalizeClientFromAPI,
   createClientFromResponse,

@@ -4,6 +4,7 @@ import { resetPassword, confirmResetPassword } from "aws-amplify/auth";
 import { Mail, Lock, Loader2, ArrowRight, ArrowLeft } from "lucide-react";
 import AuthLayout from "../../components/auth/AuthLayout";
 import { passwordRules } from "../../utils/passwordRules";
+import { validateEmail } from "@/src/utils/validators";
 
 interface FormErrors {
   email?: string;
@@ -29,7 +30,10 @@ const ForgotPassword: React.FC = () => {
 
   const validateRequest = () => {
     const newErrors: FormErrors = {};
-    if (!email.trim()) newErrors.email = "Email is required";
+    const emailError = validateEmail(email);
+    if (emailError) {
+      newErrors.email = emailError;
+    }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };

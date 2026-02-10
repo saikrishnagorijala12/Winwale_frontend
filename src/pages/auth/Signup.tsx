@@ -12,6 +12,8 @@ import {
   Eye,
 } from "lucide-react";
 import AuthLayout from "../../components/auth/AuthLayout";
+import { validateSignupForm } from "@/src/utils/authValidators";
+import { passwordRules } from "@/src/utils/passwordRules";
 
 type FormErrors = {
   fullName?: string;
@@ -21,29 +23,6 @@ type FormErrors = {
 };
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-const passwordRules = {
-  length: {
-    test: (p: string) => p.length >= 8,
-    label: "At least 8 characters",
-  },
-  lowercase: {
-    test: (p: string) => /[a-z]/.test(p),
-    label: "At least 1 lowercase letter",
-  },
-  uppercase: {
-    test: (p: string) => /[A-Z]/.test(p),
-    label: "At least 1 uppercase letter",
-  },
-  number: {
-    test: (p: string) => /\d/.test(p),
-    label: "At least 1 number",
-  },
-  special: {
-    test: (p: string) => /[^A-Za-z0-9]/.test(p),
-    label: "At least 1 special character",
-  },
-};
 
 const PasswordChecklist: React.FC<{ password: string }> = ({ password }) => {
   return (
@@ -95,50 +74,19 @@ const Signup: React.FC = () => {
     setErrors((prev) => ({ ...prev, [field]: undefined }));
   };
 
-  const validateForm = () => {
-    const newErrors: FormErrors = {};
-
-    if (!formData.fullName.trim()) {
-      newErrors.fullName = "Full name is required";
-    } else if (formData.fullName.length < 3) {
-      newErrors.fullName = "Full name must be at least 3 characters";
-    } else if (formData.fullName.length > 30) {
-      newErrors.fullName = "Full name must be under 30 characters";
-    }
-
-    if (!formData.email.trim()) {
-      newErrors.email = "Email is required";
-    } else if (!emailRegex.test(formData.email)) {
-      newErrors.email = "Invalid email address";
-    } else if (formData.email.length > 50) {
-      newErrors.email = "Email must be under 50 characters";
-    }
-
-    const failedRule = Object.values(passwordRules).find(
-      (rule) => !rule.test(formData.password),
-    );
-    if (!formData.password) {
-      newErrors.password = "Password is required";
-    } else if (failedRule) {
-      newErrors.password = "Password does not meet requirements";
-    }
-
-    if (!formData.confirmPassword) {
-      newErrors.confirmPassword = "Please confirm your password";
-    } else if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = "Passwords do not match";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
   const hasFailedRules = Object.values(passwordRules).some(
     (rule) => !rule.test(formData.password),
   );
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!validateForm()) return;
+
+    const { isValid, errors: validationErrors } = validateSignupForm(formData);
+
+    if (!isValid) {
+      setErrors(validationErrors);
+      return;
+    }
 
     setLoading(true);
     setError(null);

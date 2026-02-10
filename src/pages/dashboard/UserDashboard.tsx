@@ -243,7 +243,7 @@ export default function Dashboard() {
             Welcome, {user?.name?.split(" ")[0] || "Guest"}
           </h1>
           <p className="font-medium" style={{ color: colors.muted }}>
-            Overview of your current GSA contract performance.
+            Overview of clients and recent analyses.
           </p>
         </div>
         <button
@@ -465,14 +465,14 @@ export default function Dashboard() {
           >
             <h2 className="text-xl font-bold mb-1">Quick Actions</h2>
             <p className="text-xs font-medium mb-6 opacity-70">
-              Execute common tasks
+              Perform common tasks
             </p>
 
             <div className="space-y-3">
               {[
                 { label: "Add Client", icon: UserPlus, to: "/clients" },
                 {
-                  label: "Upload Products",
+                  label: "Upload Product Catalog",
                   icon: Upload,
                   to: "/gsa-products/upload",
                 },

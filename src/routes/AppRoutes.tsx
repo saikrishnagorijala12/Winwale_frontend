@@ -101,7 +101,7 @@ const AppRoutes: React.FC = () => {
               element={
                 <ProtectedRoute
                   isAuthenticated={isAuthenticated}
-                  allowedRoles={[ROLES.USER]}
+                  allowedRoles={[ROLES.USER, ROLES.ADMIN]}
                 />
               }
             >

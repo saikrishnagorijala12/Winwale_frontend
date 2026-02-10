@@ -6,6 +6,10 @@ import {
   FormErrors,
 } from "../../types/contract.types";
 import { contractService } from "../../services/contractService";
+import { validateStep1, validateStep2 } from "@/src/utils/contractValidations";
+
+const NAME_REGEX = /^[A-Za-z]+(?:[ .'-][A-Za-z]+)*$/;
+
 
 interface EditContractModalProps {
   isOpen: boolean;
@@ -66,102 +70,18 @@ export default function EditContractModal({
     }
   }, [isOpen, initialContract]);
 
-  const validateStep1 = (): boolean => {
-    const newErrors: FormErrors = {};
-
-    if (!formData.contract_number?.trim()) {
-      newErrors.contract_number = "Contract number is required";
-    } else if (formData.contract_number.length > 50) {
-      newErrors.contract_number = "Max 50 characters allowed";
-    }
-
-    if (formData.contract_officer_name?.length > 30) {
-      newErrors.contract_officer_name = "Max 30 characters allowed";
-    }
-
-    if (formData.contract_officer_address?.length > 50) {
-      newErrors.contract_officer_address = "Max 50 characters allowed";
-    }
-
-    if (formData.contract_officer_city?.length > 50) {
-      newErrors.contract_officer_city = "Max 50 characters allowed";
-    }
-
-    if (formData.contract_officer_state?.length > 50) {
-      newErrors.contract_officer_state = "Max 50 characters allowed";
-    }
-
-    if (
-      formData.contract_officer_zip &&
-      !/^[A-Za-z0-9]{1,7}$/.test(formData.contract_officer_zip)
-    ) {
-      newErrors.contract_officer_zip =
-        "ZIP must be alphanumeric and max 7 characters";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const validateStep2 = (): boolean => {
-    const newErrors: FormErrors = {};
-
-    if (formData.origin_country?.length > 50) {
-      newErrors.origin_country = "Max 50 characters allowed";
-    }
-
-    if (
-      formData.gsa_proposed_discount < 0 ||
-      formData.gsa_proposed_discount > 100.0
-    ) {
-      newErrors.gsa_proposed_discount = "Discount must be between 0 and 100.00";
-    }
-
-    if (formData.q_v_discount?.length > 50) {
-      newErrors.q_v_discount = "Max 50 characters allowed";
-    }
-
-    if (formData.additional_concessions?.length > 50) {
-      newErrors.additional_concessions = "Max 50 characters allowed";
-    }
-
-    if (
-      !Number.isInteger(formData.normal_delivery_time) ||
-      formData.normal_delivery_time < 0
-    ) {
-      newErrors.normal_delivery_time =
-        "Normal delivery time must be a positive number";
-    }
-
-    if (
-      !Number.isInteger(formData.expedited_delivery_time) ||
-      formData.expedited_delivery_time < 0
-    ) {
-      newErrors.expedited_delivery_time =
-        "Expedited delivery time must be a positive number";
-    }
-
-    if (!formData.fob_term) {
-      newErrors.fob_term = "FOB term is required";
-    }
-
-    if (!formData.energy_star_compliance) {
-      newErrors.energy_star_compliance = "Energy Star compliance is required";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
 
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (step === 1) {
-      if (validateStep1()) setStep(2);
-      return;
-    }
+      const validation = validateStep1(formData);
+      
+      setErrors(validation.errors);
 
-    if (!validateStep2()) {
+      if (validation.isValid) {
+        setStep(2);
+      }
       return;
     }
 

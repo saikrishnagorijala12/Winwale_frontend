@@ -41,7 +41,7 @@ export const CompanyFormStep: React.FC<CompanyFormStepProps> = ({
           aria-invalid={!!errors.company_name}
         />
         {errors.company_name && (
-          <p className="mt-1 text-xs text-red-600 font-medium">
+          <p className="mt-1 text-xs text-red-600">
             {errors.company_name}
           </p>
         )}
@@ -64,7 +64,7 @@ export const CompanyFormStep: React.FC<CompanyFormStepProps> = ({
           aria-invalid={!!errors.company_email}
         />
         {errors.company_email && (
-          <p className="mt-1 text-xs text-red-600 font-medium">
+          <p className="mt-1 text-xs text-red-600">
             {errors.company_email}
           </p>
         )}
@@ -87,7 +87,7 @@ export const CompanyFormStep: React.FC<CompanyFormStepProps> = ({
           aria-invalid={!!errors.company_phone_no}
         />
         {errors.company_phone_no && (
-          <p className="mt-1 text-xs text-red-600 font-medium">
+          <p className="mt-1 text-xs text-red-600">
             {errors.company_phone_no}
           </p>
         )}
@@ -110,7 +110,7 @@ export const CompanyFormStep: React.FC<CompanyFormStepProps> = ({
           aria-invalid={!!errors.company_address}
         />
         {errors.company_address && (
-          <p className="mt-1 text-xs text-red-600 font-medium">
+          <p className="mt-1 text-xs text-red-600">
             {errors.company_address}
           </p>
         )}
@@ -133,7 +133,7 @@ export const CompanyFormStep: React.FC<CompanyFormStepProps> = ({
           aria-invalid={!!errors.company_city}
         />
         {errors.company_city && (
-          <p className="mt-1 text-xs text-red-600 font-medium">
+          <p className="mt-1 text-xs text-red-600">
             {errors.company_city}
           </p>
         )}
@@ -156,7 +156,7 @@ export const CompanyFormStep: React.FC<CompanyFormStepProps> = ({
           aria-invalid={!!errors.company_state}
         />
         {errors.company_state && (
-          <p className="mt-1 text-xs text-red-600 font-medium">
+          <p className="mt-1 text-xs text-red-600">
             {errors.company_state}
           </p>
         )}
@@ -179,7 +179,7 @@ export const CompanyFormStep: React.FC<CompanyFormStepProps> = ({
           aria-invalid={!!errors.company_zip}
         />
         {errors.company_zip && (
-          <p className="mt-1 text-xs text-red-600 font-medium">
+          <p className="mt-1 text-xs text-red-600">
             {errors.company_zip}
           </p>
         )}

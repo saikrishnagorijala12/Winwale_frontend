@@ -8,13 +8,9 @@ import {
 interface ContactFormStepProps {
   formData: ClientFormData | EditingClient;
   onChange: (field: keyof ClientFormData, value: string) => void;
-  errors: Record<string, string>;
+  errors: ClientFormErrors;
   onClearError: (field: keyof ClientFormErrors) => void;
 }
-
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const PHONE_REGEX = /^\+?\d{1,15}$/;
-const ZIP_REGEX = /^[A-Za-z0-9]{1,7}$/;
 
 export const ContactFormStep: React.FC<ContactFormStepProps> = ({
   formData,
@@ -22,8 +18,9 @@ export const ContactFormStep: React.FC<ContactFormStepProps> = ({
   errors,
   onClearError,
 }) => {
-  const inputClass = () =>
-    "w-full px-4 py-3 rounded-xl border-2 transition-colors focus:outline-none border-slate-200 focus:border-[#38A1DB]";
+  const inputClass = (field: keyof ClientFormErrors) =>
+    `w-full mt-2 px-4 py-3 rounded-xl border-2 transition-colors focus:outline-none border-slate-200 focus:border-[#38A1DB]"
+    }`;
 
   return (
     <div className="grid md:grid-cols-2 gap-6">
@@ -34,20 +31,16 @@ export const ContactFormStep: React.FC<ContactFormStepProps> = ({
         </label>
         <input
           type="text"
-          className={inputClass()}
+          className={inputClass("contact_officer_name")}
           value={formData.contact_officer_name}
           onChange={(e) => {
-            const value = e.target.value;
-            onChange("contact_officer_name", value);
-
-            if (value.trim() && value.length <= 30) {
-              onClearError("contact_officer_name");
-            }
+            onChange("contact_officer_name", e.target.value);
+            onClearError("contact_officer_name");
           }}
           aria-invalid={!!errors.contact_officer_name}
         />
         {errors.contact_officer_name && (
-          <p className="mt-1 text-xs text-red-600 font-medium">
+          <p className="mt-1 text-xs text-red-600">
             {errors.contact_officer_name}
           </p>
         )}
@@ -60,20 +53,16 @@ export const ContactFormStep: React.FC<ContactFormStepProps> = ({
         </label>
         <input
           type="email"
-          className={inputClass()}
+          className={inputClass("contact_officer_email")}
           value={formData.contact_officer_email}
           onChange={(e) => {
-            const value = e.target.value;
-            onChange("contact_officer_email", value);
-
-            if (value.trim() && EMAIL_REGEX.test(value) && value.length <= 50) {
-              onClearError("contact_officer_email");
-            }
+            onChange("contact_officer_email", e.target.value);
+            onClearError("contact_officer_email");
           }}
           aria-invalid={!!errors.contact_officer_email}
         />
         {errors.contact_officer_email && (
-          <p className="mt-1 text-xs text-red-600 font-medium">
+          <p className="mt-1 text-xs text-red-600">
             {errors.contact_officer_email}
           </p>
         )}
@@ -86,64 +75,104 @@ export const ContactFormStep: React.FC<ContactFormStepProps> = ({
         </label>
         <input
           type="tel"
-          className={inputClass()}
+          className={inputClass("contact_officer_phone_no")}
           value={formData.contact_officer_phone_no}
           onChange={(e) => {
-            const value = e.target.value;
-            onChange("contact_officer_phone_no", value);
-
-            if (PHONE_REGEX.test(value)) {
-              onClearError("contact_officer_phone_no");
-            }
+            onChange("contact_officer_phone_no", e.target.value);
+            onClearError("contact_officer_phone_no");
           }}
           aria-invalid={!!errors.contact_officer_phone_no}
         />
         {errors.contact_officer_phone_no && (
-          <p className="mt-1 text-xs text-red-600 font-medium">
+          <p className="mt-1 text-xs text-red-600">
             {errors.contact_officer_phone_no}
           </p>
         )}
       </div>
 
-      {/* Optional fields */}
-      {[
-        ["Address", "contact_officer_address"],
-        ["City", "contact_officer_city"],
-        ["State", "contact_officer_state"],
-        ["ZIP", "contact_officer_zip"],
-      ].map(([label, field]) => (
-        <div
-          key={field}
-          className={field === "contact_officer_address" ? "md:col-span-2" : ""}
-        >
-          <label className="block text-sm font-bold text-slate-700 mb-2">
-            {label} <span className="text-slate-400">(optional)</span>
-          </label>
-          <input
-            type="text"
-            className="w-full px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] focus:outline-none transition-colors"
-            value={(formData as any)[field] || ""}
-            onChange={(e) => {
-              const value = e.target.value;
-              onChange(field as keyof ClientFormData, value);
+      {/* Address */}
+      <div className="md:col-span-2">
+        <label className="text-sm font-bold text-slate-700">
+          Address
+        </label>
+        <input
+          type="text"
+          className={inputClass("contact_officer_address")}
+          value={formData.contact_officer_address || ""}
+          onChange={(e) => {
+            onChange("contact_officer_address", e.target.value);
+            onClearError("contact_officer_address");
+          }}
+        />
+        {errors.contact_officer_address && (
+          <p className="mt-1 text-xs text-red-600">
+            {errors.contact_officer_address}
+          </p>
+        )}
+      </div>
 
-              if (
-                !value ||
-                (field === "contact_officer_zip"
-                  ? ZIP_REGEX.test(value)
-                  : value.length <= 50)
-              ) {
-                onClearError(field as keyof ClientFormErrors);
-              }
-            }}
-          />
-          {errors[field] && (
-            <p className="mt-1 text-xs text-red-600 font-medium">
-              {errors[field]}
-            </p>
-          )}
-        </div>
-      ))}
+      {/* City */}
+      <div>
+        <label className="text-sm font-bold text-slate-700">
+          City
+        </label>
+        <input
+          type="text"
+          className={inputClass("contact_officer_city")}
+          value={formData.contact_officer_city || ""}
+          onChange={(e) => {
+            onChange("contact_officer_city", e.target.value);
+            onClearError("contact_officer_city");
+          }}
+        />
+        {errors.contact_officer_city && (
+          <p className="mt-1 text-xs text-red-600">
+            {errors.contact_officer_city}
+          </p>
+        )}
+      </div>
+
+      {/* State */}
+      <div>
+        <label className="text-sm font-bold text-slate-700">
+          State
+        </label>
+        <input
+          type="text"
+          className={inputClass("contact_officer_state")}
+          value={formData.contact_officer_state || ""}
+          onChange={(e) => {
+            onChange("contact_officer_state", e.target.value);
+            onClearError("contact_officer_state");
+          }}
+        />
+        {errors.contact_officer_state && (
+          <p className="mt-1 text-xs text-red-600">
+            {errors.contact_officer_state}
+          </p>
+        )}
+      </div>
+
+      {/* ZIP */}
+      <div>
+        <label className="text-sm font-bold text-slate-700">
+          ZIP
+        </label>
+        <input
+          type="text"
+          className={inputClass("contact_officer_zip")}
+          value={formData.contact_officer_zip || ""}
+          onChange={(e) => {
+            onChange("contact_officer_zip", e.target.value);
+            onClearError("contact_officer_zip");
+          }}
+        />
+        {errors.contact_officer_zip && (
+          <p className="mt-1 text-xs text-red-600">
+            {errors.contact_officer_zip}
+          </p>
+        )}
+      </div>
     </div>
   );
 };
