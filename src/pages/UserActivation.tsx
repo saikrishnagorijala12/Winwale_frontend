@@ -373,7 +373,13 @@ const UserCard: React.FC<UserCardProps> = ({
         </div>
         <div className="flex items-center gap-2 text-sm text-slate-600">
           <Calendar className="w-4 h-4 text-slate-400 shrink-0" />
-          <span>{new Date(user.created_time).toLocaleDateString()}</span>
+          <span>
+            {new Date(user.created_time).toLocaleDateString("en-US", {
+              month: "short",
+              day: "2-digit",
+              year: "numeric",
+            })}
+          </span>
         </div>
       </div>
 
@@ -618,12 +624,14 @@ export default function UserActivation() {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-[#24578f]" />
-      </div>
-    );
-  }
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center">
+      <Loader2 className="w-10 h-10 animate-spin text-[#24578f]" />
+      <p className="mt-4 text-slate-500">Loading users ...</p>
+    </div>
+  );
+}
+
 
   return (
     <div className="min-h-screen bg-linear-to-br from-slate-50 via-blue-50/30 to-slate-100 p-4 sm:p-6 lg:p-10 space-y-6 sm:space-y-8 lg:space-y-10">
@@ -809,7 +817,7 @@ export default function UserActivation() {
                   Status
                 </th>
                 <th className="text-left px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                  Request Date
+                  Registered Date
                 </th>
                 <th className="text-right px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                   Actions
@@ -856,7 +864,11 @@ export default function UserActivation() {
                   <td className="px-4 py-5">
                     <div className="flex items-center gap-2 text-sm text-slate-400 font-medium">
                       <Calendar className="w-4 h-4" />
-                      {new Date(user.created_time).toLocaleDateString("en-US")}
+                      {new Date(user.created_time).toLocaleDateString("en-US", {
+                        month: "short",
+                        day: "2-digit",
+                        year: "numeric",
+                      })}
                     </div>
                   </td>
                   <td className="px-4 py-5">

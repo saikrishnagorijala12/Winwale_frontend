@@ -10,43 +10,8 @@ import {
   Inbox,
   Loader2,
 } from "lucide-react";
-import api from "../lib/axios";
-
-interface Product {
-  product_id: number;
-  client: string;
-
-  item_type: string;
-  item_name: string;
-  item_description?: string;
-
-  manufacturer: string;
-  manufacturer_part_number: string;
-  client_part_number?: string;
-
-  sin?: string;
-  commercial_list_price?: number;
-
-  country_of_origin?: string;
-  recycled_content_percent?: number;
-
-  uom?: string;
-  quantity_per_pack?: number;
-  quantity_unit_uom?: string;
-
-  nsn?: string;
-  upc?: string;
-  unspsc?: string;
-
-  hazmat?: boolean;
-  product_info_code?: string;
-
-  url_508?: string;
-  product_url?: string;
-
-  created_time: string;
-  updated_time: string;
-}
+import { Product } from "../types/product.types";
+import { productService } from "../services/productService";
 
 export default function ClientProducts() {
   const navigate = useNavigate();
@@ -68,8 +33,8 @@ export default function ClientProducts() {
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      const res = await api.get(`/products/client/${clientId}`);
-      setProducts(res.data);
+      const data = await productService.getProductsByClient(Number(clientId));
+      setProducts(data.items);
     } catch (err: any) {
       setError(err.response?.data?.detail || "Failed to load products");
     } finally {
@@ -105,7 +70,7 @@ export default function ClientProducts() {
     return (
       <div className="flex items-center justify-center min-h-screen bg-slate-50">
         <div className="flex flex-col items-center justify-center gap-3">
-          <Loader2 className="w-12 h-12 animate-spin text-[#24578f]" />
+          <Loader2 className="w-8 h-8 animate-spin text-[#24578f]" />
           <span className="text-slate-400 font-bold">Loading Products...</span>
         </div>
       </div>
@@ -127,7 +92,7 @@ export default function ClientProducts() {
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
             <div>
               <h1 className="text-3xl font-bold text-slate-900">
-                {products[0]?.client || "Client"} Products
+                {products[0]?.client_name || "Client"} Products
               </h1>
               <p className="text-slate-500">
                 Managing {products.length} catalog items
@@ -305,11 +270,10 @@ export default function ClientProducts() {
 
                         <button
                           onClick={() => setCurrentPage(page)}
-                          className={`inline-flex items-center justify-center min-w-10 h-10 px-3 rounded-xl text-sm font-bold transition-all active:scale-95 ${
-                            page === currentPage
-                              ? "bg-[#3399cc] text-white shadow-blue-200 "
-                              : "bg-transparent text-slate-600 hover:bg-slate-100 hover:text-slate-900"
-                          }`}
+                          className={`inline-flex items-center justify-center min-w-10 h-10 px-3 rounded-xl text-sm font-bold transition-all active:scale-95 ${page === currentPage
+                            ? "bg-[#3399cc] text-white shadow-blue-200 "
+                            : "bg-transparent text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                            }`}
                         >
                           {page}
                         </button>

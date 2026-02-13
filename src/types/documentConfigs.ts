@@ -14,7 +14,7 @@ export const documentConfigs: DocumentConfig[] = [
         behavior: "readonly",
         section: "Contract & Contact Info",
       },
-       {
+      {
         id: "companyName",
         label: "Company Name",
         type: "text",
@@ -99,7 +99,7 @@ export const documentConfigs: DocumentConfig[] = [
       },
 
       {
-        id: "sin",
+        id: "sin_additions",
         label: "SIN",
         type: "text",
         behavior: "editable",
@@ -289,19 +289,18 @@ export const documentConfigs: DocumentConfig[] = [
         type: "email",
         behavior: "readonly",
         section: "Contract & Contact Info",
-        validation: [{ type: "required", message: "Required" }],
       },
       {
         id: "consultantPhone",
         label: "Consultant Phone",
         type: "text",
-        behavior: "readonly",
+        behavior: "manual",
         section: "Contract & Contact Info",
         validation: [{ type: "required", message: "Required" }],
       },
 
       {
-        id: "sin",
+        id: "sin_deletions",
         label: "SIN",
         type: "text",
         behavior: "manual",
@@ -363,7 +362,7 @@ export const documentConfigs: DocumentConfig[] = [
       },
       {
         id: "contractorName",
-        label: "Contractor Name",
+        label: "Contracting Officer",
         type: "text",
         behavior: "readonly",
         section: "Contract & Contact Info",
@@ -414,24 +413,30 @@ export const documentConfigs: DocumentConfig[] = [
         type: "email",
         behavior: "readonly",
         section: "Contract & Contact Info",
-        validation: [{ type: "required", message: "Required" }],
       },
       {
         id: "consultantPhone",
         label: "Consultant Phone",
         type: "text",
-        behavior: "readonly",
+        behavior: "manual",
         section: "Contract & Contact Info",
         validation: [{ type: "required", message: "Required" }],
       },
 
       {
-        id: "sin",
+        id: "sin_price_increase",
         label: "SIN",
         type: "text",
         behavior: "manual",
         section: "Request Details",
         validation: [{ type: "required", message: "Required" }],
+      },
+      {
+        id: "priceIncreased",
+        label: "Number of Products Price Increased",
+        type: "number",
+        behavior: "readonly",
+        section: "Request Details",
       },
       {
         id: "requestedIncrease",
@@ -449,11 +454,19 @@ export const documentConfigs: DocumentConfig[] = [
         section: "Request Details",
         validation: [{ type: "required", message: "Required" }],
       },
+      {
+        id: "backgroundInfo",
+        label: "Background Information",
+        type: "textarea",
+        behavior: "manual",
+        section: "Request Details",
+        validation: [{ type: "required", message: "Required" }],
+      },
     ],
   },
 
   {
-    id: "decrease-decrease",
+    id: "price-decrease",
     name: "Price Decrease",
     description:
       "Economic Price Adjustment for price decreases based on index changes",
@@ -489,7 +502,7 @@ export const documentConfigs: DocumentConfig[] = [
       },
       {
         id: "contractorName",
-        label: "Contractor Name",
+        label: "Contracting Officer",
         type: "text",
         behavior: "readonly",
         section: "Contract & Contact Info",
@@ -540,24 +553,29 @@ export const documentConfigs: DocumentConfig[] = [
         type: "email",
         behavior: "readonly",
         section: "Contract & Contact Info",
-        validation: [{ type: "required", message: "Required" }],
       },
       {
         id: "consultantPhone",
         label: "Consultant Phone",
         type: "text",
-        behavior: "readonly",
+        behavior: "manual",
         section: "Contract & Contact Info",
         validation: [{ type: "required", message: "Required" }],
       },
-
       {
-        id: "sin",
+        id: "sin_price_decrease",
         label: "SIN",
         type: "text",
         behavior: "manual",
         section: "Request Details",
         validation: [{ type: "required", message: "Required" }],
+      },
+      {
+        id: "priceDecreased",
+        label: "Number of Products Price Decreased",
+        type: "number",
+        behavior: "readonly",
+        section: "Request Details",
       },
       {
         id: "requestedDecrease",
@@ -591,7 +609,7 @@ export const documentConfigs: DocumentConfig[] = [
         behavior: "readonly",
         section: "Contract & Contact Info",
       },
-       {
+      {
         id: "companyName",
         label: "Company Name",
         type: "text",
@@ -614,7 +632,7 @@ export const documentConfigs: DocumentConfig[] = [
       },
       {
         id: "contractorName",
-        label: "Contractor Name",
+        label: "Contracting Officer",
         type: "text",
         behavior: "readonly",
         section: "Contract & Contact Info",
@@ -665,23 +683,23 @@ export const documentConfigs: DocumentConfig[] = [
         type: "email",
         behavior: "readonly",
         section: "Contract & Contact Info",
-        validation: [{ type: "required", message: "Required" }],
       },
       {
         id: "consultantPhone",
         label: "Consultant Phone",
         type: "text",
-        behavior: "readonly",
+        behavior: "manual",
         section: "Contract & Contact Info",
         validation: [{ type: "required", message: "Required" }],
       },
 
       {
-        id: "sin",
+        id: "sin_description_change",
         label: "SIN",
         type: "text",
         behavior: "editable",
         section: "Request Details",
+        validation: [{ type: "required", message: "Required" }],
       },
       {
         id: "descriptionChanged",

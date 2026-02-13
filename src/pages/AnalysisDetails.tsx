@@ -96,7 +96,7 @@ export default function AnalysisDetails() {
   if (isFetchingJob) {
     return (
       <div className="py-120 text-center">
-        <Loader2 className="w-10 h-10 animate-spin mx-auto text-[#24578f]" />
+        <Loader2 className="w-8 h-8 animate-spin mx-auto text-[#24578f]" />
         <p className="mt-4 text-slate-500">Fetching modification details...</p>
       </div>
     );
@@ -496,11 +496,15 @@ export default function AnalysisDetails() {
       <div className="flex justify-between items-center pt-4">
         <button
           onClick={() => navigate(-1)}
-          className="px-6 py-3 rounded-xl border border-slate-200 bg-white text-slate-700 font-bold hover:bg-slate-50 transition-all shadow-sm"
+          className="flex items-center gap-2 px-5 py-3 rounded-xl font-medium text-sm bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 transition-colors"
         >
+          <ChevronLeft className="w-4 h-4" />
           Back
         </button>
-        <button className="btn-primary">
+        <button
+          onClick={() => navigate(`/documents?job_id=${jobId}`)}
+          className="btn-primary"
+        >
           Generate Documents <ArrowRight className="w-4 h-4" />
         </button>
       </div>

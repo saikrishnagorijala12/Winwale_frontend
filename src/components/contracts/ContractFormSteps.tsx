@@ -143,7 +143,7 @@ export function Step1({
       </div>
 
       <div>
-        <label className="text-sm font-bold text-slate-700">Officer Name</label>
+        <label className="text-sm font-bold text-slate-700">Contract Officer Name</label>
         <input
           type="text"
           className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] outline-none"
@@ -161,7 +161,7 @@ export function Step1({
 
       <div>
         <label className="text-sm font-bold text-slate-700">
-          Officer Address
+          GSA Office Address
         </label>
         <input
           type="text"
@@ -179,7 +179,7 @@ export function Step1({
       </div>
 
       <div>
-        <label className="text-sm font-bold text-slate-700">City</label>
+        <label className="text-sm font-bold text-slate-700">GSA Office City</label>
         <input
           type="text"
           className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] outline-none"

@@ -9,6 +9,7 @@ import {
 import { getDocumentConfig } from "../types/documentConfigs";
 import api from "../lib/axios";
 import { useAuth } from "./AuthContext";
+import * as validators from "../utils/validators";
 
 const fetchJobDetails = async (jobId: string) => {
   const response = await api.get(`/generate/${jobId}`);
@@ -22,7 +23,7 @@ const mapJobDetailsToForm = (api: any) => {
 
   const discounts = contract.discounts || {};
   const delivery = contract.delivery || {};
-  const address = contract.address || contract.addres || {};
+  const address = contract.address || {};
   const other = contract.other || {};
 
   return {
@@ -40,7 +41,7 @@ const mapJobDetailsToForm = (api: any) => {
     gsaOfficeState: address.contract_officer_state,
     gsaOfficeZip: address.contract_officer_zip,
     gsaOfficeCityStateZip:
-      `${address.contract_officer_city || ""}, ${address.contract_officer_state || ""} ${address.contract_officer_zip || ""}`.trim(),
+      `${address.contract_officer_city || ""}, ${address.contract_officer_state || ""}, ${address.contract_officer_zip || ""}`.trim(),
 
     deliveryAroNormal: delivery.normal_delivery_time,
     deliveryAroExpedited: delivery.expedited_delivery_time,
@@ -69,6 +70,8 @@ const mapJobDetailsToForm = (api: any) => {
     numberOfProductsDeleted: modificationSummary.products_deleted,
     descriptionChanged: modificationSummary.description_changed,
     numberOfItemsChanged: modificationSummary.description_changed,
+    priceIncreased: modificationSummary.price_increased,
+    priceDecreased: modificationSummary.price_decreased,
     requestedIncrease: modificationSummary.price_increased > 0 ? "" : undefined,
     requestedDecrease: modificationSummary.price_decreased > 0 ? "" : undefined,
   };
@@ -97,6 +100,8 @@ export const DocumentProvider: React.FC<{ children: React.ReactNode }> = ({
     [],
   );
   const [analysisSummary, setAnalysisSummary] = useState<any | null>(null);
+  const [cachedJobDetails, setCachedJobDetails] = useState<any | null>(null);
+  const [loadedJobId, setLoadedJobId] = useState<string | null>(null);
 
   const loadDocumentConfig = useCallback(
     async (typeId: string, jobId?: string) => {
@@ -105,15 +110,24 @@ export const DocumentProvider: React.FC<{ children: React.ReactNode }> = ({
 
       setDocumentConfig(config);
       setSelectedDocumentType(typeId);
-      setCurrentStep("load-config");
 
       try {
         let mappedData: Record<string, any> = {};
 
-        const jobDetails = jobId ? await fetchJobDetails(jobId) : null;
+        let jobDetails = null;
+
+        if (jobId) {
+          if (jobId === loadedJobId && cachedJobDetails) {
+            jobDetails = cachedJobDetails;
+          } else {
+            setCurrentStep("load-config");
+            jobDetails = await fetchJobDetails(jobId);
+            setCachedJobDetails(jobDetails);
+            setLoadedJobId(jobId);
+          }
+        }
 
         if (jobDetails) {
-          console.log("Received job details:", jobDetails);
           mappedData = mapJobDetailsToForm(jobDetails);
           setAnalysisSummary(jobDetails.modification_summary);
         }
@@ -124,24 +138,33 @@ export const DocumentProvider: React.FC<{ children: React.ReactNode }> = ({
           mappedData.consultantPhone = user.phone_no;
         }
 
-        const initialData: Record<string, string | number> = {};
-
+        const newValues: Record<string, string | number> = {};
         config.fields.forEach((field) => {
           if (mappedData[field.id] !== undefined) {
-            initialData[field.id] = mappedData[field.id];
+            newValues[field.id] = mappedData[field.id];
           } else if (field.defaultValue !== undefined) {
-            initialData[field.id] = field.defaultValue;
+            newValues[field.id] = field.defaultValue;
           }
         });
 
-        console.log("Final initialData to set:", initialData);
-        setFormData(initialData);
+        setFormData((prev) => {
+          const merged = { ...prev };
+          Object.keys(newValues).forEach((key) => {
+            const isCountField = key.toLowerCase().includes("numberof") ||
+              key.toLowerCase().includes("priceincreased") ||
+              key.toLowerCase().includes("pricedecreased") ||
+              key.toLowerCase().includes("descriptionchanged");
+            if (isCountField || prev[key] === undefined || prev[key] === "") {
+              merged[key] = newValues[key];
+            }
+          });
+          return merged;
+        });
       } catch (error) {
         console.error("Prefill failed:", error);
-        setFormData({});
       }
     },
-    [user],
+    [user, loadedJobId, cachedJobDetails, setCurrentStep],
   );
 
   const updateField = useCallback((fieldId: string, value: string | number) => {
@@ -156,35 +179,60 @@ export const DocumentProvider: React.FC<{ children: React.ReactNode }> = ({
 
     documentConfig.fields.forEach((field) => {
       const value = formData[field.id];
+      const fieldValue = typeof value === "string" ? value.trim() : value;
+      const fieldLabel = field.label;
 
-      field.validation?.forEach((rule) => {
-        switch (rule.type) {
-          case "required":
-            if (!value || (typeof value === "string" && value.trim() === "")) {
-              errors.push({
-                fieldId: field.id,
-                message: rule.message,
-              });
-            }
-            break;
-          case "email":
-            if (value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value))) {
-              errors.push({
-                fieldId: field.id,
-                message: rule.message,
-              });
-            }
-            break;
-          case "phone":
-            if (value && !/^[\d\s\-\(\)\+]+$/.test(String(value))) {
-              errors.push({
-                fieldId: field.id,
-                message: rule.message,
-              });
-            }
-            break;
+      const hasRequiredRule = field.validation?.some(
+        (rule) => rule.type === "required",
+      );
+
+      if (hasRequiredRule) {
+        if (
+          !fieldValue &&
+          fieldValue !== 0 &&
+          (typeof fieldValue !== "string" || fieldValue.trim() === "")
+        ) {
+          errors.push({
+            fieldId: field.id,
+            message: `${fieldLabel} is required`,
+          });
+          return;
         }
-      });
+      }
+
+      if (!fieldValue && fieldValue !== 0) {
+        return;
+      }
+
+      let errorMessage: string | null = null;
+
+      if (field.type === "email") {
+        errorMessage = validators.validateEmail(String(fieldValue));
+      } else if (
+        field.id.toLowerCase().includes("phone") ||
+        field.id.toLowerCase().includes("phoneno")
+      ) {
+        errorMessage = validators.validatePhone(String(fieldValue), fieldLabel);
+      } else if (
+        field.id.toLowerCase().includes("zip") ||
+        field.id.toLowerCase().includes("postal")
+      ) {
+        errorMessage = validators.validateZip(String(fieldValue));
+      } else if (field.type === "number" || field.type === "percentage") {
+        const numValue = Number(fieldValue);
+        if (isNaN(numValue)) {
+          errorMessage = `${fieldLabel} must be a valid number`;
+        } else if (numValue < 0) {
+          errorMessage = `${fieldLabel} must be a positive number`;
+        }
+      }
+
+      if (errorMessage) {
+        errors.push({
+          fieldId: field.id,
+          message: errorMessage,
+        });
+      }
     });
 
     setValidationErrors(errors);
@@ -198,6 +246,8 @@ export const DocumentProvider: React.FC<{ children: React.ReactNode }> = ({
     setFormData({});
     setValidationErrors([]);
     setAnalysisSummary(null);
+    setCachedJobDetails(null);
+    setLoadedJobId(null);
   }, []);
 
   const generateDocument = useCallback((): DocumentMetadata => {
@@ -214,7 +264,7 @@ export const DocumentProvider: React.FC<{ children: React.ReactNode }> = ({
       generatedAt: new Date().toISOString(),
       data: { ...formData },
     };
-  }, [documentConfig, documentHistory, formData, selectedDocumentType,user]);
+  }, [documentConfig, documentHistory, formData, selectedDocumentType, user]);
 
   const addToHistory = useCallback((doc: DocumentMetadata) => {
     setDocumentHistory((prev) => [doc, ...prev]);

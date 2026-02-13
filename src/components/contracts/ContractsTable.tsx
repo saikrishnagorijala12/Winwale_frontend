@@ -80,7 +80,7 @@ export default function ContractTable({
                 Client
               </th>
               <th className="text-left px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                Officer
+                Contract Officer
               </th>
               <th className="text-left px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                 Location

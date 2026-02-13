@@ -2,7 +2,6 @@ import { useDocument } from "@/src/context/DocumentContext";
 import { DocumentTypeCard } from "../components/document/DocumentTypeSelector";
 import DocumentFormRenderer from "../components/document/DocumentFormRenderer";
 import { DocumentPreview } from "../components/document/DocumentPreview";
-import { GenerationConfirmation } from "../components/document/GenerationConfirmation";
 import { Loader2 } from "lucide-react";
 import { documentConfigs } from "../types/documentConfigs";
 import { useSearchParams } from "react-router-dom";
@@ -39,7 +38,7 @@ export const DocumentWorkflowRenderer = () => {
       "add-product": Number(analysisSummary.products_added || 0),
       "delete-product": Number(analysisSummary.products_deleted || 0),
       "price-increase": Number(analysisSummary.price_increased || 0),
-      "decrease-decrease": Number(analysisSummary.price_decreased || 0),
+      "price-decrease": Number(analysisSummary.price_decreased || 0),
       "description-change": Number(analysisSummary.description_changed || 0),
     };
 
@@ -49,7 +48,7 @@ export const DocumentWorkflowRenderer = () => {
         "add-product": "additions",
         "delete-product": "deletions",
         "price-increase": "price increases",
-        "decrease-decrease": "price decreases",
+        "price-decrease": "price decreases",
         "description-change": "description changes",
       };
       return `No ${names[selectedDocumentType] || "modifications"} were detected in the analysis for this document type.`;
@@ -61,10 +60,6 @@ export const DocumentWorkflowRenderer = () => {
 
   if (currentStep === "preview") {
     return <DocumentPreview />;
-  }
-
-  if (currentStep === "generate") {
-    return <GenerationConfirmation />;
   }
 
   return (
@@ -81,15 +76,26 @@ export const DocumentWorkflowRenderer = () => {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-          {documentConfigs.map((config) => (
-            <DocumentTypeCard
-              key={config.id}
-              config={config}
-              isSelected={selectedDocumentType === config.id}
-              onSelect={() => handleSelect(config.id)}
-              variant="horizontal"
-            />
-          ))}
+          {documentConfigs.map((config) => {
+            const counts: Record<string, number> = {
+              "add-product": Number(analysisSummary?.products_added || 0),
+              "delete-product": Number(analysisSummary?.products_deleted || 0),
+              "price-increase": Number(analysisSummary?.price_increased || 0),
+              "price-decrease": Number(analysisSummary?.price_decreased || 0),
+              "description-change": Number(analysisSummary?.description_changed || 0),
+            };
+
+            return (
+              <DocumentTypeCard
+                key={config.id}
+                config={config}
+                isSelected={selectedDocumentType === config.id}
+                onSelect={() => handleSelect(config.id)}
+                count={analysisSummary ? (counts[config.id] ?? 0) : undefined}
+                variant="horizontal"
+              />
+            );
+          })}
         </div>
 
         <div className="pt-2">

@@ -24,7 +24,6 @@ export const ContactFormStep: React.FC<ContactFormStepProps> = ({
 
   return (
     <div className="grid md:grid-cols-2 gap-6">
-      {/* Primary Contact Name */}
       <div className="md:col-span-2">
         <label className="text-sm font-bold text-slate-700">
           Primary Contact Name <span className="text-red-500">*</span>
@@ -46,7 +45,6 @@ export const ContactFormStep: React.FC<ContactFormStepProps> = ({
         )}
       </div>
 
-      {/* Email */}
       <div>
         <label className="text-sm font-bold text-slate-700">
           Email <span className="text-red-500">*</span>
@@ -68,7 +66,6 @@ export const ContactFormStep: React.FC<ContactFormStepProps> = ({
         )}
       </div>
 
-      {/* Phone */}
       <div>
         <label className="text-sm font-bold text-slate-700">
           Phone <span className="text-red-500">*</span>
@@ -90,7 +87,6 @@ export const ContactFormStep: React.FC<ContactFormStepProps> = ({
         )}
       </div>
 
-      {/* Address */}
       <div className="md:col-span-2">
         <label className="text-sm font-bold text-slate-700">
           Address
@@ -111,7 +107,6 @@ export const ContactFormStep: React.FC<ContactFormStepProps> = ({
         )}
       </div>
 
-      {/* City */}
       <div>
         <label className="text-sm font-bold text-slate-700">
           City
@@ -132,7 +127,6 @@ export const ContactFormStep: React.FC<ContactFormStepProps> = ({
         )}
       </div>
 
-      {/* State */}
       <div>
         <label className="text-sm font-bold text-slate-700">
           State
@@ -153,7 +147,6 @@ export const ContactFormStep: React.FC<ContactFormStepProps> = ({
         )}
       </div>
 
-      {/* ZIP */}
       <div>
         <label className="text-sm font-bold text-slate-700">
           ZIP

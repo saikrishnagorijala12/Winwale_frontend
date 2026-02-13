@@ -1,10 +1,7 @@
 import React, { useMemo, useState, useEffect } from "react";
-import {
-  ChevronLeft,
-  ChevronRight,
-  AlertCircle
-} from "lucide-react";
+import { ChevronLeft, ChevronRight, AlertCircle } from "lucide-react";
 import { useDocument } from "@/src/context/DocumentContext";
+import { useNavigate } from "react-router-dom";
 
 interface FieldOption {
   value: string;
@@ -16,11 +13,15 @@ interface DocumentField {
   label: string;
   type: string;
   section?: string;
-  required?: boolean;
   placeholder?: string;
   behavior?: string;
   width?: string;
   options?: Array<{ value: string; label: string }>;
+  validation?: Array<{
+    type: string;
+    message: string;
+    value?: string | number;
+  }>;
 }
 
 export default function DocumentFormRenderer() {
@@ -32,8 +33,8 @@ export default function DocumentFormRenderer() {
     setCurrentStep,
     validationErrors,
   } = useDocument();
+  const navigate = useNavigate();
 
-  // State for active tab
   const [activeTab, setActiveTab] = useState<string>("");
 
   const colors = {
@@ -44,8 +45,7 @@ export default function DocumentFormRenderer() {
     border: "#d9e0e8",
     success: "#33b17d",
     warning: "#f9ab20",
-    destructive: "#df3a3a",
-    secondaryBg: "#f8fafc"
+    secondaryBg: "#f8fafc",
   };
 
   const inputStyles = `
@@ -61,22 +61,30 @@ export default function DocumentFormRenderer() {
 
   const fieldsBySection = useMemo(() => {
     if (!documentConfig?.fields) return {} as Record<string, DocumentField[]>;
-    
-    return documentConfig.fields.reduce((acc, field: DocumentField) => {
-      const section = field.section || "General Information";
-      if (!acc[section]) acc[section] = [];
-      acc[section].push(field);
-      return acc;
-    }, {} as Record<string, DocumentField[]>);
+
+    return documentConfig.fields.reduce(
+      (acc, field: DocumentField) => {
+        const section = field.section || "General Information";
+        if (!acc[section]) acc[section] = [];
+        acc[section].push(field);
+        return acc;
+      },
+      {} as Record<string, DocumentField[]>,
+    );
   }, [documentConfig]);
 
-  const sections = useMemo(() => Object.keys(fieldsBySection), [fieldsBySection]);
+  const sections = useMemo(
+    () => Object.keys(fieldsBySection),
+    [fieldsBySection],
+  );
 
   useEffect(() => {
-    if (sections.length > 0 && !activeTab) {
-      setActiveTab(sections[0]);
-    }
-  }, [sections, activeTab]);
+  if (sections.length === 0) return;
+  if (!sections.includes(activeTab)) {
+    setActiveTab(sections[0]);
+  }
+}, [sections, activeTab]);
+
 
   const handleProceedToValidation = () => {
     const isValid = validateForm();
@@ -85,10 +93,12 @@ export default function DocumentFormRenderer() {
     }
   };
 
-  // Helper to check if a specific section has errors
   const sectionHasErrors = (sectionName: string) => {
-    const sectionFieldIds = fieldsBySection[sectionName]?.map(f => f.id) || [];
-    return validationErrors.some(err => sectionFieldIds.includes(err.fieldId));
+    const sectionFieldIds =
+      fieldsBySection[sectionName]?.map((f) => f.id) || [];
+    return validationErrors.some((err) =>
+      sectionFieldIds.includes(err.fieldId),
+    );
   };
 
   if (!documentConfig) {
@@ -101,8 +111,13 @@ export default function DocumentFormRenderer() {
 
   const getInputType = (type: string) => {
     switch (type) {
-      case "number": case "email": case "password": case "date": return type;
-      default: return "text";
+      case "number":
+      case "email":
+      case "password":
+      case "date":
+        return type;
+      default:
+        return "text";
     }
   };
 
@@ -110,20 +125,19 @@ export default function DocumentFormRenderer() {
 
   return (
     <div className="animate-fade-in  mx-auto">
-      
       {/* Tab Navigation */}
       <div className="flex flex-wrap gap-2 mb-6 border-b border-slate-200">
         {sections.map((section) => {
           const isActive = activeTab === section;
           const hasErrors = sectionHasErrors(section);
-          
+
           return (
             <button
               key={section}
               onClick={() => setActiveTab(section)}
               className={`px-6 py-4 text-xs font-bold uppercase tracking-widest transition-all border-b-2 relative ${
-                isActive 
-                  ? "border-[#24548f] text-[#24548f]" 
+                isActive
+                  ? "border-[#24548f] text-[#24548f]"
                   : "border-transparent text-slate-400 hover:text-slate-600"
               }`}
             >
@@ -144,14 +158,23 @@ export default function DocumentFormRenderer() {
         <div className="p-8 flex flex-wrap -mx-4 gap-y-6">
           {fieldsBySection[activeTab]?.map((field) => {
             const isReadOnly = field.behavior === "readonly";
-            const hasError = validationErrors.some((err) => err.fieldId === field.id);
-            const widthClass = field.width || (field.type === "textarea" ? "w-full" : "w-full md:w-1/2");
+            const hasError = validationErrors.some(
+              (err) => err.fieldId === field.id,
+            );
+            const widthClass =
+              field.width ||
+              (field.type === "textarea" ? "w-full" : "w-full md:w-1/2");
 
             return (
               <div key={field.id} className={`${widthClass} px-4`}>
-                <label className="text-[11px] font-black uppercase tracking-widest ml-1" style={{ color: colors.muted }}>
-                  {field.required && <span className="text-red-500 mr-1">*</span>}
-                  {field.label}
+                <label
+                  className="text-sm font-black ml-1"
+                  style={{ color: colors.muted }}
+                >
+                  {field.label}{" "}
+                  {field.validation?.some(
+                    (rule) => rule.type === "required",
+                  ) && <span className="text-red-500 mr-1">*</span>}
                 </label>
 
                 {field.type === "textarea" ? (
@@ -162,8 +185,10 @@ export default function DocumentFormRenderer() {
                     placeholder={field.placeholder}
                     className={`${isReadOnly ? disabledInputStyles : inputStyles} min-h-30 resize-none`}
                     style={{
-                      borderColor: hasError ? colors.destructive : colors.border,
-                      backgroundColor: isReadOnly ? colors.secondaryBg : 'white'
+                      borderColor: colors.border,
+                      backgroundColor: isReadOnly
+                        ? colors.secondaryBg
+                        : "white",
                     }}
                   />
                 ) : field.type === "select" ? (
@@ -174,11 +199,15 @@ export default function DocumentFormRenderer() {
                       disabled={isReadOnly}
                       className={`${isReadOnly ? disabledInputStyles : inputStyles} appearance-none pr-8`}
                       style={{
-                        borderColor: hasError ? colors.destructive : colors.border,
-                        backgroundColor: isReadOnly ? colors.secondaryBg : 'white'
+                        borderColor: colors.border,
+                        backgroundColor: isReadOnly
+                          ? colors.secondaryBg
+                          : "white",
                       }}
                     >
-                      <option value="" disabled>Select {field.label}</option>
+                      <option value="" disabled>
+                        Select {field.label}
+                      </option>
                       {field.options?.map((option) => (
                         <option key={option.value} value={option.value}>
                           {option.label}
@@ -198,15 +227,19 @@ export default function DocumentFormRenderer() {
                     placeholder={field.placeholder}
                     className={isReadOnly ? disabledInputStyles : inputStyles}
                     style={{
-                      borderColor: hasError ? colors.destructive : colors.border,
-                      backgroundColor: isReadOnly ? colors.secondaryBg : 'white'
+                      borderColor: colors.border,
+                      backgroundColor: isReadOnly
+                        ? colors.secondaryBg
+                        : "white",
                     }}
                   />
                 )}
                 {hasError && (
                   <div className="flex items-center gap-1 mt-1.5 ml-1 text-red-600">
-                    <AlertCircle className="w-3 h-3" />
-                    <p className="text-[10px] font-bold">This field is required</p>
+                    <p className="text-xs">
+                      {validationErrors.find((err) => err.fieldId === field.id)
+                        ?.message || "This field is required"}
+                    </p>
                   </div>
                 )}
               </div>
@@ -217,26 +250,37 @@ export default function DocumentFormRenderer() {
 
       {/* Footer Actions */}
       <div className="mt-8 flex items-center justify-between pb-10">
-        <button
-          onClick={() => activeIndex > 0 ? setActiveTab(sections[activeIndex - 1]) : setCurrentStep("select-type")}
-          className="flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-sm text-slate-600 hover:bg-slate-100 transition-colors"
-        >
-          <ChevronLeft className="w-4 h-4" />
-          {activeIndex === 0 ? "Back" : "Previous Section"}
-        </button>
+        {activeIndex === 0 ? (
+          <button
+            onClick={() => navigate(-1)}
+            className="flex items-center gap-2 px-5 py-3 rounded-xl font-medium text-sm bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 transition-colors"
+          >
+            <ChevronLeft className="w-4 h-4" />
+            Back
+          </button>
+        ) : (
+          <button
+            onClick={() =>
+              activeIndex > 0
+                ? setActiveTab(sections[activeIndex - 1])
+                : setCurrentStep("select-type")
+            }
+            className="flex items-center gap-2 px-5 py-3 rounded-xl font-medium text-sm bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 transition-colors"
+          >
+            <ChevronLeft className="w-4 h-4" />
+            Previous Section
+          </button>
+        )}
 
         {activeIndex === sections.length - 1 ? (
-          <button
-            onClick={handleProceedToValidation}
-            className="flex items-center gap-2 px-8 py-3 bg-[#24548f] text-white rounded-xl font-bold text-sm hover:bg-[#1a3e6b] transition-all shadow-lg shadow-blue-900/10"
-          >
+          <button onClick={handleProceedToValidation} className="btn-primary">
             Review & Continue
             <ChevronRight className="w-4 h-4" strokeWidth={3} />
           </button>
         ) : (
           <button
             onClick={() => setActiveTab(sections[activeIndex + 1])}
-            className="flex items-center gap-2 px-8 py-3 bg-white border border-slate-200 text-[#24548f] rounded-xl font-bold text-sm hover:bg-slate-50 transition-all"
+            className="btn-primary"
           >
             Next Section
             <ChevronRight className="w-4 h-4" />

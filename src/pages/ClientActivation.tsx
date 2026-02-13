@@ -56,7 +56,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   const isApprove = action === "approve";
 
   return (
-    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4 h-full">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 h-full">
       <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full overflow-hidden text-left">
         <div className="p-6 sm:p-8">
           <p className="text-slate-500 mb-6 text-sm sm:text-base">
@@ -304,7 +304,13 @@ const ClientCard: React.FC<ClientCardProps> = ({
         </div>
         <div className="flex items-center gap-2 text-sm text-slate-600">
           <Calendar className="w-4 h-4 text-slate-400 shrink-0" />
-          <span>{new Date(client.created_time).toLocaleDateString()}</span>
+          <span>
+            {new Date(client.created_time).toLocaleDateString("en-US", {
+              month: "short",
+              day: "2-digit",
+              year: "numeric",
+            })}
+          </span>
         </div>
       </div>
 
@@ -567,8 +573,9 @@ const ClientActivation = () => {
 
   if (loading)
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="w-10 h-10 animate-spin text-[#24578f]" />
+      <div className="min-h-screen flex flex-col items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-[#24578f]" />
+        <p className="mt-4 text-slate-500">Loading clients ...</p>
       </div>
     );
 
@@ -781,7 +788,7 @@ const ClientActivation = () => {
                   Status
                 </th>
                 <th className="text-left px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-widerral Information">
-                  Request Date
+                  Created Date
                 </th>
                 <th className="text-right px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                   Actions
@@ -825,7 +832,14 @@ const ClientActivation = () => {
                   <td className="px-4 py-5">
                     <div className="flex items-center gap-2 text-sm text-slate-400 font-medium">
                       <Calendar className="w-4 h-4" />
-                      {new Date(client.created_time).toLocaleDateString()}
+                      {new Date(client.created_time).toLocaleDateString(
+                        "en-US",
+                        {
+                          month: "short",
+                          day: "2-digit",
+                          year: "numeric",
+                        },
+                      )}
                     </div>
                   </td>
                   <td className="px-4 py-5">

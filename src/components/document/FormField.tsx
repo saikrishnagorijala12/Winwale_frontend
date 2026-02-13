@@ -37,7 +37,7 @@ export const FormField = ({ field }: FormFieldProps) => {
             onChange={(e) => updateField(field.id, e.target.value)}
             placeholder={field.placeholder}
             disabled={isReadonly}
-            className={`${baseClassName} min-h-[100px]`}
+            className={`${baseClassName} min-h-25`}
           />
         );
 

@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
 import {
-  Users,
   CheckCircle2,
-  XCircle,
   UserPlus,
   Building2,
   ChevronRight,
@@ -12,7 +10,6 @@ import {
   FileText,
   TrendingDown,
   FileEdit,
-  Loader2,
   UserCheck,
   Upload,
   File,
@@ -25,6 +22,10 @@ import {
   STATUS_BADGE_BASE,
   STATUS_MAP,
 } from "@/src/utils/statusUtils";
+
+const Skeleton = ({ className }) => (
+  <div className={`animate-pulse bg-slate-200 rounded-md ${className}`} />
+);
 
 export default function UnifiedAdminDashboard() {
   const navigate = useNavigate();
@@ -147,15 +148,6 @@ export default function UnifiedAdminDashboard() {
       };
     });
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center gap-3">
-        <Loader2 className="w-10 h-10 animate-spin text-[#24578f]" />
-        <p className="text-sm text-slate-500 font-medium">Loading...</p>
-      </div>
-    );
-  }
-
   return (
     <div
       className="min-h-screen p-6 lg:p-10 animate-fade-in"
@@ -164,63 +156,86 @@ export default function UnifiedAdminDashboard() {
       {/* Header Section */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10 animate-slide-up">
         <div className="space-y-1">
-          <h1
-            className="text-3xl font-extrabold tracking-tight"
-            style={{ color: colors.fg }}
-          >
-            Welcome, {user?.name?.split(" ")[0] || "Guest"}
-          </h1>
-          <p className="font-medium" style={{ color: colors.muted }}>
-            Overview of platform users and recent analyses.
-          </p>
+          {loading ? (
+            <>
+              <Skeleton className="h-9 w-48 mb-2" />
+              <Skeleton className="h-5 w-64" />
+            </>
+          ) : (
+            <>
+              <h1
+                className="text-3xl font-extrabold tracking-tight"
+                style={{ color: colors.fg }}
+              >
+                Welcome, {user?.name?.split(" ")[0] || "Guest"}
+              </h1>
+              <p className="font-medium" style={{ color: colors.muted }}>
+                Overview of platform users and recent analyses.
+              </p>
+            </>
+          )}
         </div>
-        <button
-          onClick={() => navigate("/pricelist-analysis")}
-          className="btn-primary"
-        >
-          <FileSearch className="w-4 h-4" />
-          New Analysis
-        </button>
+        {!loading && (
+          <button
+            onClick={() => navigate("/pricelist-analysis")}
+            className="btn-primary"
+          >
+            <FileSearch className="w-4 h-4" />
+            New Analysis
+          </button>
+        )}
       </div>
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 animate-slide-up">
-        {stats.map((stat) => (
-          <div
-            key={stat.label}
-            className="bg-white p-6 flex flex-col justify-between rounded-2xl transition-all hover:shadow-lg "
-          >
-            <div className="flex justify-between items-start">
-              <span
-                className="text-[11px] font-black uppercase tracking-widest"
-                style={{ color: colors.muted }}
-              >
-                {stat.label}
-              </span>
+        {loading
+          ? Array(4)
+              .fill(0)
+              .map((_, i) => (
+                <div key={i} className="bg-white p-6 rounded-2xl h-32 flex flex-col justify-between">
+                  <div className="flex justify-between">
+                    <Skeleton className="h-3 w-20" />
+                    <Skeleton className="h-10 w-10 rounded-xl" />
+                  </div>
+                  <Skeleton className="h-8 w-12" />
+                </div>
+              ))
+          : stats.map((stat) => (
               <div
-                className="p-2.5 rounded-xl"
-                style={{ backgroundColor: colors.secondaryBg }}
+                key={stat.label}
+                className="bg-white p-6 flex flex-col justify-between rounded-2xl transition-all hover:shadow-lg "
               >
-                <stat.icon
-                  className="w-5 h-5 text-[#24548f]"
-                  strokeWidth={2.5}
-                />
+                <div className="flex justify-between items-start">
+                  <span
+                    className="text-[11px] font-black uppercase tracking-widest"
+                    style={{ color: colors.muted }}
+                  >
+                    {stat.label}
+                  </span>
+                  <div
+                    className="p-2.5 rounded-xl"
+                    style={{ backgroundColor: colors.secondaryBg }}
+                  >
+                    <stat.icon
+                      className="w-5 h-5 text-[#24548f]"
+                      strokeWidth={2.5}
+                    />
+                  </div>
+                </div>
+                <div>
+                  <div
+                    className="text-3xl font-black tracking-tighter mb-1"
+                    style={{ color: colors.fg }}
+                  >
+                    {stat.value}
+                  </div>
+                </div>
               </div>
-            </div>
-            <div>
-              <div
-                className="text-3xl font-black tracking-tighter mb-1"
-                style={{ color: colors.fg }}
-              >
-                {stat.value}
-              </div>
-            </div>
-          </div>
-        ))}
+            ))}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-        {/* Left:  Analysis History */}
+        {/* Left: Analysis History */}
         <div className="lg:col-span-2 bg-white p-8 rounded-2xl animate-slide-up shadow-sm ">
           <div className="flex items-center justify-between mb-8">
             <div>
@@ -237,174 +252,129 @@ export default function UnifiedAdminDashboard() {
                 Latest price modifications tracked
               </p>
             </div>
-            <button
-              onClick={() => navigate("/analyses")}
-              className="text-sm font-bold transition-colors"
-              style={{ color: colors.muted }}
-            >
-              View all
-            </button>
+            {!loading && (
+              <button
+                onClick={() => navigate("/analyses")}
+                className="text-sm font-bold transition-colors"
+                style={{ color: colors.muted }}
+              >
+                View all
+              </button>
+            )}
           </div>
 
           <div className="space-y-3">
-            {recentAnalyses.map((item) => {
-              const slug = normalizeStatus(item.status);
-              const config = slug === "unknown" ? null : STATUS_MAP[slug];
-
-              return (
-                <div
-                  key={item.id}
-                  onClick={() => navigate(`/analyses/${item.id}`)}
-                  className="group flex items-center gap-4 p-4 rounded-2xl border border-transparent hover:shadow-sm transition-all cursor-pointer"
-                  style={{ backgroundColor: `${colors.bg}80` }}
-                >
-                  <div
-                    className="w-12 h-12 rounded-xl bg-white border flex items-center justify-center shrink-0 shadow-sm group-hover:scale-105 transition-transform"
-                    style={{ borderColor: colors.border }}
-                  >
-                    <FileText
-                      className="w-5 h-5"
-                      style={{ color: colors.primary }}
-                    />
+            {loading ? (
+              Array(5)
+                .fill(0)
+                .map((_, i) => (
+                  <div key={i} className="flex items-center gap-4 p-4 rounded-2xl border border-transparent bg-slate-50/50">
+                    <Skeleton className="w-12 h-12 rounded-xl shrink-0" />
+                    <div className="flex-1 space-y-2">
+                      <Skeleton className="h-4 w-32" />
+                      <Skeleton className="h-3 w-20" />
+                    </div>
+                    <div className="hidden sm:flex gap-4">
+                      <Skeleton className="h-8 w-8" />
+                      <Skeleton className="h-8 w-8" />
+                      <Skeleton className="h-8 w-8" />
+                    </div>
+                    <Skeleton className="h-6 w-20 rounded-full" />
                   </div>
+                ))
+            ) : (
+              <>
+                {recentAnalyses.map((item) => {
+                  const slug = normalizeStatus(item.status);
+                  const config = slug === "unknown" ? null : STATUS_MAP[slug];
 
-                  <div className="flex-1 min-w-0">
-                    <h4
-                      className="font-bold truncate"
-                      style={{ color: colors.fg }}
+                  return (
+                    <div
+                      key={item.id}
+                      onClick={() => navigate(`/analyses/${item.id}`)}
+                      className="group flex items-center gap-4 p-4 rounded-2xl border border-transparent hover:shadow-sm transition-all cursor-pointer"
+                      style={{ backgroundColor: `${colors.bg}80` }}
                     >
-                      {item.client}
-                    </h4>
-                    <p
-                      className="text-xs font-bold"
-                      style={{ color: colors.muted }}
-                    >
-                      {item.contract}
-                    </p>
-                  </div>
+                      <div
+                        className="w-12 h-12 rounded-xl bg-white border flex items-center justify-center shrink-0 shadow-sm group-hover:scale-105 transition-transform"
+                        style={{ borderColor: colors.border }}
+                      >
+                        <FileText
+                          className="w-5 h-5"
+                          style={{ color: colors.primary }}
+                        />
+                      </div>
 
-                  <div className="hidden sm:flex items-center gap-6 px-4">
-                    <div className="text-center">
-                      <p
-                        className="text-[9px] font-black uppercase"
-                        style={{ color: colors.muted }}
-                      >
-                        Add
-                      </p>
-                      <p
-                        className="text-sm font-black"
-                        style={{ color: colors.success }}
-                      >
-                        +{item.add}
-                      </p>
+                      <div className="flex-1 min-w-0">
+                        <h4
+                          className="font-bold truncate"
+                          style={{ color: colors.fg }}
+                        >
+                          {item.client}
+                        </h4>
+                        <p
+                          className="text-xs font-bold"
+                          style={{ color: colors.muted }}
+                        >
+                          {item.contract}
+                        </p>
+                      </div>
+
+                      <div className="hidden sm:flex items-center gap-6 px-4">
+                        <div className="text-center">
+                          <p className="text-[9px] font-black uppercase" style={{ color: colors.muted }}>Add</p>
+                          <p className="text-sm font-black" style={{ color: colors.success }}>+{item.add}</p>
+                        </div>
+                        <div className="text-center">
+                          <p className="text-[9px] font-black uppercase" style={{ color: colors.muted }}>Del</p>
+                          <p className="text-sm font-black" style={{ color: colors.destructive }}>-{item.del}</p>
+                        </div>
+                        <div className="text-center">
+                          <p className="text-[9px] font-black uppercase" style={{ color: colors.muted }}>Incr</p>
+                          <p className="flex items-center gap-1 text-amber-600 text-sm font-bold"><TrendingUp className="w-3 h-3" />{item.incr}</p>
+                        </div>
+                        <div className="text-center">
+                          <p className="text-[9px] font-black uppercase" style={{ color: colors.muted }}>Decr</p>
+                          <p className="flex items-center gap-1 text-blue-600 text-sm font-bold"><TrendingDown className="w-3 h-3" />{item.decr}</p>
+                        </div>
+                        <div className="text-center">
+                          <p className="text-[9px] font-black uppercase" style={{ color: colors.muted }}>Desc</p>
+                          <p className="flex items-center gap-1 text-indigo-600 text-sm font-bold"><FileEdit className="w-3 h-3" />{item.desc}</p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-3">
+                        <span className={`${STATUS_BADGE_BASE} ${config ? config.styles : "bg-slate-100 text-slate-700 border-slate-200"}`}>
+                          {config && <config.icon className="w-3 h-3 stroke-[2.5px]" />}
+                          <span>{config ? config.label : "Unknown"}</span>
+                        </span>
+                        <ChevronRight className="w-4 h-4" style={{ color: colors.border }} />
+                      </div>
                     </div>
-
-                    <div className="text-center">
-                      <p
-                        className="text-[9px] font-black uppercase"
-                        style={{ color: colors.muted }}
-                      >
-                        Del
-                      </p>
-                      <p
-                        className="text-sm font-black"
-                        style={{ color: colors.destructive }}
-                      >
-                        -{item.del}
-                      </p>
-                    </div>
-
-                    <div className="text-center">
-                      <p
-                        className="text-[9px] font-black uppercase"
-                        style={{ color: colors.muted }}
-                      >
-                        Incr
-                      </p>
-                      <p className="flex items-center gap-1 text-amber-600 text-sm font-bold">
-                        <TrendingUp className="w-3 h-3" />
-                        {item.incr}
-                      </p>
-                    </div>
-
-                    <div className="text-center">
-                      <p
-                        className="text-[9px] font-black uppercase"
-                        style={{ color: colors.muted }}
-                      >
-                        Decr
-                      </p>
-                      <p className="flex items-center gap-1 text-blue-600 text-sm font-bold">
-                        <TrendingDown className="w-3 h-3" />
-                        {item.decr}
-                      </p>
-                    </div>
-
-                    <div className="text-center">
-                      <p
-                        className="text-[9px] font-black uppercase"
-                        style={{ color: colors.muted }}
-                      >
-                        Desc
-                      </p>
-                      <p className="flex items-center gap-1 text-indigo-600 text-sm font-bold">
-                        <FileEdit className="w-3 h-3" />
-                        {item.desc}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Status */}
-                  <div className="flex items-center gap-3">
-                    <span
-                      className={`${STATUS_BADGE_BASE} ${
-                        config
-                          ? config.styles
-                          : "bg-slate-100 text-slate-700 border-slate-200"
-                      }`}
-                    >
-                      {config && (
-                        <config.icon className="w-3 h-3 stroke-[2.5px]" />
-                      )}
-                      <span>{config ? config.label : "Unknown"}</span>
-                    </span>
-
-                    <ChevronRight
-                      className="w-4 h-4"
-                      style={{ color: colors.border }}
-                    />
-                  </div>
-                </div>
-              );
-            })}
-            {recentAnalyses.length === 0 && (
-              <p className="text-center py-8" style={{ color: colors.muted }}>
-                No analyses found
-              </p>
+                  );
+                })}
+                {recentAnalyses.length === 0 && (
+                  <p className="text-center py-8" style={{ color: colors.muted }}>No analyses found</p>
+                )}
+              </>
             )}
           </div>
         </div>
 
-        {/* Right: Administrative Sidebar and quick actions */}
+        {/* Right: Administrative Sidebar */}
         <div className="space-y-8">
           <div
             className="rounded-4xl p-8 shadow-xl text-white"
             style={{ backgroundColor: colors.primary }}
           >
             <h2 className="text-xl font-bold mb-1">Quick Actions</h2>
-            <p className="text-xs font-medium mb-6 opacity-70">
-              Perform common tasks
-            </p>
+            <p className="text-xs font-medium mb-6 opacity-70">Perform common tasks</p>
 
             <div className="space-y-3">
               {[
                 { label: "Add Client", icon: Building2, to: "/clients" },
                 { label: "Manage Contracts", icon: File, to: "/contracts" },
-                {
-                  label: "Upload Product Catalog",
-                  icon: Upload,
-                  to: "/gsa-products/upload",
-                },
+                { label: "Upload Product Catalog", icon: Upload, to: "/gsa-products/upload" },
               ].map((action) => (
                 <button
                   key={action.label}
@@ -419,142 +389,119 @@ export default function UnifiedAdminDashboard() {
               ))}
             </div>
           </div>
-          {/* User Requests Queue */}
 
           <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-            {/* Tab Headers */}
             <div className="flex border-b border-slate-50">
               <button
                 onClick={() => setAdminTab("users")}
                 className={`flex-1 py-4 text-[10px] font-black uppercase tracking-widest transition-all relative ${
-                  adminTab === "users"
-                    ? "text-[#24548f]"
-                    : "text-slate-400 hover:text-slate-600"
+                  adminTab === "users" ? "text-[#24548f]" : "text-slate-400 hover:text-slate-600"
                 }`}
               >
                 User Approvals
-                {pendingUsers.length > 0 && (
-                  <span className="ml-2 bg-blue-50 text-[#24548f] px-1.5 py-0.5 rounded-md text-[9px]">
-                    {pendingUsers.length}
-                  </span>
+                {!loading && pendingUsers.length > 0 && (
+                  <span className="ml-2 bg-blue-50 text-[#24548f] px-1.5 py-0.5 rounded-md text-[9px]">{pendingUsers.length}</span>
                 )}
-                {adminTab === "users" && (
-                  <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#24548f]" />
-                )}
+                {adminTab === "users" && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#24548f]" />}
               </button>
               <button
                 onClick={() => setAdminTab("clients")}
                 className={`flex-1 py-4 text-[10px] font-black uppercase tracking-widest transition-all relative ${
-                  adminTab === "clients"
-                    ? "text-emerald-600"
-                    : "text-slate-400 hover:text-slate-600"
+                  adminTab === "clients" ? "text-emerald-600" : "text-slate-400 hover:text-slate-600"
                 }`}
               >
                 Client Reviews
-                {pendingClients.length > 0 && (
-                  <span className="ml-2 bg-emerald-50 text-emerald-600 px-1.5 py-0.5 rounded-md text-[9px]">
-                    {pendingClients.length}
-                  </span>
+                {!loading && pendingClients.length > 0 && (
+                  <span className="ml-2 bg-emerald-50 text-emerald-600 px-1.5 py-0.5 rounded-md text-[9px]">{pendingClients.length}</span>
                 )}
-                {adminTab === "clients" && (
-                  <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-emerald-600" />
-                )}
+                {adminTab === "clients" && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-emerald-600" />}
               </button>
             </div>
 
-            {/* Tab Content */}
             <div className="p-6">
-              {adminTab === "users" ? (
+              {loading ? (
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <Skeleton className="w-8 h-8 rounded-lg" />
+                      <div className="space-y-1">
+                        <Skeleton className="h-3 w-24" />
+                        <Skeleton className="h-2 w-16" />
+                      </div>
+                    </div>
+                    <Skeleton className="w-4 h-4" />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <Skeleton className="w-8 h-8 rounded-lg" />
+                      <div className="space-y-1">
+                        <Skeleton className="h-3 w-20" />
+                        <Skeleton className="h-2 w-12" />
+                      </div>
+                    </div>
+                    <Skeleton className="w-4 h-4" />
+                  </div>
+                </div>
+              ) : adminTab === "users" ? (
                 <div className="space-y-4 animate-fade-in">
                   {pendingUsers.map((item) => (
-                    <div
-                      key={item.user_id}
-                      className="flex items-center justify-between group"
-                    >
+                    <div key={item.user_id} className="flex items-center justify-between group">
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-[10px] font-bold text-slate-500">
                           {item.name.charAt(0)}
                         </div>
                         <div>
-                          <p className="text-xs font-bold text-slate-800">
-                            {item.name}
-                          </p>
-                          <p className="text-[10px] text-slate-400">
-                            {new Date(item.created_time).toLocaleDateString()}
-                          </p>
+                          <p className="text-xs font-bold text-slate-800">{item.name}</p>
+                          <p className="text-[10px] text-slate-400">{new Date(item.created_time).toLocaleDateString()}</p>
                         </div>
                       </div>
-                      <button
-                        onClick={() => navigate("/user-activation")}
-                        className="p-1.5 hover:bg-blue-50 rounded-lg transition-colors text-[#24548f]"
-                      >
+                      <button onClick={() => navigate("/user-activation")} className="p-1.5 hover:bg-blue-50 rounded-lg transition-colors text-[#24548f]">
                         <ChevronRight className="w-4 h-4" />
                       </button>
                     </div>
                   ))}
                   {pendingUsers.length === 0 && (
-                    <div className="flex flex-col items-center justify-center py-10 text-center">
+                    <div className="flex flex-col items-center justify-center py-1.75 text-center">
                       <div className="w-10 h-10 bg-slate-50 rounded-full flex items-center justify-center mb-2">
                         <UserCheck className="w-5 h-5 text-slate-300" />
                       </div>
-                      <p className="text-[11px] text-slate-400 italic">
-                        No pending user requests
-                      </p>
+                      <p className="text-[11px] text-slate-400 italic">No pending user requests</p>
                     </div>
                   )}
                 </div>
               ) : (
                 <div className="space-y-4 animate-fade-in">
                   {pendingClients.map((item) => (
-                    <div
-                      key={item.client_id}
-                      className="flex items-center justify-between group"
-                    >
+                    <div key={item.client_id} className="flex items-center justify-between group">
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-600">
                           <Building2 className="w-4 h-4" />
                         </div>
                         <div>
-                          <p className="text-xs font-bold text-slate-800">
-                            {item.company_name}
-                          </p>
-                          <p className="text-[10px] text-slate-400">
-                            Review Required
-                          </p>
+                          <p className="text-xs font-bold text-slate-800">{item.company_name}</p>
+                          <p className="text-[10px] text-slate-400">Review Required</p>
                         </div>
                       </div>
-                      <button
-                        onClick={() => navigate("/client-activation")}
-                        className="p-1.5 hover:bg-emerald-50 rounded-lg transition-colors text-emerald-600"
-                      >
+                      <button onClick={() => navigate("/client-activation")} className="p-1.5 hover:bg-emerald-50 rounded-lg transition-colors text-emerald-600">
                         <ChevronRight className="w-4 h-4" />
                       </button>
                     </div>
                   ))}
                   {pendingClients.length === 0 && (
-                    <div className="flex flex-col items-center justify-center py-10 text-center">
+                    <div className="flex flex-col items-center justify-center py-1.75 text-center">
                       <div className="w-10 h-10 bg-slate-50 rounded-full flex items-center justify-center mb-2">
                         <Building2 className="w-5 h-5 text-slate-300" />
                       </div>
-                      <p className="text-[11px] text-slate-400 italic">
-                        No pending client reviews
-                      </p>
+                      <p className="text-[11px] text-slate-400 italic">No pending client reviews</p>
                     </div>
                   )}
                 </div>
               )}
             </div>
 
-            {/* Footer Action */}
             <div className="px-6 py-2.5 bg-slate-50/50 border-t border-slate-100">
               <button
-                onClick={() =>
-                  navigate(
-                    adminTab === "users"
-                      ? "/user-activation"
-                      : "/client-activation",
-                  )
-                }
+                onClick={() => navigate(adminTab === "users" ? "/user-activation" : "/client-activation")}
                 className="w-full text-center text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-[#24548f] transition-colors"
               >
                 View All

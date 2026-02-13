@@ -24,7 +24,6 @@ export const CompanyFormStep: React.FC<CompanyFormStepProps> = ({
 
   return (
     <div className="grid md:grid-cols-2 gap-6">
-      {/* Company Name */}
       <div className="md:col-span-2">
         <label className="text-sm font-bold text-slate-700">
           Company Name <span className="text-red-500">*</span>
@@ -47,7 +46,6 @@ export const CompanyFormStep: React.FC<CompanyFormStepProps> = ({
         )}
       </div>
 
-      {/* Company Email */}
       <div>
         <label className="text-sm font-bold text-slate-700">
           Company Email <span className="text-red-500">*</span>
@@ -70,7 +68,6 @@ export const CompanyFormStep: React.FC<CompanyFormStepProps> = ({
         )}
       </div>
 
-      {/* Company Phone */}
       <div>
         <label className="text-sm font-bold text-slate-700">
           Company Phone <span className="text-red-500">*</span>
@@ -93,7 +90,6 @@ export const CompanyFormStep: React.FC<CompanyFormStepProps> = ({
         )}
       </div>
 
-      {/* Address */}
       <div className="md:col-span-2">
         <label className="text-sm font-bold text-slate-700">
           Company Address <span className="text-red-500">*</span>
@@ -116,7 +112,6 @@ export const CompanyFormStep: React.FC<CompanyFormStepProps> = ({
         )}
       </div>
 
-      {/* City */}
       <div>
         <label className="text-sm font-bold text-slate-700">
           City <span className="text-red-500">*</span>
@@ -139,7 +134,6 @@ export const CompanyFormStep: React.FC<CompanyFormStepProps> = ({
         )}
       </div>
 
-      {/* State */}
       <div>
         <label className="text-sm font-bold text-slate-700">
           State <span className="text-red-500">*</span>
@@ -162,7 +156,6 @@ export const CompanyFormStep: React.FC<CompanyFormStepProps> = ({
         )}
       </div>
 
-      {/* ZIP */}
       <div>
         <label className="text-sm font-bold text-slate-700">
           ZIP <span className="text-red-500">*</span>

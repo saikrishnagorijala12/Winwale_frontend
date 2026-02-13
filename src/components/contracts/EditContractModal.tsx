@@ -211,10 +211,7 @@ export default function EditContractModal({
                   </label>
                   <input
                     type="text"
-                    className={`w-full mt-2 px-4 py-3 rounded-xl border-2 transition-all outline-none ${
-                      errors.contract_number
-                        ? "border-red-300 focus:border-red-500 bg-red-50/30"
-                        : "border-slate-200 focus:border-[#38A1DB]"
+                    className={`w-full mt-2 px-4 py-3 rounded-xl border-2 transition-all outline-none border-slate-200 focus:border-[#38A1DB]"
                     }`}
                     value={formData.contract_number}
                     onChange={(e) =>

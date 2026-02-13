@@ -3,6 +3,7 @@ import { AdditionTemplate } from "../templates/AdditionTemplate";
 import { DeletionTemplate } from "../templates/DeletionTemplate";
 import { ProductDescriptiveChangeTemplate } from "../templates/DescriptionChangeTemplate";
 import { PriceIncreaseEpaTemplate } from "../templates/PriceIncreaseEpaTemplate";
+import { PriceDecreaseEpaTemplate } from "../templates/PriceDecreaseEpaTemplate";
 
 export const DocumentBodyRenderer = ({
   documentId,
@@ -19,7 +20,6 @@ export const DocumentBodyRenderer = ({
         switch (type) {
           case "addition":
             return <AdditionTemplate data={data} />;
-
           case "deletion":
             return <DeletionTemplate data={data} />;
 
@@ -28,6 +28,9 @@ export const DocumentBodyRenderer = ({
 
           case "price-increase":
             return <PriceIncreaseEpaTemplate data={data} />
+
+          case "price-decrease":
+            return <PriceDecreaseEpaTemplate data={data} />
 
           default:
             return null;

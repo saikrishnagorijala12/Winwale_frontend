@@ -44,7 +44,6 @@ export const ProfileSection = ({
     setPhoneError("");
     setFormError("");
 
-    // Full name validation
     if (!trimmedName) {
       setNameError("Full name is required");
       return;

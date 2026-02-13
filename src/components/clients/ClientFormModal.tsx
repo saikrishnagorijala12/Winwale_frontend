@@ -78,7 +78,6 @@ export const ClientFormModal: React.FC<ClientFormModalProps> = ({
           </div>
         </div>
 
-        {/* Stepper */}
         <FormStepper currentStep={currentStep} steps={STEPS} />
 
         {backendError && (
@@ -102,7 +101,6 @@ export const ClientFormModal: React.FC<ClientFormModalProps> = ({
           </div>
         )}
 
-        {/* Body */}
         <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto">
           <div className="py-4 px-8 space-y-6">
             {currentStep === 1 && (
@@ -124,7 +122,6 @@ export const ClientFormModal: React.FC<ClientFormModalProps> = ({
             )}
           </div>
 
-          {/* Footer */}
           <div className="sticky bottom-0 bg-slate-50 p-6 flex justify-between border-t border-slate-100 shrink-0">
             <button
               type="button"

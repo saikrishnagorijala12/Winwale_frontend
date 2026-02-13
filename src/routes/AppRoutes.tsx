@@ -118,14 +118,14 @@ const AppRoutes: React.FC = () => {
               <Route path="/gsa-products" element={<GsaProducts />} />
               <Route path="/gsa-products/upload" element={<UploadGsa />} />
               {/* <Route path="/pricelist-analysis" element={<Analysis />} /> */}
-              {/* <Route
+              <Route
                 path="/documents"
                 element={
                   <DocumentProvider>
                     <DocumentWorkflowRenderer />
                   </DocumentProvider>
                 }
-              /> */}
+              />
 
               <Route path="/analyses" element={<AnalysisHistory />} />
               <Route path="/analyses/:jobId" element={<AnalysisDetails />} />
@@ -142,8 +142,6 @@ const AppRoutes: React.FC = () => {
             >
               <Route path="/client-activation" element={<ClientActivation />} />
               <Route path="/user-activation" element={<UserActivation />} />
-              {/* <Route path="/gsa-products" element={<GsaProducts />} />
-              <Route path="/upload-gsa" element={<UploadGsa />} /> */}
             </Route>
           </Route>
         </Route>

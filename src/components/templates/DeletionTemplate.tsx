@@ -1,57 +1,62 @@
 export const DeletionTemplate = ({ data }: { data: any }) => (
-  <div className="relative text-[13px] leading-[1.6] text-foreground px-8 py-6">
+  <div
+    className="relative text-[14px] leading-[1.6] text-foreground px-12 py-10"
+    style={{ fontFamily: "'Times New Roman', Times, serif" }}
+  >
     {/* Logo */}
     <div className="absolute top-6 right-8">
-      <img
-        src="winvale-logo.png"
-        alt="Winvale"
-        className="h-10 w-[140px] object-contain"
-      />
+      <img src="logo.png" alt="Winvale" className="h-10 w-35 object-contain" />
     </div>
 
     {/* Date */}
-    <p className="mb-4"><strong>[{data.submissionDate || "DATE"}]</strong></p>
+    <p className="mb-6">{data.submissionDate || "DATE"}</p>
 
     {/* Address Block */}
+    <p className="mb-6">
+      Attn: {data.contractorName} ({data.contractNumber}) <br />
+      General Services Administration <br />
+      {data.gsaOfficeAddressLine} <br />
+      {data.gsaOfficeCityStateZip}
+    </p>
 
-    <div className="mb-4">
-      Attn: <strong>{data.contractorName}</strong> (<strong>{data.contractNumber}</strong>) <p>General Services Administration</p>
-      <p><strong>{data.gsaOfficeAddressLine}</strong></p>
-      <p><strong>{data.gsaOfficeCityStateZip}</strong></p>
-    </div>
     {/* Subject */}
-    <div className="mb-4">
+
+    <div className="mb-6">
       <p>
         <strong>Re:</strong> <strong>{data.companyName}</strong>
         <br />
         <strong>
-          Deletion Modification to GSA Contract <strong>{data.contractNumber}</strong>
+          Deletion Modification to GSA Contract{" "}
+          <strong>{data.contractNumber}</strong>
         </strong>
       </p>
     </div>
-    <p className="mb-3">
-      Dear <strong>{data.salutation}</strong> <strong>{data.contractorName}</strong>
+    <p className="mb-4">
+      Dear {data.salutation} {data.contractorName}
     </p>
 
     {/* Body */}
-    <p className="mb-3">
+    <p className="mb-4">
       The purpose of this letter is to request your approval of a Deletion
-      Modification to GSA Schedule Contract <strong>{data.contractNumber}</strong>. The
-      modification consists of the deletion of{" "}
-      <strong>{data.numberOfProductsDeleted}</strong> item(s) listed under SIN{" "}
-      <strong>{data.sin}</strong>. These
-      products are being removed because <strong>{data.deletionRationale}</strong>.
+      Modification to GSA Schedule Contract{" "}
+      <strong>{data.contractNumber}</strong>. The modification consists of the
+      deletion of <strong>{data.numberOfProductsDeleted}</strong> item(s) listed
+      under SIN <strong>{data.sin_deletions}</strong>. These products are being removed
+      because <strong>{data.deletionRationale}</strong>.
     </p>
 
-    <p className="mb-3"><strong>{data.companyName}</strong> states the following:</p>
+    <p className="mb-1">{data.companyName} states the following:</p>
 
     {/* Certification */}
-    <ul className="list-disc ml-6 mb-4 space-y-1">
+    <ol
+      className="ml-10 mb-4 space-y-1 list-outside"
+      style={{ listStyleType: "lower-alpha" }}
+    >
       <li>
         The items being deleted will not be added at a later date with a higher
         price without justification for such higher price.
       </li>
-    </ul>
+    </ol>
 
     <p className="mb-4">
       I certify to the best of my knowledge that the information provided is
@@ -62,20 +67,20 @@ export const DeletionTemplate = ({ data }: { data: any }) => (
     {/* Contact */}
     <p className="mb-4">
       If you have any questions regarding this request, please contact{" "}
-      <strong>{data.consultantName}</strong> of The Winvale Group at{" "}
-      <strong>{data.consultantPhone}</strong> or <strong>{data.consultantEmail}</strong>.
+      <strong>{data.consultantName}</strong> of The Winvale Group at <strong>{data.consultantPhone}</strong> or{" "}
+      <strong>{data.consultantEmail}</strong>.
     </p>
 
     {/* Signature */}
-    <p className="mb-6">Sincerely,</p>
-
+    <p className="mb-4">Sincerely,</p>
     <div>
-      <p className="font-semibold">
-        <strong>{data.authorizedNegotiatorName || "John R. Doe"}</strong>
-      </p>
       <p>
-        <strong>{data.authorizedNegotiatorTitle || "Director of Contracts"}</strong> – Authorized
-        to sign on behalf of <strong>{data.companyName || "COMPANY NAME"}</strong>
+        _________________________________
+        <br />
+        {data.contractorName || "AUTHORIZED NEGOTIATOR NAME"}
+        <br />
+        {data.authorizedNegotiatorTitle || "[Title]"} – Authorized to sign on
+        behalf of {data.companyName || "COMPANY NAME"}
       </p>
     </div>
   </div>

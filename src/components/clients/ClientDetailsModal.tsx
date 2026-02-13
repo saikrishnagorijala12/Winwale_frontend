@@ -63,10 +63,8 @@ export const ClientDetailsModal: React.FC<ClientDetailsModalProps> = ({
           </div>
         </div>
 
-        {/* Main Content Body */}
         <div className="flex-1 overflow-y-auto p-8">
           <div className="grid md:grid-cols-2 gap-8">
-            {/* Left Column: Company Info */}
             <div className="space-y-6">
               <div className="flex items-center gap-2 pb-2 border-b border-slate-100">
                 <Building2 className="w-5 h-5 text-[#38A1DB]" />
@@ -82,7 +80,6 @@ export const ClientDetailsModal: React.FC<ClientDetailsModalProps> = ({
               </div>
             </div>
 
-            {/* Right Column: Primary Contact */}
             <div className="space-y-6">
               <div className="flex items-center gap-2 pb-2 border-b border-slate-100">
                 <User className="w-5 h-5 text-[#38A1DB]" />
@@ -119,7 +116,6 @@ export const ClientDetailsModal: React.FC<ClientDetailsModalProps> = ({
           </div>
         </div>
 
-        {/* Footer Actions */}
         <div className="sticky bottom-0 bg-slate-50 p-6 rounded-b-3xl flex justify-between border-t border-slate-100">
           <button
             onClick={onClose}
