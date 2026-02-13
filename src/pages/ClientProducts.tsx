@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { useClient } from "../context/ClientContext";
 import {
   Search,
   ChevronLeft,
@@ -15,7 +16,9 @@ import { productService } from "../services/productService";
 
 export default function ClientProducts() {
   const navigate = useNavigate();
-  const { clientId } = useParams<{ clientId: string }>();
+  const { selectedClientId } = useClient();
+
+  const clientId = selectedClientId;
 
   const [products, setProducts] = useState<Product[]>([]);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
@@ -27,13 +30,18 @@ export default function ClientProducts() {
   const itemsPerPage = 10;
 
   useEffect(() => {
-    fetchProducts();
+    if (clientId) {
+      fetchProducts();
+    } else {
+      setLoading(false);
+    }
   }, [clientId]);
 
   const fetchProducts = async () => {
+    if (!clientId) return;
     try {
       setLoading(true);
-      const data = await productService.getProductsByClient(Number(clientId));
+      const data = await productService.getProductsByClient(clientId);
       setProducts(data.items);
     } catch (err: any) {
       setError(err.response?.data?.detail || "Failed to load products");
@@ -83,19 +91,23 @@ export default function ClientProducts() {
         {/* Navigation & Header */}
         <div className="mb-8">
           <button
-            onClick={() => navigate("/clients")}
-            className="flex items-center gap-2 text-slate-500 hover:text-[#3399cc] transition-colors mb-4 text-sm font-medium"
+            onClick={() => navigate(-1)}
+            className="flex items-center gap-2 text-slate-500 hover:text-slate-800 transition-colors mb-6 font-medium group"
           >
-            <ArrowLeft size={16} /> Back to Clients
+            <ChevronLeft
+              size={20}
+              className="group-hover:-translate-x-1 transition-transform"
+            />
+            Back to Clients
           </button>
 
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
             <div>
               <h1 className="text-3xl font-bold text-slate-900">
-                {products[0]?.client_name || "Client"} Products
+                {products[0]?.client_name || (clientId ? "Client" : "No Client Selected")} Products
               </h1>
               <p className="text-slate-500">
-                Managing {products.length} catalog items
+                {clientId ? `Managing ${products.length} catalog items` : "Please select a client from the Clients page"}
               </p>
             </div>
           </div>

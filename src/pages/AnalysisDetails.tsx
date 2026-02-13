@@ -1,6 +1,7 @@
-import { useParams, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useEffect, useState, useMemo } from "react";
 import api from "../lib/axios";
+import { useAnalysis } from "../context/AnalysisContext";
 
 import {
   Loader2,
@@ -20,7 +21,8 @@ import { exportAnalysisToExcel } from "../utils/exportAnalysisUtils";
 const itemsPerPage = 7;
 
 export default function AnalysisDetails() {
-  const { jobId } = useParams();
+  const { selectedJobId } = useAnalysis();
+  const jobId = selectedJobId;
   const navigate = useNavigate();
 
   const [isFetchingJob, setIsFetchingJob] = useState(true);
@@ -30,6 +32,10 @@ export default function AnalysisDetails() {
 
   useEffect(() => {
     const fetchJob = async () => {
+      if (!jobId) {
+        setIsFetchingJob(false);
+        return;
+      }
       try {
         setIsFetchingJob(true);
         const res = await api.get(`/jobs/${jobId}`);
@@ -247,10 +253,10 @@ export default function AnalysisDetails() {
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-12 mx-auto">
         <div>
           <h1 className="text-3xl font-extrabold tracking-tight text-slate-800">
-            Analysis Details
+            {jobId ? "Analysis Details" : "No Analysis Selected"}
           </h1>
           <p className="text-slate-500 font-medium mt-1">
-            Review the analysis results of ANAL-JOB-{jobId}
+            {jobId ? `Review the analysis results of ANAL-JOB-${jobId}` : "Please select an analysis from the History page"}
           </p>
         </div>
       </div>
@@ -293,11 +299,10 @@ export default function AnalysisDetails() {
                     setCurrentPage(1);
                   }}
                   className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold transition-all
-                         ${
-                           activeTab === tab.id
-                             ? "bg-white text-slate-900 shadow-sm"
-                             : "text-slate-500 hover:text-slate-700"
-                         }`}
+                         ${activeTab === tab.id
+                      ? "bg-white text-slate-900 shadow-sm"
+                      : "text-slate-500 hover:text-slate-700"
+                    }`}
                 >
                   <tab.icon
                     size={14}
@@ -404,8 +409,8 @@ export default function AnalysisDetails() {
                           <td className="p-3 text-right font-bold text-slate-900 tabular-nums">
                             {(action.price ?? action.new_price)
                               ? `$${Number(
-                                  action.price ?? action.new_price,
-                                ).toLocaleString()}`
+                                action.price ?? action.new_price,
+                              ).toLocaleString()}`
                               : "-"}
                           </td>
                         </>
@@ -469,11 +474,10 @@ export default function AnalysisDetails() {
                         key={idx}
                         onClick={() => setCurrentPage(page)}
                         className={`min-w-9 h-9 flex items-center justify-center rounded-lg text-sm font-bold transition-all
-        ${
-          currentPage === page
-            ? "bg-[#3399cc] text-white shadow-md shadow-[#3399cc]/30"
-            : "text-slate-500 hover:bg-slate-100 hover:text-slate-900"
-        }`}
+        ${currentPage === page
+                            ? "bg-[#3399cc] text-white shadow-md shadow-[#3399cc]/30"
+                            : "text-slate-500 hover:bg-slate-100 hover:text-slate-900"
+                          }`}
                       >
                         {page}
                       </button>
@@ -502,7 +506,7 @@ export default function AnalysisDetails() {
           Back
         </button>
         <button
-          onClick={() => navigate(`/documents?job_id=${jobId}`)}
+          onClick={() => navigate(`/documents`)}
           className="btn-primary"
         >
           Generate Documents <ArrowRight className="w-4 h-4" />

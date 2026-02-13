@@ -97,6 +97,7 @@ import {
 } from "lucide-react";
 import { normalizeStatus } from "../../utils/statusUtils";
 import { AnalysisJob } from "../../types/analysis.types";
+import { useAnalysis } from "../../context/AnalysisContext";
 
 interface AnalysisActionsMenuProps {
   item: AnalysisJob;
@@ -112,8 +113,9 @@ export default function AnalysisActionsMenu({
   onClose,
 }: AnalysisActionsMenuProps) {
   const navigate = useNavigate();
+  const { setSelectedJobId } = useAnalysis();
   const handleGenerate = (jobId: any) => {
-    navigate(`/documents?job_id=${jobId}`);
+    navigate(`/documents`);
   };
 
   return (
@@ -124,14 +126,15 @@ export default function AnalysisActionsMenu({
       <button
         onClick={(e) => {
           e.stopPropagation();
-          navigate(`/analyses/${item.job_id}`);
+          setSelectedJobId(item.job_id);
+          navigate(`/analyses/details`);
         }}
         className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors font-medium"
       >
         <Eye className="w-4 h-4 text-slate-400" />
         View Details
       </button>
-       <button
+      <button
         onClick={(e) => {
           e.stopPropagation();
           handleGenerate(item.job_id);

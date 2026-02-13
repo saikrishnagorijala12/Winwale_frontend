@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import api from "../lib/axios";
+import ConfirmationModal from "../components/shared/ConfirmationModal";
 import { ClientDetailsModal } from "../components/clients/ClientDetailsModal";
 import { ClientFormModal } from "../components/clients/ClientFormModal";
 import {
@@ -37,73 +38,7 @@ import {
 
 type TabType = "all" | "pending" | "approved" | "rejected";
 
-interface ConfirmationModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onConfirm: () => void;
-  client: any;
-  action: "approve" | "reject";
-}
 
-const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
-  isOpen,
-  onClose,
-  onConfirm,
-  client,
-  action,
-}) => {
-  if (!isOpen) return null;
-  const isApprove = action === "approve";
-
-  return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 h-full">
-      <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full overflow-hidden text-left">
-        <div className="p-6 sm:p-8">
-          <p className="text-slate-500 mb-6 text-sm sm:text-base">
-            Are you sure you want to {isApprove ? "approve" : "reject"}{" "}
-            <span className="font-bold text-slate-700">
-              {client?.company_name}
-            </span>
-            ?
-          </p>
-
-          <div className="bg-slate-50 rounded-2xl p-4 mb-6 space-y-2">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-slate-500">Company:</span>
-              <span className="text-sm font-semibold text-slate-700 truncate ml-2">
-                {client?.company_name}
-              </span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-slate-500">Email:</span>
-              <span className="text-sm font-semibold text-slate-700 truncate ml-2">
-                {client?.company_email}
-              </span>
-            </div>
-          </div>
-          <div className="flex flex-col sm:flex-row gap-3">
-            <button
-              onClick={onClose}
-              className="flex-1 px-6 py-3 bg-white border border-slate-200 text-slate-700 rounded-xl font-bold text-sm hover:bg-slate-50 transition-all"
-            >
-              Cancel
-            </button>
-            <button
-              onClick={onConfirm}
-              className={`flex-1 px-6 py-3 rounded-xl font-bold text-sm text-white transition-all shadow-sm ${
-                isApprove
-                  ? "bg-emerald-500 hover:bg-emerald-600"
-                  : "bg-rose-500 hover:bg-rose-600"
-              }`}
-            >
-              {isApprove ? "Approve" : "Reject"}
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
 
 interface ActionDropdownProps {
   client: any;
@@ -217,11 +152,10 @@ const ActionDropdown: React.FC<ActionDropdownProps> = ({
                 isApproved ? onReject() : onApprove();
                 setIsOpen(false);
               }}
-              className={`w-full px-4 py-2 text-left text-sm font-medium flex items-center gap-2 transition-colors ${
-                isApproved
-                  ? "text-rose-600 hover:bg-rose-50"
-                  : "text-emerald-600 hover:bg-emerald-50"
-              }`}
+              className={`w-full px-4 py-2 text-left text-sm font-medium flex items-center gap-2 transition-colors ${isApproved
+                ? "text-red-600 hover:bg-rose-50"
+                : "text-emerald-600 hover:bg-emerald-50"
+                }`}
             >
               {isApproved ? (
                 <>
@@ -585,8 +519,20 @@ const ClientActivation = () => {
         isOpen={confirmModal.isOpen}
         onClose={closeConfirmModal}
         onConfirm={handleStatusUpdate}
-        client={confirmModal.client}
-        action={confirmModal.action}
+        title={`Confirm ${confirmModal.action === "approve" ? "Approval" : "Rejection"}`}
+        message={
+          <>
+            Are you sure you want to {confirmModal.action}{" "}
+            <span className="font-bold text-slate-700">{confirmModal.client?.company_name}</span>?
+          </>
+        }
+        details={[
+          { label: "Company", value: confirmModal.client?.company_name || "" },
+          { label: "Email", value: confirmModal.client?.company_email || "" },
+        ]}
+        variant={confirmModal.action === "approve" ? "emerald" : "rose"}
+        confirmText={confirmModal.action === "approve" ? "Approve" : "Reject"}
+        isSubmitting={loading} // loading here is used by several things, but it works for now
       />
 
       <ClientDetailsModal
@@ -688,8 +634,8 @@ const ClientActivation = () => {
 
       {/* Main Content Card */}
       <div className="bg-white rounded-2xl sm:rounded-3xl shadow-sm border border-slate-100 ">
-        <div className="border-b border-slate-100 px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6 ">
-          <div className="flex gap-1 sm:gap-2 min-w-max">
+        <div className="border-b border-slate-100 px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6 overflow-x-auto">
+          <div className="flex gap-1 sm:gap-2 min-w-max ">
             {[
               {
                 id: "all",
@@ -719,11 +665,10 @@ const ClientActivation = () => {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as TabType)}
-                className={`px-4 sm:px-6 py-2 sm:py-3 rounded-t-xl font-bold text-xs sm:text-sm transition-all whitespace-nowrap ${
-                  activeTab === tab.id
-                    ? `bg-${tab.color}-50 text-${tab.color}-600 border-b-2 border-${tab.color}-600`
-                    : "text-slate-500 hover:text-slate-700 hover:bg-slate-50"
-                }`}
+                className={`px-4 sm:px-6 py-2 sm:py-3 rounded-t-xl font-bold text-xs sm:text-sm transition-all whitespace-nowrap ${activeTab === tab.id
+                  ? `bg-${tab.color}-50 text-${tab.color}-600 border-b-2 border-${tab.color}-600`
+                  : "text-slate-500 hover:text-slate-700 hover:bg-slate-50"
+                  }`}
               >
                 {tab.label} ({tab.count})
               </button>
@@ -915,10 +860,9 @@ const ClientActivation = () => {
                         <button
                           onClick={() => setCurrentPage(Number(pageNum))}
                           className={`min-w-9 h-9 flex items-center justify-center rounded-lg text-sm font-bold transition-all
-                            ${
-                              currentPage === pageNum
-                                ? "bg-[#3399cc] text-white shadow-md shadow-[#3399cc]/30"
-                                : "text-slate-500 hover:bg-slate-100 hover:text-slate-900"
+                            ${currentPage === pageNum
+                              ? "bg-[#3399cc] text-white shadow-md shadow-[#3399cc]/30"
+                              : "text-slate-500 hover:bg-slate-100 hover:text-slate-900"
                             }`}
                         >
                           {pageNum}

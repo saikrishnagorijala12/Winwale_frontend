@@ -279,8 +279,8 @@ export default function PriceListAnalysis() {
               />
               <div
                 className={`border-2 border-dashed rounded-xl p-12 text-center transition-colors cursor-pointer ${file
-                    ? "border-emerald-500 bg-emerald-50"
-                    : "border-slate-300 hover:border-[#3399cc] hover:bg-cyan-50/50"
+                  ? "border-emerald-500 bg-emerald-50"
+                  : "border-slate-300 hover:border-[#3399cc] hover:bg-cyan-50/50"
                   }`}
                 onClick={handleFileChange}
               >
@@ -862,7 +862,7 @@ export default function PriceListAnalysis() {
               </button>
               <button
                 onClick={() =>
-                  navigate(`/documents?job_id=${uploadResult.job_id}`)
+                  navigate(`/documents`)
                 }
                 className="btn-primary"
               >
@@ -893,14 +893,14 @@ export default function PriceListAnalysis() {
           <div key={step.id} className="flex items-center shrink-0">
             <div
               className={`h-10 px-4 flex items-center gap-3 rounded-3xl transition-all ${currentStep === step.id
-                  ? "bg-[#3399cc] text-white shadow-lg"
-                  : "text-slate-400"
+                ? "bg-[#3399cc] text-white shadow-lg"
+                : "text-slate-400"
                 }`}
             >
               <div
                 className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold border ${currentStep === step.id
-                    ? "border-white/30"
-                    : "border-slate-200"
+                  ? "border-white/30"
+                  : "border-slate-200"
                   }`}
               >
                 {currentStep > step.id ? (

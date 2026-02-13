@@ -22,6 +22,7 @@ import {
 import api from "../lib/axios";
 import { Role } from "../types/roles.types";
 import { toast } from "sonner";
+import ConfirmationModal from "../components/shared/ConfirmationModal";
 
 const ROLE_MAP: Record<Role, string> = {
   admin: "Administrator",
@@ -30,164 +31,6 @@ const ROLE_MAP: Record<Role, string> = {
 
 type TabType = "all" | "pending" | "approved" | "rejected";
 
-interface ConfirmationModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onConfirm: () => void;
-  user: any;
-  action: "approve" | "reject";
-  isSubmitting: boolean;
-}
-
-const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
-  isOpen,
-  onClose,
-  onConfirm,
-  user,
-  action,
-  isSubmitting,
-}) => {
-  if (!isOpen) return null;
-
-  const isApprove = action === "approve";
-
-  return (
-    <div className="fixed inset-0 bg-slate-900/40 flex items-center justify-center z-50 p-4 h-full">
-      <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full overflow-hidden">
-        <div className="p-8">
-          <p className="text-slate-500 mb-6">
-            Are you sure you want to {isApprove ? "approve" : "reject"}{" "}
-            <span className="font-bold text-slate-700">{user?.name}</span>?
-          </p>
-
-          <div className="bg-slate-50 rounded-2xl p-4 mb-6 space-y-2">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-slate-500">Email:</span>
-              <span className="text-sm font-semibold text-slate-700">
-                {user?.email}
-              </span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-slate-500">Role:</span>
-              <span className="text-sm font-semibold text-slate-700">
-                {ROLE_MAP[user?.role] || "User"}
-              </span>
-            </div>
-          </div>
-
-          {!isApprove && (
-            <div className="flex items-start gap-3 bg-rose-50 border border-rose-100 rounded-2xl p-4 mb-6">
-              <AlertTriangle className="w-5 h-5 text-rose-500 shrink-0 mt-0.5" />
-              <p className="text-xs text-rose-700">
-                This action will reject the user's account. They won't be able
-                to access the system.
-              </p>
-            </div>
-          )}
-
-          <div className="flex gap-3">
-            <button
-              onClick={onClose}
-              className="flex-1 px-6 py-3 bg-white border border-slate-200 text-slate-700 rounded-xl font-bold text-sm hover:bg-slate-50 transition-all"
-            >
-              Cancel
-            </button>
-            <button
-              disabled={isSubmitting}
-              onClick={onConfirm}
-              className={`flex-1 px-6 py-3 rounded-xl font-bold text-sm text-white transition-all shadow-sm flex items-center justify-center gap-2 ${
-                isApprove
-                  ? "bg-emerald-500 hover:bg-emerald-600"
-                  : "bg-rose-500 hover:bg-rose-600"
-              } disabled:opacity-70`}
-            >
-              {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
-              {isApprove ? "Approve" : "Reject"}
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-interface RoleChangeModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onConfirm: () => void;
-  user: any;
-  isSubmitting: boolean;
-}
-
-const RoleChangeModal: React.FC<RoleChangeModalProps> = ({
-  isOpen,
-  onClose,
-  onConfirm,
-  user,
-  isSubmitting,
-}) => {
-  if (!isOpen) return null;
-
-  const currentRole = ROLE_MAP[user?.role] || "User";
-  const newRole = user?.role === "admin" ? "Consultant" : "Administrator";
-
-  return (
-    <div className="fixed inset-0 bg-slate-900/40 flex items-center justify-center z-50 p-4 h-full">
-      <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full overflow-hidden">
-        <div className="p-8">
-          <h3 className="text-xl font-bold text-slate-800 mb-2">
-            Change User Role
-          </h3>
-          <p className="text-slate-500 mb-6">
-            Are you sure you want to change the role of{" "}
-            <span className="font-bold text-slate-700">{user?.name}</span>?
-          </p>
-
-          <div className="bg-slate-50 rounded-2xl p-4 mb-6 space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-slate-500">Current Role:</span>
-              <span className="text-sm font-semibold text-slate-700">
-                {currentRole}
-              </span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-slate-500">New Role:</span>
-              <span className="text-sm font-semibold text-[#3399cc]">
-                {newRole}
-              </span>
-            </div>
-          </div>
-
-          <div className="flex items-start gap-3 bg-yellow-50 border border-yellow-100 rounded-2xl p-4 mb-6">
-            <AlertTriangle className="w-5 h-5 text-yellow-600 shrink-0 mt-0.5" />
-            <p className="text-xs text-yellow-700">
-              This will change the user's permissions and access level in the
-              system.
-            </p>
-          </div>
-
-          <div className="flex gap-3">
-            <button
-              onClick={onClose}
-              disabled={isSubmitting}
-              className="flex-1 px-6 py-3 bg-white border border-slate-200 text-slate-700 rounded-xl font-bold text-sm hover:bg-slate-50 transition-all disabled:opacity-70"
-            >
-              Cancel
-            </button>
-            <button
-              disabled={isSubmitting}
-              onClick={onConfirm}
-              className="flex-1 px-6 py-3 rounded-xl font-bold text-sm text-white transition-all shadow-sm flex items-center justify-center gap-2 bg-[#3399cc] hover:bg-[#2980b9] disabled:opacity-70"
-            >
-              {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
-              Change Role
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
 
 interface ActionDropdownProps {
   user: any;
@@ -624,13 +467,13 @@ export default function UserActivation() {
   };
 
   if (loading) {
-  return (
-    <div className="min-h-screen flex flex-col items-center justify-center">
-      <Loader2 className="w-10 h-10 animate-spin text-[#24578f]" />
-      <p className="mt-4 text-slate-500">Loading users ...</p>
-    </div>
-  );
-}
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center">
+        <Loader2 className="w-10 h-10 animate-spin text-[#24578f]" />
+        <p className="mt-4 text-slate-500">Loading users ...</p>
+      </div>
+    );
+  }
 
 
   return (
@@ -639,16 +482,54 @@ export default function UserActivation() {
         isOpen={confirmModal.isOpen}
         onClose={closeConfirmModal}
         onConfirm={confirmStatusChange}
-        user={confirmModal.user}
-        action={confirmModal.action}
+        title={`Confirm ${confirmModal.action === "approve" ? "Approval" : "Rejection"}`}
+        message={
+          <>
+            Are you sure you want to {confirmModal.action}{" "}
+            <span className="font-bold text-slate-700">{confirmModal.user?.name}</span>?
+          </>
+        }
+        details={[
+          { label: "Email", value: confirmModal.user?.email || "" },
+          { label: "Role", value: ROLE_MAP[confirmModal.user?.role] || "User" },
+        ]}
+        warning={
+          confirmModal.action === "reject"
+            ? {
+              message: "This action will reject the user's account. They won't be able to access the system.",
+              type: "rose",
+            }
+            : undefined
+        }
+        variant={confirmModal.action === "approve" ? "emerald" : "rose"}
+        confirmText={confirmModal.action === "approve" ? "Approve" : "Reject"}
         isSubmitting={isActionLoading}
       />
 
-      <RoleChangeModal
+      <ConfirmationModal
         isOpen={roleChangeModal.isOpen}
         onClose={closeRoleChangeModal}
         onConfirm={handleRoleChange}
-        user={roleChangeModal.user}
+        title="Change User Role"
+        message={
+          <>
+            Are you sure you want to change the role of{" "}
+            <span className="font-bold text-slate-700">{roleChangeModal.user?.name}</span>?
+          </>
+        }
+        details={[
+          { label: "Current Role", value: ROLE_MAP[roleChangeModal.user?.role] || "User" },
+          {
+            label: "New Role",
+            value: roleChangeModal.user?.role === "admin" ? "Consultant" : "Administrator",
+          },
+        ]}
+        warning={{
+          message: "This will change the user's permissions and access level in the system.",
+          type: "amber",
+        }}
+        variant="blue"
+        confirmText="Change Role"
         isSubmitting={isActionLoading}
       />
 
@@ -715,7 +596,7 @@ export default function UserActivation() {
       {/* Main Table Card */}
       <div className="bg-white rounded-2xl sm:rounded-3xl shadow-sm border border-slate-100 ">
         {/* Tabs */}
-        <div className="border-b border-slate-100 px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6 ">
+        <div className="border-b border-slate-100 px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6 overflow-x-auto">
           <div className="flex gap-1 sm:gap-2 min-w-max">
             {[
               {
@@ -746,11 +627,10 @@ export default function UserActivation() {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as TabType)}
-                className={`px-4 sm:px-6 py-2 sm:py-3 rounded-t-xl font-bold text-xs sm:text-sm transition-all whitespace-nowrap ${
-                  activeTab === tab.id
-                    ? `bg-${tab.color}-50 text-${tab.color}-600 border-b-2 border-${tab.color}-600`
-                    : "text-slate-500 hover:text-slate-700 hover:bg-slate-50"
-                }`}
+                className={`px-4 sm:px-6 py-2 sm:py-3 rounded-t-xl font-bold text-xs sm:text-sm transition-all whitespace-nowrap ${activeTab === tab.id
+                  ? `bg-${tab.color}-50 text-${tab.color}-600 border-b-2 border-${tab.color}-600`
+                  : "text-slate-500 hover:text-slate-700 hover:bg-slate-50"
+                  }`}
               >
                 {tab.label} ({tab.count})
               </button>
@@ -941,10 +821,9 @@ export default function UserActivation() {
                         <button
                           onClick={() => setCurrentPage(Number(pageNum))}
                           className={`min-w-9 h-9 flex items-center justify-center rounded-lg text-sm font-bold transition-all
-                            ${
-                              currentPage === pageNum
-                                ? "bg-[#3399cc] text-white shadow-md shadow-[#3399cc]/30"
-                                : "text-slate-500 hover:bg-slate-100 hover:text-slate-900"
+                            ${currentPage === pageNum
+                              ? "bg-[#3399cc] text-white shadow-md shadow-[#3399cc]/30"
+                              : "text-slate-500 hover:bg-slate-100 hover:text-slate-900"
                             }`}
                         >
                           {pageNum}

@@ -9,11 +9,11 @@ export interface ModificationSummary {
 export interface ModificationAction {
   action_id: number;
   action_type:
-    | "NEW_PRODUCT"
-    | "REMOVED_PRODUCT"
-    | "PRICE_INCREASE"
-    | "PRICE_DECREASE"
-    | "DESCRIPTION_CHANGE";
+  | "NEW_PRODUCT"
+  | "REMOVED_PRODUCT"
+  | "PRICE_INCREASE"
+  | "PRICE_DECREASE"
+  | "DESCRIPTION_CHANGE";
   product_id?: number | null;
   product_name?: string | null;
   manufacturer_part_number?: string | null;
@@ -33,7 +33,7 @@ export interface AnalysisJobResponse {
   user_id: number;
   user: string;
   status: "pending" | "approved" | "rejected";
-  modifications_actions: ModificationAction[];
+  action_summary: Record<string, number>;
   created_time: string;
   updated_time: string;
 }

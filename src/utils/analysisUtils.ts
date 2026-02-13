@@ -16,7 +16,7 @@ export const formatDateTime = (dateString: string): string => {
 };
 
 export const processModifications = (
-  actions?: ModificationAction[]
+  actionSummary?: Record<string, number>
 ): ModificationSummary => {
   const summary: ModificationSummary = {
     additions: 0,
@@ -26,29 +26,13 @@ export const processModifications = (
     descriptionChanges: 0,
   };
 
-  if (!actions || !Array.isArray(actions)) return summary;
+  if (!actionSummary) return summary;
 
-  actions.forEach((a) => {
-    switch (a.action_type) {
-      case "NEW_PRODUCT":
-        summary.additions++;
-        break;
-      case "REMOVED_PRODUCT":
-        summary.deletions++;
-        break;
-      case "PRICE_INCREASE":
-        summary.priceIncreases++;
-        break;
-      case "PRICE_DECREASE":
-        summary.priceDecreases++;
-        break;
-      case "DESCRIPTION_CHANGE":
-        summary.descriptionChanges++;
-        break;
-      default:
-        break;
-    }
-  });
+  summary.additions = actionSummary["NEW_PRODUCT"] || 0;
+  summary.deletions = actionSummary["REMOVED_PRODUCT"] || 0;
+  summary.priceIncreases = actionSummary["PRICE_INCREASE"] || 0;
+  summary.priceDecreases = actionSummary["PRICE_DECREASE"] || 0;
+  summary.descriptionChanges = actionSummary["DESCRIPTION_CHANGE"] || 0;
 
   return summary;
 };

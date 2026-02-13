@@ -6,7 +6,7 @@ import ContractTable from "../components/contracts/ContractsTable";
 import ContractDetailsModal from "../components/contracts/ContractDetailsModal";
 import AddContractModal from "../components/contracts/AddContractModal";
 import EditContractModal from "../components/contracts/EditContractModal";
-import DeleteConfirmationModal from "../components/contracts/DeleteConfirmationModal";
+import ConfirmationModal from "../components/shared/ConfirmationModal";
 
 export default function ContractsPage() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -184,14 +184,29 @@ export default function ContractsPage() {
         }}
         onSuccess={fetchContracts}
       />
-      <DeleteConfirmationModal
+      <ConfirmationModal
         isOpen={showDeleteDialog}
-        loading={deleting}
-        onCancel={() => {
+        onClose={() => {
           setShowDeleteDialog(false);
           setContractToDelete(null);
         }}
         onConfirm={confirmDelete}
+        title="Delete Contract"
+        message={
+          <>
+            Are you sure you want to delete contract{" "}
+            <span className="font-bold text-slate-700">
+              {
+                contracts.find((c) => c.client_id === contractToDelete)
+                  ?.contract_number
+              }
+            </span>
+            ?
+          </>
+        }
+        variant="rose"
+        confirmText="Delete"
+        isSubmitting={deleting}
       />
     </div>
   );

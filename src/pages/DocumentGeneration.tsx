@@ -6,6 +6,7 @@ import { Loader2 } from "lucide-react";
 import { documentConfigs } from "../types/documentConfigs";
 import { useSearchParams } from "react-router-dom";
 import { useEffect } from "react";
+import { useAnalysis } from "../context/AnalysisContext";
 
 export const DocumentWorkflowRenderer = () => {
   const {
@@ -16,8 +17,8 @@ export const DocumentWorkflowRenderer = () => {
     analysisSummary,
   } = useDocument();
 
-  const [searchParams] = useSearchParams();
-  const jobId = searchParams.get("job_id");
+  const { selectedJobId } = useAnalysis();
+  const jobId = selectedJobId ? String(selectedJobId) : null;
 
   useEffect(() => {
     if (!selectedDocumentType && documentConfigs.length > 0) {

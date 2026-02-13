@@ -38,6 +38,8 @@ import AnalysisHistory from "../pages/AnalysisHistory";
 import DownloadHistory from "../pages/DownloadHistory";
 import Dashboard from "../pages/dashboard/Dashboard";
 import AnalysisDetails from "../pages/AnalysisDetails";
+import { ClientProvider } from "../context/ClientContext";
+import { AnalysisProvider } from "../context/AnalysisContext";
 
 try {
   Amplify.configure(awsExports);
@@ -94,54 +96,62 @@ const AppRoutes: React.FC = () => {
 
         <Route element={<ProtectedRoute isAuthenticated={isAuthenticated} />}>
           <Route element={<AppLayout />}>
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/settings" element={<Settings />} />
+            <Route element={<ClientProvider />}>
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/settings" element={<Settings />} />
 
-            <Route
-              element={
-                <ProtectedRoute
-                  isAuthenticated={isAuthenticated}
-                  allowedRoles={[ROLES.USER, ROLES.ADMIN]}
-                />
-              }
-            >
-              <Route path="/clients" element={<Clients />} />
               <Route
-                path="/clients/:clientId/products"
-                element={<ClientProducts />}
-              />
-              <Route path="/contracts" element={<ContractManagement />} />
-              <Route
-                path="/pricelist-analysis"
-                element={<PriceListAnalysis />}
-              />
-              <Route path="/gsa-products" element={<GsaProducts />} />
-              <Route path="/gsa-products/upload" element={<UploadGsa />} />
-              {/* <Route path="/pricelist-analysis" element={<Analysis />} /> */}
-              <Route
-                path="/documents"
                 element={
-                  <DocumentProvider>
-                    <DocumentWorkflowRenderer />
-                  </DocumentProvider>
+                  <ProtectedRoute
+                    isAuthenticated={isAuthenticated}
+                    allowedRoles={[ROLES.USER, ROLES.ADMIN]}
+                  />
                 }
-              />
+              >
+                <Route path="/clients" element={<Clients />} />
+                <Route path="/clients/products" element={<ClientProducts />} />
+                <Route path="/contracts" element={<ContractManagement />} />
 
-              <Route path="/analyses" element={<AnalysisHistory />} />
-              <Route path="/analyses/:jobId" element={<AnalysisDetails />} />
-              {/* <Route path="/downloads" element={<DownloadHistory />} /> */}
-            </Route>
+                <Route path="/gsa-products" element={<GsaProducts />} />
+                <Route path="/gsa-products/upload" element={<UploadGsa />} />
+                {/* <Route path="/pricelist-analysis" element={<Analysis />} /> */}
+                <Route element={<AnalysisProvider />}>
+                  <Route
+                    path="/pricelist-analysis"
+                    element={<PriceListAnalysis />}
+                  />
+                  <Route
+                    path="/documents"
+                    element={
+                      <DocumentProvider>
+                        <DocumentWorkflowRenderer />
+                      </DocumentProvider>
+                    }
+                  />
 
-            <Route
-              element={
-                <ProtectedRoute
-                  isAuthenticated={isAuthenticated}
-                  allowedRoles={[ROLES.ADMIN]}
+                  <Route path="/analyses" element={<AnalysisHistory />} />
+                  <Route
+                    path="/analyses/details"
+                    element={<AnalysisDetails />}
+                  />
+                </Route>
+                {/* <Route path="/downloads" element={<DownloadHistory />} /> */}
+              </Route>
+
+              <Route
+                element={
+                  <ProtectedRoute
+                    isAuthenticated={isAuthenticated}
+                    allowedRoles={[ROLES.ADMIN]}
+                  />
+                }
+              >
+                <Route
+                  path="/client-activation"
+                  element={<ClientActivation />}
                 />
-              }
-            >
-              <Route path="/client-activation" element={<ClientActivation />} />
-              <Route path="/user-activation" element={<UserActivation />} />
+                <Route path="/user-activation" element={<UserActivation />} />
+              </Route>
             </Route>
           </Route>
         </Route>

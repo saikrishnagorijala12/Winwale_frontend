@@ -11,6 +11,8 @@ import {
   rejectAnalysisJob,
 } from "../services/analysisService";
 import { AnalysisJob, SortConfig, StatusFilter } from "../types/analysis.types";
+import ConfirmationModal from "../components/shared/ConfirmationModal";
+
 
 export default function AnalysisHistory() {
   const navigate = useNavigate();
@@ -29,6 +31,11 @@ export default function AnalysisHistory() {
     key: "date",
     direction: "desc",
   });
+  const [confirmModal, setConfirmModal] = useState({
+    isOpen: false,
+    job: null as AnalysisJob | null,
+    action: "approve" as "approve" | "reject",
+  });
 
   const clientOptions = Array.from(
     new Set(analysisHistory.map((a) => a.client).filter(Boolean)),
@@ -41,7 +48,7 @@ export default function AnalysisHistory() {
 
       const formattedData: AnalysisJob[] = data.map((job) => ({
         ...job,
-        summary: processModifications(job.modifications_actions),
+        summary: processModifications(job.action_summary),
       }));
 
       setAnalysisHistory(formattedData);
@@ -61,10 +68,23 @@ export default function AnalysisHistory() {
     setCurrentPage(1);
   }, [searchQuery, clientFilter, dateFrom, dateTo]);
 
-  const handleUpdateStatus = async (
-    jobId: number,
-    action: "approve" | "reject",
-  ) => {
+  const handleUpdateStatus = (jobId: number, action: "approve" | "reject") => {
+    const job = analysisHistory.find((j) => j.job_id === jobId);
+    if (!job) return;
+
+    setConfirmModal({
+      isOpen: true,
+      job,
+      action,
+    });
+  };
+
+  const confirmUpdateStatus = async () => {
+    if (!confirmModal.job) return;
+
+    const { job, action } = confirmModal;
+    const jobId = job.job_id;
+
     try {
       setUpdatingId(jobId);
 
@@ -79,12 +99,13 @@ export default function AnalysisHistory() {
       );
 
       setAnalysisHistory((prev) =>
-        prev.map((job) =>
-          job.job_id === jobId
-            ? { ...job, status: action === "approve" ? "approved" : "rejected" }
-            : job,
+        prev.map((j) =>
+          j.job_id === jobId
+            ? { ...j, status: action === "approve" ? "approved" : "rejected" }
+            : j,
         ),
       );
+      setConfirmModal({ ...confirmModal, isOpen: false });
     } catch (error: any) {
       console.error("Status update failed:", error);
       toast.error(error.response?.data?.detail || "Failed to update status");
@@ -119,6 +140,35 @@ export default function AnalysisHistory() {
 
   return (
     <div className="min-h-screen bg-linear-to-br from-slate-50 via-blue-50/30 to-slate-100 p-4 md:p-6 lg:p-10 space-y-6 lg:space-y-10">
+      <ConfirmationModal
+        isOpen={confirmModal.isOpen}
+        onClose={() => setConfirmModal({ ...confirmModal, isOpen: false })}
+        onConfirm={confirmUpdateStatus}
+        title={`Confirm ${confirmModal.action === "approve" ? "Approval" : "Rejection"}`}
+        message={
+          <>
+            Are you sure you want to {confirmModal.action}{" "}
+            <span className="font-bold text-slate-700">
+              ANAL-JOB-{confirmModal.job?.job_id}
+            </span>
+            ?
+          </>
+        }
+        details={[
+          { label: "Client", value: confirmModal.job?.client || "" },
+          { label: "Contract", value: confirmModal.job?.contract_number || "" },
+        ]}
+        warning={{
+          message:
+            confirmModal.action === "approve"
+              ? "This will approve the analysis and update the product catalog. This action cannot be undone."
+              : "This will reject the analysis and the product catalog won’t be updated. This action cannot be undone.",
+          type: confirmModal.action === "approve" ? "emerald" : "rose",
+        }}
+        variant={confirmModal.action === "approve" ? "emerald" : "rose"}
+        confirmText={confirmModal.action === "approve" ? "Approve" : "Reject"}
+        isSubmitting={updatingId === confirmModal.job?.job_id}
+      />
       <AnalysisHistoryHeader onDownloadHistory={handleDownloadHistory} />
 
       <AnalysisFilters

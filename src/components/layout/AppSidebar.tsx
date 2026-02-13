@@ -146,7 +146,7 @@ export default function AppSidebar() {
   return (
     <>
       {/* Mobile header  */}
-      <header className="md:hidden sticky top-0 left-0 right-0 h-16 flex items-center justify-between px-4 z-40 bg-white border-b border-slate-200">
+      <header className="md:hidden sticky top-0 left-0 right-0 h-16 flex items-center justify-between px-4 z-40">
         <button
           onClick={() => setOpen(true)}
           className="p-2 hover:bg-slate-100 rounded-lg transition-colors"

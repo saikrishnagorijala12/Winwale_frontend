@@ -47,7 +47,7 @@ interface Job {
   user_id: string;
   user: string;
   status: string;
-  modifications_actions: ModificationAction[];
+  action_summary: Record<string, number>;
   created_time: string;
   updated_time: string;
 }
@@ -105,12 +105,12 @@ export default function Dashboard() {
     const totalClients = clients.length;
     const completedJobs = jobs.filter((job) => job.status === "approved").length;
     const pendingJobs = jobs.filter((job) => job.status === "pending").length;
-    
+
     const totalJobsCompleted = jobs.filter((job) => job.status === "approved").length;
     const totalJobs = jobs.length;
     const successRate = totalJobs > 0
-        ? ((totalJobsCompleted / (totalJobs - pendingJobs)) * 100).toFixed(1)
-        : "0.0";
+      ? ((totalJobsCompleted / (totalJobs - pendingJobs)) * 100).toFixed(1)
+      : "0.0";
 
     return { totalClients, completedJobs, pendingJobs, successRate };
   };
@@ -132,11 +132,11 @@ export default function Dashboard() {
       client: job.client,
       contract: job.contract_number,
       status: job.status,
-      add: job.modifications_actions?.filter(a => a.action_type === "NEW_PRODUCT").length || 0,
-      del: job.modifications_actions?.filter(a => a.action_type === "REMOVED_PRODUCT").length || 0,
-      incr: job.modifications_actions?.filter(a => a.action_type === "PRICE_INCREASE").length || 0,
-      decr: job.modifications_actions?.filter(a => a.action_type === "PRICE_DECREASE").length || 0,
-      desc: job.modifications_actions?.filter(a => a.action_type === "DESCRIPTION_CHANGE").length || 0,
+      add: job.action_summary?.["NEW_PRODUCT"] || 0,
+      del: job.action_summary?.["REMOVED_PRODUCT"] || 0,
+      incr: job.action_summary?.["PRICE_INCREASE"] || 0,
+      decr: job.action_summary?.["PRICE_DECREASE"] || 0,
+      desc: job.action_summary?.["DESCRIPTION_CHANGE"] || 0,
     }));
 
   return (
@@ -175,27 +175,27 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 animate-slide-up">
         {loading
           ? Array(4).fill(0).map((_, i) => (
-              <div key={i} className="bg-white p-6 rounded-2xl h-32 flex flex-col justify-between">
-                <div className="flex justify-between">
-                  <Skeleton className="h-3 w-20" />
-                  <Skeleton className="h-10 w-10 rounded-xl" />
-                </div>
-                <Skeleton className="h-8 w-12" />
+            <div key={i} className="bg-white p-6 rounded-2xl h-32 flex flex-col justify-between">
+              <div className="flex justify-between">
+                <Skeleton className="h-3 w-20" />
+                <Skeleton className="h-10 w-10 rounded-xl" />
               </div>
-            ))
+              <Skeleton className="h-8 w-12" />
+            </div>
+          ))
           : stats.map((stat) => (
-              <div key={stat.label} className="bg-white p-6 flex flex-col justify-between rounded-2xl transition-all hover:shadow-lg ">
-                <div className="flex justify-between items-start">
-                  <span className="text-[11px] font-black uppercase tracking-widest" style={{ color: colors.muted }}>{stat.label}</span>
-                  <div className="p-2.5 rounded-xl" style={{ backgroundColor: colors.secondaryBg }}>
-                    <stat.icon className="w-5 h-5 text-[#24548f]" strokeWidth={2.5} />
-                  </div>
-                </div>
-                <div>
-                  <div className="text-3xl font-black tracking-tighter mb-1" style={{ color: colors.fg }}>{stat.value}</div>
+            <div key={stat.label} className="bg-white p-6 flex flex-col justify-between rounded-2xl transition-all hover:shadow-lg ">
+              <div className="flex justify-between items-start">
+                <span className="text-[11px] font-black uppercase tracking-widest" style={{ color: colors.muted }}>{stat.label}</span>
+                <div className="p-2.5 rounded-xl" style={{ backgroundColor: colors.secondaryBg }}>
+                  <stat.icon className="w-5 h-5 text-[#24548f]" strokeWidth={2.5} />
                 </div>
               </div>
-            ))}
+              <div>
+                <div className="text-3xl font-black tracking-tighter mb-1" style={{ color: colors.fg }}>{stat.value}</div>
+              </div>
+            </div>
+          ))}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">

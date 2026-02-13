@@ -15,6 +15,7 @@ import {
 import ModificationsSummary from "./ModificationsSummary";
 import AnalysisActionsMenu from "./AnalysisActionsMenu";
 import Pagination from "./Pagination";
+import { useAnalysis } from "../../context/AnalysisContext";
 import { normalizeStatus, STATUS_BADGE_BASE, STATUS_MAP } from "../../utils/statusUtils";
 import { formatDateTime } from "../../utils/analysisUtils";
 import { AnalysisJob, SortConfig, StatusFilter } from "../../types/analysis.types";
@@ -76,6 +77,7 @@ export default function AnalysisTable({
   onUpdateStatus,
 }: AnalysisTableProps) {
   const navigate = useNavigate();
+  const { setSelectedJobId } = useAnalysis();
   const [openMenuId, setOpenMenuId] = useState<number | null>(null);
 
   useEffect(() => {
@@ -212,7 +214,10 @@ export default function AnalysisTable({
                   return (
                     <tr
                       key={item.job_id}
-                      onClick={() => navigate(`/analyses/${item.job_id}`)}
+                      onClick={() => {
+                        setSelectedJobId(item.job_id);
+                        navigate(`/analyses/details`);
+                      }}
                       className="cursor-pointer group border-b border-slate-50 hover:bg-slate-50/50 transition-colors"
                     >
                       <td className="p-4">
@@ -341,7 +346,10 @@ export default function AnalysisTable({
               return (
                 <div
                   key={item.job_id}
-                  onClick={() => navigate(`/analyses/${item.job_id}`)}
+                  onClick={() => {
+                    setSelectedJobId(item.job_id);
+                    navigate(`/analyses/details`);
+                  }}
                   className="p-4 hover:bg-slate-50/50 transition-colors cursor-pointer"
                 >
                   {/* Header: ID and Actions */}

@@ -2,6 +2,7 @@ import React from "react";
 import { Eye, Edit, File, Trash2, Package } from "lucide-react";
 import { Client } from "../../types/client.types";
 import { useNavigate } from "react-router-dom";
+import { useClient } from "../../context/ClientContext";
 
 interface ClientActionsMenuProps {
   client: Client;
@@ -17,6 +18,7 @@ export const ClientActionsMenu: React.FC<ClientActionsMenuProps> = ({
   onClose,
 }) => {
   const navigate = useNavigate();
+  const { setSelectedClientId } = useClient();
 
   return (
     <>
@@ -57,7 +59,8 @@ export const ClientActionsMenu: React.FC<ClientActionsMenuProps> = ({
         <button
           className="w-full px-4 py-3 text-left text-sm font-bold text-slate-700 hover:bg-slate-50 flex items-center gap-3"
           onClick={() => {
-            navigate(`/clients/${client.id}/products`);
+            setSelectedClientId(client.id);
+            navigate(`/clients/products`);
             onClose();
           }}
         >
