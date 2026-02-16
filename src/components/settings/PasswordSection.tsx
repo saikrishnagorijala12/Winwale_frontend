@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Lock, ChevronRight, X, Eye, EyeOff } from "lucide-react";
-import { passwordRules } from "../../utils/passwordRules";
+import { PASSWORD_RULES as passwordRules, validatePasswordComplexity, validateMatch } from "../../utils/validators";
 
 interface PasswordSectionProps {
   onUpdate: (
@@ -52,23 +52,15 @@ export const PasswordSection = ({
       return;
     }
 
-    if (!newPassword) {
-      setNewError("New password is required");
+    const complexityErr = validatePasswordComplexity(newPassword);
+    if (complexityErr) {
+      setNewError(complexityErr);
       return;
     }
 
-    if (hasFailedRules) {
-      setNewError("Password does not meet all requirements");
-      return;
-    }
-
-    if (!confirmPassword) {
-      setConfirmError("Please confirm your new password");
-      return;
-    }
-
-    if (newPassword !== confirmPassword) {
-      setConfirmError("Passwords do not match");
+    const matchErr = validateMatch(newPassword, confirmPassword, "Passwords");
+    if (matchErr) {
+      setConfirmError(matchErr);
       return;
     }
 
@@ -135,9 +127,8 @@ export const PasswordSection = ({
             <div className="relative">
               <input
                 type={showCurrent ? "text" : "password"}
-                className={`${inputStyles} ${
-                  currentError ? "border-red-500" : ""
-                } pr-10`}
+                className={`${inputStyles} ${currentError ? "border-red-500" : ""
+                  } pr-10`}
                 autoComplete="current-password"
                 placeholder="Current password"
                 value={currentPassword}
@@ -164,9 +155,8 @@ export const PasswordSection = ({
             <div className="relative">
               <input
                 type={showNew ? "text" : "password"}
-                className={`${inputStyles} ${
-                  newError ? "border-red-500" : ""
-                } pr-10`}
+                className={`${inputStyles} ${newError ? "border-red-500" : ""
+                  } pr-10`}
                 autoComplete="new-password"
                 placeholder="New password"
                 value={newPassword}
@@ -192,11 +182,10 @@ export const PasswordSection = ({
 
             {/* Password checklist */}
             <div
-              className={`overflow-hidden transition-all duration-300 ease-in-out ${
-                newPasswordFocused && newPassword.length > 0 && hasFailedRules
+              className={`overflow-hidden transition-all duration-300 ease-in-out ${newPasswordFocused && newPassword.length > 0 && hasFailedRules
                   ? "max-h-40 opacity-100"
                   : "max-h-0 opacity-0"
-              }`}
+                }`}
             >
               <ul className="mt-3 space-y-1 text-sm">
                 {Object.entries(passwordRules).map(([key, rule]) => {
@@ -204,16 +193,14 @@ export const PasswordSection = ({
                   return (
                     <li
                       key={key}
-                      className={`flex items-center gap-2 ${
-                        passed ? "text-green-600" : "text-slate-400"
-                      }`}
+                      className={`flex items-center gap-2 ${passed ? "text-green-600" : "text-slate-400"
+                        }`}
                     >
                       <span
-                        className={`inline-flex h-4 w-4 items-center justify-center rounded-full border text-xs ${
-                          passed
+                        className={`inline-flex h-4 w-4 items-center justify-center rounded-full border text-xs ${passed
                             ? "border-green-600 bg-green-600 text-white"
                             : "border-slate-300"
-                        }`}
+                          }`}
                       >
                         {passed ? "✓" : ""}
                       </span>
@@ -230,9 +217,8 @@ export const PasswordSection = ({
             <div className="relative">
               <input
                 type={showConfirm ? "text" : "password"}
-                className={`${inputStyles} ${
-                  confirmError ? "border-red-500" : ""
-                } pr-10`}
+                className={`${inputStyles} ${confirmError ? "border-red-500" : ""
+                  } pr-10`}
                 autoComplete="new-password"
                 placeholder="Confirm new password"
                 value={confirmPassword}

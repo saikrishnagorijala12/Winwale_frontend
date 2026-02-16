@@ -69,7 +69,7 @@ export default function AddContractModal({
 
     if (step === 1) {
       const validation = validateStep1(contract);
-      
+
       setErrors(validation.errors);
 
       if (validation.isValid) {
@@ -100,9 +100,9 @@ export default function AddContractModal({
 
       const formattedPayload = {
         ...payload,
-        contract_officer_name: payload.contract_officer_name?.trim() || "",
-        contract_number: payload.contract_number.trim(),
-        origin_country: payload.origin_country?.trim() || "USA",
+        contract_officer_name: payload.contract_officer_name || "",
+        contract_number: payload.contract_number,
+        origin_country: payload.origin_country || "USA",
         gsa_proposed_discount: Number(payload.gsa_proposed_discount) || 0,
         normal_delivery_time: Number(payload.normal_delivery_time) || 0,
         expedited_delivery_time: Number(payload.expedited_delivery_time) || 0,
@@ -182,11 +182,10 @@ export default function AddContractModal({
               <React.Fragment key={stepNum}>
                 <div className="flex items-center gap-3">
                   <div
-                    className={`w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all ${
-                      active
+                    className={`w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all ${active
                         ? "bg-[#38A1DB] text-white"
                         : "bg-slate-200 text-slate-400"
-                    }`}
+                      }`}
                   >
                     {completed ? <CheckCircle2 className="w-6 h-6" /> : stepNum}
                   </div>

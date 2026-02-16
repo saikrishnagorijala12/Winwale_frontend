@@ -313,13 +313,6 @@ const ClientActivation = () => {
     toast.error(errorMessage);
   };
 
-  const trimClientPayload = (data: EditingClient): any => {
-    const trimmed: any = {};
-    Object.entries(data).forEach(([key, value]) => {
-      trimmed[key] = typeof value === "string" ? value.trim() : value;
-    });
-    return trimmed;
-  };
 
   const openConfirmModal = (client: any, action: "approve" | "reject") => {
     setConfirmModal({ isOpen: true, client, action });
@@ -406,8 +399,7 @@ const ClientActivation = () => {
 
     setIsSubmitting(true);
     try {
-      const payload = trimClientPayload(editingClient);
-      await api.put(`/clients/${editingClient.id}`, payload);
+      await api.put(`/clients/${editingClient.id}`, editingClient);
       toast.success("Client updated successfully");
       await fetchClients();
       setIsEditModalOpen(false);

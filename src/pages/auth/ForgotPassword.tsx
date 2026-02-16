@@ -58,7 +58,7 @@ const ForgotPassword: React.FC = () => {
 
     setLoading(true);
     try {
-      await resetPassword({ username: email });
+      await resetPassword({ username: email.trim() });
       setStep("confirm");
     } catch (err: any) {
       if (err?.name === "UserNotFoundException") {
@@ -80,8 +80,8 @@ const ForgotPassword: React.FC = () => {
     setLoading(true);
     try {
       await confirmResetPassword({
-        username: email,
-        confirmationCode: otp,
+        username: email.trim(),
+        confirmationCode: otp.trim(),
         newPassword,
       });
       navigate("/login");
@@ -196,11 +196,10 @@ const ForgotPassword: React.FC = () => {
             )}
 
             <div
-              className={`overflow-hidden transition-all duration-300 ${
-                passwordFocused && newPassword.length > 0 && hasFailedRules
+              className={`overflow-hidden transition-all duration-300 ${passwordFocused && newPassword.length > 0 && hasFailedRules
                   ? "max-h-40 opacity-100"
                   : "max-h-0 opacity-0"
-              }`}
+                }`}
             >
               <ul className="mt-3 space-y-1 text-sm">
                 {Object.entries(passwordRules).map(([key, rule]) => {
@@ -208,16 +207,14 @@ const ForgotPassword: React.FC = () => {
                   return (
                     <li
                       key={key}
-                      className={`flex items-center gap-2 ${
-                        passed ? "text-green-600" : "text-slate-400"
-                      }`}
+                      className={`flex items-center gap-2 ${passed ? "text-green-600" : "text-slate-400"
+                        }`}
                     >
                       <span
-                        className={`inline-flex h-4 w-4 items-center justify-center rounded-full border text-xs ${
-                          passed
+                        className={`inline-flex h-4 w-4 items-center justify-center rounded-full border text-xs ${passed
                             ? "border-green-600 bg-green-600 text-white"
                             : "border-slate-300"
-                        }`}
+                          }`}
                       >
                         {passed ? "✓" : ""}
                       </span>

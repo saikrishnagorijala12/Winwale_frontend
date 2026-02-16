@@ -32,7 +32,9 @@ interface Client {
   client_id: string;
   company_name: string;
   contract_number: string;
+  has_products: Boolean;
 }
+ 
 
 const steps = [
   { id: 1, title: "Select Client", description: "Choose a client" },
@@ -239,8 +241,24 @@ export default function PriceListAnalysis() {
               <div className="flex justify-end">
                 <button
                   onClick={() => {
-                    setCurrentStep(2);
+                    const client = clients.find(
+                       (c) =>String(c.client_id) === selectedClient
+                  );
+ 
+                  if (!client) {
+                    setError("Please select a client.");
+                    return;
+                  }
+ 
+                  if (!client.has_products) {
+                    setError(
+                      "No products found for this client. Please upload initial GSA products for selected client before running Price List Analysis."
+                    );
+                    return;
+                  }
+                    
                     setError(null);
+                    setCurrentStep(2);
                   }}
                   disabled={!selectedClient}
                   className="btn-primary"

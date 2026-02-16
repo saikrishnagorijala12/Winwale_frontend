@@ -74,9 +74,8 @@ export function Step1({
           <input
             type="text"
             placeholder="Search by Client ID or Company Name"
-            className={`w-full mt-2 px-4 py-3 pr-10 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] outline-none ${
-              isClientSelected ? "bg-slate-50 cursor-not-allowed" : ""
-            }`}
+            className={`w-full mt-2 px-4 py-3 pr-10 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] outline-none ${isClientSelected ? "bg-slate-50 cursor-not-allowed" : ""
+              }`}
             value={clientSearch}
             readOnly={isClientSelected}
             onFocus={() => {
@@ -252,6 +251,9 @@ export function Step2({ contract, onChange, errors }: Step2Props) {
           <option value="Origin">Origin</option>
           <option value="Destination">Destination</option>
         </select>
+        {errors.fob_term && (
+          <p className="mt-1 text-xs text-red-600">{errors.fob_term}</p>
+        )}
       </div>
 
       <div>
@@ -269,6 +271,11 @@ export function Step2({ contract, onChange, errors }: Step2Props) {
           <option value="No">No</option>
           <option value="N/A">N/A</option>
         </select>
+        {errors.energy_star_compliance && (
+          <p className="mt-1 text-xs text-red-600">
+            {errors.energy_star_compliance}
+          </p>
+        )}
       </div>
       <div>
         <label className="text-sm font-bold text-slate-700">

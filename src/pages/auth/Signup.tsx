@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import AuthLayout from "../../components/auth/AuthLayout";
 import { validateSignupForm } from "@/src/utils/authValidators";
-import { passwordRules } from "@/src/utils/passwordRules";
+import { PASSWORD_RULES } from "@/src/utils/validators";
 
 type FormErrors = {
   fullName?: string;
@@ -22,27 +22,24 @@ type FormErrors = {
   confirmPassword?: string;
 };
 
-const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const PasswordChecklist: React.FC<{ password: string }> = ({ password }) => {
   return (
     <ul className="mt-3 space-y-1 text-sm">
-      {Object.entries(passwordRules).map(([key, rule]) => {
+      {Object.entries(PASSWORD_RULES).map(([key, rule]) => {
         const passed = rule.test(password);
 
         return (
           <li
             key={key}
-            className={`flex items-center gap-2 ${
-              passed ? "text-green-600" : "text-slate-400"
-            }`}
+            className={`flex items-center gap-2 ${passed ? "text-green-600" : "text-slate-400"
+              }`}
           >
             <span
-              className={`inline-flex h-4 w-4 items-center justify-center rounded-full border text-xs ${
-                passed
+              className={`inline-flex h-4 w-4 items-center justify-center rounded-full border text-xs ${passed
                   ? "border-green-600 bg-green-600 text-white"
                   : "border-slate-300"
-              }`}
+                }`}
             >
               {passed ? "✓" : ""}
             </span>
@@ -74,7 +71,7 @@ const Signup: React.FC = () => {
     setErrors((prev) => ({ ...prev, [field]: undefined }));
   };
 
-  const hasFailedRules = Object.values(passwordRules).some(
+  const hasFailedRules = Object.values(PASSWORD_RULES).some(
     (rule) => !rule.test(formData.password),
   );
 
@@ -93,12 +90,12 @@ const Signup: React.FC = () => {
 
     try {
       await signUp({
-        username: formData.email,
+        username: formData.email.trim(),
         password: formData.password,
         options: {
           userAttributes: {
-            email: formData.email,
-            name: formData.fullName,
+            email: formData.email.trim(),
+            name: formData.fullName.trim(),
           },
         },
       });
@@ -120,8 +117,8 @@ const Signup: React.FC = () => {
     setError(null);
     try {
       await confirmSignUp({
-        username: formData.email,
-        confirmationCode: otp,
+        username: formData.email.trim(),
+        confirmationCode: otp.trim(),
       });
       navigate("/login");
     } catch (err: any) {
@@ -142,7 +139,7 @@ const Signup: React.FC = () => {
   const title = step === "details" ? "Sign up" : "Verify email";
   const subtitle =
     step === "details"
-      ? "Join the Winvale Analysis Platform"
+      ? "Company employees only – use your @winvale.com email"
       : `Enter the code sent to ${formData.email}`;
 
   return (
@@ -238,13 +235,12 @@ const Signup: React.FC = () => {
             </div>
 
             <div
-              className={`overflow-hidden transition-all duration-300 ease-in-out ${
-                passwordFocused &&
-                hasFailedRules &&
-                formData.password.length > 0
+              className={`overflow-hidden transition-all duration-300 ease-in-out ${passwordFocused &&
+                  hasFailedRules &&
+                  formData.password.length > 0
                   ? "max-h-40 opacity-100"
                   : "max-h-0 opacity-0"
-              }`}
+                }`}
             >
               <PasswordChecklist password={formData.password} />
             </div>

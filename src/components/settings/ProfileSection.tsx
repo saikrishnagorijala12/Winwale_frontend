@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Save, Shield } from "lucide-react";
 import { Role } from "@/src/types/roles.types";
+import * as v from "../../utils/validators";
 
 interface ProfileSectionProps {
   user: any;
@@ -12,8 +13,6 @@ const ROLE_MAP: Record<Role, string> = {
   admin: "Administrator",
   user: "Consultant",
 };
-
-const PHONE_REGEX = /^\+?\d{1,14}$/;
 
 const inputStyles =
   "w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-[#3498db]/10 focus:border-[#3498db] transition-all bg-slate-50/50 text-slate-700";
@@ -44,26 +43,22 @@ export const ProfileSection = ({
     setPhoneError("");
     setFormError("");
 
-    if (!trimmedName) {
-      setNameError("Full name is required");
+    const nameError =
+      v.validateMinLength(name, 3, "Full name") ||
+      v.validateMaxLength(name, 30, "Full name") ||
+      v.validateName(name) ||
+      undefined;
+    if (nameError) {
+      setNameError(nameError);
       return;
     }
 
-    if (trimmedName.length < 3) {
-      setNameError("Full name must be at least 3 characters");
-      return;
-    }
-
-    if (trimmedName.length > 30) {
-      setNameError("Full name must be under 30 characters");
-      return;
-    }
-
-    if (trimmedPhone && !PHONE_REGEX.test(trimmedPhone)) {
-      setPhoneError(
-        "Phone number must be up to 14 digits and may start with +",
-      );
-      return;
+    if (trimmedPhone) {
+      const phoneError = v.validatePhone(trimmedPhone);
+      if (phoneError) {
+        setPhoneError(phoneError);
+        return;
+      }
     }
 
     if (

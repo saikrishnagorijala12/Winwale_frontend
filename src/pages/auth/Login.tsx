@@ -24,21 +24,21 @@ const Login: React.FC = () => {
   const isAuthProcessed = useRef(false);
 
   const validate = (): boolean => {
-  const newErrors: FormErrors = {};
+    const newErrors: FormErrors = {};
 
-  const emailError = validateEmail(email);
-  if (emailError) {
-    newErrors.email = emailError;
-  }
+    const emailError = validateEmail(email);
+    if (emailError) {
+      newErrors.email = emailError;
+    }
 
-  const passwordError = validateRequired(password, "Password");
-  if (passwordError) {
-    newErrors.password = passwordError;
-  }
+    const passwordError = validateRequired(password, "Password");
+    if (passwordError) {
+      newErrors.password = passwordError;
+    }
 
-  setErrors(newErrors);
-  return Object.keys(newErrors).length === 0;
-};
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -53,7 +53,7 @@ const Login: React.FC = () => {
 
     try {
       await signIn({
-        username: email,
+        username: email.trim(),
         password,
       });
 

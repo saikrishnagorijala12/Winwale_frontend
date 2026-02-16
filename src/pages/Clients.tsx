@@ -144,21 +144,6 @@ export default function ClientsPage() {
     setBackendError(errorMessage);
   };
 
-  const trimClientPayload = <T extends ClientFormData | EditingClient>(
-    data: T,
-  ): T => {
-    const trimmed: any = {};
-
-    Object.entries(data).forEach(([key, value]) => {
-      if (typeof value === "string") {
-        trimmed[key] = value.trim();
-      } else {
-        trimmed[key] = value;
-      }
-    });
-
-    return trimmed;
-  };
 
   const handleAddClient = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -181,8 +166,7 @@ export default function ClientsPage() {
 
     setIsSubmitting(true);
     try {
-      const payload = trimClientPayload(newClient);
-      const res = await api.post("/clients", payload);
+      const res = await api.post("/clients", newClient);
 
       const createdClient = createClientFromResponse(res);
       setClients((prev) => [createdClient, ...prev]);
@@ -218,9 +202,7 @@ export default function ClientsPage() {
 
     setIsSubmitting(true);
     try {
-      const payload = trimClientPayload(editingClient);
-
-      const res = await api.put(`/clients/${editingClient.id}`, payload);
+      const res = await api.put(`/clients/${editingClient.id}`, editingClient);
       const updatedClient = updateClientFromResponse(
         res,
         editingClient.products || 0,

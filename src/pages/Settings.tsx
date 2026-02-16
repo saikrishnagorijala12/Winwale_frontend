@@ -24,8 +24,8 @@ export default function Settings() {
       });
 
       await axios.put("/users", {
-        name: data.fullName.trim(),
-        phone_no: data.phone, 
+        name: data.fullName,
+        phone_no: data.phone,
       });
 
       await refreshUser();

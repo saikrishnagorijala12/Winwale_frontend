@@ -28,7 +28,6 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({ title, subtitle, children }) =>
         </div>
 
         <div className="text-blue-200 text-sm">
-          {/* &copy; 2024 Winvale Strategy & Consulting. All rights reserved. */}
         </div>
       </div>
 

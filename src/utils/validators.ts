@@ -34,29 +34,34 @@ export const validateRequired = (value: any, fieldName: string) => {
 };
 
 export const validateMinLength = (value: string | undefined, min: number, label: string) => {
-  if (value && value.length < min) return `${label} must be at least ${min} characters`;
+  const trimmed = value?.trim() || "";
+  if (trimmed && trimmed.length < min) return `${label} must be at least ${min} characters`;
   return null;
 };
 
-export const validateMaxLength = (value: string | undefined, max: number, label: string ) => {
-  if (value && value.length > max) return `${label} must be under ${max} characters`;
+export const validateMaxLength = (value: string | undefined, max: number, label: string) => {
+  const trimmed = value?.trim() || "";
+  if (trimmed && trimmed.length > max) return `${label} must be under ${max} characters`;
   return null;
 };
 
 export const validateEmail = (value: string | undefined) => {
-  if (!value?.trim()) return "Email is required";
-  if (!EMAIL_REGEX.test(value)) return "Please enter a valid email address";
-  return validateMaxLength(value, 50,"Email");
+  const trimmed = value?.trim() || "";
+  if (!trimmed) return "Email is required";
+  if (!EMAIL_REGEX.test(trimmed)) return "Please enter a valid email address";
+  return validateMaxLength(trimmed, 50, "Email");
 };
 
 export const validatePhone = (value: string | undefined, label: string = "Phone number") => {
-  if (!value?.trim()) return `${label} is required`;
-  if (!PHONE_REGEX.test(value)) return `${label} must be up to 14 digits and may start with +`;
+  const trimmed = value?.trim() || "";
+  if (!trimmed) return `${label} is required`;
+  if (!PHONE_REGEX.test(trimmed)) return `${label} must be up to 14 digits and may start with +`;
   return null;
 };
 
 export const validateZip = (value: string | undefined) => {
-  if (value && !ZIP_REGEX.test(value)) {
+  const trimmed = value?.trim() || "";
+  if (trimmed && !ZIP_REGEX.test(trimmed)) {
     return "ZIP code must be alphanumeric and up to 7 characters";
   }
   return null;
@@ -66,14 +71,14 @@ export const validateName = (value: string | undefined, isCompany = false) => {
   const trimmed = value?.trim() || "";
   const label = isCompany ? "Company name" : "Name";
   const regex = isCompany ? COMPANY_NAME_REGEX : NAME_REGEX;
-  
+
   if (!trimmed) return `${label} is required`;
   if (!regex.test(trimmed)) {
-    return isCompany 
+    return isCompany
       ? "Company name can contain letters, numbers, spaces, and . , ' & ( ) - only"
       : "Name can contain letters, spaces, and . ' - only";
   }
-  return validateMaxLength(trimmed, 30,"Name");
+  return validateMaxLength(trimmed, 30, "Name");
 };
 
 export const validateOptionalName = (value: string | undefined, fieldLabel: string = "Name") => {
@@ -82,7 +87,7 @@ export const validateOptionalName = (value: string | undefined, fieldLabel: stri
   if (!NAME_REGEX.test(trimmed)) {
     return `${fieldLabel} can contain letters, spaces, and . ' - only`;
   }
-  return validateMaxLength(trimmed, 30,"Name");
+  return validateMaxLength(trimmed, 30, "Name");
 };
 
 export const validateRange = (value: number, min: number, max: number, label: string) => {

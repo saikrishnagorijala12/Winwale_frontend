@@ -130,9 +130,9 @@ export default function ContractTable({
                         <span className="font-bold text-slate-800 text-sm transition-colors">
                           {contract.client}
                         </span>
-                        <span className="text-[11px] text-slate-400 font-medium">
+                        {/* <span className="text-[11px] text-slate-400 font-medium">
                           ID: #{contract.client_id}
-                        </span>
+                        </span> */}
                       </div>
                     </div>
                   </td>
@@ -381,7 +381,7 @@ const ContractActionMenu = ({ onView, onEdit, onDelete, onClose }: any) => (
       >
         <Edit className="w-4 h-4 text-slate-400" /> Edit Contract
       </button>
-      <div className="h-px bg-slate-100 my-1" />
+      {/* <div className="h-px bg-slate-100 my-1" />
       <button
         className="text-red-500 w-full px-4 py-3 text-left text-sm font-bold hover:bg-slate-50 flex items-center gap-3"
         onClick={() => {
@@ -390,7 +390,7 @@ const ContractActionMenu = ({ onView, onEdit, onDelete, onClose }: any) => (
         }}
       >
         <Trash2 className="w-4 h-4" /> Delete Contract
-      </button>
+      </button> */}
     </div>
   </>
 );

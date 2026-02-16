@@ -75,8 +75,11 @@ export default function EditContractModal({
     e.preventDefault();
 
     if (step === 1) {
-      const validation = validateStep1(formData);
-      
+      const validation = validateStep1({
+        ...formData,
+        client_id: initialContract.client_id,
+      } as any);
+
       setErrors(validation.errors);
 
       if (validation.isValid) {
@@ -90,14 +93,24 @@ export default function EditContractModal({
       return;
     }
 
+    const validationStep2 = validateStep2({
+      ...formData,
+      client_id: initialContract.client_id,
+    } as any);
+
+    if (!validationStep2.isValid) {
+      setErrors(validationStep2.errors);
+      return;
+    }
+
     setIsSubmitting(true);
     setErrors({});
 
     try {
       const payload: ClientContractUpdate = {
         ...formData,
-        contract_number: formData.contract_number.trim(),
-        origin_country: formData.origin_country?.trim() || "USA",
+        contract_number: formData.contract_number,
+        origin_country: formData.origin_country || "USA",
         gsa_proposed_discount: Number(formData.gsa_proposed_discount) || 0,
         normal_delivery_time: Number(formData.normal_delivery_time) || 0,
         expedited_delivery_time: Number(formData.expedited_delivery_time) || 0,
@@ -162,11 +175,10 @@ export default function EditContractModal({
               <React.Fragment key={stepNum}>
                 <div className="flex items-center gap-3">
                   <div
-                    className={`w-10 h-10 rounded-full flex items-center justify-center font-bold transition-colors ${
-                      isActive
-                        ? "bg-[#38A1DB] text-white"
-                        : "bg-slate-200 text-slate-400"
-                    }`}
+                    className={`w-10 h-10 rounded-full flex items-center justify-center font-bold transition-colors ${isActive
+                      ? "bg-[#38A1DB] text-white"
+                      : "bg-slate-200 text-slate-400"
+                      }`}
                   >
                     {isCompleted ? (
                       <CheckCircle2 className="w-6 h-6" />
@@ -207,12 +219,11 @@ export default function EditContractModal({
               <div className="grid md:grid-cols-2 gap-6">
                 <div className="md:col-span-2">
                   <label className="text-sm font-bold text-slate-700">
-                    Contract Number *
+                    Contract Number <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
-                    className={`w-full mt-2 px-4 py-3 rounded-xl border-2 transition-all outline-none border-slate-200 focus:border-[#38A1DB]"
-                    }`}
+                    className="w-full mt-2 px-4 py-3 rounded-xl border-2 transition-all outline-none border-slate-200 focus:border-[#38A1DB]"
                     value={formData.contract_number}
                     onChange={(e) =>
                       setFormData({
@@ -243,6 +254,11 @@ export default function EditContractModal({
                       })
                     }
                   />
+                  {errors.contract_officer_name && (
+                    <p className="mt-1 text-xs text-red-500 font-medium">
+                      {errors.contract_officer_name}
+                    </p>
+                  )}
                 </div>
 
                 <div>
@@ -260,6 +276,11 @@ export default function EditContractModal({
                       })
                     }
                   />
+                  {errors.contract_officer_address && (
+                    <p className="mt-1 text-xs text-red-500 font-medium">
+                      {errors.contract_officer_address}
+                    </p>
+                  )}
                 </div>
 
                 <div>
@@ -277,6 +298,11 @@ export default function EditContractModal({
                       })
                     }
                   />
+                  {errors.contract_officer_city && (
+                    <p className="mt-1 text-xs text-red-500 font-medium">
+                      {errors.contract_officer_city}
+                    </p>
+                  )}
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
@@ -295,6 +321,11 @@ export default function EditContractModal({
                         })
                       }
                     />
+                    {errors.contract_officer_state && (
+                      <p className="mt-1 text-xs text-red-500 font-medium">
+                        {errors.contract_officer_state}
+                      </p>
+                    )}
                   </div>
                   <div>
                     <label className="text-sm font-bold text-slate-700">
@@ -311,6 +342,11 @@ export default function EditContractModal({
                         })
                       }
                     />
+                    {errors.contract_officer_zip && (
+                      <p className="mt-1 text-xs text-red-500 font-medium">
+                        {errors.contract_officer_zip}
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>
@@ -330,6 +366,11 @@ export default function EditContractModal({
                     <option value="Origin">Origin</option>
                     <option value="Destination">Destination</option>
                   </select>
+                  {errors.fob_term && (
+                    <p className="mt-1 text-xs text-red-500 font-medium">
+                      {errors.fob_term}
+                    </p>
+                  )}
                 </div>
 
                 <div>
@@ -350,6 +391,11 @@ export default function EditContractModal({
                     <option value="No">No</option>
                     <option value="N/A">N/A</option>
                   </select>
+                  {errors.energy_star_compliance && (
+                    <p className="mt-1 text-xs text-red-500 font-medium">
+                      {errors.energy_star_compliance}
+                    </p>
+                  )}
                 </div>
 
                 <div>
@@ -367,6 +413,11 @@ export default function EditContractModal({
                       })
                     }
                   />
+                  {errors.normal_delivery_time && (
+                    <p className="mt-1 text-xs text-red-500 font-medium">
+                      {errors.normal_delivery_time}
+                    </p>
+                  )}
                 </div>
 
                 <div>
@@ -384,6 +435,11 @@ export default function EditContractModal({
                       })
                     }
                   />
+                  {errors.expedited_delivery_time && (
+                    <p className="mt-1 text-xs text-red-500 font-medium">
+                      {errors.expedited_delivery_time}
+                    </p>
+                  )}
                 </div>
 
                 <div className="md:col-span-2">
@@ -398,6 +454,33 @@ export default function EditContractModal({
                       setFormData({ ...formData, q_v_discount: e.target.value })
                     }
                   />
+                  {errors.q_v_discount && (
+                    <p className="mt-1 text-xs text-red-500 font-medium">
+                      {errors.q_v_discount}
+                    </p>
+                  )}
+                </div>
+
+                <div className="md:col-span-2">
+                  <label className="text-sm font-bold text-slate-700">
+                    Additional Concessions
+                  </label>
+                  <textarea
+                    rows={2}
+                    className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] outline-none resize-none"
+                    value={formData.additional_concessions}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        additional_concessions: e.target.value,
+                      })
+                    }
+                  />
+                  {errors.additional_concessions && (
+                    <p className="mt-1 text-xs text-red-500 font-medium">
+                      {errors.additional_concessions}
+                    </p>
+                  )}
                 </div>
               </div>
             )}
