@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { resetPassword, confirmResetPassword } from "aws-amplify/auth";
 import { Mail, Lock, Loader2, ArrowRight, ArrowLeft } from "lucide-react";
 import AuthLayout from "../../components/auth/AuthLayout";
-import { passwordRules } from "../../utils/passwordRules";
+import { PASSWORD_RULES as passwordRules } from "@/src/utils/validators";
 import { validateEmail } from "@/src/utils/validators";
 
 interface FormErrors {

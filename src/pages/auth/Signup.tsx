@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import AuthLayout from "../../components/auth/AuthLayout";
 import { validateSignupForm } from "@/src/utils/authValidators";
-import { PASSWORD_RULES } from "@/src/utils/validators";
+import { PASSWORD_RULES as passwordRules } from "@/src/utils/validators";
 
 type FormErrors = {
   fullName?: string;
@@ -26,7 +26,7 @@ type FormErrors = {
 const PasswordChecklist: React.FC<{ password: string }> = ({ password }) => {
   return (
     <ul className="mt-3 space-y-1 text-sm">
-      {Object.entries(PASSWORD_RULES).map(([key, rule]) => {
+      {Object.entries(passwordRules).map(([key, rule]) => {
         const passed = rule.test(password);
 
         return (
@@ -71,7 +71,7 @@ const Signup: React.FC = () => {
     setErrors((prev) => ({ ...prev, [field]: undefined }));
   };
 
-  const hasFailedRules = Object.values(PASSWORD_RULES).some(
+  const hasFailedRules = Object.values(passwordRules).some(
     (rule) => !rule.test(formData.password),
   );
 
