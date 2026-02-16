@@ -15,6 +15,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import api from "@/src/lib/axios";
+import { useAnalysis } from "../../context/AnalysisContext";
 import {
   normalizeStatus,
   STATUS_BADGE_BASE,
@@ -63,6 +64,7 @@ interface Client {
 export default function Dashboard() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { setSelectedJobId } = useAnalysis();
 
   const [clients, setClients] = useState<Client[]>([]);
   const [jobs, setJobs] = useState<Job[]>([]);
@@ -236,7 +238,15 @@ export default function Dashboard() {
                   const slug = normalizeStatus(item.status);
                   const config = slug === "unknown" ? null : STATUS_MAP[slug];
                   return (
-                    <div key={item.id} onClick={() => navigate(`/analyses/${item.id}`)} className="group flex items-center gap-4 p-4 rounded-2xl border border-transparent hover:shadow-sm transition-all cursor-pointer" style={{ backgroundColor: `${colors.bg}80` }}>
+                    <div
+                      key={item.id}
+                      onClick={() => {
+                        setSelectedJobId(Number(item.id));
+                        navigate(`/analyses/details`);
+                      }}
+                      className="group flex items-center gap-4 p-4 rounded-2xl border border-transparent hover:shadow-sm transition-all cursor-pointer"
+                      style={{ backgroundColor: `${colors.bg}80` }}
+                    >
                       <div className="w-12 h-12 rounded-xl bg-white border flex items-center justify-center shrink-0 shadow-sm group-hover:scale-105 transition-transform" style={{ borderColor: colors.border }}>
                         <FileText className="w-5 h-5" style={{ color: colors.primary }} />
                       </div>

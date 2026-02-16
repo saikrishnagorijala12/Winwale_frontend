@@ -17,6 +17,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import api from "@/src/lib/axios";
+import { useAnalysis } from "../../context/AnalysisContext";
 import {
   normalizeStatus,
   STATUS_BADGE_BASE,
@@ -30,6 +31,7 @@ const Skeleton = ({ className }) => (
 export default function UnifiedAdminDashboard() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { setSelectedJobId } = useAnalysis();
 
   const [usersList, setUsersList] = useState([]);
   const [clients, setClients] = useState([]);
@@ -270,7 +272,10 @@ export default function UnifiedAdminDashboard() {
                   return (
                     <div
                       key={item.id}
-                      onClick={() => navigate(`/analyses/${item.id}`)}
+                      onClick={() => {
+                        setSelectedJobId(Number(item.id));
+                        navigate(`/analyses/details`);
+                      }}
                       className="group flex items-center gap-4 p-4 rounded-2xl border border-transparent hover:shadow-sm transition-all cursor-pointer"
                       style={{ backgroundColor: `${colors.bg}80` }}
                     >

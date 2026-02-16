@@ -97,25 +97,27 @@ const AppRoutes: React.FC = () => {
         <Route element={<ProtectedRoute isAuthenticated={isAuthenticated} />}>
           <Route element={<AppLayout />}>
             <Route element={<ClientProvider />}>
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/settings" element={<Settings />} />
+              <Route element={<AnalysisProvider />}>
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/settings" element={<Settings />} />
 
-              <Route
-                element={
-                  <ProtectedRoute
-                    isAuthenticated={isAuthenticated}
-                    allowedRoles={[ROLES.USER, ROLES.ADMIN]}
+                <Route
+                  element={
+                    <ProtectedRoute
+                      isAuthenticated={isAuthenticated}
+                      allowedRoles={[ROLES.USER, ROLES.ADMIN]}
+                    />
+                  }
+                >
+                  <Route path="/clients" element={<Clients />} />
+                  <Route
+                    path="/clients/products"
+                    element={<ClientProducts />}
                   />
-                }
-              >
-                <Route path="/clients" element={<Clients />} />
-                <Route path="/clients/products" element={<ClientProducts />} />
-                <Route path="/contracts" element={<ContractManagement />} />
+                  <Route path="/contracts" element={<ContractManagement />} />
 
-                <Route path="/gsa-products" element={<GsaProducts />} />
-                <Route path="/gsa-products/upload" element={<UploadGsa />} />
-                {/* <Route path="/pricelist-analysis" element={<Analysis />} /> */}
-                <Route element={<AnalysisProvider />}>
+                  <Route path="/gsa-products" element={<GsaProducts />} />
+                  <Route path="/gsa-products/upload" element={<UploadGsa />} />
                   <Route
                     path="/pricelist-analysis"
                     element={<PriceListAnalysis />}
@@ -135,7 +137,6 @@ const AppRoutes: React.FC = () => {
                     element={<AnalysisDetails />}
                   />
                 </Route>
-                {/* <Route path="/downloads" element={<DownloadHistory />} /> */}
               </Route>
 
               <Route
