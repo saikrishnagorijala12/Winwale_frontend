@@ -1,0 +1,164 @@
+import React from "react";
+import {
+    FileSpreadsheet,
+    Check,
+    Upload,
+    X,
+    ChevronLeft,
+    ChevronRight,
+    AlertCircle,
+} from "lucide-react";
+
+interface FileUploadStepProps {
+    file: File | null;
+    uploadedFileName: string;
+    previewData: any[] | null;
+    totalRows: number;
+    error: string | null;
+    onFileChange: (e: React.ChangeEvent<HTMLInputElement> | React.MouseEvent) => void;
+    onBack: () => void;
+    onContinue: () => void;
+    onClearFile: () => void;
+}
+
+export const FileUploadStep = ({
+    file,
+    uploadedFileName,
+    previewData,
+    totalRows,
+    error,
+    onFileChange,
+    onBack,
+    onContinue,
+    onClearFile,
+}: FileUploadStepProps) => {
+    return (
+        <div className="group bg-white/80 backdrop-blur-md rounded-3xl border border-slate-200 shadow-2xl shadow-slate-200/60 overflow-hidden">
+            <div className="p-8 border-b border-slate-100 bg-slate-50/30">
+                <div className="flex items-center gap-2 mb-2">
+                    <div className="p-2.5 bg-cyan-50 rounded-xl shadow-sm ring-1 ring-cyan-100">
+                        <FileSpreadsheet className="w-5 h-5 text-[#3399cc]" />
+                    </div>
+                    <h3 className="text-xl font-semibold text-slate-900">
+                        Upload Commercial Pricelist
+                    </h3>
+                </div>
+                <p className="text-sm text-slate-500">
+                    Upload the updated commercial pricelist (Excel format)
+                </p>
+            </div>
+
+            <div className="p-6 space-y-6">
+                <input
+                    id="file-upload-input"
+                    type="file"
+                    className="hidden"
+                    accept=".xlsx"
+                    onChange={onFileChange}
+                />
+                <div
+                    className={`border-2 border-dashed rounded-xl p-12 text-center transition-colors cursor-pointer ${file
+                            ? "border-emerald-500 bg-emerald-50"
+                            : "border-slate-300 hover:border-[#3399cc] hover:bg-cyan-50/50"
+                        }`}
+                    onClick={onFileChange}
+                >
+                    {file ? (
+                        <div className="space-y-3">
+                            <div className="w-16 h-16 mx-auto rounded-xl bg-emerald-100 flex items-center justify-center">
+                                <Check className="w-8 h-8 text-emerald-600" />
+                            </div>
+                            <div>
+                                <p className="font-medium text-slate-900">{uploadedFileName}</p>
+                                <p className="text-sm text-slate-500">Click to replace</p>
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="space-y-3">
+                            <div className="w-16 h-16 bg-white rounded-2xl shadow-sm flex items-center justify-center mx-auto">
+                                <Upload className="w-8 h-8 text-[#3399cc]" />
+                            </div>
+                            <div>
+                                <p className="font-bold text-slate-900">
+                                    Click to browse and upload
+                                </p>
+                                <p className="text-sm text-slate-500">Excel files (.xlsx)</p>
+                            </div>
+                        </div>
+                    )}
+                </div>
+
+                {previewData && previewData.length > 0 && (
+                    <div className="mt-6 border border-slate-200 rounded-xl overflow-hidden">
+                        <div className="bg-slate-50 px-4 py-2 border-b border-slate-200 flex justify-between items-center">
+                            <span className="text-[10px] font-bold text-slate-500 uppercase">
+                                Data Preview ({totalRows} rows)
+                            </span>
+                            <button
+                                onClick={onClearFile}
+                                className="text-slate-400 hover:text-red-500"
+                            >
+                                <X className="w-4 h-4" />
+                            </button>
+                        </div>
+                        <div className="max-h-100 overflow-auto">
+                            <table className="w-full text-[11px] text-left border-collapse">
+                                <thead className="sticky top-0 z-10">
+                                    <tr className="bg-slate-100 border-b border-slate-200">
+                                        {Object.keys(previewData[0]).map((h) => (
+                                            <th
+                                                key={h}
+                                                className="px-4 py-2 font-bold text-slate-700 whitespace-nowrap"
+                                            >
+                                                {h}
+                                            </th>
+                                        ))}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {previewData.slice(0, 10).map((row, i) => (
+                                        <tr
+                                            key={i}
+                                            className="bg-white hover:bg-slate-50 border-b border-slate-50 transition-colors"
+                                        >
+                                            {Object.values(row).map((val: any, j) => (
+                                                <td
+                                                    key={j}
+                                                    className="px-4 py-2 text-slate-600 whitespace-nowrap"
+                                                >
+                                                    {String(val)}
+                                                </td>
+                                            ))}
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                )}
+
+                {error && (
+                    <div className="p-4 bg-red-50 text-red-700 rounded-xl flex items-center gap-2">
+                        <AlertCircle className="w-5 h-5" /> {error}
+                    </div>
+                )}
+
+                <div className="flex justify-between">
+                    <button
+                        onClick={onBack}
+                        className="h-11 flex items-center gap-2 px-6 py-3 rounded-xl border border-slate-200 bg-white text-slate-700 font-bold hover:bg-slate-50 transition-all shadow-sm"
+                    >
+                        <ChevronLeft className="w-4 h-4" /> Back
+                    </button>
+                    <button
+                        onClick={onContinue}
+                        disabled={!file}
+                        className="btn-primary"
+                    >
+                        Continue <ChevronRight className="w-4 h-4" />
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+};

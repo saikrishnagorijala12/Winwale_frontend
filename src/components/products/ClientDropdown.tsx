@@ -71,7 +71,7 @@ export default function ClientDropdown({
               <input
                 autoFocus
                 type="text"
-                placeholder="Filter by company name..."
+                placeholder="Search by company name..."
                 value={clientSearch}
                 onChange={(e) => setClientSearch(e.target.value)}
                 className="w-full pl-9 pr-3 py-2 text-sm border border-slate-200 rounded-xl outline-none focus:border-[#3399cc] bg-white transition-colors"

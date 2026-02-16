@@ -194,11 +194,11 @@ export default function AnalysisTable({
                 <tr>
                   <td colSpan={7} className="p-12 text-center">
                     <FileText className="w-12 h-12 mx-auto text-slate-300 mb-4" />
-                    <p className="text-lg font-bold text-slate-800 mb-2">
+                    <p className="text-lg font-bold text-slate-500 mb-2">
                       No analyses found
                     </p>
                     <p className="text-slate-500">
-                      Try adjusting your search query
+                      Try adjusting your filters
                     </p>
                   </td>
                 </tr>
@@ -326,7 +326,7 @@ export default function AnalysisTable({
         ) : paginatedHistory.length === 0 ? (
           <div className="p-12 text-center">
             <FileText className="w-12 h-12 mx-auto text-slate-300 mb-4" />
-            <p className="text-lg font-bold text-slate-800 mb-2">
+            <p className="text-lg font-bold text-slate-500 mb-2">
               No analyses found
             </p>
             <p className="text-slate-500">

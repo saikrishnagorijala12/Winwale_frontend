@@ -9,10 +9,13 @@ import {
   X,
   ArrowRight,
   Building2,
+  ChevronDown,
 } from "lucide-react";
 import * as XLSX from "xlsx";
 import api from "../lib/axios";
 import { useNavigate } from "react-router-dom";
+import { ClientDropdown } from "../components/shared/ClientDropdown";
+import ConfirmationModal from "../components/shared/ConfirmationModal";
 
 interface Client {
   client_id: string;
@@ -37,6 +40,8 @@ const UploadGsa: React.FC = () => {
   const [uploadResult, setUploadResult] = useState<UploadResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [previewData, setPreviewData] = useState<PreviewRow[] | null>(null);
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+
 
   useEffect(() => {
     fetchClients();
@@ -91,7 +96,21 @@ const UploadGsa: React.FC = () => {
     }
   };
 
-  const handleUpload = async (): Promise<void> => {
+  const handleUploadClick = () => {
+    if (!selectedClient) {
+      setError("Please select a client to associate with these products");
+      return;
+    }
+    if (!file) {
+      setError("Please select a file to upload");
+      return;
+    }
+    setError(null);
+    setIsConfirmOpen(true);
+  };
+
+  const confirmUpload = async (): Promise<void> => {
+
     if (!selectedClient) {
       setError("Please select a client to associate with these products");
       return;
@@ -126,8 +145,10 @@ const UploadGsa: React.FC = () => {
       setError(err?.response?.data?.detail ?? err?.message ?? "Upload failed");
     } finally {
       setLoading(false);
+      setIsConfirmOpen(false);
     }
   };
+
 
   const getTableHeaders = (): string[] => {
     if (!previewData || previewData.length === 0) return [];
@@ -136,8 +157,42 @@ const UploadGsa: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-linear-to-br from-slate-50 to-slate-100 p-6 md:p-10">
+      <ConfirmationModal
+        isOpen={isConfirmOpen}
+        onClose={() => setIsConfirmOpen(false)}
+        onConfirm={confirmUpload}
+        title="Confirm GSA Product Upload"
+        message={
+          <>
+            Are you sure you want to upload the product catalog for{" "}
+            <span className="font-bold text-slate-800">
+              {clients.find((c) => c.client_id === selectedClient)?.company_name}
+            </span>
+            ?
+          </>
+        }
+        details={[
+          {
+            label: "Client",
+            value:
+              clients.find((c) => c.client_id === selectedClient)
+                ?.company_name || "",
+          },
+          { label: "File", value: file?.name || "" },
+          { label: "Size", value: `${((file?.size || 0) / 1024).toFixed(1)} KB` },
+        ]}
+        warning={{
+          message:
+            "This action will update the product catalog for the selected client. Existing products may be updated or replaced.",
+          type: "amber",
+        }}
+        confirmText="Yes, Upload Catalog"
+        cancelText="Cancel"
+        isSubmitting={loading}
+        variant="emerald"
+      />
       <div className=" mx-auto">
-        {/* Navigation & Header */}
+
         <button
           onClick={() => navigate(-1)}
           className="flex items-center gap-2 text-slate-500 hover:text-slate-800 transition-colors mb-6 font-medium group"
@@ -151,7 +206,7 @@ const UploadGsa: React.FC = () => {
 
         <div className="mb-10">
           <h1 className="text-3xl font-bold text-slate-900 tracking-tight">
-            Upload GSA Price List
+            Upload GSA Products Catalog
           </h1>
           <p className="text-slate-500 mt-1">
             Update your product catalog by uploading an Excel spreadsheet.
@@ -159,14 +214,12 @@ const UploadGsa: React.FC = () => {
         </div>
 
         <div className="grid grid-cols-1 gap-8">
-          {/* Main Upload Form Card */}
           <div className="bg-white rounded-4xl shadow-sm border border-slate-200 p-8 md:p-10 relative overflow-hidden">
             <div className="absolute top-0 right-0 p-8 pointer-events-none opacity-5">
               <FileSpreadsheet size={120} />
             </div>
 
             <div className="space-y-8 relative">
-              {/* Step 1: Select Client */}
               <div className="space-y-3">
                 <div className="flex items-center gap-2 mb-2">
                   <span className="w-6 h-6 rounded-full bg-[#3399cc] text-white flex items-center justify-center text-xs font-bold">
@@ -185,28 +238,11 @@ const UploadGsa: React.FC = () => {
                     </span>
                   </div>
                 ) : (
-                  <div className="relative">
-                    <Building2
-                      className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
-                      size={18}
-                    />
-                    <select
-                      value={selectedClient}
-                      onChange={(e) => setSelectedClient(e.target.value)}
-                      className="w-full pl-12 pr-4 py-4 bg-white border border-slate-200 rounded-2xl focus:ring-4 focus:ring-[#3399cc]/10 focus:border-[#3399cc] outline-none transition-all text-slate-900 appearance-none font-medium"
-                    >
-                      <option value="">-- Choose an approved client --</option>
-                      {clients.map((client) => (
-                        <option key={client.client_id} value={client.client_id}>
-                          {client.company_name}
-                          {client.contract_number
-                            ? ` (${client.contract_number})`
-                            : "(No contract)"}
-                        </option>
-                      ))}
-                    </select>
-                    <ChevronDownIcon />
-                  </div>
+                  <ClientDropdown
+                    clients={clients}
+                    selectedClient={selectedClient}
+                    onClientSelect={setSelectedClient}
+                  />
                 )}
               </div>
 
@@ -272,7 +308,8 @@ const UploadGsa: React.FC = () => {
 
               <div className="pt-4">
                 <button
-                  onClick={handleUpload}
+                  onClick={handleUploadClick}
+
                   disabled={loading || !file || !selectedClient}
                   className="w-full bg-[#3399cc] text-white py-4 rounded-2xl font-bold flex items-center justify-center gap-3 transition-all hover:bg-[#2b82ad] disabled:opacity-40 disabled:grayscale shadow-lg shadow-blue-200 hover:shadow-xl active:scale-[0.98]"
                 >
@@ -376,25 +413,5 @@ const UploadGsa: React.FC = () => {
     </div>
   );
 };
-
-const ChevronDownIcon = () => (
-  <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
-    <svg
-      width="12"
-      height="12"
-      viewBox="0 0 12 12"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <path
-        d="M2.5 4.5L6 8L9.5 4.5"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  </div>
-);
 
 export default UploadGsa;

@@ -12,6 +12,9 @@ import {
 } from "../services/analysisService";
 import { AnalysisJob, SortConfig, StatusFilter } from "../types/analysis.types";
 import ConfirmationModal from "../components/shared/ConfirmationModal";
+import { Client } from "../types/pricelist.types";
+import api from "../lib/axios";
+
 
 
 export default function AnalysisHistory() {
@@ -37,9 +40,19 @@ export default function AnalysisHistory() {
     action: "approve" as "approve" | "reject",
   });
 
-  const clientOptions = Array.from(
-    new Set(analysisHistory.map((a) => a.client).filter(Boolean)),
-  );
+  const [clients, setClients] = useState<Client[]>([]);
+
+  const fetchClients = async () => {
+    try {
+      const response = await api.get<Client[]>("clients/approved");
+      setClients(response.data);
+    } catch (error) {
+      console.error("Failed to fetch clients:", error);
+    }
+  };
+
+  const clientOptions = clients.map((c) => c.company_name);
+
 
   const fetchAnalysisHistory = async () => {
     try {
@@ -62,7 +75,9 @@ export default function AnalysisHistory() {
 
   useEffect(() => {
     fetchAnalysisHistory();
+    fetchClients();
   }, []);
+
 
   useEffect(() => {
     setCurrentPage(1);
