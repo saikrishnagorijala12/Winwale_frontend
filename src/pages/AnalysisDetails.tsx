@@ -342,10 +342,10 @@ export default function AnalysisDetails() {
                     {isPriceChange && (
                       <>
                         <th className="text-right p-3 font-bold text-slate-700">
-                          Old Price
+                          Old List Price
                         </th>
                         <th className="text-right p-3 font-bold text-slate-700">
-                          New Price
+                          New List Price
                         </th>
                       </>
                     )}
@@ -356,7 +356,7 @@ export default function AnalysisDetails() {
                           Description
                         </th>
                         <th className="text-right p-3 font-bold text-slate-700">
-                          Price
+                          List Price
                         </th>
                       </>
                     )}
