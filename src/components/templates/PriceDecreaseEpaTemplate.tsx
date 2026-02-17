@@ -85,10 +85,10 @@ export const PriceDecreaseEpaTemplate = ({ data }: { data: any }) => (
       <p>
         _________________________________
         <br />
-        {data.contractorName || "AUTHORIZED NEGOTIATOR NAME"}
+        {data.negotiatorName || "AUTHORIZED NEGOTIATOR NAME"}
         <br />
-        {data.authorizedNegotiatorTitle || "[Title]"} – Authorized to sign on
-        behalf of {data.companyName || "COMPANY NAME"}
+        {data.negotiatorTitle || "[Title]"} – Authorized to sign on behalf of{" "}
+        {data.companyName || "COMPANY NAME"}
       </p>
     </div>
   </div>

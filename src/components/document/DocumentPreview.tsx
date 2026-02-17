@@ -73,7 +73,22 @@ export const DocumentPreview = () => {
     try {
       await convertTiptapToDocx(editorJson, {
         logoUrl: "/logo.png",
-        fileName: documentConfig.name,
+        fileName: (() => {
+          const clientName = (formData.companyName || "Client").toString();
+          const contractNumber = (formData.contractNumber || "Contract")
+            .toString()
+            .replace(/\s+/g, "_");
+          const modType = documentConfig.name.replace(/\s+/g, "_");
+          const date = new Date()
+            .toLocaleDateString("en-US", {
+              month: "2-digit",
+              day: "2-digit",
+              year: "numeric",
+            })
+            .replace(/\//g, "-");
+
+          return `${clientName}_${contractNumber}_${modType}_${date}`;
+        })(),
       });
       setHasDownloaded(true);
     } catch (error) {

@@ -38,7 +38,7 @@ export default function AnalysisFilters({
   onClearFilters,
 }: AnalysisFiltersProps) {
   return (
-    <div className="bg-white rounded-3xl shadow-sm border border-slate-200">
+    <div className="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-x-auto">
       {/* Header */}
       <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100">
         <div className="flex items-center gap-2">

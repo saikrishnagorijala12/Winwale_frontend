@@ -19,6 +19,7 @@ export default function ProductsPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
+  const [isExporting, setIsExporting] = useState(false);
 
   const itemsPerPage = 10;
 
@@ -98,10 +99,41 @@ export default function ProductsPage() {
     return filteredProducts.slice(startIndex, startIndex + itemsPerPage);
   }, [filteredProducts, startIndex, itemsPerPage]);
 
+  const handleExport = async () => {
+    try {
+      setIsExporting(true);
+      const blob = await productService.exportProducts(selectedClient?.client_id);
+
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+
+      const dateStr = new Date().toISOString().split('T')[0];
+      if (selectedClient) {
+        a.download = `${selectedClient.company_name}_products_${dateStr}.xlsx`;
+      } else {
+        a.download = `all_products_${dateStr}.xlsx`;
+      }
+
+      document.body.appendChild(a);
+      a.click();
+
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (err) {
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-linear-to-br from-slate-50 via-blue-50/30 to-slate-100 p-6 lg:p-10 space-y-10">
       <div className="mx-auto">
-        <ProductsHeader onUploadClick={() => navigate("/gsa-products/upload")} />
+        <ProductsHeader
+          onUploadClick={() => navigate("/gsa-products/upload")}
+          onExportClick={handleExport}
+          isExporting={isExporting}
+        />
 
         <ProductsFilters
           searchTerm={searchTerm}

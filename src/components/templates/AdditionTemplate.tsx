@@ -35,15 +35,17 @@ export const AdditionTemplate = ({ data }: { data: any }) => (
       The purpose of this letter is to request your approval of an Add Product
       Modification to GSA Schedule Contract{" "}
       <strong>{data.contractNumber}</strong>.{" "}
+      <strong>{data.companyName}</strong> would like to add{" "}
       <strong>{data.numberOfProductsAdded}</strong> products under SIN(s){" "}
-      <strong>{data.sin_additions}</strong>. We would like to add these products because{" "}
-      <strong>{data.additionRationale}</strong>.
+      <strong>{data.sin_additions}</strong>. We would like to add these products
+      because <strong>{data.additionRationale}</strong>.
     </p>
 
     <ul className="list-disc ml-6 mb-4 space-y-1">
       <li>
         We certify that these products are TAA Compliant in accordance with
-        52.225-6 TRADE AGREEMENTS CERTIFICATE (MAY 2014). The Country of Origin for the added products is{" "}
+        52.225-6 TRADE AGREEMENTS CERTIFICATE (MAY 2014). The Country of Origin
+        for the added products is{" "}
         <strong>
           {data?.coo && data.coo.trim() !== "" && data.coo !== "undefined"
             ? data.coo
@@ -105,8 +107,9 @@ export const AdditionTemplate = ({ data }: { data: any }) => (
       <li>No hazardous materials will be delivered under this contract.</li>
       <li>Place of Performance per FAR 52.215-6 (see current Solicitation).</li>
       <li>
-        If applicable, EPA method and mechanism are unchanged or proposed
-        herein.
+        If applicable : State whether EPA method and mechanism are the same as
+        currently awarded product(s) and/or SIN(s) or propose EPA method and
+        mechanism
       </li>
     </ul>
 
@@ -128,10 +131,10 @@ export const AdditionTemplate = ({ data }: { data: any }) => (
       <p>
         _________________________________
         <br />
-        {data.contractorName || "AUTHORIZED NEGOTIATOR NAME"}
+        {data.negotiatorName || "AUTHORIZED NEGOTIATOR NAME"}
         <br />
-        {data.authorizedNegotiatorTitle || "[Title]"} – Authorized to sign on
-        behalf of {data.companyName || "COMPANY NAME"}
+        {data.negotiatorTitle || "[Title]"} – Authorized to sign on behalf of{" "}
+        {data.companyName || "COMPANY NAME"}
       </p>
     </div>
   </div>

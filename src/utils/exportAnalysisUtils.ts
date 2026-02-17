@@ -9,6 +9,7 @@ export function exportAnalysisToExcel(
     priceDecreases: any[];
     descriptionChanges: any[];
   },
+  customFileName?: string,
 ) {
   const workbook = XLSX.utils.book_new();
 
@@ -36,6 +37,6 @@ export function exportAnalysisToExcel(
     XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
   });
 
-  const fileName = `ANAL-JOB-${jobId}-analysis.xlsx`;
+  const fileName = customFileName || `ANAL-JOB-${jobId}-analysis.xlsx`;
   XLSX.writeFile(workbook, fileName);
 }

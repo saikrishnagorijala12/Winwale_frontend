@@ -28,10 +28,7 @@ export default function PriceListAnalysis() {
   const [currentStep, setCurrentStep] = useState(1);
   const [selectedClient, setSelectedClient] = useState("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [activeTab, setActiveTab] = useState("additions");
 
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
 
   const [clients, setClients] = useState<Client[]>([]);
   const [loadingClients, setLoadingClients] = useState<boolean>(true);
@@ -173,8 +170,7 @@ export default function PriceListAnalysis() {
     setPreviewData(null);
     setTotalRows(0);
     setError(null);
-    setActiveTab("additions");
-    setCurrentPage(1);
+    setError(null);
   };
 
   const activeClient = clients.find(
@@ -264,17 +260,23 @@ export default function PriceListAnalysis() {
         return (
           <ReviewResultsStep
             categorized={getCategorizedActions()}
-            activeTab={activeTab}
-            setActiveTab={setActiveTab}
-            currentPage={currentPage}
-            setCurrentPage={setCurrentPage}
-            itemsPerPage={itemsPerPage}
-            onExport={() =>
+            onExport={() => {
+              const date = new Date().toLocaleDateString("en-US", {
+                month: "2-digit",
+                day: "2-digit",
+                year: "numeric",
+              }).replace(/\//g, "-");
+
+              const clientName =
+                activeClient?.company_name.replace(/\s+/g, "-") || "Client";
+              const contract = activeClient?.contract_number || "NoContract";
+              const fileName = `${clientName}_${contract}_modifications_${date}.xlsx`;
               exportAnalysisToExcel(
                 uploadResult.job_id,
                 getCategorizedActions(),
-              )
-            }
+                fileName,
+              );
+            }}
             onReset={handleReset}
             onGenerateDocuments={() => navigate("/documents")}
           />
