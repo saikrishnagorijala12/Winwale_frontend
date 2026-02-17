@@ -66,7 +66,7 @@ export default function AnalysisFilters({
               <input
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search by ID, client, or contract..."
+                placeholder="Search by client, contract, or Analyst..."
                 className="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:ring-4 focus:ring-[#3399cc]/10 focus:border-[#3399cc] outline-none transition-all text-sm font-medium"
               />
             </div>

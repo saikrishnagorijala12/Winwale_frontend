@@ -10,6 +10,7 @@ import {
   ExternalLink,
   Inbox,
   Loader2,
+  Check,
 } from "lucide-react";
 import { Product } from "../types/product.types";
 import { productService } from "../services/productService";
@@ -104,10 +105,14 @@ export default function ClientProducts() {
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
             <div>
               <h1 className="text-3xl font-bold text-slate-900">
-                {products[0]?.client_name || (clientId ? "Client" : "No Client Selected")} Products
+                {products[0]?.client_name ||
+                  (clientId ? "Client" : "No Client Selected")}{" "}
+                Products
               </h1>
               <p className="text-slate-500">
-                {clientId ? `Managing ${products.length} catalog items` : "Please select a client from the Clients page"}
+                {clientId
+                  ? `Managing ${products.length} catalog items`
+                  : "Please select a client from the Clients page"}
               </p>
             </div>
           </div>
@@ -282,10 +287,11 @@ export default function ClientProducts() {
 
                         <button
                           onClick={() => setCurrentPage(page)}
-                          className={`inline-flex items-center justify-center min-w-10 h-10 px-3 rounded-xl text-sm font-bold transition-all active:scale-95 ${page === currentPage
-                            ? "bg-[#3399cc] text-white shadow-blue-200 "
-                            : "bg-transparent text-slate-600 hover:bg-slate-100 hover:text-slate-900"
-                            }`}
+                          className={`inline-flex items-center justify-center min-w-10 h-10 px-3 rounded-xl text-sm font-bold transition-all active:scale-95 ${
+                            page === currentPage
+                              ? "bg-[#3399cc] text-white shadow-blue-200 "
+                              : "bg-transparent text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                          }`}
                         >
                           {page}
                         </button>
@@ -308,7 +314,6 @@ export default function ClientProducts() {
           )}
         </div>
       </div>
-
       {/* RIGHT DRAWER */}
       {selectedProduct && (
         <div className="fixed inset-0 z-50 flex justify-end">
@@ -318,86 +323,192 @@ export default function ClientProducts() {
           />
 
           <div className="relative w-full max-w-lg bg-white h-full shadow-2xl flex flex-col animate-in slide-in-from-right duration-300">
-            <div className="p-6 border-b flex items-center justify-between bg-slate-50">
-              <div>
-                <h2 className="text-xl font-bold text-slate-900">
+            <div className="p-6 border-b border-slate-100 flex items-start justify-between bg-white sticky top-0 z-10">
+              <div className="pr-8">
+                <div className="flex items-center gap-2 mb-1">
+                  <span
+                    className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${selectedProduct.item_type === "A" ? "bg-blue-100 text-blue-700" : "bg-emerald-100 text-emerald-700"}`}
+                  >
+                    {selectedProduct.item_type === "A"
+                      ? "Accessory"
+                      : "Base Product"}
+                  </span>
+                  {selectedProduct.hazmat && (
+                    <span className="px-2 py-0.5 bg-red-100 text-red-700 rounded text-[10px] font-bold uppercase">
+                      Hazmat
+                    </span>
+                  )}
+                </div>
+                <h2 className="text-xl font-bold text-slate-900 leading-tight">
                   {selectedProduct.item_name}
                 </h2>
-                <p className="text-sm text-slate-500">
+                <p className="text-xs text-slate-500 mt-1 font-medium italic">
                   {selectedProduct.item_description}
                 </p>
               </div>
               <button
                 onClick={() => setSelectedProduct(null)}
-                className="p-2 hover:bg-slate-200 rounded-full transition-colors"
+                className="p-2 hover:bg-slate-100 rounded-full transition-colors text-slate-400 hover:text-slate-900"
               >
-                <X size={20} />
+                <X size={24} />
               </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-6 space-y-8">
-              <Section title="Classification">
-                <Field label="SIN" value={selectedProduct.sin} />
-                <Field label="NSN" value={selectedProduct.nsn} />
-                <Field label="UPC" value={selectedProduct.upc} />
-                <Field label="UNSPSC" value={selectedProduct.unspsc} />
-              </Section>
+            <div className="flex-1 overflow-y-auto p-8 space-y-10 scrollbar-thin">
+              {/* Product Photo - If available */}
+              {selectedProduct.photo_path && (
+                <div className="w-full h-48 bg-slate-50 rounded-2xl border border-slate-100 overflow-hidden flex items-center justify-center">
+                  <img
+                    src={selectedProduct.photo_path}
+                    alt={selectedProduct.item_name}
+                    className="h-full w-full object-contain p-4"
+                    onError={(e) => (e.currentTarget.style.display = "none")}
+                  />
+                </div>
+              )}
 
-              <Section title="Pricing & Shipping">
-                <Field
-                  label="List Price"
+              <DrawerSection title="Core Identifiers">
+                <DrawerField
+                  label="Client"
+                  value={selectedProduct.client_name}
+                />
+                <DrawerField
+                  label="Client Part #"
+                  value={selectedProduct.client_part_number}
+                />
+                <DrawerField
+                  label="Mfr Part #"
+                  value={selectedProduct.manufacturer_part_number}
+                />
+                <DrawerField
+                  label="Manufacturer"
+                  value={selectedProduct.manufacturer}
+                />
+              </DrawerSection>
+
+              <DrawerSection title="Physical Specifications">
+                <DrawerField
+                  label="Dimensions (L x W x H)"
+                  value={
+                    selectedProduct.length
+                      ? `${selectedProduct.length} x ${selectedProduct.width} x ${selectedProduct.height} ${selectedProduct.physical_uom || ""}`
+                      : null
+                  }
+                />
+                <DrawerField
+                  label="Weight"
+                  value={
+                    selectedProduct.weight_lbs
+                      ? `${selectedProduct.weight_lbs} lbs`
+                      : null
+                  }
+                />
+                <DrawerField
+                  label="Warranty"
+                  value={selectedProduct.warranty_period}
+                />
+                <DrawerField
+                  label="Quantity per Pack"
+                  value={`${selectedProduct.quantity_per_pack || 1} ${selectedProduct.quantity_unit_uom || ""}`}
+                />
+              </DrawerSection>
+
+              <DrawerSection title="Pricing & Classification">
+                <DrawerField
+                  label="Commercial List Price"
                   value={formatCurrency(selectedProduct.commercial_list_price)}
                 />
-                <Field label="UOM" value={selectedProduct.uom} />
-                <Field
-                  label="Qty Per Pack"
-                  value={selectedProduct.quantity_per_pack}
-                />
-                <Field label="COO" value={selectedProduct.country_of_origin} />
-              </Section>
+                <DrawerField label="UOM" value={selectedProduct.uom} />
+                <DrawerField label="SIN" value={selectedProduct.sin} />
+                <DrawerField label="NSN" value={selectedProduct.nsn} />
+                <DrawerField label="UPC" value={selectedProduct.upc} />
+                <DrawerField label="UNSPSC" value={selectedProduct.unspsc} />
+              </DrawerSection>
 
-              <Section title="Compliance">
-                <Field
+              <DrawerSection title="Compliance & Environment">
+                <DrawerField
                   label="Country of Origin"
                   value={selectedProduct.country_of_origin}
                 />
-                <Field
-                  label="Recycled %"
-                  value={selectedProduct.recycled_content_percent}
+                <DrawerField
+                  label="Recycled Content"
+                  value={
+                    selectedProduct.recycled_content_percent
+                      ? `${selectedProduct.recycled_content_percent}%`
+                      : "0%"
+                  }
                 />
-              </Section>
+                <DrawerField
+                  label="Hazmat Status"
+                  value={selectedProduct.hazmat ? "Yes" : "No"}
+                />
+                <DrawerField
+                  label="Product Info Code"
+                  value={selectedProduct.product_info_code}
+                />
+              </DrawerSection>
 
-              <Section title="Documents & Links">
-                <div className="col-span-2 space-y-2">
+              <DrawerSection title="Resources & Links">
+                <div className="col-span-2 flex flex-col gap-3">
                   {selectedProduct.product_url && (
                     <a
                       href={selectedProduct.product_url}
                       target="_blank"
                       rel="noreferrer"
-                      className="flex items-center gap-2 text-[#3399cc] hover:underline font-medium"
+                      className="flex items-center justify-between gap-3 text-slate-700 hover:text-[#3399cc] font-semibold text-sm bg-slate-50 p-4 rounded-xl border border-slate-100 transition-all hover:border-[#3399cc]/30"
                     >
-                      <ExternalLink size={14} /> View Product Website
+                      <span className="flex items-center gap-2">
+                        <ExternalLink size={16} /> Product Page
+                      </span>
+                      <ChevronRight size={14} className="text-slate-400" />
                     </a>
                   )}
                   {selectedProduct.url_508 && (
                     <a
+                      target="_blank"
                       rel="noreferrer"
-                      className="flex items-center gap-2 text-[#3399cc] hover:underline font-medium"
+                      className="flex items-center justify-between gap-3 text-slate-700 hover:text-[#3399cc] font-semibold text-sm bg-slate-50 p-4 rounded-xl border border-slate-100 transition-all hover:border-[#3399cc]/30"
                     >
-                      <ExternalLink size={14} /> 508 Compliance Document
+                      <span className="flex items-center gap-2">
+                        <Check size={16} className="text-emerald-500" /> 508
+                        Compliance Link
+                      </span>
+                      <ChevronRight size={14} className="text-slate-400" />
                     </a>
                   )}
                 </div>
-              </Section>
+              </DrawerSection>
+
+              <div className="pt-6 border-t border-slate-100">
+                <div className="flex justify-between text-[10px] font-medium text-slate-400 uppercase tracking-tighter">
+                  <span>
+                    Created:{" "}
+                    {selectedProduct.created_time
+                      ? new Date(
+                          selectedProduct.created_time,
+                        ).toLocaleDateString("en-US")
+                      : "N/A"}
+                  </span>
+                  <span>
+                    Last Updated:{" "}
+                    {selectedProduct.updated_time
+                      ? new Date(
+                          selectedProduct.updated_time,
+                        ).toLocaleDateString("en-US")
+                      : "N/A"}
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       )}
+      ;
     </div>
   );
 }
 
-function Section({
+function DrawerSection({
   title,
   children,
 }: {
@@ -406,13 +517,15 @@ function Section({
 }) {
   return (
     <div>
-      <h3 className="text-sm font-semibold text-slate-900 mb-4">{title}</h3>
-      <div className="grid grid-cols-2 gap-4">{children}</div>
+      <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-5">
+        {title}
+      </h3>
+      <div className="grid grid-cols-2 gap-y-8 gap-x-4">{children}</div>
     </div>
   );
 }
 
-function Field({
+function DrawerField({
   label,
   value,
 }: {
@@ -421,8 +534,10 @@ function Field({
 }) {
   return (
     <div>
-      <p className="text-xs text-slate-500">{label}</p>
-      <p className="font-medium text-slate-900">{value ?? "-"}</p>
+      <p className="text-[10px] font-bold text-slate-400 uppercase mb-1 tracking-wide">
+        {label}
+      </p>
+      <p className="text-sm font-bold text-slate-800">{value ?? "—"}</p>
     </div>
   );
 }

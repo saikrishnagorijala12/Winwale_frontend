@@ -24,7 +24,7 @@ export type StatusConfig = {
 
 
 export const STATUS_BADGE_BASE =
-  "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border";
+  "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold border";
 
 
 export const STATUS_MAP: Record<StatusSlug, StatusConfig> = {
