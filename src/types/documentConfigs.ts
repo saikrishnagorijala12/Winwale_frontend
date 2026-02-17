@@ -42,6 +42,7 @@ export const documentConfigs: DocumentConfig[] = [
         behavior: "editable",
         section: "Contract & Contact Info",
         width: "w-3/4",
+        validation: [{ type: "required", message: "Required" }],
       },
       {
         id: "gsaOfficeAddressLine",
@@ -258,6 +259,7 @@ export const documentConfigs: DocumentConfig[] = [
         behavior: "editable",
         section: "Contract & Contact Info",
         width: "w-3/4",
+        validation: [{ type: "required", message: "Required" }],
       },
       {
         id: "gsaOfficeAddressLine",
@@ -398,6 +400,7 @@ export const documentConfigs: DocumentConfig[] = [
         behavior: "editable",
         section: "Contract & Contact Info",
         width: "w-3/4",
+        validation: [{ type: "required", message: "Required" }],
       },
       {
         id: "gsaOfficeAddressLine",
@@ -553,6 +556,7 @@ export const documentConfigs: DocumentConfig[] = [
         behavior: "editable",
         section: "Contract & Contact Info",
         width: "w-3/4",
+        validation: [{ type: "required", message: "Required" }],
       },
       {
         id: "gsaOfficeAddressLine",
@@ -699,6 +703,7 @@ export const documentConfigs: DocumentConfig[] = [
         behavior: "editable",
         section: "Contract & Contact Info",
         width: "w-3/4",
+        validation: [{ type: "required", message: "Required" }],
       },
       {
         id: "gsaOfficeAddressLine",

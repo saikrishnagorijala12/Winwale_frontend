@@ -133,6 +133,7 @@ export default function ProductsPage() {
           onUploadClick={() => navigate("/gsa-products/upload")}
           onExportClick={handleExport}
           isExporting={isExporting}
+          totalCount={products.length}
         />
 
         <ProductsFilters

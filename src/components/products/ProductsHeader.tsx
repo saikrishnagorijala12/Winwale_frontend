@@ -5,12 +5,14 @@ interface ProductsHeaderProps {
   onUploadClick: () => void;
   onExportClick?: () => void;
   isExporting?: boolean;
+  totalCount?: number;
 }
 
 export default function ProductsHeader({
   onUploadClick,
   onExportClick,
   isExporting = false,
+  totalCount,
 }: ProductsHeaderProps) {
   return (
     <div className="flex flex-col md:flex-row justify-between md:items-center md:justify-between gap-6 mb-12 mx-auto">
@@ -34,14 +36,19 @@ export default function ProductsHeader({
           <button
             onClick={onExportClick}
             disabled={isExporting}
-            className="flex items-center justify-center gap-2 bg-white text-slate-700 border border-slate-200 px-6 py-2.5 rounded-xl font-semibold hover:bg-slate-50 transition-all shadow-am disabled:opacity-50 disabled:cursor-not-allowed"
+            title={
+              totalCount !== undefined
+                ? `Export all ${totalCount} products. (Search filters are not applied to export)`
+                : "Export all products"
+            }
+            className="flex items-center justify-center gap-2 bg-white text-slate-700 border border-slate-200 px-6 py-2.5 rounded-xl font-semibold hover:bg-slate-50 transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isExporting ? (
               <>Running...</>
             ) : (
               <>
                 <Download size={18} />
-                Export
+                Export {totalCount !== undefined ? `All (${totalCount})` : ""}
               </>
             )}
           </button>
