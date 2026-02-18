@@ -23,9 +23,9 @@ const Skeleton = ({ className }) => (
 );
 
 interface ModificationAction {
-  action_id: string;
+  action_id: number;
   action_type: string;
-  product_id: string | null;
+  product_id: number | null;
   product_name: string | null;
   manufacturer_part_number: string | null;
   old_price: number | null;
@@ -37,11 +37,11 @@ interface ModificationAction {
 }
 
 interface Job {
-  job_id: string;
-  client_id: string;
+  job_id: number;
+  client_id: number;
   contract_number: string;
   client: string;
-  user_id: string;
+  user_id: number;
   user: string;
   status: string;
   action_summary: Record<string, number>;
@@ -50,7 +50,7 @@ interface Job {
 }
 
 interface Client {
-  client_id: string;
+  client_id: number;
   status: string;
   is_deleted: boolean;
   created_time: string;
@@ -234,7 +234,7 @@ export default function Dashboard() {
                   <div
                     key={item.id}
                     onClick={() => {
-                      setSelectedJobId(Number(item.id));
+                      setSelectedJobId(item.id);
                       navigate(`/analyses/details`);
                     }}
                     className="group flex items-center gap-4 p-4 rounded-2xl border border-transparent hover:shadow-sm transition-all cursor-pointer"

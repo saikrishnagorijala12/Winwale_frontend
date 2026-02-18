@@ -84,11 +84,9 @@ export default function ClientsPage() {
   const handleApiError = (err: any, context: string = "operation") => {
     console.error(`Error during ${context}:`, err);
 
-    // The axios interceptor normalizes errors to { status, message }
     const status = err.status;
     const errorMessage = err.message || `Failed to ${context}. Please try again.`;
 
-    // For 409 conflicts on create/edit, navigate back to step 1 so the user can fix the field
     if (status === 409) {
       if (context === "create client") setAddStep(1);
       else if (context === "update client") setEditStep(1);

@@ -19,7 +19,6 @@ interface ClientTableProps {
   onMenuToggle: (clientId: number) => void;
   onView: (client: Client) => void;
   onEdit: (client: Client) => void;
-  // Pagination Props
   currentPage: number;
   totalClients: number;
   itemsPerPage: number;

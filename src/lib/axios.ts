@@ -9,19 +9,14 @@ const api = axios.create({
   },
 });
 
-/**
- * Deeply trims all string values in an object or array.
- */
 const deepTrim = (data: any): any => {
   if (typeof data === "string") {
     return data.trim();
   }
   if (data !== null && typeof data === "object") {
-    // Only handle plain objects and arrays to avoid breaking FormData or other special objects
     if (Array.isArray(data)) {
       return data.map((item) => deepTrim(item));
     }
-    // Check if it's a plain object
     if (Object.getPrototypeOf(data) === Object.prototype) {
       const trimmed: any = {};
       for (const key in data) {
@@ -44,7 +39,6 @@ api.interceptors.request.use(async (config) => {
     config.headers.Authorization = `Bearer ${idToken}`;
   }
 
-  // Automatically trim payloads for POST, PUT, and PATCH requests
   if (
     config.data &&
     ["post", "put", "patch"].includes(config.method?.toLowerCase() || "")

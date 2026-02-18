@@ -35,11 +35,11 @@ export default function AnalysisFilters({
 }: AnalysisFiltersProps) {
   const selectedClientId =
     clientFilter === "All"
-      ? ""
-      : (clients.find((c) => c.company_name === clientFilter)?.client_id ?? "");
+      ? 0
+      : (clients.find((c) => c.company_name === clientFilter)?.client_id ?? 0);
 
-  const handleClientSelect = (clientId: string) => {
-    if (clientId === "") {
+  const handleClientSelect = (clientId: number) => {
+    if (clientId === 0) {
       setClientFilter("All");
     } else {
       const client = clients.find((c) => c.client_id === clientId);
@@ -77,7 +77,7 @@ export default function AnalysisFilters({
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search by client, contract, or Analyst..."
-                className="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:ring-4 focus:ring-[#3399cc]/10 focus:border-[#3399cc] outline-none transition-all text-sm font-medium"
+                className="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 outline-none transition-all text-sm font-medium"
               />
             </div>
           </div>
@@ -110,7 +110,7 @@ export default function AnalysisFilters({
                 onChange={(e) =>
                   setStatusFilter(e.target.value as StatusFilter)
                 }
-                className="w-full text-slate-500 appearance-none pl-11 pr-10 py-3 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:ring-4 focus:ring-[#3399cc]/10 focus:border-[#3399cc] outline-none transition-all text-sm font-medium"
+                className="w-full text-slate-500 appearance-none pl-11 pr-10 py-3 rounded-xl border border-slate-200 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 outline-none transition-all text-sm font-medium"
               >
                 <option value="All">All Status</option>
                 <option value="pending">Pending</option>
@@ -137,7 +137,7 @@ export default function AnalysisFilters({
                       e.target.value ? new Date(e.target.value) : undefined,
                     )
                   }
-                  className="w-full text-slate-500 px-4 pr-3 py-3 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:ring-4 focus:ring-[#3399cc]/10 focus:border-[#3399cc] outline-none transition-all text-sm font-medium"
+                  className="w-full text-slate-500 px-4 pr-3 py-3 rounded-xl border border-slate-200 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-blue-500/20  outline-none transition-all text-sm font-medium"
                 />
               </div>
 
@@ -150,7 +150,7 @@ export default function AnalysisFilters({
                       e.target.value ? new Date(e.target.value) : undefined,
                     )
                   }
-                  className="w-full text-slate-500 px-4 pr-3 py-3 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:ring-4 focus:ring-[#3399cc]/10 focus:border-[#3399cc] outline-none transition-all text-sm font-medium"
+                  className="w-full text-slate-500 px-4 pr-3 py-3 rounded-xl border border-slate-200 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-blue-500/20  outline-none transition-all text-sm font-medium"
                 />
               </div>
             </div>

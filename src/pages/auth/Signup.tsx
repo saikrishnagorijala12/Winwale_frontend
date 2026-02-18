@@ -167,7 +167,7 @@ const Signup: React.FC = () => {
                   clearError("fullName");
                   setFormData({ ...formData, fullName: e.target.value });
                 }}
-                className="block w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
+                className="block w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 outline-none"
                 placeholder="Your Name"
               />
             </div>
@@ -191,7 +191,7 @@ const Signup: React.FC = () => {
                   clearError("email");
                   setFormData({ ...formData, email: e.target.value });
                 }}
-                className="block w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
+                className="block w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 outline-none"
                 placeholder="name@winvale.com"
               />
             </div>
@@ -217,7 +217,7 @@ const Signup: React.FC = () => {
                 }}
                 onFocus={() => setPasswordFocused(true)}
                 onBlur={() => setPasswordFocused(false)}
-                className="block w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
+                className="block w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 outline-none"
                 placeholder="Min. 8 characters"
               />
 
@@ -264,7 +264,7 @@ const Signup: React.FC = () => {
                   clearError("confirmPassword");
                   setFormData({ ...formData, confirmPassword: e.target.value });
                 }}
-                className="block w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
+                className="block w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 outline-none"
                 placeholder="Re-enter password"
               />
             </div>
@@ -293,7 +293,7 @@ const Signup: React.FC = () => {
               type="text"
               required
               maxLength={6}
-              className="block w-full text-center text-3xl tracking-[0.5em] font-mono py-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
+              className="block w-full text-center text-3xl tracking-[0.5em] font-mono py-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 outline-none"
               placeholder="000000"
               value={otp}
               onChange={(e) => setOtp(e.target.value)}

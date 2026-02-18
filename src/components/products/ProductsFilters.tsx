@@ -1,14 +1,14 @@
 import React from "react";
 import { Search } from "lucide-react";
-import { Client } from "../../types/product.types";
-import ClientDropdown from "./ClientDropdown";
+import { Client as ProductClient } from "../../types/product.types";
+import { ClientDropdown } from "../shared/ClientDropdown";
 
 interface ProductsFiltersProps {
   searchTerm: string;
   onSearchChange: (value: string) => void;
-  clients: Client[];
-  selectedClient: Client | null;
-  onClientSelect: (client: Client | null) => void;
+  clients: ProductClient[];
+  selectedClient: ProductClient | null;
+  onClientSelect: (client: ProductClient | null) => void;
 }
 
 export default function ProductsFilters({
@@ -18,6 +18,15 @@ export default function ProductsFilters({
   selectedClient,
   onClientSelect,
 }: ProductsFiltersProps) {
+  const handleClientSelect = (clientId: number) => {
+    if (clientId === 0) {
+      onClientSelect(null);
+    } else {
+      const match = clients.find((c) => c.client_id === clientId);
+      onClientSelect(match ?? null);
+    }
+  };
+
   return (
     <div className="mx-auto bg-white p-4 rounded-4xl shadow-sm border border-slate-100 mb-8 flex flex-col lg:flex-row gap-4 items-center">
       <div className="relative flex-1 w-full">
@@ -34,11 +43,16 @@ export default function ProductsFilters({
         />
       </div>
 
-      <ClientDropdown
-        clients={clients}
-        selectedClient={selectedClient}
-        onClientSelect={onClientSelect}
-      />
+      <div className="w-full lg:w-80">
+        <ClientDropdown
+          clients={clients}
+          selectedClient={selectedClient?.client_id ?? 0}
+          onClientSelect={handleClientSelect}
+          allowAll
+          allLabel="All Clients"
+          placeholder="Filter by client..."
+        />
+      </div>
     </div>
   );
 }

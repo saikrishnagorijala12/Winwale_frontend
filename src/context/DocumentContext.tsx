@@ -11,7 +11,7 @@ import api from "../lib/axios";
 import { useAuth } from "./AuthContext";
 import * as validators from "../utils/validators";
 
-const fetchJobDetails = async (jobId: string) => {
+const fetchJobDetails = async (jobId: number) => {
   const response = await api.get(`/generate/${jobId}`);
   return response.data;
 };
@@ -101,10 +101,10 @@ export const DocumentProvider: React.FC<{ children: React.ReactNode }> = ({
   );
   const [analysisSummary, setAnalysisSummary] = useState<any | null>(null);
   const [cachedJobDetails, setCachedJobDetails] = useState<any | null>(null);
-  const [loadedJobId, setLoadedJobId] = useState<string | null>(null);
+  const [loadedJobId, setLoadedJobId] = useState<number | null>(null);
 
   const loadDocumentConfig = useCallback(
-    async (typeId: string, jobId?: string) => {
+    async (typeId: string, jobId?: number) => {
       const config = getDocumentConfig(typeId);
       if (!config) return;
 

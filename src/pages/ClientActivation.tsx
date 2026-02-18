@@ -300,10 +300,8 @@ const ClientActivation = () => {
   }, [activeTab, searchQuery]);
 
   const handleApiError = (err: any, context: string = "operation") => {
-    // The axios interceptor normalizes errors to { status, message }
     const errorMessage = err.message || `Failed to ${context}. Please try again.`;
 
-    // For 409 conflicts on edit, navigate back to step 1 so the user can fix the field
     if (err.status === 409) {
       setCurrentStep(1);
     }
@@ -497,7 +495,7 @@ const ClientActivation = () => {
         ]}
         variant={confirmModal.action === "approve" ? "emerald" : "rose"}
         confirmText={confirmModal.action === "approve" ? "Approve" : "Reject"}
-        isSubmitting={loading} // loading here is used by several things, but it works for now
+        isSubmitting={loading} 
       />
 
       <ClientDetailsModal
@@ -653,7 +651,7 @@ const ClientActivation = () => {
             <input
               type="text"
               placeholder="Search by company or contact..."
-              className="w-full pl-11 pr-4 py-3 bg-white border border-slate-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-400 transition-all"
+              className="w-full pl-11 pr-4 py-3 bg-white border border-slate-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20  transition-all"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />

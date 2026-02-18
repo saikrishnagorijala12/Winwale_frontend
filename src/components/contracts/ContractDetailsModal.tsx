@@ -1,4 +1,3 @@
-// src/components/contracts/ContractDetailsModal.tsx
 import React from "react";
 import {
   X,

@@ -18,7 +18,7 @@ export const DocumentWorkflowRenderer = () => {
   } = useDocument();
 
   const { selectedJobId } = useAnalysis();
-  const jobId = selectedJobId ? String(selectedJobId) : null;
+  const jobId = selectedJobId || null;
 
   useEffect(() => {
     if (!selectedDocumentType && documentConfigs.length > 0) {

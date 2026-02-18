@@ -132,7 +132,7 @@ export interface DocumentContextType {
   documentHistory: DocumentMetadata[];
   addToHistory: (doc: DocumentMetadata) => void;
 
-  loadDocumentConfig: (typeId: string, jobId?: string) => Promise<void>;
+  loadDocumentConfig: (typeId: string, jobId?: number) => Promise<void>;
   resetWorkflow: () => void;
   generateDocument: () => DocumentMetadata;
   analysisSummary: any | null;

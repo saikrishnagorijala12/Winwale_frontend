@@ -90,7 +90,6 @@ export default function ProductsPage() {
     }
   };
 
-  // -------------------- SEARCH FILTER --------------------
   const filteredProducts = useMemo(() => {
     return products.filter(
       (p) =>
@@ -109,7 +108,6 @@ export default function ProductsPage() {
     return filteredProducts.slice(startIndex, startIndex + itemsPerPage);
   }, [filteredProducts, startIndex]);
 
-  // -------------------- EXPORT --------------------
   const handleExport = async () => {
     try {
       setIsExporting(true);

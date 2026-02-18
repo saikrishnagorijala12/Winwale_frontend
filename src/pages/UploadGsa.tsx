@@ -17,7 +17,7 @@ import ConfirmationModal from "../components/shared/ConfirmationModal";
 import { toast } from "sonner";
 
 interface Client {
-  client_id: string;
+  client_id: number;
   company_name: string;
   contract_number?: string | null;
 }
@@ -32,7 +32,7 @@ type PreviewRow = Record<string, unknown>;
 const UploadGsa: React.FC = () => {
   const navigate = useNavigate();
   const [clients, setClients] = useState<Client[]>([]);
-  const [selectedClient, setSelectedClient] = useState<string>("");
+  const [selectedClient, setSelectedClient] = useState<number>(0);
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [loadingClients, setLoadingClients] = useState<boolean>(true);
@@ -96,7 +96,7 @@ const UploadGsa: React.FC = () => {
   };
 
   const handleUploadClick = () => {
-    if (!selectedClient) {
+    if (selectedClient === 0) {
       setError("Please select a client to associate with these products");
       return;
     }
@@ -110,7 +110,7 @@ const UploadGsa: React.FC = () => {
 
   const confirmUpload = async (): Promise<void> => {
 
-    if (!selectedClient) {
+    if (selectedClient === 0) {
       setError("Please select a client to associate with these products");
       return;
     }
@@ -320,7 +320,7 @@ const UploadGsa: React.FC = () => {
                 <button
                   onClick={handleUploadClick}
 
-                  disabled={loading || !file || !selectedClient}
+                  disabled={loading || !file || selectedClient === 0}
                   className="w-full bg-[#3399cc] text-white py-4 rounded-2xl font-bold flex items-center justify-center gap-3 transition-all hover:bg-[#2b82ad] disabled:opacity-40 disabled:grayscale shadow-lg shadow-blue-200 hover:shadow-xl active:scale-[0.98]"
                 >
                   {loading ? (

@@ -107,6 +107,7 @@ export const DocumentTypeCard = ({
               : `bg-slate-100 group-hover:${styles.bg}`
             }
           `}
+          
         >
           <IconComponent
             className={`w-5 h-5 transition-all duration-300 ${isSelected ? "scale-110" : "group-hover:scale-110"
@@ -157,15 +158,16 @@ export const DocumentTypeCard = ({
             w-14 h-14 rounded-2xl flex items-center justify-center shrink-0
             transition-all duration-300
             ${isSelected
-              ? `${styles.iconBg} shadow-lg shadow-black/10`
+              ? 'shadow-lg shadow-black/10'
               : `bg-slate-50 border border-slate-200 group-hover:${styles.bg} group-hover:border-black/5`
             }
           `}
+          style={isSelected ? { backgroundColor: styles.iconColor } : {}}
         >
           <IconComponent
             className={`w-6 h-6 transition-all duration-300 ${isSelected ? "scale-110" : "group-hover:scale-110"
               }`}
-            style={{ color: isSelected ? "#ffffff" : styles.iconColor }}
+            style={{ color: "#ffffff" }}
             strokeWidth={2.5}
           />
         </div>
@@ -207,10 +209,11 @@ export const DocumentTypeSelector = () => {
   const { selectedDocumentType, loadDocumentConfig, setCurrentStep } =
     useDocument();
   const [searchParams] = useSearchParams();
-  const jobId = searchParams.get("job_id");
+  const jobIdParam = searchParams.get("job_id");
+  const jobId = jobIdParam ? Number(jobIdParam) : undefined;
 
   const handleSelect = (configId: string) => {
-    loadDocumentConfig(configId, jobId || undefined);
+    loadDocumentConfig(configId, jobId);
     setTimeout(() => {
       setCurrentStep("form-entry");
     }, 500);

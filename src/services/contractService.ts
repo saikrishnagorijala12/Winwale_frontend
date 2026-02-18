@@ -1,4 +1,3 @@
-// src/services/contractService.ts
 import api from "../lib/axios";
 import {
   ClientContractRead,

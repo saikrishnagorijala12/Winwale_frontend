@@ -1,4 +1,3 @@
-// Regex Patterns
 export const COMPANY_NAME_REGEX = /^[A-Za-z0-9]+(?:[A-Za-z0-9 .,'&()\-]*[A-Za-z0-9])?$/;
 export const NAME_REGEX = /^[A-Za-z]+(?:[ .'-][A-Za-z]+)*$/;
 export const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;

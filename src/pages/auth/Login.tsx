@@ -97,7 +97,7 @@ const Login: React.FC = () => {
                 setEmail(e.target.value);
                 setErrors((prev) => ({ ...prev, email: undefined }));
               }}
-              className="block w-full pl-11 pr-4 py-3 rounded-xl outline-none transition-all bg-slate-50 border border-slate-200 focus:ring-blue-500"
+              className="block w-full pl-11 pr-4 py-3 rounded-xl outline-none transition-all bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-blue-500/20"
               placeholder="name@winvale.com"
             />
           </div>
@@ -121,7 +121,7 @@ const Login: React.FC = () => {
                 setPassword(e.target.value);
                 setErrors((prev) => ({ ...prev, password: undefined }));
               }}
-              className="block w-full pl-11 pr-11 py-3 rounded-xl outline-none transition-all bg-slate-50 border border-slate-200 focus:ring-blue-500"
+              className="block w-full pl-11 pr-11 py-3 rounded-xl outline-none transition-all bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-blue-500/20"
               placeholder="••••••••"
             />
             <button

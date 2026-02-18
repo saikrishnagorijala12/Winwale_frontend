@@ -12,7 +12,6 @@ import awsExports from "../aws-exports";
 import Login from "../pages/auth/Login";
 import Signup from "../pages/auth/Signup";
 import ForgotPassword from "../pages/auth/ForgotPassword";
-// import Dashboard from "../pages/Dashboard";
 import Settings from "../pages/Settings";
 import NotFound from "../pages/NotFound";
 import PendingApproval from "../pages/PendingApproval";
@@ -31,7 +30,6 @@ import GsaProducts from "../pages/GsaProducts";
 
 import { ROLES } from "../types/roles.types";
 import PriceListAnalysis from "../pages/PriceListAnalysis";
-// import Analysis from "../pages/Analysis";
 import { DocumentProvider } from "../context/DocumentContext";
 import { DocumentWorkflowRenderer } from "../pages/DocumentGeneration";
 import AnalysisHistory from "../pages/AnalysisHistory";

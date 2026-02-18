@@ -15,7 +15,7 @@ const ROLE_MAP: Record<Role, string> = {
 };
 
 const inputStyles =
-  "w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-[#3498db]/10 focus:border-[#3498db] transition-all bg-slate-50/50 text-slate-700";
+  "w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-[#3498db] transition-all bg-slate-50/50 text-slate-700";
 
 const disabledInputStyles =
   "w-full px-4 py-2.5 rounded-xl border border-slate-100 bg-slate-100/50 text-slate-500 cursor-not-allowed";

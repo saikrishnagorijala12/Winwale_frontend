@@ -1,5 +1,5 @@
 export interface Client {
-    client_id: string;
+    client_id: number;
     company_name: string;
     contract_number?: string | null;
     has_products?: Boolean;

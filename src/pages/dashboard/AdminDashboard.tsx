@@ -265,7 +265,7 @@ export default function UnifiedAdminDashboard() {
                   <div
                     key={item.id}
                     onClick={() => {
-                      setSelectedJobId(Number(item.id));
+                      setSelectedJobId(item.id);
                       navigate(`/analyses/details`);
                     }}
                     className="group flex items-center gap-4 p-4 rounded-2xl border border-transparent hover:shadow-sm transition-all cursor-pointer"
