@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Search,
-  Filter,
   FileText,
   Download,
   ChevronDown,
@@ -16,6 +15,7 @@ import {
   CheckCircle2,
   Clock,
 } from "lucide-react";
+import { toast } from "sonner";
 
 const mockDownloadHistory = [
   {
@@ -69,19 +69,13 @@ const fileTypeStyles = {
 export default function DownloadHistory() {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
-  const [toast, setToast] = useState(null);
   const [showConfirm, setShowConfirm] = useState(false);
   const [downloads, setDownloads] = useState(mockDownloadHistory);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
-  const showToast = (message, type = "success") => {
-    setToast({ message, type });
-    setTimeout(() => setToast(null), 3000);
-  };
-
   const handleDownload = (fileName) => {
-    showToast(`Downloading ${fileName}...`);
+    toast.success(`Downloading ${fileName}...`);
   };
 
   const formatDate = (date) => {
@@ -128,14 +122,6 @@ export default function DownloadHistory() {
 
   return (
     <div className="min-h-screen bg-linear-to-br from-slate-50 via-blue-50/30 to-slate-100 p-6 lg:p-10 space-y-8">
-      {/* Toast */}
-      {toast && (
-        <div className="fixed top-4 right-4 px-6 py-3 bg-slate-900 text-white rounded-xl shadow-2xl z-50 flex items-center gap-2 animate-in fade-in slide-in-from-top-4">
-          <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-          {toast.message}
-        </div>
-      )}
-
       {/* Breadcrumb & Header */}
       <div className="space-y-4">
         <button
@@ -143,7 +129,7 @@ export default function DownloadHistory() {
           className="flex items-center gap-2 text-slate-500 hover:text-blue-600 transition-colors font-medium text-sm group"
         >
           <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-          Back to Analysis
+          Back
         </button>
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div className="space-y-1">
@@ -280,10 +266,9 @@ export default function DownloadHistory() {
                         <button
                           onClick={() => setCurrentPage(Number(pageNum))}
                           className={`min-w-9 h-9 flex items-center justify-center rounded-lg text-sm font-bold transition-all
-                            ${
-                              currentPage === pageNum
-                                ? "bg-[#3399cc] text-white shadow-md shadow-[#3399cc]/30"
-                                : "text-slate-500 hover:bg-slate-100 hover:text-slate-900"
+                            ${currentPage === pageNum
+                              ? "bg-[#3399cc] text-white shadow-md shadow-[#3399cc]/30"
+                              : "text-slate-500 hover:bg-slate-100 hover:text-slate-900"
                             }`}
                         >
                           {pageNum}
@@ -333,7 +318,7 @@ export default function DownloadHistory() {
                   onClick={() => {
                     setDownloads([]);
                     setShowConfirm(false);
-                    showToast("Download history cleared");
+                    toast.success("Download history cleared");
                   }}
                   className="px-4 py-2 rounded-xl text-sm font-semibold bg-rose-600 text-white hover:bg-rose-700"
                 >

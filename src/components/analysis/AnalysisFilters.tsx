@@ -1,12 +1,8 @@
 import React from "react";
-import {
-  Search,
-  Filter,
-  Building2,
-  CheckCircle2,
-  ChevronDown,
-} from "lucide-react";
+import { Search, Filter, CheckCircle2, ChevronDown } from "lucide-react";
 import { StatusFilter } from "../../types/analysis.types";
+import { Client } from "../../types/pricelist.types";
+import { ClientDropdown } from "../shared/ClientDropdown";
 
 interface AnalysisFiltersProps {
   searchQuery: string;
@@ -19,7 +15,7 @@ interface AnalysisFiltersProps {
   setDateFrom: (value: Date | undefined) => void;
   dateTo: Date | undefined;
   setDateTo: (value: Date | undefined) => void;
-  clientOptions: string[];
+  clients: Client[];
   onClearFilters: () => void;
 }
 
@@ -34,11 +30,25 @@ export default function AnalysisFilters({
   setDateFrom,
   dateTo,
   setDateTo,
-  clientOptions,
+  clients,
   onClearFilters,
 }: AnalysisFiltersProps) {
+  const selectedClientId =
+    clientFilter === "All"
+      ? ""
+      : (clients.find((c) => c.company_name === clientFilter)?.client_id ?? "");
+
+  const handleClientSelect = (clientId: string) => {
+    if (clientId === "") {
+      setClientFilter("All");
+    } else {
+      const client = clients.find((c) => c.client_id === clientId);
+      setClientFilter(client?.company_name ?? "All");
+    }
+  };
+
   return (
-    <div className="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-x-auto">
+    <div className="bg-white rounded-3xl shadow-sm border border-slate-200">
       {/* Header */}
       <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100">
         <div className="flex items-center gap-2">
@@ -55,7 +65,7 @@ export default function AnalysisFilters({
 
       {/* Inputs */}
       <div className="p-6">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 ">
           {/* Search */}
           <div className="space-y-1">
             <label className="text-[11px] font-black uppercase tracking-widest text-slate-400">
@@ -73,26 +83,19 @@ export default function AnalysisFilters({
           </div>
 
           {/* Client */}
-          <div className="space-y-1">
+          <div className="space-y-1 overflow-visible">
             <label className="text-[11px] font-black uppercase tracking-widest text-slate-400">
               Client
             </label>
-            <div className="relative">
-              <Building2 className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-              <select
-                value={clientFilter}
-                onChange={(e) => setClientFilter(e.target.value)}
-                className="w-full text-slate-500 appearance-none pl-11 pr-10 py-3 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:ring-4 focus:ring-[#3399cc]/10 focus:border-[#3399cc] outline-none transition-all text-sm font-medium"
-              >
-                <option value="All">All Clients</option>
-                {clientOptions.map((c) => (
-                  <option key={c} value={c}>
-                    {c}
-                  </option>
-                ))}
-              </select>
-              <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
-            </div>
+            <ClientDropdown
+              clients={clients}
+              selectedClient={selectedClientId}
+              onClientSelect={handleClientSelect}
+              allowAll
+              allLabel="All Clients"
+              placeholder="Filter by client..."
+              compact
+            />
           </div>
 
           {/* Status */}
@@ -104,7 +107,9 @@ export default function AnalysisFilters({
               <CheckCircle2 className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
               <select
                 value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value as StatusFilter)}
+                onChange={(e) =>
+                  setStatusFilter(e.target.value as StatusFilter)
+                }
                 className="w-full text-slate-500 appearance-none pl-11 pr-10 py-3 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:ring-4 focus:ring-[#3399cc]/10 focus:border-[#3399cc] outline-none transition-all text-sm font-medium"
               >
                 <option value="All">All Status</option>

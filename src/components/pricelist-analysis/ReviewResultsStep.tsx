@@ -8,6 +8,7 @@ interface ReviewResultsStepProps {
     onExport: () => void;
     onReset: () => void;
     onGenerateDocuments: () => void;
+    isLoading?: boolean;
 }
 
 export const ReviewResultsStep = ({
@@ -15,12 +16,14 @@ export const ReviewResultsStep = ({
     onExport,
     onReset,
     onGenerateDocuments,
+    isLoading = false,
 }: ReviewResultsStepProps) => {
     return (
         <div className="space-y-6">
             <AnalysisResultsViewer
                 categorized={categorized}
                 onExport={onExport}
+                isLoading={isLoading}
             />
 
             <div className="flex justify-between items-center pt-4">

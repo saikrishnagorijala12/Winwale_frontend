@@ -9,6 +9,9 @@ interface ClientDropdownProps {
     placeholder?: string;
     disabled?: boolean;
     className?: string;
+    allowAll?: boolean;
+    allLabel?: string;
+    compact?: boolean;
 }
 
 export const ClientDropdown: React.FC<ClientDropdownProps> = ({
@@ -18,6 +21,9 @@ export const ClientDropdown: React.FC<ClientDropdownProps> = ({
     placeholder = "Choose an approved client...",
     disabled = false,
     className = "",
+    allowAll = false,
+    allLabel = "All Clients",
+    compact = false,
 }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [clientSearch, setClientSearch] = useState("");
@@ -60,9 +66,9 @@ export const ClientDropdown: React.FC<ClientDropdownProps> = ({
         <div className={`relative group/select ${className}`} ref={dropdownRef}>
             <div
                 onClick={toggleDropdown}
-                className={`w-full pl-6 pr-6 py-4 bg-white border rounded-2xl outline-none font-medium flex items-center justify-between transition-all ${disabled
-                        ? "opacity-60 cursor-not-allowed bg-slate-50"
-                        : "cursor-pointer"
+                className={`w-full pl-6 pr-6 ${compact ? "py-3" : "py-4"} bg-slate-50/50 border ${compact ? "rounded-xl" : "rounded-2xl"} outline-none font-medium flex items-center justify-between transition-all ${disabled
+                    ? "opacity-60 cursor-not-allowed bg-slate-50"
+                    : "cursor-pointer"
                     } ${isOpen
                         ? "border-[#3399cc] ring-4 ring-[#3399cc]/10 shadow-lg shadow-[#3399cc]/5"
                         : "border-slate-200 hover:border-slate-300"
@@ -75,13 +81,14 @@ export const ClientDropdown: React.FC<ClientDropdownProps> = ({
                         size={18}
                     />
                     <span
-                        className={`block truncate ${selectedClientData ? "text-slate-900" : "text-slate-400"
+                        className={`block truncate ${selectedClientData || (allowAll && selectedClient === "") ? "text-slate-900" : "text-slate-400"
                             }`}
                     >
-                        {selectedClientData
-                            ? `${selectedClientData.company_name} (${selectedClientData.contract_number || "No Contract"
-                            })`
-                            : placeholder}
+                        {allowAll && selectedClient === ""
+                            ? allLabel
+                            : selectedClientData
+                                ? `${selectedClientData.company_name} (${selectedClientData.contract_number || "No Contract"})`
+                                : placeholder}
                     </span>
                 </div>
                 <ChevronDown
@@ -111,6 +118,22 @@ export const ClientDropdown: React.FC<ClientDropdownProps> = ({
                         </div>
                     </div>
                     <div className="max-h-60 overflow-y-auto py-2 custom-scrollbar">
+                        {allowAll && (
+                            <div
+                                onClick={() => {
+                                    onClientSelect("");
+                                    setIsOpen(false);
+                                }}
+                                className={`px-4 py-3 mx-2 rounded-xl cursor-pointer transition-colors text-sm font-medium flex items-center justify-between
+                    ${selectedClient === ""
+                                        ? "bg-slate-100 text-[#3399cc]"
+                                        : "text-slate-700 hover:bg-slate-50 hover:text-slate-900"
+                                    }`}
+                            >
+                                <span className="font-semibold">{allLabel}</span>
+                                {selectedClient === "" && <Check size={16} className="text-[#3399cc] shrink-0 ml-2" />}
+                            </div>
+                        )}
                         {filteredClients.length === 0 ? (
                             <div className="px-4 py-8 text-slate-400 text-sm text-center italic">
                                 No clients found matching "{clientSearch}"
@@ -138,8 +161,8 @@ export const ClientDropdown: React.FC<ClientDropdownProps> = ({
                                         {c.contract_number && (
                                             <span
                                                 className={`text-xs mt-1 transition-colors truncate ${selectedClient === c.client_id
-                                                        ? "text-[#3399cc]/70"
-                                                        : "text-slate-400 group-hover:text-slate-500"
+                                                    ? "text-[#3399cc]/70"
+                                                    : "text-slate-400 group-hover:text-slate-500"
                                                     }`}
                                             >
                                                 Contract: {c.contract_number}

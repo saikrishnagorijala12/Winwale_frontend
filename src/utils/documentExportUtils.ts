@@ -42,7 +42,7 @@ export const convertTiptapToDocx = async (json: any, options: { logoUrl?: string
                         italics: child.marks?.some((m: any) => m.type === "italic"),
                         underline: child.marks?.some((m: any) => m.type === "underline") ? {} : undefined,
                         font: "Times New Roman",
-                        size: 24, // 12pt
+                        size: 24, 
                     });
                 } else if (child.type === "hardBreak") {
                     return new TextRun({ break: 1 });
@@ -53,7 +53,7 @@ export const convertTiptapToDocx = async (json: any, options: { logoUrl?: string
             children.push(
                 new Paragraph({
                     children: textRuns,
-                    spacing: { after: 240, line: 360 }, // 12pt after, 1.5 line spacing
+                    spacing: { after: 240, line: 360 }, 
                 })
             );
         } else if (node.type === "bulletList" || node.type === "orderedList") {
@@ -96,7 +96,7 @@ export const convertTiptapToDocx = async (json: any, options: { logoUrl?: string
                         text: child.text,
                         bold: true,
                         font: "Times New Roman",
-                        size: 32 - (node.attrs.level * 2), // Slightly larger headers
+                        size: 32 - (node.attrs.level * 2), 
                     });
                 }
                 return null;

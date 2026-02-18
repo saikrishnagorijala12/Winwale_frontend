@@ -9,39 +9,16 @@ import {
   Clock,
   MoreVertical,
   Eye,
-  CheckCircle2,
-  XCircle,
 } from "lucide-react";
 import ModificationsSummary from "./ModificationsSummary";
 import AnalysisActionsMenu from "./AnalysisActionsMenu";
 import Pagination from "./Pagination";
 import { useAnalysis } from "../../context/AnalysisContext";
-import { normalizeStatus, STATUS_BADGE_BASE, STATUS_MAP } from "../../utils/statusUtils";
+import { normalizeStatus } from "../../utils/statusUtils";
+import StatusBadge from "../shared/StatusBadge";
 import { formatDateTime } from "../../utils/analysisUtils";
 import { AnalysisJob, SortConfig, StatusFilter } from "../../types/analysis.types";
 
-const getStatusBadge = (status: string) => {
-  const slug = normalizeStatus(status);
-
-  if (slug === "unknown") {
-    return (
-      <span
-        className={`${STATUS_BADGE_BASE} bg-slate-100 text-slate-700 border-slate-200`}
-      >
-        Unknown
-      </span>
-    );
-  }
-
-  const { label, styles, icon: Icon } = STATUS_MAP[slug];
-
-  return (
-    <span className={`${STATUS_BADGE_BASE} ${styles}`}>
-      <Icon className="w-3 h-3 stroke-[2.5px]" />
-      <span className="hidden sm:inline">{label}</span>
-    </span>
-  );
-};
 
 interface AnalysisTableProps {
   analysisHistory: AnalysisJob[];
@@ -244,7 +221,7 @@ export default function AnalysisTable({
 
                       <td className="p-4">
                         <span className="text-slate-500 font-medium text-sm">
-                          {getStatusBadge(item.status)}
+                          <StatusBadge status={item.status} />
                         </span>
                       </td>
                       <td className="p-4">
@@ -364,7 +341,7 @@ export default function AnalysisTable({
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      {getStatusBadge(item.status)}
+                      <StatusBadge status={item.status} />
                       <button
                         onClick={(e) => {
                           e.stopPropagation();

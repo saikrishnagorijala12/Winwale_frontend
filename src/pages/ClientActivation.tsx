@@ -19,6 +19,7 @@ import {
   ChevronRight,
   ChevronLeft,
 } from "lucide-react";
+import StatusBadge from "../components/shared/StatusBadge";
 import { toast } from "sonner";
 import api from "../lib/axios";
 import ConfirmationModal from "../components/shared/ConfirmationModal";
@@ -182,7 +183,6 @@ interface ClientCardProps {
   onEdit: () => void;
   onApprove: () => void;
   onReject: () => void;
-  getStatusBadge: (status: string) => JSX.Element;
 }
 
 const ClientCard: React.FC<ClientCardProps> = ({
@@ -191,7 +191,6 @@ const ClientCard: React.FC<ClientCardProps> = ({
   onEdit,
   onApprove,
   onReject,
-  getStatusBadge,
 }) => {
   return (
     <div
@@ -249,7 +248,7 @@ const ClientCard: React.FC<ClientCardProps> = ({
       </div>
 
       <div className="flex items-center justify-between pt-3 border-t border-slate-100">
-        {getStatusBadge(client.status)}
+        <StatusBadge status={client.status} />
       </div>
     </div>
   );
@@ -285,8 +284,8 @@ const ClientActivation = () => {
       setLoading(true);
       const response = await api.get("/clients");
       setClients(Array.isArray(response.data) ? response.data : []);
-    } catch (err: any) {
-      handleApiError(err, "load clients");
+    } catch {
+      toast.error("Failed to load clients");
     } finally {
       setLoading(false);
     }
@@ -301,11 +300,11 @@ const ClientActivation = () => {
   }, [activeTab, searchQuery]);
 
   const handleApiError = (err: any, context: string = "operation") => {
-    const status = err.response?.status;
-    const message = err.response?.data?.detail || err.response?.data?.message;
-    let errorMessage = message || `Failed to ${context}. Please try again.`;
+    // The axios interceptor normalizes errors to { status, message }
+    const errorMessage = err.message || `Failed to ${context}. Please try again.`;
 
-    if (status === 409) {
+    // For 409 conflicts on edit, navigate back to step 1 so the user can fix the field
+    if (err.status === 409) {
       setCurrentStep(1);
     }
 
@@ -446,26 +445,6 @@ const ClientActivation = () => {
   );
   const totalPages = Math.ceil(totalItems / itemsPerPage);
 
-  const getStatusBadge = (status: string) => {
-    if (status === "rejected") {
-      return (
-        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold border bg-rose-50 text-rose-600 border-rose-100">
-          <XCircle className="w-3 h-3" /> Rejected
-        </span>
-      );
-    } else if (status === "approved") {
-      return (
-        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold border bg-emerald-50 text-emerald-600 border-emerald-100">
-          <CheckCircle2 className="w-3 h-3" /> Approved
-        </span>
-      );
-    }
-    return (
-      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold border bg-orange-50 text-orange-600 border-orange-100">
-        <Clock className="w-3 h-3" /> Pending
-      </span>
-    );
-  };
 
   const getTabTitle = () => {
     switch (activeTab) {
@@ -497,13 +476,7 @@ const ClientActivation = () => {
     }
   };
 
-  if (loading)
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-[#24578f]" />
-        <p className="mt-4 text-slate-500">Loading clients ...</p>
-      </div>
-    );
+
 
   return (
     <div className="min-h-screen bg-linear-to-br from-slate-50 via-blue-50/30 to-slate-100 p-4 sm:p-6 lg:p-10 space-y-6 sm:space-y-8 lg:space-y-10">
@@ -689,21 +662,26 @@ const ClientActivation = () => {
 
         {/* Mobile Card View (< lg) */}
         <div className="lg:hidden px-4 sm:px-6 pb-4 sm:pb-6 space-y-3 sm:space-y-4">
-          {paginatedClients.map((client) => (
-            <ClientCard
-              key={client.client_id}
-              client={client}
-              onView={() => handleViewClient(client)}
-              onEdit={() => handleEditClient(normalizeClientFromAPI(client))}
-              onApprove={() => openConfirmModal(client, "approve")}
-              onReject={() => openConfirmModal(client, "reject")}
-              getStatusBadge={getStatusBadge}
-            />
-          ))}
-          {paginatedClients.length === 0 && (
+          {loading ? (
+            <div className="py-16 flex flex-col items-center justify-center gap-3">
+              <Loader2 className="w-8 h-8 animate-spin text-[#24578f]" />
+              <p className="text-slate-400 text-sm">Loading clients...</p>
+            </div>
+          ) : paginatedClients.length === 0 ? (
             <div className="py-16 text-center text-slate-400 text-sm">
               No clients found.
             </div>
+          ) : (
+            paginatedClients.map((client) => (
+              <ClientCard
+                key={client.client_id}
+                client={client}
+                onView={() => handleViewClient(client)}
+                onEdit={() => handleEditClient(normalizeClientFromAPI(client))}
+                onApprove={() => openConfirmModal(client, "approve")}
+                onReject={() => openConfirmModal(client, "reject")}
+              />
+            ))
           )}
         </div>
 
@@ -733,74 +711,86 @@ const ClientActivation = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {paginatedClients.map((client) => (
-                <tr
-                  key={client.client_id}
-                  onClick={() => handleRowClick(client)}
-                  className="group hover:bg-slate-50/30 transition-colors cursor-pointer"
-                >
-                  <td className="px-4 py-5">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center">
-                        <Building2 className="w-5 h-5 text-blue-500" />
-                      </div>
-                      <div>
-                        <p className="font-bold text-sm text-slate-800">
-                          {client.company_name}
-                        </p>
-                        <p className="text-xs text-slate-400">
-                          {client.company_email}
-                        </p>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-4 py-5">
-                    <p className="text-sm font-semibold text-slate-700">
-                      {client.contact_officer_name || "N/A"}
-                    </p>
-                  </td>
-                  <td className="px-4 py-5">
-                    <div className="text-sm text-slate-600 flex items-center gap-1">
-                      <MapPin className="w-3 h-3 text-slate-400" />
-                      {client.company_city}, {client.company_state}
-                    </div>
-                  </td>
-                  <td className="px-4 py-5">{getStatusBadge(client.status)}</td>
-                  <td className="px-4 py-5">
-                    <div className="flex items-center gap-2 text-sm text-slate-400 font-medium">
-                      <Calendar className="w-4 h-4" />
-                      {new Date(client.created_time).toLocaleDateString(
-                        "en-US",
-                        {
-                          month: "short",
-                          day: "2-digit",
-                          year: "numeric",
-                        },
-                      )}
-                    </div>
-                  </td>
-                  <td className="px-4 py-5">
-                    <div className="flex items-center justify-end">
-                      <ActionDropdown
-                        client={client}
-                        onView={() => handleViewClient(client)}
-                        onEdit={() =>
-                          handleEditClient(normalizeClientFromAPI(client))
-                        }
-                        onApprove={() => openConfirmModal(client, "approve")}
-                        onReject={() => openConfirmModal(client, "reject")}
-                      />
+              {loading ? (
+                <tr>
+                  <td colSpan={6} className="px-6 py-20 text-center">
+                    <div className="flex flex-col items-center justify-center gap-3">
+                      <Loader2 className="w-8 h-8 animate-spin text-[#24578f]" />
+                      <p className="text-slate-400 text-sm">Loading clients...</p>
                     </div>
                   </td>
                 </tr>
-              ))}
+              ) : paginatedClients.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="px-6 py-20 text-center text-slate-400">
+                    No clients found.
+                  </td>
+                </tr>
+              ) : (
+                paginatedClients.map((client) => (
+                  <tr
+                    key={client.client_id}
+                    onClick={() => handleRowClick(client)}
+                    className="group hover:bg-slate-50/30 transition-colors cursor-pointer"
+                  >
+                    <td className="px-4 py-5">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center">
+                          <Building2 className="w-5 h-5 text-blue-500" />
+                        </div>
+                        <div>
+                          <p className="font-bold text-sm text-slate-800">
+                            {client.company_name}
+                          </p>
+                          <p className="text-xs text-slate-400">
+                            {client.company_email}
+                          </p>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-4 py-5">
+                      <p className="text-sm font-semibold text-slate-700">
+                        {client.contact_officer_name || "N/A"}
+                      </p>
+                    </td>
+                    <td className="px-4 py-5">
+                      <div className="text-sm text-slate-600 flex items-center gap-1">
+                        <MapPin className="w-3 h-3 text-slate-400" />
+                        {client.company_city}, {client.company_state}
+                      </div>
+                    </td>
+                    <td className="px-4 py-5"><StatusBadge status={client.status} /></td>
+                    <td className="px-4 py-5">
+                      <div className="flex items-center gap-2 text-sm text-slate-400 font-medium">
+                        <Calendar className="w-4 h-4" />
+                        {new Date(client.created_time).toLocaleDateString(
+                          "en-US",
+                          {
+                            month: "short",
+                            day: "2-digit",
+                            year: "numeric",
+                          },
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-4 py-5">
+                      <div className="flex items-center justify-end">
+                        <ActionDropdown
+                          client={client}
+                          onView={() => handleViewClient(client)}
+                          onEdit={() =>
+                            handleEditClient(normalizeClientFromAPI(client))
+                          }
+                          onApprove={() => openConfirmModal(client, "approve")}
+                          onReject={() => openConfirmModal(client, "reject")}
+                        />
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
-          {paginatedClients.length === 0 && (
-            <div className="py-20 text-center text-slate-400">
-              No clients found.
-            </div>
-          )}
         </div>
         {totalItems > itemsPerPage && (
           <div className="px-6 py-5 bg-white border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">

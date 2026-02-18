@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { Client, Product, ProductsList } from "../types/product.types";
+import { toast } from "sonner";
+import { Client, Product } from "../types/product.types";
 import { productService } from "../services/productService";
 import { clientService } from "../services/clientService";
 import ProductsHeader from "../components/products/ProductsHeader";
@@ -15,7 +16,6 @@ export default function ProductsPage() {
   const [clients, setClients] = useState<Client[]>([]);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
@@ -27,7 +27,6 @@ export default function ProductsPage() {
     const initData = async () => {
       try {
         setLoading(true);
-        setError("");
 
         const [prodRes, clientRes] = await Promise.allSettled([
           productService.getAllProducts(),
@@ -36,17 +35,24 @@ export default function ProductsPage() {
 
         if (prodRes.status === "fulfilled") {
           setProducts(prodRes.value.items);
-        } else if (prodRes.reason?.response?.status === 404) {
-          setProducts([]);
         } else {
-          setError("Failed to load products");
+          const err: any = prodRes.reason;
+
+          if (err?.status === 404) {
+            setProducts([]);
+          } else {
+            toast.error(err?.message || "Failed to load products.");
+          }
         }
 
         if (clientRes.status === "fulfilled") {
           setClients(clientRes.value);
+        } else {
+          const err: any = clientRes.reason;
+          toast.error(err?.message || "Failed to load clients.");
         }
       } catch {
-        setError("Failed to initialize page data");
+        toast.error("Failed to initialize page data.");
       } finally {
         setLoading(false);
       }
@@ -58,29 +64,33 @@ export default function ProductsPage() {
   const handleClientSelect = async (client: Client | null) => {
     setSelectedClient(client);
     setCurrentPage(1);
-    setError("");
 
     try {
       setLoading(true);
+
       if (!client) {
         const data = await productService.getAllProducts();
         setProducts(data.items);
       } else {
-        const data = await productService.getProductsByClient(client.client_id);
+        const data = await productService.getProductsByClient(
+          client.client_id
+        );
         setProducts(data.items);
       }
     } catch (err: any) {
-      if (err.response && err.response.status === 404) {
+      if (err?.status === 404) {
         setProducts([]);
       } else {
-        console.error("Filtering error", err);
-        setError("Failed to fetch products for this client");
+        toast.error(
+          err?.message || "Failed to fetch products for this client."
+        );
       }
     } finally {
       setLoading(false);
     }
   };
 
+  // -------------------- SEARCH FILTER --------------------
   const filteredProducts = useMemo(() => {
     return products.filter(
       (p) =>
@@ -88,7 +98,7 @@ export default function ProductsPage() {
         p.manufacturer.toLowerCase().includes(searchTerm.toLowerCase()) ||
         p.manufacturer_part_number
           .toLowerCase()
-          .includes(searchTerm.toLowerCase()),
+          .includes(searchTerm.toLowerCase())
     );
   }, [products, searchTerm]);
 
@@ -97,18 +107,23 @@ export default function ProductsPage() {
 
   const paginatedProducts = useMemo(() => {
     return filteredProducts.slice(startIndex, startIndex + itemsPerPage);
-  }, [filteredProducts, startIndex, itemsPerPage]);
+  }, [filteredProducts, startIndex]);
 
+  // -------------------- EXPORT --------------------
   const handleExport = async () => {
     try {
       setIsExporting(true);
-      const blob = await productService.exportProducts(selectedClient?.client_id);
+
+      const blob = await productService.exportProducts(
+        selectedClient?.client_id
+      );
 
       const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
+      const a = document.createElement("a");
       a.href = url;
 
-      const dateStr = new Date().toISOString().split('T')[0];
+      const dateStr = new Date().toISOString().split("T")[0];
+
       if (selectedClient) {
         a.download = `${selectedClient.company_name}_products_${dateStr}.xlsx`;
       } else {
@@ -120,7 +135,10 @@ export default function ProductsPage() {
 
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
-    } catch (err) {
+
+      toast.success("Export completed successfully.");
+    } catch (err: any) {
+      toast.error(err?.message || "Failed to export products.");
     } finally {
       setIsExporting(false);
     }

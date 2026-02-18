@@ -1,10 +1,7 @@
 import React from "react";
 import {
-  CheckCircle2,
-  Clock,
   Loader2,
   MoreVertical,
-  XCircle,
   ChevronLeft,
   ChevronRight,
   Inbox,
@@ -12,11 +9,7 @@ import {
 } from "lucide-react";
 import { Client } from "../../types/client.types";
 import { ClientActionsMenu } from "./ClientActionsMenu";
-import {
-  normalizeStatus,
-  STATUS_BADGE_BASE,
-  STATUS_MAP,
-} from "@/src/utils/statusUtils";
+import StatusBadge from "../shared/StatusBadge";
 
 interface ClientTableProps {
   clients: Client[];
@@ -44,28 +37,6 @@ const formatDate = (value?: string | Date | null) => {
   });
 };
 
-const getStatusBadge = (status: string) => {
-  const slug = normalizeStatus(status);
-
-  if (slug === "unknown") {
-    return (
-      <span
-        className={`${STATUS_BADGE_BASE} bg-slate-100 text-slate-700 border-slate-200`}
-      >
-        Unknown
-      </span>
-    );
-  }
-
-  const { label, styles, icon: Icon } = STATUS_MAP[slug];
-
-  return (
-    <span className={`${STATUS_BADGE_BASE} ${styles}`}>
-      <Icon className="w-3 h-3 stroke-[2.5px]" />
-      <span className="hidden sm:inline">{label}</span>
-    </span>
-  );
-};
 
 export const ClientTable: React.FC<ClientTableProps> = ({
   clients,
@@ -169,7 +140,7 @@ export const ClientTable: React.FC<ClientTableProps> = ({
                       </span>
                     </div>
                   </td>
-                  <td className="px-4 py-4">{getStatusBadge(client.status)}</td>
+                  <td className="px-4 py-4"><StatusBadge status={client.status} /></td>
                   <td className="px-6 py-4">
                     {!client.contact ? (
                       <span className="text-[10px] italic font-medium text-gray-400 uppercase">
@@ -245,7 +216,7 @@ export const ClientTable: React.FC<ClientTableProps> = ({
                     <h3 className="font-bold text-slate-900 text-lg">
                       {client.name}
                     </h3>
-                    <div className="mt-1">{getStatusBadge(client.status)}</div>
+                    <div className="mt-1"><StatusBadge status={client.status} /></div>
                   </div>
                 </div>
                 <div className="relative">
@@ -334,10 +305,9 @@ export const ClientTable: React.FC<ClientTableProps> = ({
                     <button
                       onClick={() => onPageChange(Number(pageNum))}
                       className={`min-w-9 h-9 flex items-center justify-center rounded-lg text-sm font-bold transition-all
-                        ${
-                          currentPage === pageNum
-                            ? "bg-[#3399cc] text-white shadow-md shadow-[#3399cc]/30"
-                            : "text-slate-500 hover:bg-slate-100 hover:text-slate-900"
+                        ${currentPage === pageNum
+                          ? "bg-[#3399cc] text-white shadow-md shadow-[#3399cc]/30"
+                          : "text-slate-500 hover:bg-slate-100 hover:text-slate-900"
                         }`}
                     >
                       {pageNum}

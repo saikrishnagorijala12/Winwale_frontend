@@ -1,21 +1,20 @@
 import React, { useEffect, useState, ChangeEvent } from "react";
+import { useFileDrop } from "../hooks/useFileDrop";
 import {
   Upload,
-  CheckCircle,
   AlertCircle,
   Loader2,
   ChevronLeft,
   FileSpreadsheet,
   X,
   ArrowRight,
-  Building2,
-  ChevronDown,
 } from "lucide-react";
 import * as XLSX from "xlsx";
 import api from "../lib/axios";
 import { useNavigate } from "react-router-dom";
 import { ClientDropdown } from "../components/shared/ClientDropdown";
 import ConfirmationModal from "../components/shared/ConfirmationModal";
+import { toast } from "sonner";
 
 interface Client {
   client_id: string;
@@ -37,7 +36,6 @@ const UploadGsa: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [loadingClients, setLoadingClients] = useState<boolean>(true);
-  const [uploadResult, setUploadResult] = useState<UploadResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [previewData, setPreviewData] = useState<PreviewRow[] | null>(null);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
@@ -53,34 +51,35 @@ const UploadGsa: React.FC = () => {
       const response = await api.get<Client[]>("clients/approved");
       setClients(response.data);
     } catch {
-      setError("Failed to load approved clients");
+      toast.error("Failed to load approved clients");
     } finally {
       setLoadingClients(false);
     }
+  };
+
+  const processFile = async (selectedFile: File): Promise<void> => {
+    setFile(selectedFile);
+    setError(null);
+    await previewExcel(selectedFile);
   };
 
   const handleFileChange = async (
     e: ChangeEvent<HTMLInputElement>,
   ): Promise<void> => {
     const selectedFile = e.target.files?.[0] ?? null;
-
     if (!selectedFile) {
       setFile(null);
       setPreviewData(null);
       return;
     }
-
-    if (!selectedFile.name.endsWith(".xlsx")) {
-      setError("Invalid format. Please select an Excel (.xlsx) file");
-      setFile(null);
-      return;
-    }
-
-    setFile(selectedFile);
-    setError(null);
-    setUploadResult(null);
-    await previewExcel(selectedFile);
+    await processFile(selectedFile);
   };
+
+  const { isDragging, handleDragOver, handleDragLeave, handleDrop } =
+    useFileDrop({
+      onFileDrop: processFile,
+      onInvalidFile: (reason) => setError(reason),
+    });
 
   const previewExcel = async (file: File): Promise<void> => {
     try {
@@ -122,7 +121,6 @@ const UploadGsa: React.FC = () => {
 
     setLoading(true);
     setError(null);
-    setUploadResult(null);
 
     const formData = new FormData();
     formData.append("file", file);
@@ -134,7 +132,10 @@ const UploadGsa: React.FC = () => {
         { headers: { "Content-Type": "multipart/form-data" } },
       );
 
-      setUploadResult(response.data);
+      const { inserted, updated } = response.data;
+      toast.success(
+        `Upload successful! ${inserted} inserted, ${updated} updated. Redirecting...`,
+      );
       setFile(null);
       setPreviewData(null);
 
@@ -142,7 +143,7 @@ const UploadGsa: React.FC = () => {
         navigate("/gsa-products");
       }, 2500);
     } catch (err: any) {
-      setError(err?.response?.data?.detail ?? err?.message ?? "Upload failed");
+      toast.error(err?.message ?? "Upload failed");
     } finally {
       setLoading(false);
       setIsConfirmOpen(false);
@@ -201,7 +202,7 @@ const UploadGsa: React.FC = () => {
             size={20}
             className="group-hover:-translate-x-1 transition-transform"
           />
-          Back to Products
+          Back
         </button>
 
         <div className="mb-10">
@@ -258,22 +259,31 @@ const UploadGsa: React.FC = () => {
                 </div>
 
                 {!file ? (
-                  <label className="group flex flex-col items-center justify-center w-full h-56 border-2 border-dashed border-slate-200 rounded-4xl cursor-pointer hover:border-[#3399cc] hover:bg-blue-50/30 transition-all bg-slate-50/50">
+                  <label
+                    className={`group flex flex-col items-center justify-center w-full h-56 border-2 border-dashed rounded-4xl cursor-pointer transition-all ${isDragging
+                      ? "border-[#3399cc] bg-blue-50/60 scale-[1.01]"
+                      : "border-slate-200 bg-slate-50/50 hover:border-[#3399cc] hover:bg-blue-50/30"
+                      }`}
+                    onDragOver={handleDragOver}
+                    onDragLeave={handleDragLeave}
+                    onDrop={handleDrop}
+                  >
                     <div className="flex flex-col items-center justify-center p-6 text-center">
-                      <div className="w-16 h-16 bg-white rounded-2xl shadow-sm flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                        <Upload className="w-8 h-8 text-[#3399cc]" />
+                      <div className={`w-16 h-16 bg-white rounded-2xl shadow-sm flex items-center justify-center mb-4 transition-transform ${isDragging ? "scale-110" : "group-hover:scale-110"
+                        }`}>
+                        <Upload className={`w-8 h-8 ${isDragging ? "text-[#2b82ad]" : "text-[#3399cc]"}`} />
                       </div>
                       <p className="text-base font-bold text-slate-700 mb-1">
-                        Click to browse and upload
+                        {isDragging ? "Drop your file here" : "Drag & drop or click to browse"}
                       </p>
                       <p className="text-sm text-slate-400">
-                        Excel (.xlsx) files only
+                        Excel (.xlsx or .xls) files only
                       </p>
                     </div>
                     <input
                       id="file-input"
                       type="file"
-                      accept=".xlsx"
+                      accept=".xlsx,.xls"
                       onChange={handleFileChange}
                       className="hidden"
                     />
@@ -331,31 +341,6 @@ const UploadGsa: React.FC = () => {
                 <div className="p-4 bg-red-50 border border-red-100 rounded-2xl flex items-start gap-3 animate-in fade-in slide-in-from-top-2">
                   <AlertCircle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
                   <p className="text-sm text-red-700 font-medium">{error}</p>
-                </div>
-              )}
-
-              {uploadResult && (
-                <div className="p-5 bg-emerald-50 border border-emerald-100 rounded-2xl flex items-start gap-4 animate-in zoom-in-95 duration-300">
-                  <div className="w-10 h-10 bg-emerald-500 rounded-full flex items-center justify-center shrink-0">
-                    <CheckCircle className="w-6 h-6 text-white" />
-                  </div>
-                  <div className="text-sm text-emerald-800">
-                    <p className="font-black text-base uppercase tracking-tight">
-                      Upload Successful
-                    </p>
-                    <div className="flex gap-4 mt-1 font-medium opacity-80">
-                      <span>
-                        Inserted: <strong>{uploadResult.inserted}</strong>
-                      </span>
-                      <span className="w-1 h-1 bg-emerald-300 rounded-full my-auto" />
-                      <span>
-                        Updated: <strong>{uploadResult.updated}</strong>
-                      </span>
-                    </div>
-                    <p className="mt-3 text-xs opacity-60 italic font-medium">
-                      Redirecting to catalog...
-                    </p>
-                  </div>
                 </div>
               )}
             </div>

@@ -1,4 +1,5 @@
 import React from "react";
+import { useFileDrop } from "../../hooks/useFileDrop";
 import {
     FileSpreadsheet,
     Check,
@@ -16,6 +17,8 @@ interface FileUploadStepProps {
     totalRows: number;
     error: string | null;
     onFileChange: (e: React.ChangeEvent<HTMLInputElement> | React.MouseEvent) => void;
+    onFileDrop: (file: File) => void;
+    onInvalidFile?: (reason: string) => void;
     onBack: () => void;
     onContinue: () => void;
     onClearFile: () => void;
@@ -28,10 +31,17 @@ export const FileUploadStep = ({
     totalRows,
     error,
     onFileChange,
+    onFileDrop,
+    onInvalidFile,
     onBack,
     onContinue,
     onClearFile,
 }: FileUploadStepProps) => {
+    const { isDragging, handleDragOver, handleDragLeave, handleDrop } =
+        useFileDrop({
+            onFileDrop,
+            onInvalidFile,
+        });
     return (
         <div className="group bg-white/80 backdrop-blur-md rounded-3xl border border-slate-200 shadow-2xl shadow-slate-200/60 overflow-hidden">
             <div className="p-8 border-b border-slate-100 bg-slate-50/30">
@@ -53,15 +63,20 @@ export const FileUploadStep = ({
                     id="file-upload-input"
                     type="file"
                     className="hidden"
-                    accept=".xlsx"
+                    accept=".xlsx,.xls"
                     onChange={onFileChange}
                 />
                 <div
-                    className={`border-2 border-dashed rounded-xl p-12 text-center transition-colors cursor-pointer ${file
+                    className={`border-2 border-dashed rounded-xl p-12 text-center transition-all cursor-pointer ${file
                             ? "border-emerald-500 bg-emerald-50"
-                            : "border-slate-300 hover:border-[#3399cc] hover:bg-cyan-50/50"
+                            : isDragging
+                                ? "border-[#3399cc] bg-cyan-50/70 scale-[1.01]"
+                                : "border-slate-300 hover:border-[#3399cc] hover:bg-cyan-50/50"
                         }`}
                     onClick={onFileChange}
+                    onDragOver={handleDragOver}
+                    onDragLeave={handleDragLeave}
+                    onDrop={handleDrop}
                 >
                     {file ? (
                         <div className="space-y-3">
@@ -75,14 +90,15 @@ export const FileUploadStep = ({
                         </div>
                     ) : (
                         <div className="space-y-3">
-                            <div className="w-16 h-16 bg-white rounded-2xl shadow-sm flex items-center justify-center mx-auto">
-                                <Upload className="w-8 h-8 text-[#3399cc]" />
+                            <div className={`w-16 h-16 bg-white rounded-2xl shadow-sm flex items-center justify-center mx-auto transition-transform ${isDragging ? "scale-110" : ""
+                                }`}>
+                                <Upload className={`w-8 h-8 ${isDragging ? "text-[#2b82ad]" : "text-[#3399cc]"}`} />
                             </div>
                             <div>
                                 <p className="font-bold text-slate-900">
-                                    Click to browse and upload
+                                    {isDragging ? "Drop your file here" : "Drag & drop or click to browse"}
                                 </p>
-                                <p className="text-sm text-slate-500">Excel files (.xlsx)</p>
+                                <p className="text-sm text-slate-500">Excel (.xlsx or .xls) files only</p>
                             </div>
                         </div>
                     )}

@@ -84,61 +84,14 @@ export default function ClientsPage() {
   const handleApiError = (err: any, context: string = "operation") => {
     console.error(`Error during ${context}:`, err);
 
-    const status = err.response?.status;
-    const message = err.response?.data?.detail || err.response?.data?.message;
-    let errorMessage = "";
+    // The axios interceptor normalizes errors to { status, message }
+    const status = err.status;
+    const errorMessage = err.message || `Failed to ${context}. Please try again.`;
 
-    switch (status) {
-      case 400:
-        errorMessage =
-          message || "Invalid data provided. Please check your inputs.";
-        break;
-
-      case 401:
-        errorMessage =
-          message || "You are not authorized. Please log in again.";
-        break;
-
-      case 403:
-        errorMessage =
-          message || "You don't have permission to perform this action.";
-        break;
-
-      case 404:
-        errorMessage = message || "Client not found.";
-        break;
-
-      case 409:
-        errorMessage =
-          message ||
-          "A client with this email or phone number already exists. Please use different contact information.";
-        if (context === "create client") {
-          setAddStep(1);
-        } else if (context === "update client") {
-          setEditStep(1);
-        }
-        break;
-
-      case 422:
-        errorMessage =
-          message || "Validation error. Please check all required fields.";
-        break;
-
-      case 500:
-        errorMessage =
-          message || "Server error occurred. Please try again later.";
-        break;
-
-      case 503:
-        errorMessage =
-          message || "Service temporarily unavailable. Please try again later.";
-        break;
-
-      default:
-        if (err.message === "Network Error") {
-        } else {
-          errorMessage = message || `Failed to ${context}. Please try again.`;
-        }
+    // For 409 conflicts on create/edit, navigate back to step 1 so the user can fix the field
+    if (status === 409) {
+      if (context === "create client") setAddStep(1);
+      else if (context === "update client") setEditStep(1);
     }
 
     setBackendError(errorMessage);
@@ -173,6 +126,7 @@ export default function ClientsPage() {
       fetchClients();
       setShowAddDialog(false);
       resetAddClientForm();
+      toast.success("Client created successfully");
     } catch (err: any) {
       handleApiError(err, "create client");
     } finally {
@@ -214,6 +168,7 @@ export default function ClientsPage() {
       setEditingClient(null);
       setEditStep(1);
       setErrors({});
+      toast.success("Client updated successfully");
     } catch (err: any) {
       handleApiError(err, "update client");
     } finally {
@@ -277,8 +232,8 @@ export default function ClientsPage() {
       const res = await api.get("/clients");
       const normalized = res.data.map(normalizeClientFromAPI);
       setClients(normalized);
-    } catch (err: any) {
-      handleApiError(err, "load clients");
+    } catch {
+      toast.error("Failed to load clients");
     } finally {
       setLoading(false);
     }

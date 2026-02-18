@@ -1,4 +1,4 @@
-import { NavLink, useNavigate } from "react-router-dom";
+import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { useState, useEffect } from "react";
 import {
@@ -102,6 +102,7 @@ export const navSections = [
 
 export default function AppSidebar() {
   const { user, logout } = useAuth();
+  const location = useLocation();
   const [open, setOpen] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
@@ -110,7 +111,7 @@ export default function AppSidebar() {
   >({
     Overview: true,
     Analysis: true,
-    Workspace: false,
+    Workspace: true,
     Administrative: true,
     System: false,
   });
@@ -134,6 +135,24 @@ export default function AppSidebar() {
       [label]: !prev[label],
     }));
   };
+
+  useEffect(() => {
+  const currentPath = location.pathname;
+
+  navSections.forEach((section) => {
+    const hasMatch = section.items.some(
+      (item) => currentPath.startsWith(item.to)
+    );
+
+    if (hasMatch) {
+      setExpandedSections((prev) => ({
+        ...prev,
+        [section.label]: true,
+      }));
+    }
+  });
+}, [location.pathname]);
+
 
   const handleLogout = () => setShowLogoutConfirm(true);
 
@@ -228,9 +247,7 @@ export default function AppSidebar() {
 
                 <div
                   className={`space-y-0.5 overflow-hidden transition-all duration-300 ${
-                    isExpanded
-                      ? "max-h-125 opacity-100"
-                      : "max-h-0 opacity-0"
+                    isExpanded ? "max-h-125 opacity-100" : "max-h-0 opacity-0"
                   }`}
                 >
                   {visibleItems.map((item) => (
@@ -268,7 +285,10 @@ export default function AppSidebar() {
 
         {/* Footer  */}
         <div className="p-4 bg-slate-50/50 border-t border-slate-200">
-          <div className="flex items-center gap-3 p-2.5 rounded-xl bg-white border border-slate-200 shadow-sm mb-3">
+          <Link
+            to="/settings"
+            className="flex items-center gap-3 p-2.5 rounded-xl bg-white border border-slate-200 shadow-sm mb-3"
+          >
             <div className="w-10 h-10 rounded-full bg-linear-to-br from-[#c3d7e7] to-[#a3c1da] flex items-center justify-center shrink-0">
               <span className="text-sm font-bold text-[#1e293b]">
                 {user?.name?.charAt(0).toUpperCase() || "U"}
@@ -282,7 +302,7 @@ export default function AppSidebar() {
                 {ROLE_MAP[user?.role as Role] || "Guest"}
               </p>
             </div>
-          </div>
+          </Link>
           <button
             onClick={handleLogout}
             className="w-full flex items-center gap-3 px-3 py-2.5 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all group"

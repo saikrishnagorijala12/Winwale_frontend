@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState } from "react";
 import {
     Plus,
     Minus,
@@ -8,6 +8,7 @@ import {
     Download,
     ChevronLeft,
     ChevronRight,
+    Loader2,
 } from "lucide-react";
 import { CategorizedActions } from "../../types/pricelist.types";
 import { StatCard } from "../pricelist-analysis/StatCard";
@@ -97,13 +98,6 @@ export const AnalysisResultsViewer = ({
     const isAddOrDelete =
         activeTab === "additions" || activeTab === "deletions";
 
-    if (isLoading) {
-        return (
-            <div className="py-20 text-center text-slate-500">
-                Loading analysis results...
-            </div>
-        );
-    }
 
     return (
         <div className="space-y-6">
@@ -209,60 +203,16 @@ export const AnalysisResultsViewer = ({
                             </thead>
 
                             <tbody className="divide-y divide-slate-100">
-                                {paginatedActions.map((action: any, i: number) => (
-                                    <tr key={i} className="hover:bg-slate-50 transition-colors">
-                                        <td className="p-3 font-mono text-xs text-slate-500">
-                                            {action.manufacturer_part_number || "N/A"}
+                                {isLoading ? (
+                                    <tr>
+                                        <td colSpan={4} className="px-6 py-16 text-center">
+                                            <div className="flex flex-col items-center justify-center gap-3">
+                                                <Loader2 className="w-8 h-8 animate-spin text-[#24578f]" />
+                                                <p className="text-slate-400 text-sm">Loading analysis results...</p>
+                                            </div>
                                         </td>
-                                        <td className="p-3 font-medium text-slate-900">
-                                            {action.product_name || "Unknown Product"}
-                                        </td>
-
-                                        {isDescChange && (
-                                            <>
-                                                <td className="p-3 text-xs text-slate-400 truncate max-w-60">
-                                                    {action.old_description || "-"}
-                                                </td>
-                                                <td className="p-3 text-xs text-slate-700">
-                                                    {action.new_description || "-"}
-                                                </td>
-                                            </>
-                                        )}
-
-                                        {isPriceChange && (
-                                            <>
-                                                <td className="p-3 text-right text-slate-400 tabular-nums">
-                                                    {action.old_price
-                                                        ? `$${Number(action.old_price).toLocaleString()}`
-                                                        : "-"}
-                                                </td>
-                                                <td className="p-3 text-right font-bold text-slate-900 tabular-nums">
-                                                    {action.new_price
-                                                        ? `$${Number(action.new_price).toLocaleString()}`
-                                                        : "-"}
-                                                </td>
-                                            </>
-                                        )}
-
-                                        {isAddOrDelete && (
-                                            <>
-                                                <td className="p-3 text-xs text-slate-700 truncate max-w-60">
-                                                    {action.description ||
-                                                        action.new_description ||
-                                                        "-"}
-                                                </td>
-                                                <td className="p-3 text-right font-bold text-slate-900 tabular-nums">
-                                                    {(action.price ?? action.new_price)
-                                                        ? `$${Number(
-                                                            action.price ?? action.new_price,
-                                                        ).toLocaleString()}`
-                                                        : "-"}
-                                                </td>
-                                            </>
-                                        )}
                                     </tr>
-                                ))}
-                                {activeActions.length === 0 && (
+                                ) : activeActions.length === 0 ? (
                                     <tr>
                                         <td
                                             colSpan={4}
@@ -271,6 +221,60 @@ export const AnalysisResultsViewer = ({
                                             No modifications found for this category.
                                         </td>
                                     </tr>
+                                ) : (
+                                    paginatedActions.map((action: any, i: number) => (
+                                        <tr key={i} className="hover:bg-slate-50 transition-colors">
+                                            <td className="p-3 font-mono text-xs text-slate-500">
+                                                {action.manufacturer_part_number || "N/A"}
+                                            </td>
+                                            <td className="p-3 font-medium text-slate-900">
+                                                {action.product_name || "Unknown Product"}
+                                            </td>
+
+                                            {isDescChange && (
+                                                <>
+                                                    <td className="p-3 text-xs text-slate-400 truncate max-w-60">
+                                                        {action.old_description || "-"}
+                                                    </td>
+                                                    <td className="p-3 text-xs text-slate-700">
+                                                        {action.new_description || "-"}
+                                                    </td>
+                                                </>
+                                            )}
+
+                                            {isPriceChange && (
+                                                <>
+                                                    <td className="p-3 text-right text-slate-400 tabular-nums">
+                                                        {action.old_price
+                                                            ? `$${Number(action.old_price).toLocaleString()}`
+                                                            : "-"}
+                                                    </td>
+                                                    <td className="p-3 text-right font-bold text-slate-900 tabular-nums">
+                                                        {action.new_price
+                                                            ? `$${Number(action.new_price).toLocaleString()}`
+                                                            : "-"}
+                                                    </td>
+                                                </>
+                                            )}
+
+                                            {isAddOrDelete && (
+                                                <>
+                                                    <td className="p-3 text-xs text-slate-700 truncate max-w-60">
+                                                        {action.description ||
+                                                            action.new_description ||
+                                                            "-"}
+                                                    </td>
+                                                    <td className="p-3 text-right font-bold text-slate-900 tabular-nums">
+                                                        {(action.price ?? action.new_price)
+                                                            ? `$${Number(
+                                                                action.price ?? action.new_price,
+                                                            ).toLocaleString()}`
+                                                            : "-"}
+                                                    </td>
+                                                </>
+                                            )}
+                                        </tr>
+                                    ))
                                 )}
                             </tbody>
                         </table>

@@ -55,32 +55,28 @@ api.interceptors.request.use(async (config) => {
   return config;
 });
 
-// -------------------- RESPONSE --------------------
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    // Network / CORS / timeout
     if (!error.response) {
-      toast.error("Network error. Please check your connection.");
-      return Promise.reject(error);
+      return Promise.reject({
+        status: 0,
+        message: "Network error. Please check your connection.",
+      });
     }
 
     const status = error.response.status;
+
     const message =
       error.response.data?.detail ||
-      error.response.data?.message;
+      error.response.data?.message ||
+      "Something went wrong.";
 
-    // Server errors
-    if (status >= 500) {
-      toast.error(message || "Server error. Please try again later.");
-    }
-
-    if (status === 401) {
-      toast.error("Session expired. Please log in again.");
-    }
-
-    return Promise.reject(error);
-  }
+    return Promise.reject({
+      status,
+      message,
+    });
+  },
 );
 
 export default api;

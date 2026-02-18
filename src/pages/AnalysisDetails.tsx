@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useState, useMemo } from "react";
 import api from "../lib/axios";
 import { useAnalysis } from "../context/AnalysisContext";
+import { toast } from "sonner";
 
 import {
   Loader2,
@@ -30,6 +31,8 @@ export default function AnalysisDetails() {
         setIsFetchingJob(true);
         const res = await api.get(`/jobs/${jobId}`);
         setJob(res.data);
+      } catch {
+        toast.error("Failed to load analysis details");
       } finally {
         setIsFetchingJob(false);
       }
@@ -72,16 +75,7 @@ export default function AnalysisDetails() {
     return base;
   }, [job]);
 
-  if (isFetchingJob) {
-    return (
-      <div className="py-120 text-center">
-        <Loader2 className="w-8 h-8 animate-spin mx-auto text-[#24578f]" />
-        <p className="mt-4 text-slate-500">Fetching modification details...</p>
-      </div>
-    );
-  }
-
-  if (!job) {
+  if (!isFetchingJob && !job) {
     return (
       <div className="py-20 text-center text-slate-500">Analysis not found</div>
     );
@@ -103,6 +97,7 @@ export default function AnalysisDetails() {
 
       <AnalysisResultsViewer
         categorized={categorized}
+        isLoading={isFetchingJob}
         onExport={() => {
           const date = new Date().toLocaleDateString("en-US", {
             month: "2-digit",

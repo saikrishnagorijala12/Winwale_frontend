@@ -8,6 +8,7 @@ import {
 import { Step1, Step2 } from "./ContractFormSteps";
 import { clientService } from "../../services/clientService";
 import { contractService } from "../../services/contractService";
+import { toast } from "sonner";
 import { validateStep1, validateStep2 } from "@/src/utils/contractValidations";
 
 interface AddContractModalProps {
@@ -110,25 +111,13 @@ export default function AddContractModal({
 
       await contractService.createContract(client_id!, formattedPayload);
 
+      toast.success("Contract created successfully");
       onSuccess();
       handleClose();
     } catch (err: any) {
-      const detail = err?.response?.data?.detail;
-      const status = err?.response?.status;
-
-      if (status === 409) {
-        setErrors({
-          submit: detail || "This client already has an active contract.",
-        });
-      } else if (Array.isArray(detail)) {
-        setErrors({
-          submit: detail[0]?.msg || "Invalid data format provided.",
-        });
-      } else {
-        setErrors({
-          submit: detail || "An error occurred while creating the contract.",
-        });
-      }
+      setErrors({
+        submit: err?.message || "An error occurred while creating the contract.",
+      });
     } finally {
       setIsSubmitting(false);
     }

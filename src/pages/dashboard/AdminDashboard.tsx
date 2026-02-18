@@ -18,11 +18,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import api from "@/src/lib/axios";
 import { useAnalysis } from "../../context/AnalysisContext";
-import {
-  normalizeStatus,
-  STATUS_BADGE_BASE,
-  STATUS_MAP,
-} from "@/src/utils/statusUtils";
+import StatusBadge from "../../components/shared/StatusBadge";
 
 const Skeleton = ({ className }) => (
   <div className={`animate-pulse bg-slate-200 rounded-md ${className}`} />
@@ -265,78 +261,54 @@ export default function UnifiedAdminDashboard() {
                 ))
             ) : (
               <>
-                {recentAnalyses.map((item) => {
-                  const slug = normalizeStatus(item.status);
-                  const config = slug === "unknown" ? null : STATUS_MAP[slug];
-
-                  return (
+                {recentAnalyses.map((item) => (
+                  <div
+                    key={item.id}
+                    onClick={() => {
+                      setSelectedJobId(Number(item.id));
+                      navigate(`/analyses/details`);
+                    }}
+                    className="group flex items-center gap-4 p-4 rounded-2xl border border-transparent hover:shadow-sm transition-all cursor-pointer"
+                    style={{ backgroundColor: `${colors.bg}80` }}
+                  >
                     <div
-                      key={item.id}
-                      onClick={() => {
-                        setSelectedJobId(Number(item.id));
-                        navigate(`/analyses/details`);
-                      }}
-                      className="group flex items-center gap-4 p-4 rounded-2xl border border-transparent hover:shadow-sm transition-all cursor-pointer"
-                      style={{ backgroundColor: `${colors.bg}80` }}
+                      className="w-12 h-12 rounded-xl bg-white border flex items-center justify-center shrink-0 shadow-sm group-hover:scale-105 transition-transform"
+                      style={{ borderColor: colors.border }}
                     >
-                      <div
-                        className="w-12 h-12 rounded-xl bg-white border flex items-center justify-center shrink-0 shadow-sm group-hover:scale-105 transition-transform"
-                        style={{ borderColor: colors.border }}
-                      >
-                        <FileText
-                          className="w-5 h-5"
-                          style={{ color: colors.primary }}
-                        />
+                      <FileText className="w-5 h-5" style={{ color: colors.primary }} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-bold truncate" style={{ color: colors.fg }}>{item.client}</h4>
+                      <p className="text-xs font-bold" style={{ color: colors.muted }}>{item.contract}</p>
+                    </div>
+                    <div className="hidden sm:flex items-center gap-6 px-4">
+                      <div className="text-center">
+                        <p className="text-[9px] font-black uppercase" style={{ color: colors.muted }}>Add</p>
+                        <p className="text-sm font-black" style={{ color: colors.success }}>+{item.add}</p>
                       </div>
-
-                      <div className="flex-1 min-w-0">
-                        <h4
-                          className="font-bold truncate"
-                          style={{ color: colors.fg }}
-                        >
-                          {item.client}
-                        </h4>
-                        <p
-                          className="text-xs font-bold"
-                          style={{ color: colors.muted }}
-                        >
-                          {item.contract}
-                        </p>
+                      <div className="text-center">
+                        <p className="text-[9px] font-black uppercase" style={{ color: colors.muted }}>Del</p>
+                        <p className="text-sm font-black" style={{ color: colors.destructive }}>-{item.del}</p>
                       </div>
-
-                      <div className="hidden sm:flex items-center gap-6 px-4">
-                        <div className="text-center">
-                          <p className="text-[9px] font-black uppercase" style={{ color: colors.muted }}>Add</p>
-                          <p className="text-sm font-black" style={{ color: colors.success }}>+{item.add}</p>
-                        </div>
-                        <div className="text-center">
-                          <p className="text-[9px] font-black uppercase" style={{ color: colors.muted }}>Del</p>
-                          <p className="text-sm font-black" style={{ color: colors.destructive }}>-{item.del}</p>
-                        </div>
-                        <div className="text-center">
-                          <p className="text-[9px] font-black uppercase" style={{ color: colors.muted }}>Incr</p>
-                          <p className="flex items-center gap-1 text-amber-600 text-sm font-bold"><TrendingUp className="w-3 h-3" />{item.incr}</p>
-                        </div>
-                        <div className="text-center">
-                          <p className="text-[9px] font-black uppercase" style={{ color: colors.muted }}>Decr</p>
-                          <p className="flex items-center gap-1 text-blue-600 text-sm font-bold"><TrendingDown className="w-3 h-3" />{item.decr}</p>
-                        </div>
-                        <div className="text-center">
-                          <p className="text-[9px] font-black uppercase" style={{ color: colors.muted }}>Desc</p>
-                          <p className="flex items-center gap-1 text-indigo-600 text-sm font-bold"><FileEdit className="w-3 h-3" />{item.desc}</p>
-                        </div>
+                      <div className="text-center">
+                        <p className="text-[9px] font-black uppercase" style={{ color: colors.muted }}>Incr</p>
+                        <p className="flex items-center gap-1 text-amber-600 text-sm font-bold"><TrendingUp className="w-3 h-3" />{item.incr}</p>
                       </div>
-
-                      <div className="flex items-center gap-3">
-                        <span className={`${STATUS_BADGE_BASE} ${config ? config.styles : "bg-slate-100 text-slate-700 border-slate-200"}`}>
-                          {config && <config.icon className="w-3 h-3 stroke-[2.5px]" />}
-                          <span>{config ? config.label : "Unknown"}</span>
-                        </span>
-                        <ChevronRight className="w-4 h-4" style={{ color: colors.border }} />
+                      <div className="text-center">
+                        <p className="text-[9px] font-black uppercase" style={{ color: colors.muted }}>Decr</p>
+                        <p className="flex items-center gap-1 text-blue-600 text-sm font-bold"><TrendingDown className="w-3 h-3" />{item.decr}</p>
+                      </div>
+                      <div className="text-center">
+                        <p className="text-[9px] font-black uppercase" style={{ color: colors.muted }}>Desc</p>
+                        <p className="flex items-center gap-1 text-indigo-600 text-sm font-bold"><FileEdit className="w-3 h-3" />{item.desc}</p>
                       </div>
                     </div>
-                  );
-                })}
+                    <div className="flex items-center gap-3">
+                      <StatusBadge status={item.status} />
+                      <ChevronRight className="w-4 h-4" style={{ color: colors.border }} />
+                    </div>
+                  </div>
+                ))}
                 {recentAnalyses.length === 0 && (
                   <p className="text-center py-8" style={{ color: colors.muted }}>No analyses found</p>
                 )}

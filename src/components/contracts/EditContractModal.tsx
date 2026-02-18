@@ -6,6 +6,7 @@ import {
   FormErrors,
 } from "../../types/contract.types";
 import { contractService } from "../../services/contractService";
+import { toast } from "sonner";
 import { validateStep1, validateStep2 } from "@/src/utils/contractValidations";
 
 const NAME_REGEX = /^[A-Za-z]+(?:[ .'-][A-Za-z]+)*$/;
@@ -117,16 +118,13 @@ export default function EditContractModal({
       };
 
       await contractService.updateContract(initialContract.client_id, payload);
+      toast.success("Contract updated successfully");
       onSuccess();
       handleClose();
     } catch (err: any) {
-      const backendError = err?.response?.data?.detail;
-
-      if (Array.isArray(backendError)) {
-        setErrors({ submit: backendError[0]?.msg || "Validation error" });
-      } else {
-        setErrors({ submit: backendError || "An unexpected error occurred" });
-      }
+      setErrors({
+        submit: err?.message || "An unexpected error occurred",
+      });
       console.error("Update Error:", err);
     } finally {
       setIsSubmitting(false);
@@ -503,7 +501,6 @@ export default function EditContractModal({
             >
               {isSubmitting ? (
                 <>
-                  <Loader2 className="w-5 h-5 animate-spin" />
                   Saving...
                 </>
               ) : step === 1 ? (

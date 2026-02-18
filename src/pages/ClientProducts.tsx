@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { Product } from "../types/product.types";
 import { productService } from "../services/productService";
+import { toast } from "sonner";
 
 export default function ClientProducts() {
   const navigate = useNavigate();
@@ -24,7 +25,6 @@ export default function ClientProducts() {
   const [products, setProducts] = useState<Product[]>([]);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -45,7 +45,7 @@ export default function ClientProducts() {
       const data = await productService.getProductsByClient(clientId);
       setProducts(data.items);
     } catch (err: any) {
-      setError(err.response?.data?.detail || "Failed to load products");
+      toast.error(err.message || "Failed to load products");
     } finally {
       setLoading(false);
     }
@@ -75,16 +75,7 @@ export default function ClientProducts() {
     }).format(value);
   };
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-slate-50">
-        <div className="flex flex-col items-center justify-center gap-3">
-          <Loader2 className="w-8 h-8 animate-spin text-[#24578f]" />
-          <span className="text-slate-400 font-bold">Loading Products...</span>
-        </div>
-      </div>
-    );
-  }
+
 
   return (
     <div className="min-h-screen bg-linear-to-br from-slate-50 to-slate-100 p-6">
@@ -99,7 +90,7 @@ export default function ClientProducts() {
               size={20}
               className="group-hover:-translate-x-1 transition-transform"
             />
-            Back to Clients
+            Back
           </button>
 
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
@@ -163,7 +154,16 @@ export default function ClientProducts() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {paginatedProducts.length === 0 ? (
+                {loading ? (
+                  <tr>
+                    <td colSpan={6} className="px-6 py-20 text-center">
+                      <div className="flex flex-col items-center justify-center gap-3">
+                        <Loader2 className="w-8 h-8 animate-spin text-[#24578f]" />
+                        <span className="text-slate-400 font-bold">Loading Products...</span>
+                      </div>
+                    </td>
+                  </tr>
+                ) : paginatedProducts.length === 0 ? (
                   <tr>
                     <td colSpan={6} className="px-6 py-20 text-center">
                       <div className="flex flex-col items-center justify-center gap-3 text-slate-500">
@@ -287,11 +287,10 @@ export default function ClientProducts() {
 
                         <button
                           onClick={() => setCurrentPage(page)}
-                          className={`inline-flex items-center justify-center min-w-10 h-10 px-3 rounded-xl text-sm font-bold transition-all active:scale-95 ${
-                            page === currentPage
-                              ? "bg-[#3399cc] text-white shadow-blue-200 "
-                              : "bg-transparent text-slate-600 hover:bg-slate-100 hover:text-slate-900"
-                          }`}
+                          className={`inline-flex items-center justify-center min-w-10 h-10 px-3 rounded-xl text-sm font-bold transition-all active:scale-95 ${page === currentPage
+                            ? "bg-[#3399cc] text-white shadow-blue-200 "
+                            : "bg-transparent text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                            }`}
                         >
                           {page}
                         </button>
@@ -485,16 +484,16 @@ export default function ClientProducts() {
                     Created:{" "}
                     {selectedProduct.created_time
                       ? new Date(
-                          selectedProduct.created_time,
-                        ).toLocaleDateString("en-US")
+                        selectedProduct.created_time,
+                      ).toLocaleDateString("en-US")
                       : "N/A"}
                   </span>
                   <span>
                     Last Updated:{" "}
                     {selectedProduct.updated_time
                       ? new Date(
-                          selectedProduct.updated_time,
-                        ).toLocaleDateString("en-US")
+                        selectedProduct.updated_time,
+                      ).toLocaleDateString("en-US")
                       : "N/A"}
                   </span>
                 </div>

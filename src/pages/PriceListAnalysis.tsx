@@ -1,10 +1,11 @@
 import React, { ChangeEvent, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Loader2 } from "lucide-react";
+
 import api from "../lib/axios";
 import * as XLSX from "xlsx";
 import { exportAnalysisToExcel } from "../utils/exportAnalysisUtils";
 import { useAnalysis } from "../context/AnalysisContext";
+import { toast } from "sonner";
 
 
 import { AnalysisStepper } from "../components/pricelist-analysis/AnalysisStepper";
@@ -52,7 +53,7 @@ export default function PriceListAnalysis() {
       const response = await api.get<Client[]>("clients/approved");
       setClients(response.data);
     } catch {
-      setError("Failed to fetch clients.");
+      toast.error("Failed to fetch clients.");
     } finally {
       setLoadingClients(false);
     }
@@ -64,7 +65,7 @@ export default function PriceListAnalysis() {
       const response = await api.get(`/jobs/${jobId}`);
       setJobDetails(response.data);
     } catch (err) {
-      setError("Failed to fetch detailed job results.");
+      toast.error("Failed to fetch detailed job results.");
     } finally {
       setIsFetchingJob(false);
     }
@@ -80,11 +81,18 @@ export default function PriceListAnalysis() {
     const target = e.target as HTMLInputElement;
     const selectedFile = target.files?.[0] ?? null;
     if (!selectedFile) return;
-    if (!selectedFile.name.endsWith(".xlsx")) {
-      setError("Invalid format. Please select an Excel (.xlsx) file");
+    await processFile(selectedFile);
+  };
+
+  const handleFileDrop = async (droppedFile: File) => {
+    await processFile(droppedFile);
+  };
+
+  const processFile = async (selectedFile: File) => {
+    if (!selectedFile.name.match(/\.(xlsx|xls)$/i)) {
+      setError("Invalid format. Please select an Excel (.xlsx or .xls) file");
       return;
     }
-
     setFile(selectedFile);
     setUploadedFileName(selectedFile.name);
     setError(null);
@@ -130,9 +138,7 @@ export default function PriceListAnalysis() {
       setIsAnalyzing(false);
     } catch (err: any) {
       setIsAnalyzing(false);
-      setError(
-        err?.response?.data?.detail ?? "Analysis failed. Please try again.",
-      );
+      toast.error(err?.message ?? "Analysis failed. Please try again.");
     }
   };
 
@@ -214,6 +220,8 @@ export default function PriceListAnalysis() {
             totalRows={totalRows}
             error={error}
             onFileChange={handleFileChange}
+            onFileDrop={handleFileDrop}
+            onInvalidFile={(reason) => setError(reason)}
             onBack={() => {
               setCurrentStep(1);
               setFile(null);
@@ -247,19 +255,10 @@ export default function PriceListAnalysis() {
           />
         );
       case 4:
-        if (isFetchingJob) {
-          return (
-            <div className="py-20 text-center">
-              <Loader2 className="w-8 h-8 animate-spin mx-auto text-[#3399cc]" />
-              <p className="mt-4 text-slate-500">
-                Fetching modification details...
-              </p>
-            </div>
-          );
-        }
         return (
           <ReviewResultsStep
             categorized={getCategorizedActions()}
+            isLoading={isFetchingJob}
             onExport={() => {
               const date = new Date().toLocaleDateString("en-US", {
                 month: "2-digit",

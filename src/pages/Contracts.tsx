@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { Search, Plus, AlertCircle, X } from "lucide-react";
+import { Search, Plus } from "lucide-react";
+import { toast } from "sonner";
 import { ClientContractRead } from "../types/contract.types";
 import { contractService } from "../services/contractService";
 import ContractTable from "../components/contracts/ContractsTable";
@@ -14,7 +15,6 @@ export default function ContractsPage() {
     useState<ClientContractRead | null>(null);
   const [contracts, setContracts] = useState<ClientContractRead[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [contractToEdit, setContractToEdit] =
@@ -38,11 +38,11 @@ export default function ContractsPage() {
   const fetchContracts = async () => {
     try {
       setLoading(true);
-      setError(null);
       const data = await contractService.getAllContracts();
       setContracts(data);
     } catch (err) {
       console.error("Error fetching contracts:", err);
+      toast.error("Failed to load contracts");
     } finally {
       setLoading(false);
     }
@@ -84,10 +84,9 @@ export default function ContractsPage() {
           c.client_id === contractToDelete ? { ...c, is_deleted: true } : c,
         ),
       );
+      toast.success("Contract deleted successfully");
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Failed to delete contract",
-      );
+      toast.error(err.message || "Failed to delete contract");
     } finally {
       setDeleting(false);
       setShowDeleteDialog(false);
@@ -102,20 +101,6 @@ export default function ContractsPage() {
 
   return (
     <div className="min-h-screen bg-linear-to-br from-slate-50 via-blue-50/30 to-slate-100 p-6 lg:p-10 space-y-10">
-      {error && (
-        <div className="mx-auto mb-6 bg-red-50 border border-red-200 rounded-2xl p-4 flex items-start gap-3">
-          <AlertCircle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
-          <div className="flex-1">
-            <p className="text-sm font-semibold text-red-800">{error}</p>
-          </div>
-          <button
-            onClick={() => setError(null)}
-            className="text-red-400 hover:text-red-600"
-          >
-            <X className="w-4 h-4" />
-          </button>
-        </div>
-      )}
 
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-12 mx-auto ">
         <div>

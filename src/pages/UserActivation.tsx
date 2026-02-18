@@ -19,6 +19,7 @@ import {
   ChevronRight,
   ChevronLeft,
 } from "lucide-react";
+import StatusBadge from "../components/shared/StatusBadge";
 import api from "../lib/axios";
 import { Role } from "../types/roles.types";
 import { toast } from "sonner";
@@ -163,7 +164,6 @@ interface UserCardProps {
   onApprove: () => void;
   onReject: () => void;
   onChangeRole: () => void;
-  getStatusBadge: (user: any) => JSX.Element;
   getRoleStyle: (roleId: string) => string;
 }
 
@@ -172,7 +172,6 @@ const UserCard: React.FC<UserCardProps> = ({
   onApprove,
   onReject,
   onChangeRole,
-  getStatusBadge,
   getRoleStyle,
 }) => {
   return (
@@ -227,7 +226,7 @@ const UserCard: React.FC<UserCardProps> = ({
       </div>
 
       <div className="flex items-center justify-between pt-3 border-t border-slate-100">
-        {getStatusBadge(user)}
+        <StatusBadge status={user.is_deleted ? "rejected" : user.is_active ? "approved" : "pending"} />
       </div>
     </div>
   );
@@ -258,7 +257,7 @@ export default function UserActivation() {
       const data = response.data;
       setUsers(Array.isArray(data) ? data : [data]);
     } catch (error) {
-      console.error("Error fetching users:", error);
+      toast.error("Failed to load users. Please try again.")
     } finally {
       setLoading(false);
     }
@@ -326,7 +325,7 @@ export default function UserActivation() {
         }),
       );
       toast.success(
-        `Client ${action === "approve" ? "approved" : "rejected"} successfully`,
+        `User account ${action === "approve" ? "approved" : "rejected"} successfully`,
       );
       closeConfirmModal();
     } catch (error) {
@@ -353,11 +352,9 @@ export default function UserActivation() {
 
       toast.success("User role changed successfully");
       closeRoleChangeModal();
-    } catch (error: any) {
-      console.error(error);
-      const errorMessage =
-        error.response?.data?.detail || "Failed to change user role";
-      toast.error(errorMessage);
+    } catch (err: any) {
+      console.error(err);
+      toast.error(err.message || "Failed to change user role");
     } finally {
       setIsActionLoading(false);
     }
@@ -411,29 +408,10 @@ export default function UserActivation() {
     }
   };
 
-  const getStatusBadge = (user) => {
-    if (user.is_deleted) {
-      return (
-        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold border bg-rose-50 text-rose-600 border-rose-100">
-          <XCircle className="w-3 h-3" />
-          Rejected
-        </span>
-      );
-    } else if (user.is_active) {
-      return (
-        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold border bg-emerald-50 text-emerald-600 border-emerald-100">
-          <CheckCircle2 className="w-3 h-3" />
-          Approved
-        </span>
-      );
-    } else {
-      return (
-        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold border bg-orange-50 text-orange-600 border-orange-100">
-          <Clock className="w-3 h-3" />
-          Pending
-        </span>
-      );
-    }
+  const getUserStatus = (user: any): string => {
+    if (user.is_deleted) return "rejected";
+    if (user.is_active) return "approved";
+    return "pending";
   };
 
   const getTabTitle = () => {
@@ -466,14 +444,7 @@ export default function UserActivation() {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center">
-        <Loader2 className="w-10 h-10 animate-spin text-[#24578f]" />
-        <p className="mt-4 text-slate-500">Loading users ...</p>
-      </div>
-    );
-  }
+
 
 
   return (
@@ -661,21 +632,26 @@ export default function UserActivation() {
 
         {/* Mobile Card View  */}
         <div className="lg:hidden px-4 sm:px-6 pb-4 sm:pb-6 space-y-3 sm:space-y-4">
-          {paginatedUsers.map((user) => (
-            <UserCard
-              key={user.user_id}
-              user={user}
-              onApprove={() => openConfirmModal(user, "approve")}
-              onReject={() => openConfirmModal(user, "reject")}
-              onChangeRole={() => openRoleChangeModal(user)}
-              getStatusBadge={getStatusBadge}
-              getRoleStyle={getRoleStyle}
-            />
-          ))}
-          {paginatedUsers.length === 0 && (
+          {loading ? (
+            <div className="py-16 flex flex-col items-center justify-center gap-3">
+              <Loader2 className="w-8 h-8 animate-spin text-[#24578f]" />
+              <p className="text-slate-400 text-sm">Loading users...</p>
+            </div>
+          ) : paginatedUsers.length === 0 ? (
             <div className="py-16 text-center text-slate-400 text-sm">
               No users found.
             </div>
+          ) : (
+            paginatedUsers.map((user) => (
+              <UserCard
+                key={user.user_id}
+                user={user}
+                onApprove={() => openConfirmModal(user, "approve")}
+                onReject={() => openConfirmModal(user, "reject")}
+                onChangeRole={() => openRoleChangeModal(user)}
+                getRoleStyle={getRoleStyle}
+              />
+            ))
           )}
         </div>
 
@@ -705,71 +681,83 @@ export default function UserActivation() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {paginatedUsers.map((user) => (
-                <tr
-                  key={user.user_id}
-                  className="group hover:bg-slate-50/30 transition-colors"
-                >
-                  <td className="px-4 py-5">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-blue-50 rounded-full flex items-center justify-center text-blue-500 font-bold text-xs uppercase">
-                        {user.name.charAt(0)}
-                      </div>
-                      <div>
-                        <p className="font-bold text-sm text-slate-800">
-                          {user.name}
-                        </p>
-                        <p className="text-xs text-slate-400 flex items-center gap-1">
-                          {user.email}
-                        </p>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-4 py-5">
-                    <span
-                      className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold border capitalize ${getRoleStyle(
-                        user.role,
-                      )}`}
-                    >
-                      <Shield className="w-3 h-3" />
-                      {ROLE_MAP[user.role] || "User"}
-                    </span>
-                  </td>
-                  <td className="px-4 py-5">
-                    <p className="text-sm font-semibold text-slate-600">
-                      {user.phone_no || "No Phone"}
-                    </p>
-                  </td>
-                  <td className="px-4 py-5">{getStatusBadge(user)}</td>
-                  <td className="px-4 py-5">
-                    <div className="flex items-center gap-2 text-sm text-slate-400 font-medium">
-                      <Calendar className="w-4 h-4" />
-                      {new Date(user.created_time).toLocaleDateString("en-US", {
-                        month: "short",
-                        day: "2-digit",
-                        year: "numeric",
-                      })}
-                    </div>
-                  </td>
-                  <td className="px-4 py-5">
-                    <div className="flex items-center justify-end">
-                      <ActionDropdown
-                        user={user}
-                        onApprove={() => openConfirmModal(user, "approve")}
-                        onReject={() => openConfirmModal(user, "reject")}
-                        onChangeRole={() => openRoleChangeModal(user)}
-                      />
+              {loading ? (
+                <tr>
+                  <td colSpan={6} className="px-6 py-20 text-center">
+                    <div className="flex flex-col items-center justify-center gap-3">
+                      <Loader2 className="w-8 h-8 animate-spin text-[#24578f]" />
+                      <p className="text-slate-400 text-sm">Loading users...</p>
                     </div>
                   </td>
                 </tr>
-              ))}
+              ) : paginatedUsers.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="px-6 py-20 text-center text-slate-400">
+                    No users found.
+                  </td>
+                </tr>
+              ) : (
+                paginatedUsers.map((user) => (
+                  <tr
+                    key={user.user_id}
+                    className="group hover:bg-slate-50/30 transition-colors"
+                  >
+                    <td className="px-4 py-5">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-blue-50 rounded-full flex items-center justify-center text-blue-500 font-bold text-xs uppercase">
+                          {user.name.charAt(0)}
+                        </div>
+                        <div>
+                          <p className="font-bold text-sm text-slate-800">
+                            {user.name}
+                          </p>
+                          <p className="text-xs text-slate-400 flex items-center gap-1">
+                            {user.email}
+                          </p>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-4 py-5">
+                      <span
+                        className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold border capitalize ${getRoleStyle(
+                          user.role,
+                        )}`}
+                      >
+                        <Shield className="w-3 h-3" />
+                        {ROLE_MAP[user.role] || "User"}
+                      </span>
+                    </td>
+                    <td className="px-4 py-5">
+                      <p className="text-sm font-semibold text-slate-600">
+                        {user.phone_no || "No Phone"}
+                      </p>
+                    </td>
+                    <td className="px-4 py-5"><StatusBadge status={user.is_deleted ? "rejected" : user.is_active ? "approved" : "pending"} /></td>
+                    <td className="px-4 py-5">
+                      <div className="flex items-center gap-2 text-sm text-slate-400 font-medium">
+                        <Calendar className="w-4 h-4" />
+                        {new Date(user.created_time).toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "2-digit",
+                          year: "numeric",
+                        })}
+                      </div>
+                    </td>
+                    <td className="px-4 py-5">
+                      <div className="flex items-center justify-end">
+                        <ActionDropdown
+                          user={user}
+                          onApprove={() => openConfirmModal(user, "approve")}
+                          onReject={() => openConfirmModal(user, "reject")}
+                          onChangeRole={() => openRoleChangeModal(user)}
+                        />
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
-          {paginatedUsers.length === 0 && (
-            <div className="py-20 text-center text-slate-400">
-              No users found.
-            </div>
-          )}
         </div>
         {totalItems > itemsPerPage && (
           <div className="px-6 py-5 bg-white border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">

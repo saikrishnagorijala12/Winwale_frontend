@@ -51,7 +51,6 @@ export default function AnalysisHistory() {
     }
   };
 
-  const clientOptions = clients.map((c) => c.company_name);
 
 
   const fetchAnalysisHistory = async () => {
@@ -123,7 +122,7 @@ export default function AnalysisHistory() {
       setConfirmModal({ ...confirmModal, isOpen: false });
     } catch (error: any) {
       console.error("Status update failed:", error);
-      toast.error(error.response?.data?.detail || "Failed to update status");
+      toast.error(error.message || "Failed to update status");
     } finally {
       setUpdatingId(null);
     }
@@ -197,7 +196,7 @@ export default function AnalysisHistory() {
         setDateFrom={setDateFrom}
         dateTo={dateTo}
         setDateTo={setDateTo}
-        clientOptions={clientOptions}
+        clients={clients}
         onClearFilters={clearFilters}
       />
 
