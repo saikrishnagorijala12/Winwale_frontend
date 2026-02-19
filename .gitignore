@@ -6,7 +6,7 @@ node_modules
 
 # src/pages/AnalysisHistory.tsx
 # src/pages/DocumentGeneration.tsx
-# src/pages/DownloadHistory.tsx
+src/pages/DownloadHistory.tsx
 
 # src/context/DocumentContext.tsx
 

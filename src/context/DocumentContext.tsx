@@ -150,7 +150,8 @@ export const DocumentProvider: React.FC<{ children: React.ReactNode }> = ({
         setFormData((prev) => {
           const merged = { ...prev };
           Object.keys(newValues).forEach((key) => {
-            const isCountField = key.toLowerCase().includes("numberof") ||
+            const isCountField =
+              key.toLowerCase().includes("numberof") ||
               key.toLowerCase().includes("priceincreased") ||
               key.toLowerCase().includes("pricedecreased") ||
               key.toLowerCase().includes("descriptionchanged");
@@ -213,6 +214,11 @@ export const DocumentProvider: React.FC<{ children: React.ReactNode }> = ({
         field.id.toLowerCase().includes("phoneno")
       ) {
         errorMessage = validators.validatePhone(String(fieldValue), fieldLabel);
+      } else if (
+        field.id.toLowerCase().includes("name") &&
+        !field.id.toLowerCase().includes("company")
+      ) {
+        errorMessage = validators.validateName(String(fieldValue));
       } else if (
         field.id.toLowerCase().includes("zip") ||
         field.id.toLowerCase().includes("postal")

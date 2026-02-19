@@ -1,5 +1,5 @@
 import React, { useState, useRef } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { signIn } from "aws-amplify/auth";
 import { Mail, Lock, Eye, EyeOff, Loader2 } from "lucide-react";
 import AuthLayout from "../../components/auth/AuthLayout";
@@ -13,6 +13,7 @@ interface FormErrors {
 
 const Login: React.FC = () => {
   const { refreshUser } = useAuth();
+  const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -52,19 +53,39 @@ const Login: React.FC = () => {
     setLoading(true);
 
     try {
-      await signIn({
+      const { nextStep } = await signIn({
         username: email.trim(),
         password,
       });
+
+      if (nextStep.signInStep === "CONFIRM_SIGN_UP") {
+        navigate(`/verify-email?email=${encodeURIComponent(email.trim())}`, {
+          state: { password }
+        });
+        return;
+      }
 
       isAuthProcessed.current = true;
 
       try {
         await refreshUser();
-      } catch {
-        setError("Login successful, but profile could not be loaded.");
+      } catch (refreshErr: any) {
+        const msg = refreshErr.message || "";
+        if (msg.includes("UserNotConfirmedException") || msg.includes("NotConfirmed")) {
+          navigate(`/verify-email?email=${encodeURIComponent(email.trim())}`, {
+            state: { password }
+          });
+          return;
+        }
+        setError(refreshErr.message || "Login successful, but profile could not be loaded.");
       }
     } catch (err: any) {
+      if (err.name === "UserNotConfirmedException") {
+        navigate(`/verify-email?email=${encodeURIComponent(email.trim())}`, {
+          state: { password }
+        });
+        return;
+      }
       setError(
         err?.message || "Failed to sign in. Please check your credentials."
       );

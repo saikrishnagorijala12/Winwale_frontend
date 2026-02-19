@@ -42,6 +42,14 @@ export interface AnalysisJob extends AnalysisJobResponse {
   summary: ModificationSummary;
 }
 
+export interface AnalysisJobsListResponse {
+  total: number;
+  page: number;
+  page_size: number;
+  total_pages: number;
+  items: AnalysisJobResponse[];
+}
+
 export interface SortConfig {
   key: string;
   direction: "asc" | "desc";

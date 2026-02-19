@@ -6,7 +6,7 @@ import Pagination from "./Pagination";
 
 interface ProductsTableProps {
   products: Product[];
-  filteredProducts: Product[];
+  totalItems: number;
   loading: boolean;
   selectedClient: Client | null;
   currentPage: number;
@@ -19,7 +19,7 @@ interface ProductsTableProps {
 
 export default function ProductsTable({
   products,
-  filteredProducts,
+  totalItems,
   loading,
   selectedClient,
   currentPage,
@@ -88,7 +88,7 @@ export default function ProductsTable({
                     <h3 className="text-base font-bold text-slate-500">
                       {selectedClient
                         ? "No products found for this client"
-                        : "No products match your search"}
+                        : "No products found"}
                     </h3>
                   </div>
                 </td>
@@ -98,13 +98,13 @@ export default function ProductsTable({
         </table>
       </div>
 
-      {filteredProducts.length > itemsPerPage && (
+      {totalItems > itemsPerPage && (
         <Pagination
           currentPage={currentPage}
           totalPages={totalPages}
           itemsPerPage={itemsPerPage}
           startIndex={startIndex}
-          totalItems={filteredProducts.length}
+          totalItems={totalItems}
           onPageChange={onPageChange}
         />
       )}

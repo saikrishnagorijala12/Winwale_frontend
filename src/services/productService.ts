@@ -2,8 +2,13 @@ import api from "../lib/axios";
 import { ProductsList } from "../types/product.types";
 
 export const productService = {
-  async getAllProducts(): Promise<ProductsList> {
-    const response = await api.get("/products");
+  async getAllProducts(params?: {
+    page?: number;
+    page_size?: number;
+    search?: string;
+    client_id?: number;
+  }): Promise<ProductsList> {
+    const response = await api.get("/products", { params });
     return response.data;
   },
 

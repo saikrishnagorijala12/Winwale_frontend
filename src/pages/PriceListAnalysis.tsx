@@ -27,7 +27,7 @@ export default function PriceListAnalysis() {
   const { setSelectedJobId } = useAnalysis();
 
   const [currentStep, setCurrentStep] = useState(1);
-  const [selectedClient, setSelectedClient] = useState("");
+  const [selectedClient, setSelectedClient] = useState<number | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
 
 
@@ -166,7 +166,7 @@ export default function PriceListAnalysis() {
 
   const handleReset = () => {
     setCurrentStep(1);
-    setSelectedClient("");
+    setSelectedClient(null);
     setFile(null);
     setUploadedFileName("");
     setUploadResult(null);
@@ -180,7 +180,7 @@ export default function PriceListAnalysis() {
   };
 
   const activeClient = clients.find(
-    (c) => String(c.client_id) === String(selectedClient),
+    (c) => c.client_id === selectedClient,
   );
 
   const renderStepContent = () => {
@@ -189,7 +189,7 @@ export default function PriceListAnalysis() {
         return (
           <ClientSelectionStep
             clients={clients}
-            selectedClient={selectedClient}
+            selectedClient={selectedClient ?? 0}
             onClientSelect={(id) => {
               setSelectedClient(id);
               setError(null);

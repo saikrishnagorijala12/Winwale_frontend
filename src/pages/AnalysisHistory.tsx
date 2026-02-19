@@ -14,20 +14,21 @@ import { AnalysisJob, SortConfig, StatusFilter } from "../types/analysis.types";
 import ConfirmationModal from "../components/shared/ConfirmationModal";
 import { Client } from "../types/pricelist.types";
 import api from "../lib/axios";
-
-
+import { useDebounce } from "../hooks/useDebounce";
 
 export default function AnalysisHistory() {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
+  const debouncedSearchQuery = useDebounce(searchQuery, 500);
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("All");
   const [clientFilter, setClientFilter] = useState("All");
   const [dateFrom, setDateFrom] = useState<Date | undefined>(undefined);
   const [dateTo, setDateTo] = useState<Date | undefined>(undefined);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
+  const itemsPerPage = 50;
 
   const [analysisHistory, setAnalysisHistory] = useState<AnalysisJob[]>([]);
+  const [totalItems, setTotalItems] = useState(0);
   const [updatingId, setUpdatingId] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [sortConfig, setSortConfig] = useState<SortConfig>({
@@ -51,19 +52,26 @@ export default function AnalysisHistory() {
     }
   };
 
-
-
   const fetchAnalysisHistory = async () => {
     try {
       setLoading(true);
-      const data = await fetchAnalysisJobs();
+      const data = await fetchAnalysisJobs({
+        page: currentPage,
+        page_size: itemsPerPage,
+        search: debouncedSearchQuery || undefined,
+        client_id: clientFilter === "All" ? undefined : clients.find(c => c.company_name === clientFilter)?.client_id,
+        status: statusFilter === "All" ? undefined : statusFilter,
+        date_from: dateFrom?.toISOString(),
+        date_to: dateTo?.toISOString(),
+      });
 
-      const formattedData: AnalysisJob[] = data.map((job) => ({
+      const formattedData: AnalysisJob[] = data.items.map((job) => ({
         ...job,
         summary: processModifications(job.action_summary),
       }));
 
       setAnalysisHistory(formattedData);
+      setTotalItems(data.total);
     } catch (error) {
       console.error("Failed to fetch analysis history:", error);
       toast.error("Failed to load analysis history");
@@ -73,14 +81,16 @@ export default function AnalysisHistory() {
   };
 
   useEffect(() => {
-    fetchAnalysisHistory();
     fetchClients();
   }, []);
 
+  useEffect(() => {
+    fetchAnalysisHistory();
+  }, [currentPage, debouncedSearchQuery, clientFilter, statusFilter, dateFrom, dateTo]);
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchQuery, clientFilter, dateFrom, dateTo]);
+  }, [debouncedSearchQuery, clientFilter, statusFilter, dateFrom, dateTo]);
 
   const handleUpdateStatus = (jobId: number, action: "approve" | "reject") => {
     const job = analysisHistory.find((j) => j.job_id === jobId);
@@ -202,17 +212,13 @@ export default function AnalysisHistory() {
 
       <AnalysisTable
         analysisHistory={analysisHistory}
+        totalItems={totalItems}
         loading={loading}
         currentPage={currentPage}
         setCurrentPage={setCurrentPage}
         itemsPerPage={itemsPerPage}
         sortConfig={sortConfig}
         onSort={handleSort}
-        statusFilter={statusFilter}
-        clientFilter={clientFilter}
-        searchQuery={searchQuery}
-        dateFrom={dateFrom}
-        dateTo={dateTo}
         updatingId={updatingId}
         onUpdateStatus={handleUpdateStatus}
       />

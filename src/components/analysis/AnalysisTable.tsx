@@ -17,39 +17,34 @@ import { useAnalysis } from "../../context/AnalysisContext";
 import { normalizeStatus } from "../../utils/statusUtils";
 import StatusBadge from "../shared/StatusBadge";
 import { formatDateTime } from "../../utils/analysisUtils";
-import { AnalysisJob, SortConfig, StatusFilter } from "../../types/analysis.types";
-
+import {
+  AnalysisJob,
+  SortConfig,
+  StatusFilter,
+} from "../../types/analysis.types";
 
 interface AnalysisTableProps {
   analysisHistory: AnalysisJob[];
+  totalItems: number;
   loading: boolean;
   currentPage: number;
   setCurrentPage: (page: number) => void;
   itemsPerPage: number;
   sortConfig: SortConfig;
   onSort: (key: string) => void;
-  statusFilter: StatusFilter;
-  clientFilter: string;
-  searchQuery: string;
-  dateFrom: Date | undefined;
-  dateTo: Date | undefined;
   updatingId: number | null;
   onUpdateStatus: (jobId: number, action: "approve" | "reject") => void;
 }
 
 export default function AnalysisTable({
   analysisHistory,
+  totalItems,
   loading,
   currentPage,
   setCurrentPage,
   itemsPerPage,
   sortConfig,
   onSort,
-  statusFilter,
-  clientFilter,
-  searchQuery,
-  dateFrom,
-  dateTo,
   updatingId,
   onUpdateStatus,
 }: AnalysisTableProps) {
@@ -63,54 +58,7 @@ export default function AnalysisTable({
     return () => window.removeEventListener("click", handleClickOutside);
   }, []);
 
-  const filteredAndSortedHistory = [...analysisHistory]
-    .filter((item) => {
-      const q = searchQuery.toLowerCase();
-
-      const matchesSearch =
-        !q ||
-        item.job_id?.toString().includes(q) ||
-        item.client?.toLowerCase().includes(q) ||
-        item.user?.toLowerCase().includes(q) ||
-        item.contract_number?.toLowerCase().includes(q);
-
-      const matchesClient =
-        clientFilter === "All" || item.client === clientFilter;
-
-      const matchesStatus =
-        statusFilter === "All" || normalizeStatus(item.status) === statusFilter;
-
-      const createdAt = new Date(item.created_time).getTime();
-
-      const matchesDateFrom =
-        !dateFrom || createdAt >= new Date(dateFrom).getTime();
-
-      const matchesDateTo = !dateTo || createdAt <= new Date(dateTo).getTime();
-
-      return (
-        matchesSearch &&
-        matchesClient &&
-        matchesStatus &&
-        matchesDateFrom &&
-        matchesDateTo
-      );
-    })
-    .sort((a, b) => {
-      if (sortConfig.key === "date") {
-        const aTime = new Date(a.created_time).getTime();
-        const bTime = new Date(b.created_time).getTime();
-        return sortConfig.direction === "asc" ? aTime - bTime : bTime - aTime;
-      }
-      return 0;
-    });
-
-  const totalItems = filteredAndSortedHistory.length;
   const startIndex = (currentPage - 1) * itemsPerPage;
-
-  const paginatedHistory = filteredAndSortedHistory.slice(
-    startIndex,
-    startIndex + itemsPerPage,
-  );
 
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-slate-200">
@@ -167,20 +115,17 @@ export default function AnalysisTable({
                     </div>
                   </td>
                 </tr>
-              ) : paginatedHistory.length === 0 ? (
+              ) : analysisHistory.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="p-12 text-center">
                     <FileText className="w-12 h-12 mx-auto text-slate-300 mb-4" />
-                    <p className="text-lg font-bold text-slate-500 mb-2">
+                    <p className="font-bold text-slate-500 mb-2">
                       No analyses found
-                    </p>
-                    <p className="text-slate-500">
-                      Try adjusting your filters
                     </p>
                   </td>
                 </tr>
               ) : (
-                paginatedHistory.map((item) => {
+                analysisHistory.map((item) => {
                   const hasModifications =
                     item.summary.additions > 0 ||
                     item.summary.deletions > 0 ||
@@ -300,19 +245,16 @@ export default function AnalysisTable({
               </p>
             </div>
           </div>
-        ) : paginatedHistory.length === 0 ? (
+        ) : analysisHistory.length === 0 ? (
           <div className="p-12 text-center">
             <FileText className="w-12 h-12 mx-auto text-slate-300 mb-4" />
-            <p className="text-lg font-bold text-slate-500 mb-2">
+            <p className="font-bold text-slate-500 mb-2">
               No analyses found
-            </p>
-            <p className="text-slate-500">
-              Try adjusting your search query
             </p>
           </div>
         ) : (
           <div className="divide-y divide-slate-100">
-            {paginatedHistory.map((item) => {
+            {analysisHistory.map((item) => {
               const hasModifications =
                 item.summary.additions > 0 ||
                 item.summary.deletions > 0 ||
@@ -366,7 +308,6 @@ export default function AnalysisTable({
 
                   {/* Client Info */}
                   <div className="flex items-center gap-3 mb-3">
-
                     <div className="leading-tight min-w-0 flex-1">
                       <div className="font-semibold text-slate-800 truncate">
                         {item.client || "—"}
@@ -387,7 +328,10 @@ export default function AnalysisTable({
 
                   {/* Analyzed By */}
                   <div className="text-xs text-slate-500">
-                    Analyzed by <span className="font-medium text-slate-700">{item.user}</span>
+                    Analyzed by{" "}
+                    <span className="font-medium text-slate-700">
+                      {item.user}
+                    </span>
                   </div>
                 </div>
               );

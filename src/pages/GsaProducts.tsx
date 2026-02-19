@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { Client, Product } from "../types/product.types";
@@ -8,6 +8,7 @@ import ProductsHeader from "../components/products/ProductsHeader";
 import ProductsFilters from "../components/products/ProductsFilters";
 import ProductsTable from "../components/products/ProductsTable";
 import ProductDrawer from "../components/products/ProductDrawer";
+import { useDebounce } from "../hooks/useDebounce";
 
 export default function ProductsPage() {
   const navigate = useNavigate();
@@ -17,96 +18,66 @@ export default function ProductsPage() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const debouncedSearchTerm = useDebounce(searchTerm, 500);
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
   const [isExporting, setIsExporting] = useState(false);
+  const [totalItems, setTotalItems] = useState(0);
 
-  const itemsPerPage = 10;
+  const itemsPerPage = 50;
 
-  useEffect(() => {
-    const initData = async () => {
-      try {
-        setLoading(true);
-
-        const [prodRes, clientRes] = await Promise.allSettled([
-          productService.getAllProducts(),
-          clientService.getApprovedClients(),
-        ]);
-
-        if (prodRes.status === "fulfilled") {
-          setProducts(prodRes.value.items);
-        } else {
-          const err: any = prodRes.reason;
-
-          if (err?.status === 404) {
-            setProducts([]);
-          } else {
-            toast.error(err?.message || "Failed to load products.");
-          }
-        }
-
-        if (clientRes.status === "fulfilled") {
-          setClients(clientRes.value);
-        } else {
-          const err: any = clientRes.reason;
-          toast.error(err?.message || "Failed to load clients.");
-        }
-      } catch {
-        toast.error("Failed to initialize page data.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    initData();
-  }, []);
-
-  const handleClientSelect = async (client: Client | null) => {
-    setSelectedClient(client);
-    setCurrentPage(1);
-
+  const fetchProducts = async (page: number, search: string, clientId?: number) => {
     try {
       setLoading(true);
-
-      if (!client) {
-        const data = await productService.getAllProducts();
-        setProducts(data.items);
-      } else {
-        const data = await productService.getProductsByClient(
-          client.client_id
-        );
-        setProducts(data.items);
-      }
+      const data = await productService.getAllProducts({
+        page,
+        page_size: itemsPerPage,
+        search: search || undefined,
+        client_id: clientId,
+      });
+      setProducts(data.items);
+      setTotalItems(data.total);
     } catch (err: any) {
       if (err?.status === 404) {
         setProducts([]);
+        setTotalItems(0);
       } else {
-        toast.error(
-          err?.message || "Failed to fetch products for this client."
-        );
+        toast.error(err?.message || "Failed to load products.");
       }
     } finally {
       setLoading(false);
     }
   };
 
-  const filteredProducts = useMemo(() => {
-    return products.filter(
-      (p) =>
-        p.item_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        p.manufacturer.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        p.manufacturer_part_number
-          .toLowerCase()
-          .includes(searchTerm.toLowerCase())
-    );
-  }, [products, searchTerm]);
+  useEffect(() => {
+    const initClients = async () => {
+      try {
+        const clientRes = await clientService.getApprovedClients();
+        setClients(clientRes);
+      } catch (err: any) {
+        toast.error(err?.message || "Failed to load clients.");
+      }
+    };
 
-  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+    initClients();
+  }, []);
+
+  useEffect(() => {
+    fetchProducts(currentPage, debouncedSearchTerm, selectedClient?.client_id);
+  }, [currentPage, debouncedSearchTerm, selectedClient]);
+
+  const handleClientSelect = (client: Client | null) => {
+    setSelectedClient(client);
+    setCurrentPage(1);
+  };
+
+  const handleSearchChange = (value: string) => {
+    setSearchTerm(value);
+    setCurrentPage(1);
+  };
+
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
-
-  const paginatedProducts = useMemo(() => {
-    return filteredProducts.slice(startIndex, startIndex + itemsPerPage);
-  }, [filteredProducts, startIndex]);
 
   const handleExport = async () => {
     try {
@@ -149,23 +120,20 @@ export default function ProductsPage() {
           onUploadClick={() => navigate("/gsa-products/upload")}
           onExportClick={handleExport}
           isExporting={isExporting}
-          totalCount={products.length}
+          totalCount={totalItems}
         />
 
         <ProductsFilters
           searchTerm={searchTerm}
-          onSearchChange={(value) => {
-            setSearchTerm(value);
-            setCurrentPage(1);
-          }}
+          onSearchChange={handleSearchChange}
           clients={clients}
           selectedClient={selectedClient}
           onClientSelect={handleClientSelect}
         />
 
         <ProductsTable
-          products={paginatedProducts}
-          filteredProducts={filteredProducts}
+          products={products}
+          totalItems={totalItems}
           loading={loading}
           selectedClient={selectedClient}
           currentPage={currentPage}

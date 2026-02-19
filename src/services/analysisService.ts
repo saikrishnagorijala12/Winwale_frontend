@@ -2,22 +2,27 @@ import api from "../lib/axios";
 import {
   AnalysisJob,
   AnalysisJobResponse,
+  AnalysisJobsListResponse,
   CreateJobRequest,
   CreateJobResponse,
   UpdateJobStatusResponse,
 } from "../types/analysis.types";
 
-/**
- * Fetch all analysis jobs
- */
-export const fetchAnalysisJobs = async (): Promise<AnalysisJobResponse[]> => {
-  const response = await api.get<AnalysisJobResponse[]>("/jobs");
+
+export const fetchAnalysisJobs = async (params?: {
+  page?: number;
+  page_size?: number;
+  search?: string;
+  client_id?: number | "All";
+  status?: string;
+  date_from?: string;
+  date_to?: string;
+}): Promise<AnalysisJobsListResponse> => {
+  const response = await api.get<AnalysisJobsListResponse>("/jobs", { params });
   return response.data;
 };
 
-/**
- * Fetch a single analysis job by ID
- */
+
 export const fetchAnalysisJobById = async (
   jobId: number
 ): Promise<AnalysisJob> => {
@@ -25,9 +30,7 @@ export const fetchAnalysisJobById = async (
   return response.data;
 };
 
-/**
- * Create a new analysis job
- */
+
 export const createAnalysisJob = async (
   data: CreateJobRequest
 ): Promise<CreateJobResponse> => {
@@ -35,9 +38,7 @@ export const createAnalysisJob = async (
   return response.data;
 };
 
-/**
- * Approve an analysis job
- */
+
 export const approveAnalysisJob = async (
   jobId: number
 ): Promise<UpdateJobStatusResponse> => {
@@ -47,9 +48,7 @@ export const approveAnalysisJob = async (
   return response.data;
 };
 
-/**
- * Reject an analysis job
- */
+
 export const rejectAnalysisJob = async (
   jobId: number
 ): Promise<UpdateJobStatusResponse> => {

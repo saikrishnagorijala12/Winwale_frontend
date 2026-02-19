@@ -10,8 +10,8 @@ import { ClientDropdown } from "../../components/shared/ClientDropdown";
 
 interface ClientSelectionStepProps {
   clients: Client[];
-  selectedClient: string;
-  onClientSelect: (clientId: string) => void;
+  selectedClient: number | null;
+  onClientSelect: (clientId: number | null) => void;
   onContinue: () => void;
   error: string | null;
 }
