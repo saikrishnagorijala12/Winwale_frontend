@@ -17,37 +17,12 @@ import { useAuth } from "../../context/AuthContext";
 import api from "@/src/lib/axios";
 import { useAnalysis } from "../../context/AnalysisContext";
 import StatusBadge from "../../components/shared/StatusBadge";
+import { fetchAnalysisJobs } from "../../services/analysisService";
+import { AnalysisJobResponse } from "../../types/analysis.types";
 
 const Skeleton = ({ className }) => (
   <div className={`animate-pulse bg-slate-200 rounded-md ${className}`} />
 );
-
-interface ModificationAction {
-  action_id: number;
-  action_type: string;
-  product_id: number | null;
-  product_name: string | null;
-  manufacturer_part_number: string | null;
-  old_price: number | null;
-  new_price: number | null;
-  old_description: string | null;
-  new_description: string | null;
-  number_of_items_impacted: number;
-  created_time: string;
-}
-
-interface Job {
-  job_id: number;
-  client_id: number;
-  contract_number: string;
-  client: string;
-  user_id: number;
-  user: string;
-  status: string;
-  action_summary: Record<string, number>;
-  created_time: string;
-  updated_time: string;
-}
 
 interface Client {
   client_id: number;
@@ -63,7 +38,7 @@ export default function Dashboard() {
   const { setSelectedJobId } = useAnalysis();
 
   const [clients, setClients] = useState<Client[]>([]);
-  const [jobs, setJobs] = useState<Job[]>([]);
+  const [jobs, setJobs] = useState<AnalysisJobResponse[]>([]);
   const [loading, setLoading] = useState(true);
 
   const colors = {
@@ -85,13 +60,13 @@ export default function Dashboard() {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const [clientsRes, jobsRes] = await Promise.all([
+      const [clientsRes, jobsData] = await Promise.all([
         api.get("clients"),
-        api.get("jobs"),
+        fetchAnalysisJobs({ page: 1, page_size: 50 }),
       ]);
 
       setClients(clientsRes.data);
-      setJobs(jobsRes.data);
+      setJobs(jobsData.items || []);
     } catch (error) {
       console.error("Error fetching data:", error);
     } finally {

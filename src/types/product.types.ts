@@ -62,5 +62,8 @@ export interface Product {
 
 export interface ProductsList {
   total: number;
+  page: number;
+  page_size: number;
+  total_pages: number;
   items: Product[];
 }

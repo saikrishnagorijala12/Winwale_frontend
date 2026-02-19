@@ -19,6 +19,8 @@ import { useAuth } from "../../context/AuthContext";
 import api from "@/src/lib/axios";
 import { useAnalysis } from "../../context/AnalysisContext";
 import StatusBadge from "../../components/shared/StatusBadge";
+import { fetchAnalysisJobs } from "../../services/analysisService";
+import { AnalysisJobResponse } from "../../types/analysis.types";
 
 const Skeleton = ({ className }) => (
   <div className={`animate-pulse bg-slate-200 rounded-md ${className}`} />
@@ -31,7 +33,7 @@ export default function UnifiedAdminDashboard() {
 
   const [usersList, setUsersList] = useState([]);
   const [clients, setClients] = useState([]);
-  const [jobs, setJobs] = useState([]);
+  const [jobs, setJobs] = useState<AnalysisJobResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [adminTab, setAdminTab] = useState<"users" | "clients">("users");
 
@@ -54,15 +56,15 @@ export default function UnifiedAdminDashboard() {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const [usersRes, clientsRes, jobsRes] = await Promise.all([
+      const [usersRes, clientsRes, jobsData] = await Promise.all([
         api.get("/users/all"),
         api.get("/clients"),
-        api.get("/jobs"),
+        fetchAnalysisJobs({ page: 1, page_size: 50 }),
       ]);
 
       setUsersList(Array.isArray(usersRes.data) ? usersRes.data : []);
       setClients(Array.isArray(clientsRes.data) ? clientsRes.data : []);
-      setJobs(Array.isArray(jobsRes.data) ? jobsRes.data : []);
+      setJobs(jobsData.items || []);
     } catch (error) {
       console.error("Error fetching dashboard data:", error);
     } finally {

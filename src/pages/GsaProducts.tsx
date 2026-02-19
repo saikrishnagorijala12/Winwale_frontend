@@ -23,6 +23,7 @@ export default function ProductsPage() {
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
   const [isExporting, setIsExporting] = useState(false);
   const [totalItems, setTotalItems] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
 
   const itemsPerPage = 50;
 
@@ -37,6 +38,7 @@ export default function ProductsPage() {
       });
       setProducts(data.items);
       setTotalItems(data.total);
+      setTotalPages(data.total_pages);
     } catch (err: any) {
       if (err?.status === 404) {
         setProducts([]);
@@ -76,7 +78,6 @@ export default function ProductsPage() {
     setCurrentPage(1);
   };
 
-  const totalPages = Math.ceil(totalItems / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
 
   const handleExport = async () => {
