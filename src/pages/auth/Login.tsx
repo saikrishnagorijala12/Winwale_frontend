@@ -1,6 +1,6 @@
 import React, { useState, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { signIn } from "aws-amplify/auth";
+import { signIn, signOut } from "aws-amplify/auth";
 import { Mail, Lock, Eye, EyeOff, Loader2 } from "lucide-react";
 import AuthLayout from "../../components/auth/AuthLayout";
 import { useAuth } from "../../context/AuthContext";
@@ -87,11 +87,19 @@ const Login: React.FC = () => {
         return;
       }
       if (err?.message?.includes("There is already a signed in user")) {
-        try {
-          await refreshUser();
-        } catch (_) {
+        await signOut();
+        const { nextStep: retryStep } = await signIn({
+          username: email.trim(),
+          password,
+        });
+        if (retryStep.signInStep === "CONFIRM_SIGN_UP") {
+          navigate(`/verify-email?email=${encodeURIComponent(email.trim())}`, {
+            state: { password },
+          });
+          return;
         }
-        navigate("/dashboard");
+        isAuthProcessed.current = true;
+        await refreshUser();
         return;
       }
       setError(
