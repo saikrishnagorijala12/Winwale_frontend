@@ -42,6 +42,7 @@ export default function PriceListAnalysis() {
   const [previewData, setPreviewData] = useState<any[] | null>(null);
   const [totalRows, setTotalRows] = useState<number>(0);
   const [isFetchingJob, setIsFetchingJob] = useState(false);
+  const [isParsingFile, setIsParsingFile] = useState(false);
 
   useEffect(() => {
     fetchClients();
@@ -96,21 +97,27 @@ export default function PriceListAnalysis() {
     setFile(selectedFile);
     setUploadedFileName(selectedFile.name);
     setError(null);
+    setPreviewData(null);
+    setIsParsingFile(true);
 
-    const arrayBuffer = await selectedFile.arrayBuffer();
-    const data = new Uint8Array(arrayBuffer);
-    const workbook = XLSX.read(data, { type: "array" });
-    const sheet = workbook.Sheets[workbook.SheetNames[0]];
-    const jsonData = XLSX.utils.sheet_to_json(sheet, { defval: "" });
-    if (jsonData.length === 0) {
-      setError("The uploaded Excel file contains no data rows.");
-      setFile(null);
-      setPreviewData(null);
-      setTotalRows(0);
-      return;
+    try {
+      const arrayBuffer = await selectedFile.arrayBuffer();
+      const data = new Uint8Array(arrayBuffer);
+      const workbook = XLSX.read(data, { type: "array" });
+      const sheet = workbook.Sheets[workbook.SheetNames[0]];
+      const jsonData = XLSX.utils.sheet_to_json(sheet, { defval: "" });
+      if (jsonData.length === 0) {
+        setError("The uploaded Excel file contains no data rows.");
+        setFile(null);
+        setPreviewData(null);
+        setTotalRows(0);
+        return;
+      }
+      setTotalRows(jsonData.length);
+      setPreviewData(jsonData);
+    } finally {
+      setIsParsingFile(false);
     }
-    setTotalRows(jsonData.length);
-    setPreviewData(jsonData);
   };
 
   const handleRunAnalysis = async () => {
@@ -218,6 +225,7 @@ export default function PriceListAnalysis() {
             uploadedFileName={uploadedFileName}
             previewData={previewData}
             totalRows={totalRows}
+            isParsingFile={isParsingFile}
             error={error}
             onFileChange={handleFileChange}
             onFileDrop={handleFileDrop}

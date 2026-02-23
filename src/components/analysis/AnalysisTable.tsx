@@ -85,15 +85,7 @@ export default function AnalysisTable({
                   className="text-left px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider cursor-pointer select-none"
                   onClick={() => onSort("date")}
                 >
-                  <div className="flex items-center gap-1">
-                    Date & Time
-                    {sortConfig.key === "date" &&
-                      (sortConfig.direction === "asc" ? (
-                        <SortAsc className="w-3 h-3 stroke-[2.5px] text-slate-400" />
-                      ) : (
-                        <SortDesc className="w-3 h-3 text-slate-400" />
-                      ))}
-                  </div>
+                  <div className="flex items-center gap-1">Date & Time</div>
                 </th>
                 <th className="text-left px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                   Analyzed By
@@ -248,9 +240,7 @@ export default function AnalysisTable({
         ) : analysisHistory.length === 0 ? (
           <div className="p-12 text-center">
             <FileText className="w-12 h-12 mx-auto text-slate-300 mb-4" />
-            <p className="font-bold text-slate-500 mb-2">
-              No analyses found
-            </p>
+            <p className="font-bold text-slate-500 mb-2">No analyses found</p>
           </div>
         ) : (
           <div className="divide-y divide-slate-100">

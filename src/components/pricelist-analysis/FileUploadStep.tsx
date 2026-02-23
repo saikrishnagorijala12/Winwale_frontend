@@ -8,6 +8,7 @@ import {
     ChevronLeft,
     ChevronRight,
     AlertCircle,
+    Loader2,
 } from "lucide-react";
 
 interface FileUploadStepProps {
@@ -15,6 +16,7 @@ interface FileUploadStepProps {
     uploadedFileName: string;
     previewData: any[] | null;
     totalRows: number;
+    isParsingFile: boolean;
     error: string | null;
     onFileChange: (e: React.ChangeEvent<HTMLInputElement> | React.MouseEvent) => void;
     onFileDrop: (file: File) => void;
@@ -29,6 +31,7 @@ export const FileUploadStep = ({
     uploadedFileName,
     previewData,
     totalRows,
+    isParsingFile,
     error,
     onFileChange,
     onFileDrop,
@@ -68,10 +71,10 @@ export const FileUploadStep = ({
                 />
                 <div
                     className={`border-2 border-dashed rounded-xl p-12 text-center transition-all cursor-pointer ${file
-                            ? "border-emerald-500 bg-emerald-50"
-                            : isDragging
-                                ? "border-[#3399cc] bg-cyan-50/70 scale-[1.01]"
-                                : "border-slate-300 hover:border-[#3399cc] hover:bg-cyan-50/50"
+                        ? "border-emerald-500 bg-emerald-50"
+                        : isDragging
+                            ? "border-[#3399cc] bg-cyan-50/70 scale-[1.01]"
+                            : "border-slate-300 hover:border-[#3399cc] hover:bg-cyan-50/50"
                         }`}
                     onClick={onFileChange}
                     onDragOver={handleDragOver}
@@ -104,11 +107,23 @@ export const FileUploadStep = ({
                     )}
                 </div>
 
-                {previewData && previewData.length > 0 && (
+                {isParsingFile && (
+                    <div className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-4 flex items-center gap-3">
+                        <Loader2 className="w-5 h-5 animate-spin text-[#3399cc] shrink-0" />
+                        <div className="flex-1">
+                            <p className="text-xs font-bold text-slate-600 mb-1.5">Parsing file, please wait…</p>
+                            <div className="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                                <div className="h-full bg-[#3399cc] rounded-full animate-[progress_1.2s_ease-in-out_infinite]" style={{ width: "60%" }} />
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {!isParsingFile && previewData && previewData.length > 0 && (
                     <div className="mt-6 border border-slate-200 rounded-xl overflow-hidden">
                         <div className="bg-slate-50 px-4 py-2 border-b border-slate-200 flex justify-between items-center">
                             <span className="text-[10px] font-bold text-slate-500 uppercase">
-                                Data Preview ({totalRows} rows)
+                                Data Preview (10 of {totalRows} rows)
                             </span>
                             <button
                                 onClick={onClearFile}
@@ -117,7 +132,7 @@ export const FileUploadStep = ({
                                 <X className="w-4 h-4" />
                             </button>
                         </div>
-                        <div className="max-h-100 overflow-auto">
+                        <div className="max-h-[420px] overflow-auto">
                             <table className="w-full text-[11px] text-left border-collapse">
                                 <thead className="sticky top-0 z-10">
                                     <tr className="bg-slate-100 border-b border-slate-200">
@@ -168,7 +183,7 @@ export const FileUploadStep = ({
                     </button>
                     <button
                         onClick={onContinue}
-                        disabled={!file}
+                        disabled={!file || isParsingFile || !previewData}
                         className="btn-primary"
                     >
                         Continue <ChevronRight className="w-4 h-4" />

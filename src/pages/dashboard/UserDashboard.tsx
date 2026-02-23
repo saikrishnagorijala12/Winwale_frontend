@@ -62,7 +62,7 @@ export default function Dashboard() {
       setLoading(true);
       const [clientsRes, jobsData] = await Promise.all([
         api.get("clients"),
-        fetchAnalysisJobs({ page: 1, page_size: 50 }),
+        fetchAnalysisJobs({ page: 1, page_size: 5 }),
       ]);
 
       setClients(clientsRes.data);

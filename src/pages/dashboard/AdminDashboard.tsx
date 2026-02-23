@@ -59,7 +59,7 @@ export default function UnifiedAdminDashboard() {
       const [usersRes, clientsRes, jobsData] = await Promise.all([
         api.get("/users/all"),
         api.get("/clients"),
-        fetchAnalysisJobs({ page: 1, page_size: 50 }),
+        fetchAnalysisJobs({ page: 1, page_size: 5 }),
       ]);
 
       setUsersList(Array.isArray(usersRes.data) ? usersRes.data : []);

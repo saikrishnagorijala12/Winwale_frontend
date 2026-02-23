@@ -78,27 +78,49 @@ export default function ContractDetailsModal({
                 Contract Officer
               </h3>
             </div>
-            <div className="space-y-4">
-              <div>
-                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-                  Officer Name
-                </label>
-                <p className="text-slate-800 font-semibold mt-1">
-                  {contract.contract_officer_name || "—"}
-                </p>
-              </div>
-              <ContactRow
-                icon={MapPin}
-                value={`${contract.contract_officer_address || ""}, ${
-                  contract.contract_officer_city || ""
-                }, ${contract.contract_officer_state || ""} ${
-                  contract.contract_officer_zip || ""
-                }`
-                  .trim()
-                  .replace(/^,\s*/, "")
-                  .replace(/,\s*,/g, ",")}
-              />
-            </div>
+
+            {(() => {
+              const hasOfficer =
+                contract.contract_officer_name ||
+                contract.contract_officer_address ||
+                contract.contract_officer_city ||
+                contract.contract_officer_state ||
+                contract.contract_officer_zip;
+
+              if (!hasOfficer) {
+                return (
+                  <div className="flex flex-col items-center justify-center py-6 gap-2 text-center">
+                    <User className="w-8 h-8 text-slate-200" />
+                    <p className="text-sm font-semibold text-slate-400">No officer details on record</p>
+                    <p className="text-xs text-slate-300">Contact information has not been added for this contract.</p>
+                  </div>
+                );
+              }
+
+              const addressParts = [
+                contract.contract_officer_address,
+                contract.contract_officer_city,
+                [contract.contract_officer_state, contract.contract_officer_zip]
+                  .filter(Boolean)
+                  .join(" "),
+              ].filter(Boolean).join(", ");
+
+              return (
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                      Officer Name
+                    </label>
+                    <p className="text-slate-800 font-semibold mt-1">
+                      {contract.contract_officer_name || "—"}
+                    </p>
+                  </div>
+                  {addressParts && (
+                    <ContactRow icon={MapPin} value={addressParts} />
+                  )}
+                </div>
+              );
+            })()}
           </div>
 
           <div className="bg-linear-to-br from-blue-50 to-white p-6 rounded-2xl border border-blue-200">
@@ -149,11 +171,10 @@ export default function ContractDetailsModal({
                 </label>
                 <div className="flex items-center gap-2 mt-1">
                   <ShieldCheck
-                    className={`w-4 h-4 ${
-                      contract.energy_star_compliance === "Yes"
+                    className={`w-4 h-4 ${contract.energy_star_compliance === "Yes"
                         ? "text-emerald-500"
                         : "text-slate-300"
-                    }`}
+                      }`}
                   />
                   <span className="text-sm font-bold text-slate-700">
                     {contract.energy_star_compliance}

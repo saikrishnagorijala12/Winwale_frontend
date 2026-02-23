@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { CategorizedActions } from "../../types/pricelist.types";
 import { StatCard } from "../pricelist-analysis/StatCard";
+import ConfirmationModal from "../shared/ConfirmationModal";
 
 interface AnalysisResultsViewerProps {
     categorized: CategorizedActions;
@@ -26,6 +27,7 @@ export const AnalysisResultsViewer = ({
 }: AnalysisResultsViewerProps) => {
     const [activeTab, setActiveTab] = useState<string>("additions");
     const [currentPage, setCurrentPage] = useState(1);
+    const [isConfirmExportOpen, setIsConfirmExportOpen] = useState(false);
     const itemsPerPage = 7;
 
     const activeActions =
@@ -101,6 +103,19 @@ export const AnalysisResultsViewer = ({
 
     return (
         <div className="space-y-6">
+            <ConfirmationModal
+                isOpen={isConfirmExportOpen}
+                onClose={() => setIsConfirmExportOpen(false)}
+                onConfirm={() => {
+                    setIsConfirmExportOpen(false);
+                    onExport();
+                }}
+                title="Export Analysis Results"
+                message="This will download all modification categories as an Excel file."
+                confirmText="Yes, Export"
+                cancelText="Cancel"
+                variant="blue"
+            />
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
                 {tabs.map((tab) => (
                     <StatCard
@@ -120,7 +135,7 @@ export const AnalysisResultsViewer = ({
                     </h3>
 
                     <button
-                        onClick={onExport}
+                        onClick={() => setIsConfirmExportOpen(true)}
                         className="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-50 text-slate-700 text-sm font-bold border border-slate-200 hover:bg-slate-100 transition-all"
                     >
                         <Download size={16} /> Export All

@@ -23,8 +23,12 @@ interface Client {
 }
 
 interface UploadResult {
+  status_code: number;
   inserted: number;
   updated: number;
+  reactivated: number;
+  deleted: number;
+  skipped: number;
 }
 
 type PreviewRow = Record<string, unknown>;
@@ -86,7 +90,15 @@ const UploadGsa: React.FC = () => {
       const arrayBuffer = await file.arrayBuffer();
       const data = new Uint8Array(arrayBuffer);
       const workbook = XLSX.read(data, { type: "array" });
-      const sheet = workbook.Sheets[workbook.SheetNames[0]];
+      const productsSheetName = workbook.SheetNames.find(
+        (name) => name.trim().toUpperCase() === "PRODUCTS"
+      );
+      if (!productsSheetName) {
+        setPreviewData(null);
+        setError("No 'PRODUCTS' tab found in the uploaded file.");
+        return;
+      }
+      const sheet = workbook.Sheets[productsSheetName];
       const jsonData = XLSX.utils.sheet_to_json<PreviewRow>(sheet);
       setPreviewData(jsonData.slice(0, 10));
     } catch (err) {
@@ -132,9 +144,9 @@ const UploadGsa: React.FC = () => {
         { headers: { "Content-Type": "multipart/form-data" } },
       );
 
-      const { inserted, updated } = response.data;
+      const { inserted, updated, reactivated, deleted, skipped } = response.data;
       toast.success(
-        `Upload successful! ${inserted} inserted, ${updated} updated. Redirecting...`,
+        `Upload successful! ${inserted} inserted, ${updated} updated, ${reactivated} reactivated, ${deleted} deleted, ${skipped} skipped. Redirecting...`
       );
       setFile(null);
       setPreviewData(null);
@@ -320,7 +332,7 @@ const UploadGsa: React.FC = () => {
                 <button
                   onClick={handleUploadClick}
 
-                  disabled={loading || !file || selectedClient === 0}
+                  disabled={loading || !file || selectedClient === 0 || !previewData?.length}
                   className="w-full bg-[#3399cc] text-white py-4 rounded-2xl font-bold flex items-center justify-center gap-3 transition-all hover:bg-[#2b82ad] disabled:opacity-40 disabled:grayscale shadow-lg shadow-blue-200 hover:shadow-xl active:scale-[0.98]"
                 >
                   {loading ? (

@@ -9,6 +9,7 @@ import ProductsFilters from "../components/products/ProductsFilters";
 import ProductsTable from "../components/products/ProductsTable";
 import ProductDrawer from "../components/products/ProductDrawer";
 import { useDebounce } from "../hooks/useDebounce";
+import ConfirmationModal from "../components/shared/ConfirmationModal";
 
 export default function ProductsPage() {
   const navigate = useNavigate();
@@ -22,6 +23,7 @@ export default function ProductsPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
   const [isExporting, setIsExporting] = useState(false);
+  const [isConfirmExportOpen, setIsConfirmExportOpen] = useState(false);
   const [totalItems, setTotalItems] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
 
@@ -119,7 +121,7 @@ export default function ProductsPage() {
       <div className="mx-auto">
         <ProductsHeader
           onUploadClick={() => navigate("/gsa-products/upload")}
-          onExportClick={handleExport}
+          onExportClick={() => setIsConfirmExportOpen(true)}
           isExporting={isExporting}
           totalCount={totalItems}
         />
@@ -152,6 +154,29 @@ export default function ProductsPage() {
           onClose={() => setSelectedProduct(null)}
         />
       )}
+
+      <ConfirmationModal
+        isOpen={isConfirmExportOpen}
+        onClose={() => setIsConfirmExportOpen(false)}
+        onConfirm={() => {
+          setIsConfirmExportOpen(false);
+          handleExport();
+        }}
+        title="Export GSA Products"
+        message={
+          selectedClient
+            ? <>Export all products for <span className="font-bold text-slate-800">{selectedClient.company_name}</span> to Excel?</>
+            : "Export all products across all clients to Excel?"
+        }
+        details={[
+          { label: "Client", value: selectedClient?.company_name ?? "All Clients" },
+          { label: "Total Products", value: totalItems.toLocaleString() },
+        ]}
+        confirmText="Yes, Export"
+        cancelText="Cancel"
+        isSubmitting={isExporting}
+        variant="blue"
+      />
     </div>
   );
 }
