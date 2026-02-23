@@ -51,7 +51,7 @@ export function Step1({
         </label>
         <input
           type="text"
-          className={`w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB]"
+          className={`w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 "
           } outline-none`}
           value={contract.contract_number}
           onChange={(e) =>
@@ -74,8 +74,9 @@ export function Step1({
           <input
             type="text"
             placeholder="Search by Client ID or Company Name"
-            className={`w-full mt-2 px-4 py-3 pr-10 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] outline-none ${isClientSelected ? "bg-slate-50 cursor-not-allowed" : ""
-              }`}
+            className={`w-full mt-2 px-4 py-3 pr-10 rounded-xl border-2 border-slate-200  outline-none ${
+              isClientSelected ? "bg-slate-50 cursor-not-allowed" : ""
+            }`}
             value={clientSearch}
             readOnly={isClientSelected}
             onFocus={() => {
@@ -142,10 +143,12 @@ export function Step1({
       </div>
 
       <div>
-        <label className="text-sm font-bold text-slate-700">Contract Officer Name</label>
+        <label className="text-sm font-bold text-slate-700">
+          Contract Officer Name
+        </label>
         <input
           type="text"
-          className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] outline-none"
+          className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200  outline-none"
           value={contract.contract_officer_name || ""}
           onChange={(e) =>
             onChange({ ...contract, contract_officer_name: e.target.value })
@@ -164,7 +167,7 @@ export function Step1({
         </label>
         <input
           type="text"
-          className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] outline-none"
+          className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200  outline-none"
           value={contract.contract_officer_address || ""}
           onChange={(e) =>
             onChange({ ...contract, contract_officer_address: e.target.value })
@@ -178,10 +181,12 @@ export function Step1({
       </div>
 
       <div>
-        <label className="text-sm font-bold text-slate-700">GSA Office City</label>
+        <label className="text-sm font-bold text-slate-700">
+          GSA Office City
+        </label>
         <input
           type="text"
-          className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] outline-none"
+          className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200  outline-none"
           value={contract.contract_officer_city || ""}
           onChange={(e) =>
             onChange({ ...contract, contract_officer_city: e.target.value })
@@ -199,7 +204,7 @@ export function Step1({
           <label className="text-sm font-bold text-slate-700">State</label>
           <input
             type="text"
-            className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] outline-none"
+            className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200  outline-none"
             value={contract.contract_officer_state || ""}
             onChange={(e) =>
               onChange({ ...contract, contract_officer_state: e.target.value })
@@ -215,7 +220,7 @@ export function Step1({
           <label className="text-sm font-bold text-slate-700">ZIP</label>
           <input
             type="text"
-            className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] outline-none"
+            className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200  outline-none"
             value={contract.contract_officer_zip || ""}
             onChange={(e) =>
               onChange({ ...contract, contract_officer_zip: e.target.value })
@@ -244,12 +249,13 @@ export function Step2({ contract, onChange, errors }: Step2Props) {
       <div>
         <label className="text-sm font-bold text-slate-700">FOB Term</label>
         <select
-          className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] outline-none bg-white"
+          className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200  outline-none bg-white"
           value={contract.fob_term || "Origin"}
           onChange={(e) => onChange({ ...contract, fob_term: e.target.value })}
         >
           <option value="Origin">Origin</option>
           <option value="Destination">Destination</option>
+          <option value="No Delivery">No Delivery</option>
         </select>
         {errors.fob_term && (
           <p className="mt-1 text-xs text-red-600">{errors.fob_term}</p>
@@ -261,7 +267,7 @@ export function Step2({ contract, onChange, errors }: Step2Props) {
           Energy Star Compliance
         </label>
         <select
-          className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] outline-none bg-white"
+          className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200  outline-none bg-white"
           value={contract.energy_star_compliance || "Yes"}
           onChange={(e) =>
             onChange({ ...contract, energy_star_compliance: e.target.value })
@@ -283,7 +289,7 @@ export function Step2({ contract, onChange, errors }: Step2Props) {
         </label>
         <input
           type="number"
-          className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] outline-none"
+          className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200  outline-none"
           value={contract.normal_delivery_time || 30}
           onChange={(e) =>
             onChange({
@@ -304,7 +310,7 @@ export function Step2({ contract, onChange, errors }: Step2Props) {
         </label>
         <input
           type="number"
-          className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] outline-none"
+          className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200  outline-none"
           value={contract.expedited_delivery_time || 10}
           onChange={(e) =>
             onChange({
@@ -324,7 +330,7 @@ export function Step2({ contract, onChange, errors }: Step2Props) {
           Quantity/Volume Discounts
         </label>
         <input
-          className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] outline-none resize-none"
+          className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200  outline-none resize-none"
           value={contract.q_v_discount || ""}
           onChange={(e) =>
             onChange({ ...contract, q_v_discount: e.target.value })
@@ -340,7 +346,7 @@ export function Step2({ contract, onChange, errors }: Step2Props) {
         </label>
         <textarea
           rows={2}
-          className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] outline-none resize-none"
+          className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200  outline-none resize-none"
           value={contract.additional_concessions || ""}
           onChange={(e) =>
             onChange({ ...contract, additional_concessions: e.target.value })

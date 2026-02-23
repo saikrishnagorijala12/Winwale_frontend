@@ -86,6 +86,14 @@ const Login: React.FC = () => {
         });
         return;
       }
+      if (err?.message?.includes("There is already a signed in user")) {
+        try {
+          await refreshUser();
+        } catch (_) {
+        }
+        navigate("/dashboard");
+        return;
+      }
       setError(
         err?.message || "Failed to sign in. Please check your credentials."
       );

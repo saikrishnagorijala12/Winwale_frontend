@@ -502,7 +502,6 @@ export default function ClientProducts() {
           </div>
         </div>
       )}
-      ;
     </div>
   );
 }

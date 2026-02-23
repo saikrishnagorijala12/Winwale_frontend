@@ -221,7 +221,7 @@ export default function EditContractModal({
                   </label>
                   <input
                     type="text"
-                    className="w-full mt-2 px-4 py-3 rounded-xl border-2 transition-all outline-none border-slate-200 focus:border-[#38A1DB]"
+                    className="w-full mt-2 px-4 py-3 rounded-xl border-2 transition-all outline-none border-slate-200 "
                     value={formData.contract_number}
                     onChange={(e) =>
                       setFormData({
@@ -243,7 +243,7 @@ export default function EditContractModal({
                   </label>
                   <input
                     type="text"
-                    className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] outline-none"
+                    className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200  outline-none"
                     value={formData.contract_officer_name}
                     onChange={(e) =>
                       setFormData({
@@ -265,7 +265,7 @@ export default function EditContractModal({
                   </label>
                   <input
                     type="text"
-                    className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] outline-none"
+                    className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200  outline-none"
                     value={formData.contract_officer_address}
                     onChange={(e) =>
                       setFormData({
@@ -287,7 +287,7 @@ export default function EditContractModal({
                   </label>
                   <input
                     type="text"
-                    className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] outline-none"
+                    className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200  outline-none"
                     value={formData.contract_officer_city}
                     onChange={(e) =>
                       setFormData({
@@ -310,7 +310,7 @@ export default function EditContractModal({
                     </label>
                     <input
                       type="text"
-                      className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] outline-none"
+                      className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200  outline-none"
                       value={formData.contract_officer_state}
                       onChange={(e) =>
                         setFormData({
@@ -331,7 +331,7 @@ export default function EditContractModal({
                     </label>
                     <input
                       type="text"
-                      className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] outline-none"
+                      className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200  outline-none"
                       value={formData.contract_officer_zip}
                       onChange={(e) =>
                         setFormData({
@@ -355,7 +355,7 @@ export default function EditContractModal({
                     FOB Term
                   </label>
                   <select
-                    className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] outline-none bg-white"
+                    className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200  outline-none bg-white"
                     value={formData.fob_term}
                     onChange={(e) =>
                       setFormData({ ...formData, fob_term: e.target.value })
@@ -363,6 +363,7 @@ export default function EditContractModal({
                   >
                     <option value="Origin">Origin</option>
                     <option value="Destination">Destination</option>
+                    <option value="No Delivery">No Delivery</option>
                   </select>
                   {errors.fob_term && (
                     <p className="mt-1 text-xs text-red-500 font-medium">
@@ -376,7 +377,7 @@ export default function EditContractModal({
                     Energy Star
                   </label>
                   <select
-                    className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] outline-none bg-white"
+                    className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200  outline-none bg-white"
                     value={formData.energy_star_compliance}
                     onChange={(e) =>
                       setFormData({
@@ -402,7 +403,7 @@ export default function EditContractModal({
                   </label>
                   <input
                     type="number"
-                    className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] outline-none"
+                    className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200  outline-none"
                     value={formData.normal_delivery_time}
                     onChange={(e) =>
                       setFormData({
@@ -424,7 +425,7 @@ export default function EditContractModal({
                   </label>
                   <input
                     type="number"
-                    className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] outline-none"
+                    className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200  outline-none"
                     value={formData.expedited_delivery_time}
                     onChange={(e) =>
                       setFormData({
@@ -446,7 +447,7 @@ export default function EditContractModal({
                   </label>
                   <textarea
                     rows={2}
-                    className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] outline-none resize-none"
+                    className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200  outline-none resize-none"
                     value={formData.q_v_discount}
                     onChange={(e) =>
                       setFormData({ ...formData, q_v_discount: e.target.value })
@@ -465,7 +466,7 @@ export default function EditContractModal({
                   </label>
                   <textarea
                     rows={2}
-                    className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#38A1DB] outline-none resize-none"
+                    className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200  outline-none resize-none"
                     value={formData.additional_concessions}
                     onChange={(e) =>
                       setFormData({
