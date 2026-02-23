@@ -23,12 +23,8 @@ interface Client {
 }
 
 interface UploadResult {
-  status_code: number;
-  inserted: number;
-  updated: number;
-  reactivated: number;
-  deleted: number;
-  skipped: number;
+  status: string;
+  message: string;
 }
 
 type PreviewRow = Record<string, unknown>;
@@ -138,22 +134,17 @@ const UploadGsa: React.FC = () => {
     formData.append("file", file);
 
     try {
-      const response = await api.post<UploadResult>(
+      await api.post<UploadResult>(
         `/upload/${selectedClient}`,
         formData,
         { headers: { "Content-Type": "multipart/form-data" } },
       );
 
-      const { inserted, updated, reactivated, deleted, skipped } = response.data;
       toast.success(
-        `Upload successful! ${inserted} inserted, ${updated} updated, ${reactivated} reactivated, ${deleted} deleted, ${skipped} skipped. Redirecting...`
+        "Upload received! Your product catalog is being processed in the background."
       );
       setFile(null);
       setPreviewData(null);
-
-      setTimeout(() => {
-        navigate("/gsa-products");
-      }, 2500);
     } catch (err: any) {
       toast.error(err?.message ?? "Upload failed");
     } finally {
