@@ -36,11 +36,6 @@ export default function ProductsHeader({
           <button
             onClick={onExportClick}
             disabled={isExporting}
-            title={
-              totalCount !== undefined
-                ? `Export all ${totalCount} products. (Search filters are not applied to export)`
-                : "Export all products"
-            }
             className="flex items-center justify-center gap-2 bg-white text-slate-700 border border-slate-200 px-6 py-2.5 rounded-xl font-semibold hover:bg-slate-50 transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isExporting ? (
@@ -48,7 +43,7 @@ export default function ProductsHeader({
             ) : (
               <>
                 <Download size={18} />
-                Export {totalCount !== undefined ? `All (${totalCount})` : ""}
+                Export All
               </>
             )}
           </button>
