@@ -8,11 +8,11 @@ interface SearchBarProps {
   onFilterChange: (status: string) => void;
 }
 
-export const SearchBar: React.FC<SearchBarProps> = ({ 
-  searchQuery, 
-  onSearchChange, 
-  filterStatus, 
-  onFilterChange 
+export const SearchBar: React.FC<SearchBarProps> = ({
+  searchQuery,
+  onSearchChange,
+  filterStatus,
+  onFilterChange
 }) => {
   const statuses = ["all", "approved", "pending", "rejected"];
 
@@ -23,7 +23,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
         <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
         <input
           type="text"
-          placeholder="Search clients by name, email, or contact..."
+          placeholder="Search by name, email, contact, or contract number..."
           className="w-full pl-14 pr-6 py-3.5 rounded-2xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20  bg-slate-50/50 text-slate-700 placeholder:text-slate-400 transition-all font-medium"
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
@@ -40,8 +40,8 @@ export const SearchBar: React.FC<SearchBarProps> = ({
               onClick={() => onFilterChange(status)}
               className={`
                 flex-1 lg:flex-none px-6 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all duration-200 whitespace-nowrap
-                ${isActive 
-                  ? "bg-white text-[#24548f] shadow-sm ring-1 ring-slate-200" 
+                ${isActive
+                  ? "bg-white text-[#24548f] shadow-sm ring-1 ring-slate-200"
                   : "text-slate-500 hover:text-slate-700 hover:bg-slate-200/50"
                 }
               `}

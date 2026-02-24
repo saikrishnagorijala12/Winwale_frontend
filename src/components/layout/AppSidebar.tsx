@@ -15,6 +15,7 @@ import {
   FileSearchCorner,
   ChevronDown,
   ChevronRight,
+  FileText,
 } from "lucide-react";
 import { Role, ROLES } from "@/src/types/roles.types";
 
@@ -58,7 +59,7 @@ export const navSections = [
       },
       {
         to: "/contracts",
-        icon: File,
+        icon: FileText,
         label: "Contracts",
         roles: [ROLES.ADMIN, ROLES.USER],
       },
@@ -137,21 +138,21 @@ export default function AppSidebar() {
   };
 
   useEffect(() => {
-  const currentPath = location.pathname;
+    const currentPath = location.pathname;
 
-  navSections.forEach((section) => {
-    const hasMatch = section.items.some(
-      (item) => currentPath.startsWith(item.to)
-    );
+    navSections.forEach((section) => {
+      const hasMatch = section.items.some(
+        (item) => currentPath.startsWith(item.to)
+      );
 
-    if (hasMatch) {
-      setExpandedSections((prev) => ({
-        ...prev,
-        [section.label]: true,
-      }));
-    }
-  });
-}, [location.pathname]);
+      if (hasMatch) {
+        setExpandedSections((prev) => ({
+          ...prev,
+          [section.label]: true,
+        }));
+      }
+    });
+  }, [location.pathname]);
 
 
   const handleLogout = () => setShowLogoutConfirm(true);
@@ -176,9 +177,8 @@ export default function AppSidebar() {
 
       {/* Mobile Overlay */}
       <div
-        className={`fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 transition-opacity duration-300 md:hidden ${
-          open ? "opacity-100" : "opacity-0 pointer-events-none"
-        }`}
+        className={`fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 transition-opacity duration-300 md:hidden ${open ? "opacity-100" : "opacity-0 pointer-events-none"
+          }`}
         onClick={() => setOpen(false)}
       />
 
@@ -230,11 +230,10 @@ export default function AppSidebar() {
                 <button
                   disabled={!isAdmin}
                   onClick={() => toggleSection(section.label)}
-                  className={`w-full flex items-center justify-between px-6 mb-1 text-[10px] font-bold uppercase tracking-widest transition-colors ${
-                    isAdmin
+                  className={`w-full flex items-center justify-between px-6 mb-1 text-[10px] font-bold uppercase tracking-widest transition-colors ${isAdmin
                       ? "hover:text-slate-900 cursor-pointer text-slate-400"
                       : "text-slate-400"
-                  }`}
+                    }`}
                 >
                   <span>{section.label}</span>
                   {isAdmin &&
@@ -246,9 +245,8 @@ export default function AppSidebar() {
                 </button>
 
                 <div
-                  className={`space-y-0.5 overflow-hidden transition-all duration-300 ${
-                    isExpanded ? "max-h-125 opacity-100" : "max-h-0 opacity-0"
-                  }`}
+                  className={`space-y-0.5 overflow-hidden transition-all duration-300 ${isExpanded ? "max-h-125 opacity-100" : "max-h-0 opacity-0"
+                    }`}
                 >
                   {visibleItems.map((item) => (
                     <NavLink
@@ -256,10 +254,9 @@ export default function AppSidebar() {
                       to={item.to}
                       onClick={() => setOpen(false)}
                       className={({ isActive }) =>
-                        `group flex items-center gap-3.5 px-6 py-2 transition-all duration-200 relative ${
-                          isActive
-                            ? "text-[#24578f] font-semibold bg-[#e0e4eb]"
-                            : "text-slate-500 hover:text-slate-900 hover:bg-slate-100/50"
+                        `group flex items-center gap-3.5 px-6 py-2 transition-all duration-200 relative ${isActive
+                          ? "text-[#24578f] font-semibold bg-[#e0e4eb]"
+                          : "text-slate-500 hover:text-slate-900 hover:bg-slate-100/50"
                         }`
                       }
                     >

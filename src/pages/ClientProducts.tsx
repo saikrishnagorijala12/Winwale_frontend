@@ -15,6 +15,7 @@ import {
 import { Product } from "../types/product.types";
 import { productService } from "../services/productService";
 import { toast } from "sonner";
+import { useDebounce } from "../hooks/useDebounce";
 
 export default function ClientProducts() {
   const navigate = useNavigate();
@@ -27,23 +28,33 @@ export default function ClientProducts() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
 
-  const itemsPerPage = 10;
+  const debouncedSearchTerm = useDebounce(searchTerm, 500);
+
+  const itemsPerPage = 50;
 
   useEffect(() => {
     if (clientId) {
-      fetchProducts();
+      fetchProducts(currentPage, debouncedSearchTerm);
     } else {
       setLoading(false);
     }
-  }, [clientId]);
+  }, [clientId, currentPage, debouncedSearchTerm]);
 
-  const fetchProducts = async () => {
+  const fetchProducts = async (page: number, search: string) => {
     if (!clientId) return;
     try {
       setLoading(true);
-      const data = await productService.getProductsByClient(clientId);
+      const data = await productService.getProductsByClient(clientId, {
+        page,
+        page_size: itemsPerPage,
+        search: search || undefined
+      });
       setProducts(data.items);
+      setTotalItems(data.total);
+      setTotalPages(data.total_pages);
     } catch (err: any) {
       toast.error(err.message || "Failed to load products");
     } finally {
@@ -51,21 +62,7 @@ export default function ClientProducts() {
     }
   };
 
-  const filteredProducts = products.filter(
-    (p) =>
-      p.item_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      p.manufacturer.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      p.manufacturer_part_number
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase()),
-  );
-
-  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedProducts = filteredProducts.slice(
-    startIndex,
-    startIndex + itemsPerPage,
-  );
 
   const formatCurrency = (value?: number) => {
     if (value === undefined || value === null) return "-";
@@ -163,7 +160,7 @@ export default function ClientProducts() {
                       </div>
                     </td>
                   </tr>
-                ) : paginatedProducts.length === 0 ? (
+                ) : products.length === 0 ? (
                   <tr>
                     <td colSpan={6} className="px-6 py-20 text-center">
                       <div className="flex flex-col items-center justify-center gap-3 text-slate-500">
@@ -184,7 +181,7 @@ export default function ClientProducts() {
                     </td>
                   </tr>
                 ) : (
-                  paginatedProducts.map((product) => (
+                  products.map((product) => (
                     <tr
                       key={product.product_id}
                       className="hover:bg-blue-50/50 cursor-pointer transition-colors"
@@ -246,12 +243,12 @@ export default function ClientProducts() {
                   <span className="font-semibold text-slate-900">
                     {Math.min(
                       startIndex + itemsPerPage,
-                      filteredProducts.length,
+                      totalItems,
                     )}
                   </span>{" "}
                   of{" "}
                   <span className="font-semibold text-slate-900">
-                    {filteredProducts.length}
+                    {totalItems}
                   </span>{" "}
                   products
                 </p>

@@ -17,8 +17,16 @@ export const DocumentWorkflowRenderer = () => {
     analysisSummary,
   } = useDocument();
 
-  const { selectedJobId } = useAnalysis();
-  const jobId = selectedJobId || null;
+  const [searchParams] = useSearchParams();
+  const { selectedJobId, setSelectedJobId } = useAnalysis();
+  const urlJobId = searchParams.get("job_id");
+  const jobId = urlJobId ? Number(urlJobId) : selectedJobId;
+
+  useEffect(() => {
+    if (urlJobId && Number(urlJobId) !== selectedJobId) {
+      setSelectedJobId(Number(urlJobId));
+    }
+  }, [urlJobId, selectedJobId, setSelectedJobId]);
 
   useEffect(() => {
     if (!selectedDocumentType && documentConfigs.length > 0) {

@@ -24,9 +24,14 @@ export const fetchAnalysisJobs = async (params?: {
 
 
 export const fetchAnalysisJobById = async (
-  jobId: number
+  jobId: number,
+  params?: {
+    page?: number;
+    page_size?: number;
+    action_type?: string;
+  }
 ): Promise<AnalysisJob> => {
-  const response = await api.get<AnalysisJob>(`/jobs/${jobId}`);
+  const response = await api.get<AnalysisJob>(`/jobs/${jobId}`, { params });
   return response.data;
 };
 
@@ -55,5 +60,17 @@ export const rejectAnalysisJob = async (
   const response = await api.post<UpdateJobStatusResponse>(
     `/jobs/${jobId}/status?action=reject`
   );
+  return response.data;
+};
+
+
+export const exportPriceModifications = async (params: {
+  client_id?: number | null;
+  job_id?: number | null;
+}): Promise<Blob> => {
+  const response = await api.get("/export/price-modifications", {
+    params,
+    responseType: "blob",
+  });
   return response.data;
 };

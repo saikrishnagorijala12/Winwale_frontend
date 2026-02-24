@@ -43,7 +43,7 @@ export default function ProductsHeader({
             ) : (
               <>
                 <Download size={18} />
-                Export All
+                Export
               </>
             )}
           </button>

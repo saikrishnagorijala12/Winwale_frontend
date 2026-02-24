@@ -12,8 +12,15 @@ export const productService = {
     return response.data;
   },
 
-  async getProductsByClient(clientId: number): Promise<ProductsList> {
-    const response = await api.get(`/products/client/${clientId}`);
+  async getProductsByClient(
+    clientId: number,
+    params?: {
+      page?: number;
+      page_size?: number;
+      search?: string;
+    }
+  ): Promise<ProductsList> {
+    const response = await api.get(`/products/client/${clientId}`, { params });
     return response.data;
   },
 

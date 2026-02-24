@@ -40,6 +40,11 @@ export interface AnalysisJobResponse {
 
 export interface AnalysisJob extends AnalysisJobResponse {
   summary: ModificationSummary;
+  total_actions?: number;
+  total_pages?: number;
+  page?: number;
+  page_size?: number;
+  modifications_actions?: ModificationAction[];
 }
 
 export interface AnalysisJobsListResponse {

@@ -26,7 +26,7 @@ export const ContactFormStep: React.FC<ContactFormStepProps> = ({
     <div className="grid md:grid-cols-2 gap-6">
       <div className="md:col-span-2">
         <label className="text-sm font-bold text-slate-700">
-          Primary Contact Name <span className="text-red-500">*</span>
+          Negotiator Name <span className="text-red-500">*</span>
         </label>
         <input
           type="text"
@@ -88,9 +88,7 @@ export const ContactFormStep: React.FC<ContactFormStepProps> = ({
       </div>
 
       <div className="md:col-span-2">
-        <label className="text-sm font-bold text-slate-700">
-          Address
-        </label>
+        <label className="text-sm font-bold text-slate-700">Address</label>
         <input
           type="text"
           className={inputClass("contact_officer_address")}
@@ -108,9 +106,7 @@ export const ContactFormStep: React.FC<ContactFormStepProps> = ({
       </div>
 
       <div>
-        <label className="text-sm font-bold text-slate-700">
-          City
-        </label>
+        <label className="text-sm font-bold text-slate-700">City</label>
         <input
           type="text"
           className={inputClass("contact_officer_city")}
@@ -128,9 +124,7 @@ export const ContactFormStep: React.FC<ContactFormStepProps> = ({
       </div>
 
       <div>
-        <label className="text-sm font-bold text-slate-700">
-          State
-        </label>
+        <label className="text-sm font-bold text-slate-700">State</label>
         <input
           type="text"
           className={inputClass("contact_officer_state")}
@@ -148,9 +142,7 @@ export const ContactFormStep: React.FC<ContactFormStepProps> = ({
       </div>
 
       <div>
-        <label className="text-sm font-bold text-slate-700">
-          ZIP
-        </label>
+        <label className="text-sm font-bold text-slate-700">ZIP</label>
         <input
           type="text"
           className={inputClass("contact_officer_zip")}

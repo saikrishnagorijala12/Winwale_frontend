@@ -16,6 +16,7 @@ interface Step1Props {
   showClientDropdown: boolean;
   setShowClientDropdown: (show: boolean) => void;
   errors: FormErrors;
+  hideClientField?: boolean;
 }
 
 export function Step1({
@@ -27,6 +28,7 @@ export function Step1({
   showClientDropdown,
   setShowClientDropdown,
   errors,
+  hideClientField = false,
 }: Step1Props) {
   const clientDropdownRef = useRef<HTMLDivElement>(null);
   const isClientSelected = Boolean(contract.client_id);
@@ -65,82 +67,84 @@ export function Step1({
         )}
       </div>
 
-      <div className="md:col-span-2 relative" ref={clientDropdownRef}>
-        <label className="text-sm font-bold text-slate-700">
-          Client <span className="text-red-500">*</span>
-        </label>
+      {!hideClientField && (
+        <div className="md:col-span-2 relative" ref={clientDropdownRef}>
+          <label className="text-sm font-bold text-slate-700">
+            Client <span className="text-red-500">*</span>
+          </label>
 
-        <div className="relative">
-          <input
-            type="text"
-            placeholder="Search by Client ID or Company Name"
-            className={`w-full mt-2 px-4 py-3 pr-10 rounded-xl border-2 border-slate-200  outline-none ${
-              isClientSelected ? "bg-slate-50 cursor-not-allowed" : ""
-            }`}
-            value={clientSearch}
-            readOnly={isClientSelected}
-            onFocus={() => {
-              if (!isClientSelected) setShowClientDropdown(true);
-            }}
-            onChange={(e) => {
-              if (isClientSelected) return;
-
-              setClientSearch(e.target.value);
-              setShowClientDropdown(true);
-
-              onChange({ ...contract, client_id: undefined });
-            }}
-          />
-
-          {isClientSelected && (
-            <button
-              type="button"
-              className="absolute right-3 top-1/2 -translate-y-1/3 text-slate-400 hover:text-red-500"
-              onClick={() => {
-                onChange({ ...contract, client_id: undefined });
-                setClientSearch("");
-                setShowClientDropdown(false);
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="Search by Client ID or Company Name"
+              className={`w-full mt-2 px-4 py-3 pr-10 rounded-xl border-2 border-slate-200  outline-none ${isClientSelected ? "bg-slate-50 cursor-not-allowed" : ""
+                }`}
+              value={clientSearch}
+              readOnly={isClientSelected}
+              onFocus={() => {
+                if (!isClientSelected) setShowClientDropdown(true);
               }}
-            >
-              <X className="w-5 h-5" />
-            </button>
-          )}
-        </div>
+              onChange={(e) => {
+                if (isClientSelected) return;
 
-        {errors.client_id && (
-          <div className="mt-1 text-xs text-red-600">
-            <span>{errors.client_id}</span>
-          </div>
-        )}
+                setClientSearch(e.target.value);
+                setShowClientDropdown(true);
 
-        {/* DROPDOWN */}
-        {showClientDropdown && !isClientSelected && (
-          <div className="absolute z-50 mt-2 w-full max-h-60 overflow-y-auto bg-white border border-slate-200 rounded-xl shadow-lg">
-            {filteredClients.length === 0 ? (
-              <div className="px-4 py-3 text-slate-500 text-sm">
-                No clients found
-              </div>
-            ) : (
-              filteredClients.map((client) => (
-                <button
-                  key={client.client_id}
-                  type="button"
-                  className="w-full px-4 py-3 text-left hover:bg-blue-50 flex justify-between items-center"
-                  onClick={() => {
-                    onChange({ ...contract, client_id: client.client_id });
-                    setClientSearch(`${client.company_name}`);
-                    setShowClientDropdown(false);
-                  }}
-                >
-                  <span className="font-semibold text-slate-700">
-                    {client.company_name}
-                  </span>
-                </button>
-              ))
+                onChange({ ...contract, client_id: undefined });
+              }}
+            />
+
+            {isClientSelected && (
+              <button
+                type="button"
+                className="absolute right-3 top-1/2 -translate-y-1/3 text-slate-400 hover:text-red-500"
+                onClick={() => {
+                  onChange({ ...contract, client_id: undefined });
+                  setClientSearch("");
+                  setShowClientDropdown(false);
+                }}
+              >
+                <X className="w-5 h-5" />
+              </button>
             )}
           </div>
-        )}
-      </div>
+
+          {errors.client_id && (
+            <div className="mt-1 text-xs text-red-600">
+              <span>{errors.client_id}</span>
+            </div>
+          )}
+
+          {/* DROPDOWN */}
+          {showClientDropdown && !isClientSelected && (
+            <div className="absolute z-50 mt-2 w-full max-h-60 overflow-y-auto bg-white border border-slate-200 rounded-xl shadow-lg">
+              {filteredClients.length === 0 ? (
+                <div className="px-4 py-3 text-slate-500 text-sm">
+                  No clients found
+                </div>
+              ) : (
+                filteredClients.map((client) => (
+                  <button
+                    key={client.client_id}
+                    type="button"
+                    className="w-full px-4 py-3 text-left hover:bg-blue-50 flex justify-between items-center"
+                    onClick={() => {
+                      onChange({ ...contract, client_id: client.client_id });
+                      setClientSearch(`${client.company_name}`);
+                      setShowClientDropdown(false);
+                    }}
+                  >
+                    <span className="font-semibold text-slate-700">
+                      {client.company_name}
+                    </span>
+                  </button>
+                ))
+              )}
+            </div>
+          )}
+        </div>
+      )}
+
 
       <div>
         <label className="text-sm font-bold text-slate-700">

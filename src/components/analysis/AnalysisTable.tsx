@@ -129,8 +129,7 @@ export default function AnalysisTable({
                     <tr
                       key={item.job_id}
                       onClick={() => {
-                        setSelectedJobId(item.job_id);
-                        navigate(`/analyses/details`);
+                        navigate(`/analyses/details?id=${item.job_id}`);
                       }}
                       className="cursor-pointer group border-b border-slate-50 hover:bg-slate-50/50 transition-colors"
                     >
@@ -146,11 +145,11 @@ export default function AnalysisTable({
                           </div>
 
                           <div className="leading-tight">
-                            <span className="block font-semibold text-slate-800">
+                            <span className="block text-sm uppercase font-semibold text-slate-800">
                               {item.client || "—"}
                             </span>
-                            <span className="text-xs font-medium text-slate-500">
-                              ({item.contract_number || "No Contract"})
+                            <span className="text-[12px] font-medium text-slate-500">
+                              {item.contract_number || "No Contract"}
                             </span>
                           </div>
                         </div>
@@ -256,8 +255,7 @@ export default function AnalysisTable({
                 <div
                   key={item.job_id}
                   onClick={() => {
-                    setSelectedJobId(item.job_id);
-                    navigate(`/analyses/details`);
+                    navigate(`/analyses/details?id=${item.job_id}`);
                   }}
                   className="p-4 hover:bg-slate-50/50 transition-colors cursor-pointer"
                 >

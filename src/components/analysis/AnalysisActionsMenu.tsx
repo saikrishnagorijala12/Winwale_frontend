@@ -115,7 +115,7 @@ export default function AnalysisActionsMenu({
   const navigate = useNavigate();
   const { setSelectedJobId } = useAnalysis();
   const handleGenerate = (jobId: any) => {
-    navigate(`/documents`);
+    navigate(`/documents?job_id=${jobId}`);
   };
 
   return (
@@ -126,8 +126,7 @@ export default function AnalysisActionsMenu({
       <button
         onClick={(e) => {
           e.stopPropagation();
-          setSelectedJobId(item.job_id);
-          navigate(`/analyses/details`);
+          navigate(`/analyses/details?id=${item.job_id}`);
         }}
         className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors font-medium"
       >

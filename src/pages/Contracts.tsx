@@ -25,7 +25,7 @@ export default function ContractsPage() {
   const [deleting, setDeleting] = useState(false);
 
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 8;
+  const itemsPerPage = 10;
 
   useEffect(() => {
     fetchContracts();

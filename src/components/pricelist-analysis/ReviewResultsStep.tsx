@@ -1,10 +1,17 @@
 import React from "react";
 import { ArrowRight } from "lucide-react";
-import { CategorizedActions } from "../../types/pricelist.types";
+import { ModificationAction } from "../../types/analysis.types";
 import { AnalysisResultsViewer } from "../analysis/AnalysisResultsViewer";
 
 interface ReviewResultsStepProps {
-    categorized: CategorizedActions;
+    actions: ModificationAction[];
+    actionSummary: Record<string, number>;
+    totalActions: number;
+    totalPages: number;
+    currentPage: number;
+    activeTab: string;
+    onTabChange: (tab: string) => void;
+    onPageChange: (page: number) => void;
     onExport: () => void;
     onReset: () => void;
     onGenerateDocuments: () => void;
@@ -12,7 +19,14 @@ interface ReviewResultsStepProps {
 }
 
 export const ReviewResultsStep = ({
-    categorized,
+    actions,
+    actionSummary,
+    totalActions,
+    totalPages,
+    currentPage,
+    activeTab,
+    onTabChange,
+    onPageChange,
     onExport,
     onReset,
     onGenerateDocuments,
@@ -21,7 +35,14 @@ export const ReviewResultsStep = ({
     return (
         <div className="space-y-6">
             <AnalysisResultsViewer
-                categorized={categorized}
+                actions={actions}
+                actionSummary={actionSummary}
+                totalActions={totalActions}
+                totalPages={totalPages}
+                currentPage={currentPage}
+                activeTab={activeTab}
+                onTabChange={onTabChange}
+                onPageChange={onPageChange}
                 onExport={onExport}
                 isLoading={isLoading}
             />

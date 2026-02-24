@@ -3,9 +3,11 @@ import { useNavigate } from "react-router-dom";
 
 import api from "../lib/axios";
 import * as XLSX from "xlsx";
-import { exportAnalysisToExcel } from "../utils/exportAnalysisUtils";
+import { exportPriceModifications, fetchAnalysisJobById } from "../services/analysisService";
+import { downloadBlob } from "../utils/downloadUtils";
 import { useAnalysis } from "../context/AnalysisContext";
 import { toast } from "sonner";
+import { processModifications } from "../utils/analysisUtils";
 
 
 import { AnalysisStepper } from "../components/pricelist-analysis/AnalysisStepper";
@@ -48,25 +50,41 @@ export default function PriceListAnalysis() {
     fetchClients();
   }, []);
 
+  const [activeTab, setActiveTab] = useState<string>("NEW_PRODUCT");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 7;
+
+  useEffect(() => {
+    if (currentStep === 4 && uploadResult?.job_id) {
+      fetchJobDetails(uploadResult.job_id);
+    }
+  }, [currentStep, activeTab, currentPage, uploadResult?.job_id]);
+
   const fetchClients = async () => {
     try {
-      setLoadingClients(true);
-      const response = await api.get<Client[]>("clients/approved");
-      setClients(response.data);
-    } catch {
-      toast.error("Failed to fetch clients.");
-    } finally {
-      setLoadingClients(false);
+      const res = await api.get("/clients/approved");
+      setClients(res.data);
+    } catch (err) {
+      console.error("Failed to fetch clients:", err);
     }
   };
 
   const fetchJobDetails = async (jobId: number) => {
-    setIsFetchingJob(true);
     try {
-      const response = await api.get(`/jobs/${jobId}`);
-      setJobDetails(response.data);
+      setIsFetchingJob(true);
+      const data = await fetchAnalysisJobById(jobId, {
+        page: currentPage,
+        page_size: itemsPerPage,
+        action_type: activeTab,
+      });
+      const jobData = {
+        ...data,
+        summary: processModifications(data.action_summary),
+      };
+      setJobDetails(jobData);
     } catch (err) {
-      toast.error("Failed to fetch detailed job results.");
+      console.error("Failed to fetch job details:", err);
+      toast.error("Failed to load analysis results");
     } finally {
       setIsFetchingJob(false);
     }
@@ -139,7 +157,7 @@ export default function PriceListAnalysis() {
 
       setUploadResult(response.data);
       setSelectedJobId(response.data.job_id);
-      await fetchJobDetails(response.data.job_id);
+      // fetchJobDetails will be called by the useEffect when currentStep changes to 4
       setCurrentStep(4);
 
       setIsAnalyzing(false);
@@ -147,28 +165,6 @@ export default function PriceListAnalysis() {
       setIsAnalyzing(false);
       toast.error(err?.message ?? "Analysis failed. Please try again.");
     }
-  };
-
-  const getCategorizedActions = (): CategorizedActions => {
-    const actions = jobDetails?.modifications_actions || [];
-    return {
-      additions: actions.filter(
-        (a: any) =>
-          a.action_type === "NEW_PRODUCT" || a.action_type === "ADD_PRODUCT",
-      ),
-      deletions: actions.filter(
-        (a: any) => a.action_type === "REMOVED_PRODUCT",
-      ),
-      priceIncreases: actions.filter(
-        (a: any) => a.action_type === "PRICE_INCREASE",
-      ),
-      priceDecreases: actions.filter(
-        (a: any) => a.action_type === "PRICE_DECREASE",
-      ),
-      descriptionChanges: actions.filter(
-        (a: any) => a.action_type === "DESCRIPTION_CHANGE",
-      ),
-    };
   };
 
   const handleReset = () => {
@@ -183,7 +179,8 @@ export default function PriceListAnalysis() {
     setPreviewData(null);
     setTotalRows(0);
     setError(null);
-    setError(null);
+    setActiveTab("NEW_PRODUCT"); // Reset active tab
+    setCurrentPage(1); // Reset current page
   };
 
   const activeClient = clients.find(
@@ -265,27 +262,44 @@ export default function PriceListAnalysis() {
       case 4:
         return (
           <ReviewResultsStep
-            categorized={getCategorizedActions()}
+            actions={jobDetails?.modifications_actions || []}
+            actionSummary={jobDetails?.action_summary || {}}
+            totalActions={jobDetails?.total_actions || 0}
+            totalPages={jobDetails?.total_pages || 0}
+            currentPage={currentPage}
+            activeTab={activeTab}
+            onTabChange={(tab) => {
+              setActiveTab(tab);
+              setCurrentPage(1);
+            }}
+            onPageChange={(page) => setCurrentPage(page)}
             isLoading={isFetchingJob}
-            onExport={() => {
-              const date = new Date().toLocaleDateString("en-US", {
-                month: "2-digit",
-                day: "2-digit",
-                year: "numeric",
-              }).replace(/\//g, "-");
+            onExport={async () => {
+              try {
+                const date = new Date().toLocaleDateString("en-US", {
+                  month: "2-digit",
+                  day: "2-digit",
+                  year: "numeric",
+                }).replace(/\//g, "-");
 
-              const clientName =
-                activeClient?.company_name.replace(/\s+/g, "-") || "Client";
-              const contract = activeClient?.contract_number || "NoContract";
-              const fileName = `${clientName}_${contract}_modifications_${date}.xlsx`;
-              exportAnalysisToExcel(
-                uploadResult.job_id,
-                getCategorizedActions(),
-                fileName,
-              );
+                const clientName =
+                  activeClient?.company_name.replace(/\s+/g, "-") || "Client";
+                const contract = activeClient?.contract_number || "NoContract";
+                const fileName = `${clientName}_${contract}_modifications_${date}.xlsx`;
+
+                const blob = await exportPriceModifications({
+                  client_id: selectedClient,
+                  job_id: uploadResult?.job_id,
+                });
+                downloadBlob(blob, fileName);
+                toast.success("Analysis export complete");
+              } catch (error) {
+                console.error("Export failed:", error);
+                toast.error("Failed to export analysis");
+              }
             }}
             onReset={handleReset}
-            onGenerateDocuments={() => navigate("/documents")}
+            onGenerateDocuments={() => navigate(`/documents?job_id=${uploadResult?.job_id}`)}
           />
         );
       default:

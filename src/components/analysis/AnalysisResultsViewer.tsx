@@ -10,35 +10,37 @@ import {
     ChevronRight,
     Loader2,
 } from "lucide-react";
-import { CategorizedActions } from "../../types/pricelist.types";
+import { ModificationAction } from "../../types/analysis.types";
 import { StatCard } from "../pricelist-analysis/StatCard";
 import ConfirmationModal from "../shared/ConfirmationModal";
 
 interface AnalysisResultsViewerProps {
-    categorized: CategorizedActions;
+    actions: ModificationAction[];
+    actionSummary: Record<string, number>;
+    totalActions: number;
+    totalPages: number;
+    currentPage: number;
+    activeTab: string;
+    onTabChange: (tab: string) => void;
+    onPageChange: (page: number) => void;
     onExport: () => void;
     isLoading?: boolean;
 }
 
 export const AnalysisResultsViewer = ({
-    categorized,
+    actions,
+    actionSummary,
+    totalActions,
+    totalPages,
+    currentPage,
+    activeTab,
+    onTabChange,
+    onPageChange,
     onExport,
     isLoading = false,
 }: AnalysisResultsViewerProps) => {
-    const [activeTab, setActiveTab] = useState<string>("additions");
-    const [currentPage, setCurrentPage] = useState(1);
     const [isConfirmExportOpen, setIsConfirmExportOpen] = useState(false);
     const itemsPerPage = 7;
-
-    const activeActions =
-        categorized[activeTab as keyof CategorizedActions] || [];
-    const totalItems = activeActions.length;
-    const totalPages = Math.ceil(totalItems / itemsPerPage);
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const paginatedActions = activeActions.slice(
-        startIndex,
-        startIndex + itemsPerPage,
-    );
 
     const getPageNumbers = (totalPages: number) => {
         const pages: (number | "...")[] = [];
@@ -58,48 +60,49 @@ export const AnalysisResultsViewer = ({
 
     const tabs = [
         {
-            id: "additions",
+            id: "NEW_PRODUCT",
             label: "Additions",
             icon: Plus,
             variant: "emerald" as const,
-            count: categorized.additions.length,
+            count: actionSummary.NEW_PRODUCT || 0,
         },
         {
-            id: "deletions",
+            id: "REMOVED_PRODUCT",
             label: "Deletions",
             icon: Minus,
             variant: "red" as const,
-            count: categorized.deletions.length,
+            count: actionSummary.REMOVED_PRODUCT || 0,
         },
         {
-            id: "priceIncreases",
+            id: "PRICE_INCREASE",
             label: "Increases",
             icon: TrendingUp,
             variant: "amber" as const,
-            count: categorized.priceIncreases.length,
+            count: actionSummary.PRICE_INCREASE || 0,
         },
         {
-            id: "priceDecreases",
+            id: "PRICE_DECREASE",
             label: "Decreases",
             icon: TrendingDown,
             variant: "cyan" as const,
-            count: categorized.priceDecreases.length,
+            count: actionSummary.PRICE_DECREASE || 0,
         },
         {
-            id: "descriptionChanges",
+            id: "DESCRIPTION_CHANGE",
             label: "Descriptions",
             icon: FileEdit,
             variant: "blue" as const,
-            count: categorized.descriptionChanges.length,
+            count: actionSummary.DESCRIPTION_CHANGE || 0,
         },
     ];
 
-    const isDescChange = activeTab === "descriptionChanges";
+    const isDescChange = activeTab === "DESCRIPTION_CHANGE";
     const isPriceChange =
-        activeTab === "priceIncreases" || activeTab === "priceDecreases";
+        activeTab === "PRICE_INCREASE" || activeTab === "PRICE_DECREASE";
     const isAddOrDelete =
-        activeTab === "additions" || activeTab === "deletions";
+        activeTab === "NEW_PRODUCT" || activeTab === "REMOVED_PRODUCT";
 
+    const startIndex = (currentPage - 1) * itemsPerPage;
 
     return (
         <div className="space-y-6">
@@ -148,10 +151,7 @@ export const AnalysisResultsViewer = ({
                         {tabs.map((tab) => (
                             <button
                                 key={tab.id}
-                                onClick={() => {
-                                    setActiveTab(tab.id);
-                                    setCurrentPage(1);
-                                }}
+                                onClick={() => onTabChange(tab.id)}
                                 className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold transition-all
                        ${activeTab === tab.id
                                         ? "bg-white text-slate-900 shadow-sm"
@@ -227,7 +227,7 @@ export const AnalysisResultsViewer = ({
                                             </div>
                                         </td>
                                     </tr>
-                                ) : activeActions.length === 0 ? (
+                                ) : actions.length === 0 ? (
                                     <tr>
                                         <td
                                             colSpan={4}
@@ -237,7 +237,7 @@ export const AnalysisResultsViewer = ({
                                         </td>
                                     </tr>
                                 ) : (
-                                    paginatedActions.map((action: any, i: number) => (
+                                    actions.map((action, i: number) => (
                                         <tr key={i} className="hover:bg-slate-50 transition-colors">
                                             <td className="p-3 font-mono text-xs text-slate-500">
                                                 {action.manufacturer_part_number || "N/A"}
@@ -275,14 +275,14 @@ export const AnalysisResultsViewer = ({
                                             {isAddOrDelete && (
                                                 <>
                                                     <td className="p-3 text-xs text-slate-700 truncate max-w-60">
-                                                        {action.description ||
-                                                            action.new_description ||
+                                                        {action.new_description ||
+                                                            action.old_description ||
                                                             "-"}
                                                     </td>
                                                     <td className="p-3 text-right font-bold text-slate-900 tabular-nums">
-                                                        {(action.price ?? action.new_price)
+                                                        {(action.new_price ?? action.old_price)
                                                             ? `$${Number(
-                                                                action.price ?? action.new_price,
+                                                                action.new_price ?? action.old_price,
                                                             ).toLocaleString()}`
                                                             : "-"}
                                                     </td>
@@ -297,7 +297,7 @@ export const AnalysisResultsViewer = ({
                 </div>
 
                 {/* Pagination */}
-                {totalItems > itemsPerPage && (
+                {totalActions > itemsPerPage && (
                     <div className="px-6 py-5 bg-white border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
                         <div className="text-sm text-slate-500 font-medium">
                             Showing{" "}
@@ -306,11 +306,11 @@ export const AnalysisResultsViewer = ({
                             </span>{" "}
                             to{" "}
                             <span className="text-slate-900 font-semibold">
-                                {Math.min(startIndex + itemsPerPage, totalItems)}
+                                {Math.min(startIndex + itemsPerPage, totalActions)}
                             </span>{" "}
                             of{" "}
                             <span className="text-slate-900 font-semibold">
-                                {totalItems}
+                                {totalActions}
                             </span>{" "}
                             results
                         </div>
@@ -318,7 +318,7 @@ export const AnalysisResultsViewer = ({
                         <div className="flex items-center gap-1.5">
                             <button
                                 disabled={currentPage === 1}
-                                onClick={() => setCurrentPage(currentPage - 1)}
+                                onClick={() => onPageChange(currentPage - 1)}
                                 className="p-2 rounded-lg border border-slate-200 text-slate-400 hover:bg-slate-50 hover:text-slate-600 disabled:opacity-30 disabled:hover:bg-transparent transition-all mr-2"
                             >
                                 <ChevronLeft size={18} />
@@ -336,7 +336,7 @@ export const AnalysisResultsViewer = ({
                                     ) : (
                                         <button
                                             key={idx}
-                                            onClick={() => setCurrentPage(page)}
+                                            onClick={() => onPageChange(page as number)}
                                             className={`min-w-9 h-9 flex items-center justify-center rounded-lg text-sm font-bold transition-all
       ${currentPage === page
                                                     ? "bg-[#3399cc] text-white shadow-md shadow-[#3399cc]/30"
@@ -351,7 +351,7 @@ export const AnalysisResultsViewer = ({
 
                             <button
                                 disabled={currentPage === totalPages}
-                                onClick={() => setCurrentPage(currentPage + 1)}
+                                onClick={() => onPageChange(currentPage + 1)}
                                 className="p-2 rounded-lg border border-slate-200 text-slate-400 hover:bg-slate-50 hover:text-slate-600 disabled:opacity-30 disabled:hover:bg-transparent transition-all ml-2"
                             >
                                 <ChevronRight size={18} />

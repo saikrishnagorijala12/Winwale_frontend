@@ -21,11 +21,10 @@ import ProtectedRoute from "../components/ProtectedRoute";
 import { useAuth } from "../context/AuthContext";
 import AppLayout from "../components/layout/AppLayout";
 
-import Clients from "../pages/Clients";
+import ClientsAndContracts from "../pages/ClientsAndContracts";
 import ClientProducts from "../pages/ClientProducts";
 import ClientActivation from "../pages/ClientActivation";
 import UserActivation from "../pages/UserActivation";
-import ContractManagement from "../pages/Contracts";
 import UploadGsa from "../pages/UploadGsa";
 import GsaProducts from "../pages/GsaProducts";
 
@@ -34,11 +33,13 @@ import PriceListAnalysis from "../pages/PriceListAnalysis";
 import { DocumentProvider } from "../context/DocumentContext";
 import { DocumentWorkflowRenderer } from "../pages/DocumentGeneration";
 import AnalysisHistory from "../pages/AnalysisHistory";
-import DownloadHistory from "../pages/DownloadHistory";
 import Dashboard from "../pages/dashboard/Dashboard";
 import AnalysisDetails from "../pages/AnalysisDetails";
 import { ClientProvider } from "../context/ClientContext";
 import { AnalysisProvider } from "../context/AnalysisContext";
+import Clients from "../pages/Clients";
+import ContractsPage from "../pages/Contracts";
+import ClientsAndContractsPage from "../pages/ClientsAndContracts";
 
 try {
   Amplify.configure(awsExports);
@@ -110,11 +111,12 @@ const AppRoutes: React.FC = () => {
                   }
                 >
                   <Route path="/clients" element={<Clients />} />
+                  <Route path="/contracts" element={<ContractsPage />} />
+                  <Route path="/clients-contracts" element={<ClientsAndContractsPage />} />
                   <Route
                     path="/clients/products"
                     element={<ClientProducts />}
                   />
-                  <Route path="/contracts" element={<ContractManagement />} />
 
                   <Route path="/gsa-products" element={<GsaProducts />} />
                   <Route path="/gsa-products/upload" element={<UploadGsa />} />

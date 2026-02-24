@@ -209,8 +209,7 @@ export default function Dashboard() {
                   <div
                     key={item.id}
                     onClick={() => {
-                      setSelectedJobId(item.id);
-                      navigate(`/analyses/details`);
+                      navigate(`/analyses/details?id=${item.id}`);
                     }}
                     className="group flex items-center gap-4 p-4 rounded-2xl border border-transparent hover:shadow-sm transition-all cursor-pointer"
                     style={{ backgroundColor: `${colors.bg}80` }}
