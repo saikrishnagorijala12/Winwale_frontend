@@ -139,4 +139,6 @@ export const getInitialFormData = (): ClientFormData => ({
   contact_officer_state: "",
   contact_officer_zip: "",
   status: "pending",
+  logoUrl: "",
+  logoFile: null,
 });

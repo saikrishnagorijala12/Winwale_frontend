@@ -131,8 +131,16 @@ export const ClientTable: React.FC<ClientTableProps> = ({
                 >
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
-                      <div className="shrink-0 w-9 h-9 rounded-xl bg-linear-to-br from-[#3399cc] to-[#2980b9] flex items-center justify-center text-white font-bold text-xs shadow-sm">
-                        {client.name.substring(0, 2).toUpperCase()}
+                      <div className="shrink-0 w-9 h-9 rounded-xl bg-linear-to-br from-[#3399cc] to-[#2980b9] flex items-center justify-center text-white font-bold text-xs shadow-sm overflow-hidden border border-slate-100">
+                        {client.logoUrl ? (
+                          <img
+                            src={client.logoUrl}
+                            alt={client.name}
+                            className="w-full h-full object-contain bg-white"
+                          />
+                        ) : (
+                          client.name.substring(0, 2).toUpperCase()
+                        )}
                       </div>
                       <span className="font-semibold text-slate-900 group-hover:text-[#38A1DB] transition-colors  max-w-50">
                         {client.name}
@@ -181,6 +189,9 @@ export const ClientTable: React.FC<ClientTableProps> = ({
                         onView={() => onView(client)}
                         onEdit={() => onEdit(client)}
                         onClose={() => onMenuToggle(client.id)}
+                        openUpwards={
+                          clients.indexOf(client) >= clients.length - 2
+                        }
                       />
                     )}
                   </td>
@@ -208,8 +219,16 @@ export const ClientTable: React.FC<ClientTableProps> = ({
             >
               <div className="flex justify-between items-start mb-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-2xl bg-linear-to-br from-[#3399cc] to-[#2980b9] flex items-center justify-center text-white font-bold text-lg shadow-blue-100 shadow-lg">
-                    {client.name.substring(0, 2).toUpperCase()}
+                  <div className="w-12 h-12 rounded-2xl bg-linear-to-br from-[#3399cc] to-[#2980b9] flex items-center justify-center text-white font-bold text-lg shadow-blue-100 shadow-lg overflow-hidden border border-slate-100">
+                    {client.logoUrl ? (
+                      <img
+                        src={client.logoUrl}
+                        alt={client.name}
+                        className="w-full h-full object-contain bg-white"
+                      />
+                    ) : (
+                      client.name.substring(0, 2).toUpperCase()
+                    )}
                   </div>
                   <div>
                     <h3 className="font-bold text-slate-900 text-lg">
@@ -234,6 +253,9 @@ export const ClientTable: React.FC<ClientTableProps> = ({
                       onView={() => onView(client)}
                       onEdit={() => onEdit(client)}
                       onClose={() => onMenuToggle(client.id)}
+                      openUpwards={
+                        clients.indexOf(client) >= clients.length - 2
+                      }
                     />
                   )}
                 </div>

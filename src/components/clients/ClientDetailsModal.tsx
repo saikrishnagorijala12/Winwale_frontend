@@ -44,13 +44,21 @@ export const ClientDetailsModal: React.FC<ClientDetailsModalProps> = ({
           </button>
 
           <div className="flex items-center gap-6">
-            <div className="w-20 h-20 rounded-2xl bg-[#38A1DB] shadow-lg flex items-center justify-center text-white font-black text-2xl border-4 border-white/20">
-              {client.name
-                .split(" ")
-                .map((w) => w[0])
-                .slice(0, 2)
-                .join("")
-                .toUpperCase()}
+            <div className="w-20 h-20 rounded-2xl bg-[#38A1DB] shadow-lg flex items-center justify-center text-white font-black text-2xl border-4 border-white/20 overflow-hidden">
+              {client.logoUrl ? (
+                <img
+                  src={client.logoUrl}
+                  alt={client.name}
+                  className="w-full h-full object-contain p-1 bg-white"
+                />
+              ) : (
+                client.name
+                  .split(" ")
+                  .map((w) => w[0])
+                  .slice(0, 2)
+                  .join("")
+                  .toUpperCase()
+              )}
             </div>
             <div>
               <p className="text-blue-400 text-sm font-medium uppercase tracking-widest mb-1">

@@ -61,9 +61,9 @@ export default function AnalysisTable({
   const startIndex = (currentPage - 1) * itemsPerPage;
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-slate-200">
+    <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
       {/* Desktop Table View */}
-      <div className="hidden lg:block">
+      <div className="hidden lg:block overflow-x-auto">
         <div className="">
           <table className="w-full">
             <thead>
@@ -203,6 +203,10 @@ export default function AnalysisTable({
                               updatingId={updatingId}
                               onUpdateStatus={onUpdateStatus}
                               onClose={() => setOpenMenuId(null)}
+                              openUpwards={
+                                analysisHistory.indexOf(item) >=
+                                analysisHistory.length - 3
+                              }
                             />
                           )}
                         </div>
@@ -289,6 +293,10 @@ export default function AnalysisTable({
                           updatingId={updatingId}
                           onUpdateStatus={onUpdateStatus}
                           onClose={() => setOpenMenuId(null)}
+                          openUpwards={
+                            analysisHistory.indexOf(item) >=
+                            analysisHistory.length - 3
+                          }
                         />
                       )}
                     </div>

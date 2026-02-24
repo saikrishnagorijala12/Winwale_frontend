@@ -117,11 +117,19 @@ export default function ClientsPage() {
 
     setIsSubmitting(true);
     try {
-      const res = await api.post("/clients", newClient);
+      const { logoFile, logoUrl, ...clientPayload } = newClient;
+      const res = await api.post("/clients", clientPayload);
+      const clientId = res.data.client_id;
 
-      const createdClient = createClientFromResponse(res);
-      setClients((prev) => [createdClient, ...prev]);
-      fetchClients();
+      if (logoFile) {
+        const logoFormData = new FormData();
+        logoFormData.append("file", logoFile);
+        await api.post(`/clients/${clientId}/logo`, logoFormData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+      }
+
+      await fetchClients();
       setShowAddDialog(false);
       resetAddClientForm();
       toast.success("Client created successfully");
@@ -154,11 +162,18 @@ export default function ClientsPage() {
 
     setIsSubmitting(true);
     try {
-      const res = await api.put(`/clients/${editingClient.id}`, editingClient);
-      const updatedClient = updateClientFromResponse(res);
-      setClients((prev) =>
-        prev.map((c) => (c.id === updatedClient.id ? updatedClient : c)),
-      );
+      const { logoFile, logoUrl, ...clientPayload } = editingClient;
+      const res = await api.put(`/clients/${editingClient.id}`, clientPayload);
+
+      if (logoFile) {
+        const logoFormData = new FormData();
+        logoFormData.append("file", logoFile);
+        await api.post(`/clients/${editingClient.id}/logo`, logoFormData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+      }
+
+      await fetchClients();
       setShowEditDialog(false);
       setEditingClient(null);
       setEditStep(1);
@@ -200,6 +215,8 @@ export default function ClientsPage() {
       contact_officer_state: client.contact?.address?.split(", ")[2] || "",
       contact_officer_zip: client.contact?.address?.split(", ")[3] || "",
       status: client.status,
+      logoUrl: client.logoUrl || "",
+      logoFile: null,
     });
     setEditStep(1);
     setErrors({});
@@ -208,12 +225,11 @@ export default function ClientsPage() {
   };
 
   const handleFormChange = (
-    formData: ClientFormData | EditingClient,
     setFormData: React.Dispatch<React.SetStateAction<any>>,
     field: keyof ClientFormData,
-    value: string,
+    value: any,
   ) => {
-    setFormData({ ...formData, [field]: value });
+    setFormData((prev: any) => ({ ...prev, [field]: value }));
   };
 
   const handleClearError = (field: keyof ClientFormErrors) => {
@@ -287,7 +303,7 @@ export default function ClientsPage() {
         onNext={handleNextStep}
         onBack={() => setAddStep(1)}
         onChange={(field, value) =>
-          handleFormChange(newClient, setNewClient, field, value)
+          handleFormChange(setNewClient, field, value)
         }
         onClearError={handleClearError}
         onClearBackendError={() => setBackendError("")}
@@ -314,7 +330,7 @@ export default function ClientsPage() {
           onNext={handleEditNextStep}
           onBack={() => setEditStep(1)}
           onChange={(field, value) =>
-            handleFormChange(editingClient, setEditingClient, field, value)
+            handleFormChange(setEditingClient, field, value)
           }
           onClearError={handleClearError}
           onClearBackendError={() => setBackendError("")}

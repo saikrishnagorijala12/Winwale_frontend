@@ -9,6 +9,7 @@ interface ClientActionsMenuProps {
   onView: () => void;
   onEdit: () => void;
   onClose: () => void;
+  openUpwards?: boolean;
 }
 
 export const ClientActionsMenu: React.FC<ClientActionsMenuProps> = ({
@@ -16,6 +17,7 @@ export const ClientActionsMenu: React.FC<ClientActionsMenuProps> = ({
   onView,
   onEdit,
   onClose,
+  openUpwards = false,
 }) => {
   const navigate = useNavigate();
   const { setSelectedClientId } = useClient();
@@ -31,7 +33,8 @@ export const ClientActionsMenu: React.FC<ClientActionsMenuProps> = ({
       />
 
       <div
-        className="absolute right-8 top-12 z-50 w-64 bg-white border border-slate-100 rounded-2xl shadow-xl py-2"
+        className={`absolute right-8 ${openUpwards ? "bottom-12" : "top-12"
+          } z-50 w-64 bg-white border border-slate-100 rounded-2xl shadow-xl py-2`}
         onClick={(e) => e.stopPropagation()}
       >
         <button

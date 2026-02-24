@@ -65,7 +65,7 @@ export default function AnalysisFilters({
 
       {/* Inputs */}
       <div className="p-6">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 ">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {/* Search */}
           <div className="space-y-1">
             <label className="text-[11px] font-black uppercase tracking-widest text-slate-400">
@@ -127,7 +127,7 @@ export default function AnalysisFilters({
               Date Range
             </label>
 
-            <div className="flex flex-col gap-2 sm:flex-row">
+            <div className="flex flex-col gap-2 2xl:flex-row">
               <div className="relative flex-1">
                 <input
                   type="date"

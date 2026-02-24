@@ -22,7 +22,7 @@ interface ClientFormModalProps {
   onSubmit: (e: React.FormEvent) => void;
   onNext: (e: React.FormEvent) => void;
   onBack: () => void;
-  onChange: (field: keyof ClientFormData, value: string) => void;
+  onChange: (field: keyof ClientFormData, value: any) => void;
   onClearError: (field: keyof ClientFormErrors) => void;
   onClearBackendError?: () => void;
   submitButtonText?: string;

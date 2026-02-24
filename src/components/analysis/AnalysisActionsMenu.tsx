@@ -104,6 +104,7 @@ interface AnalysisActionsMenuProps {
   updatingId: number | null;
   onUpdateStatus: (jobId: number, action: "approve" | "reject") => void;
   onClose: () => void;
+  openUpwards?: boolean;
 }
 
 export default function AnalysisActionsMenu({
@@ -111,6 +112,7 @@ export default function AnalysisActionsMenu({
   updatingId,
   onUpdateStatus,
   onClose,
+  openUpwards = false,
 }: AnalysisActionsMenuProps) {
   const navigate = useNavigate();
   const { setSelectedJobId } = useAnalysis();
@@ -120,7 +122,8 @@ export default function AnalysisActionsMenu({
 
   return (
     <div
-      className="absolute right-12 top-4 w-48 bg-white border border-slate-200 rounded-xl shadow-xl z-50 py-2 animate-in fade-in zoom-in duration-100"
+      className={`absolute right-12 ${openUpwards ? "bottom-4" : "top-4"
+        } w-48 bg-white border border-slate-200 rounded-xl shadow-xl z-50 py-2 animate-in fade-in zoom-in duration-100`}
       onClick={(e) => e.stopPropagation()}
     >
       <button
