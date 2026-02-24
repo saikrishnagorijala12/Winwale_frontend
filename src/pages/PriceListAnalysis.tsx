@@ -205,7 +205,7 @@ export default function PriceListAnalysis() {
               }
               if (!activeClient.has_products) {
                 setError(
-                  "No products found for this client. Please upload initial GSA products for selected client before running Price List Analysis.",
+                  "Please complete uploading initial GSA products for selected client before running Price List Analysis.",
                 );
                 return;
               }

@@ -35,12 +35,12 @@ export interface Client {
   name: string;
   contract: string;
   status: ClientStatus;
-  products: number;
   lastModification: string | null;
   contact: ClientContact | null;
   email: string;
   phone: string;
   address: string;
+  logoUrl?: string;
 }
 
 export interface ClientFormData {
@@ -59,11 +59,12 @@ export interface ClientFormData {
   contact_officer_state: string;
   contact_officer_zip: string;
   status: ClientStatus;
+  logoUrl?: string;
+  logoFile?: File | null;
 }
 
 export interface EditingClient extends ClientFormData {
   id: number;
-  products?: number;
 }
 
 export interface StatusMapItem {

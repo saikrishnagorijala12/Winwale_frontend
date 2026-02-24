@@ -131,8 +131,18 @@ export default function AddClientContractModal({
     setSubmitError("");
 
     try {
-      const clientRes = await api.post("/clients", clientData);
+      const { logoFile, logoUrl, ...clientPayload } = clientData;
+      const clientRes = await api.post("/clients", clientPayload);
       const newClientId: number = clientRes.data.client_id;
+
+      // Upload logo if present
+      if (logoFile) {
+        const logoFormData = new FormData();
+        logoFormData.append("file", logoFile);
+        await api.post(`/clients/${newClientId}/logo`, logoFormData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+      }
 
       const { client_id, ...contractPayload } = {
         ...contractData,
@@ -204,11 +214,10 @@ export default function AddClientContractModal({
               <React.Fragment key={stepNum}>
                 <div className="flex flex-col items-center gap-1.5 min-w-0">
                   <div
-                    className={`w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm transition-all shrink-0 ${
-                      isActive
-                        ? "bg-[#38A1DB] text-white shadow-md shadow-blue-200"
-                        : "bg-slate-100 text-slate-400"
-                    }`}
+                    className={`w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm transition-all shrink-0 ${isActive
+                      ? "bg-[#38A1DB] text-white shadow-md shadow-blue-200"
+                      : "bg-slate-100 text-slate-400"
+                      }`}
                   >
                     {isCompleted ? (
                       <CheckCircle2 className="w-5 h-5" />
@@ -217,18 +226,16 @@ export default function AddClientContractModal({
                     )}
                   </div>
                   <span
-                    className={`text-[11px] font-semibold text-center leading-tight ${
-                      isActive ? "text-[#38A1DB]" : "text-slate-400"
-                    }`}
+                    className={`text-[11px] font-semibold text-center leading-tight ${isActive ? "text-[#38A1DB]" : "text-slate-400"
+                      }`}
                   >
                     {label}
                   </span>
                 </div>
                 {i < STEPS.length - 1 && (
                   <div
-                    className={`flex-1 h-0.5 mx-2 rounded-full transition-colors ${
-                      step > stepNum ? "bg-[#38A1DB]" : "bg-slate-200"
-                    }`}
+                    className={`flex-1 h-0.5 mx-2 rounded-full transition-colors ${step > stepNum ? "bg-[#38A1DB]" : "bg-slate-200"
+                      }`}
                   />
                 )}
               </React.Fragment>

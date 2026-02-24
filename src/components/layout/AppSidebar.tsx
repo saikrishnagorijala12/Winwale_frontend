@@ -8,14 +8,14 @@ import {
   Menu,
   X,
   UserCheck,
-  File,
-  Building2Icon,
-  ListCheckIcon,
   History,
   FileSearchCorner,
   ChevronDown,
   ChevronRight,
   FileText,
+  Building2,
+  PackageCheck,
+  FileCheckCorner,
 } from "lucide-react";
 import { Role, ROLES } from "@/src/types/roles.types";
 
@@ -51,21 +51,27 @@ export const navSections = [
   {
     label: "Workspace",
     items: [
+      // {
+      //   to: "/clients",
+      //   icon: Building2,
+      //   label: "Clients",
+      //   roles: [ROLES.ADMIN, ROLES.USER],
+      // },
+      // {
+      //   to: "/contracts",
+      //   icon: FileText,
+      //   label: "Contracts",
+      //   roles: [ROLES.ADMIN, ROLES.USER],
+      // },
       {
-        to: "/clients",
-        icon: Building2Icon,
-        label: "Clients",
-        roles: [ROLES.ADMIN, ROLES.USER],
-      },
-      {
-        to: "/contracts",
+        to: "/client-contracts",
         icon: FileText,
-        label: "Contracts",
+        label: "Client Contracts",
         roles: [ROLES.ADMIN, ROLES.USER],
       },
       {
         to: "/gsa-products",
-        icon: ListCheckIcon,
+        icon: PackageCheck,
         label: "GSA Products",
         roles: [ROLES.ADMIN, ROLES.USER],
       },
@@ -82,7 +88,7 @@ export const navSections = [
       },
       {
         to: "/client-activation",
-        icon: Building2Icon,
+        icon: FileCheckCorner,
         label: "Client Management",
         roles: [ROLES.ADMIN],
       },

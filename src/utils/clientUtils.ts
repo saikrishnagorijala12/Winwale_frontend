@@ -13,23 +13,22 @@ export const normalizeClientFromAPI = (c: any): Client => {
     name: c.company_name,
     contract: c.contract_number || "—",
     status: normalizeStatus(c.status) as ClientStatus,
-    products: c.products_count ?? 0,
     lastModification:
       (c.updated_time || c.created_time)?.split("T")[0] ?? "—",
     contact: hasContact
       ? {
-          name: c.contact_officer_name?.trim() || null,
-          email: c.contact_officer_email?.trim() || null,
-          phone: c.contact_officer_phone_no?.trim() || null,
-          address: [
-            c.contact_officer_address,
-            c.contact_officer_city,
-            c.contact_officer_state,
-            c.contact_officer_zip,
-          ]
-            .filter(Boolean)
-            .join(", ") || null,
-        }
+        name: c.contact_officer_name?.trim() || null,
+        email: c.contact_officer_email?.trim() || null,
+        phone: c.contact_officer_phone_no?.trim() || null,
+        address: [
+          c.contact_officer_address,
+          c.contact_officer_city,
+          c.contact_officer_state,
+          c.contact_officer_zip,
+        ]
+          .filter(Boolean)
+          .join(", ") || null,
+      }
       : null,
     email: c.company_email,
     phone: c.company_phone_no,
@@ -41,6 +40,7 @@ export const normalizeClientFromAPI = (c: any): Client => {
     ]
       .filter(Boolean)
       .join(", "),
+    logoUrl: c.company_logo_url,
   };
 };
 
@@ -51,25 +51,24 @@ export const createClientFromResponse = (res: any): Client => {
     name: res.data.company_name,
     contract: res.data.contract_number || "—",
     status: res.data.status as ClientStatus,
-    products: 0,
     lastModification: res.data.created_at?.split("T")[0] ?? "—",
     contact:
       res.data.contact_officer_name ||
-      res.data.contact_officer_email ||
-      res.data.contact_officer_phone_no
+        res.data.contact_officer_email ||
+        res.data.contact_officer_phone_no
         ? {
-            name: res.data.contact_officer_name || null,
-            email: res.data.contact_officer_email || null,
-            phone: res.data.contact_officer_phone_no || null,
-            address: [
-              res.data.contact_officer_address,
-              res.data.contact_officer_city,
-              res.data.contact_officer_state,
-              res.data.contact_officer_zip,
-            ]
-              .filter(Boolean)
-              .join(", ") || null,
-          }
+          name: res.data.contact_officer_name || null,
+          email: res.data.contact_officer_email || null,
+          phone: res.data.contact_officer_phone_no || null,
+          address: [
+            res.data.contact_officer_address,
+            res.data.contact_officer_city,
+            res.data.contact_officer_state,
+            res.data.contact_officer_zip,
+          ]
+            .filter(Boolean)
+            .join(", ") || null,
+        }
         : null,
     email: res.data.company_email,
     phone: res.data.company_phone_no,
@@ -81,34 +80,34 @@ export const createClientFromResponse = (res: any): Client => {
     ]
       .filter(Boolean)
       .join(", "),
+    logoUrl: res.data.company_logo_url,
   };
 };
 
-export const updateClientFromResponse = (res: any, products: number): Client => {
+export const updateClientFromResponse = (res: any): Client => {
   return {
     id: res.data.client_id,
     name: res.data.company_name,
     contract: res.data.contract_number || "—",
     status: res.data.status as ClientStatus,
-    products: products || 0,
     lastModification: res.data.updated_time?.split("T")[0] ?? "—",
     contact:
       res.data.contact_officer_name ||
-      res.data.contact_officer_email ||
-      res.data.contact_officer_phone_no
+        res.data.contact_officer_email ||
+        res.data.contact_officer_phone_no
         ? {
-            name: res.data.contact_officer_name || null,
-            email: res.data.contact_officer_email || null,
-            phone: res.data.contact_officer_phone_no || null,
-            address: [
-              res.data.contact_officer_address,
-              res.data.contact_officer_city,
-              res.data.contact_officer_state,
-              res.data.contact_officer_zip,
-            ]
-              .filter(Boolean)
-              .join(", ") || null,
-          }
+          name: res.data.contact_officer_name || null,
+          email: res.data.contact_officer_email || null,
+          phone: res.data.contact_officer_phone_no || null,
+          address: [
+            res.data.contact_officer_address,
+            res.data.contact_officer_city,
+            res.data.contact_officer_state,
+            res.data.contact_officer_zip,
+          ]
+            .filter(Boolean)
+            .join(", ") || null,
+        }
         : null,
     email: res.data.company_email,
     phone: res.data.company_phone_no,
@@ -120,6 +119,7 @@ export const updateClientFromResponse = (res: any, products: number): Client => 
     ]
       .filter(Boolean)
       .join(", "),
+    logoUrl: res.data.company_logo_url,
   };
 };
 

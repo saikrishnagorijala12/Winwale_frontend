@@ -143,8 +143,16 @@ export const ClientContractTable: React.FC<ClientContractTableProps> = ({
                     {/* Client name */}
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
-                        <div className="shrink-0 w-9 h-9 rounded-xl bg-linear-to-br from-[#3399cc] to-[#2980b9] flex items-center justify-center text-white font-bold text-xs shadow-sm">
-                          {client.name.substring(0, 2).toUpperCase()}
+                        <div className="shrink-0 w-9 h-9 rounded-xl bg-linear-to-br from-[#3399cc] to-[#2980b9] flex items-center justify-center text-white font-bold text-xs shadow-sm overflow-hidden">
+                          {client.logoUrl ? (
+                            <img
+                              src={client.logoUrl}
+                              alt={client.name}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            client.name.substring(0, 2).toUpperCase()
+                          )}
                         </div>
                         <div className="min-w-0">
                           <p className="font-semibold text-slate-900 group-hover:text-[#38A1DB] transition-colors truncate max-w-40">
@@ -261,8 +269,16 @@ export const ClientContractTable: React.FC<ClientContractTableProps> = ({
               >
                 <div className="flex justify-between items-start mb-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-2xl bg-linear-to-br from-[#3399cc] to-[#2980b9] flex items-center justify-center text-white font-bold text-lg shadow-blue-100 shadow-lg">
-                      {client.name.substring(0, 2).toUpperCase()}
+                    <div className="w-12 h-12 rounded-2xl bg-linear-to-br from-[#3399cc] to-[#2980b9] flex items-center justify-center text-white font-bold text-lg shadow-blue-100 shadow-lg overflow-hidden">
+                      {client.logoUrl ? (
+                        <img
+                          src={client.logoUrl}
+                          alt={client.name}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        client.name.substring(0, 2).toUpperCase()
+                      )}
                     </div>
                     <div>
                       <h3 className="font-bold text-slate-900 text-base">
@@ -366,10 +382,9 @@ export const ClientContractTable: React.FC<ClientContractTableProps> = ({
                     <button
                       onClick={() => onPageChange(Number(pageNum))}
                       className={`min-w-9 h-9 flex items-center justify-center rounded-lg text-sm font-bold transition-all
-                        ${
-                          currentPage === pageNum
-                            ? "bg-[#3399cc] text-white shadow-md shadow-[#3399cc]/30"
-                            : "text-slate-500 hover:bg-slate-100 hover:text-slate-900"
+                        ${currentPage === pageNum
+                          ? "bg-[#3399cc] text-white shadow-md shadow-[#3399cc]/30"
+                          : "text-slate-500 hover:bg-slate-100 hover:text-slate-900"
                         }`}
                     >
                       {pageNum}

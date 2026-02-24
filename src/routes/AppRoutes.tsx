@@ -112,7 +112,7 @@ const AppRoutes: React.FC = () => {
                 >
                   <Route path="/clients" element={<Clients />} />
                   <Route path="/contracts" element={<ContractsPage />} />
-                  <Route path="/clients-contracts" element={<ClientsAndContractsPage />} />
+                  <Route path="/client-contracts" element={<ClientsAndContractsPage />} />
                   <Route
                     path="/clients/products"
                     element={<ClientProducts />}

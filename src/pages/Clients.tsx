@@ -155,10 +155,7 @@ export default function ClientsPage() {
     setIsSubmitting(true);
     try {
       const res = await api.put(`/clients/${editingClient.id}`, editingClient);
-      const updatedClient = updateClientFromResponse(
-        res,
-        editingClient.products || 0,
-      );
+      const updatedClient = updateClientFromResponse(res);
       setClients((prev) =>
         prev.map((c) => (c.id === updatedClient.id ? updatedClient : c)),
       );
@@ -203,7 +200,6 @@ export default function ClientsPage() {
       contact_officer_state: client.contact?.address?.split(", ")[2] || "",
       contact_officer_zip: client.contact?.address?.split(", ")[3] || "",
       status: client.status,
-      products: client.products,
     });
     setEditStep(1);
     setErrors({});
