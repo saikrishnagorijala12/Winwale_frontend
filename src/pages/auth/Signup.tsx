@@ -10,6 +10,7 @@ import {
   User,
   EyeOff,
   Eye,
+  X,
 } from "lucide-react";
 import AuthLayout from "../../components/auth/AuthLayout";
 import { validateSignupForm } from "@/src/utils/authValidators";
@@ -119,8 +120,17 @@ const Signup: React.FC = () => {
   return (
     <AuthLayout title={title} subtitle={subtitle}>
       {error && (
-        <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 text-sm">
-          {error}
+        <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 text-sm flex items-center justify-between">
+          <div className="flex-1">
+            {error}
+          </div>
+          <button
+            onClick={() => setError(null)}
+            className="ml-3 text-red-500 hover:text-red-700 transition-colors p-1 rounded-md hover:bg-red-100"
+            aria-label="Dismiss error"
+          >
+            <X className="h-4 w-4" />
+          </button>
         </div>
       )}
 
@@ -139,6 +149,7 @@ const Signup: React.FC = () => {
               onChange={(e) => {
                 clearError("fullName");
                 setFormData({ ...formData, fullName: e.target.value });
+                setError(null);
               }}
               className="block w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 outline-none"
               placeholder="Your Name"
@@ -163,6 +174,7 @@ const Signup: React.FC = () => {
               onChange={(e) => {
                 clearError("email");
                 setFormData({ ...formData, email: e.target.value });
+                setError(null);
               }}
               className="block w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 outline-none"
               placeholder="name@winvale.com"
@@ -187,6 +199,7 @@ const Signup: React.FC = () => {
               onChange={(e) => {
                 clearError("password");
                 setFormData({ ...formData, password: e.target.value });
+                setError(null);
               }}
               onFocus={() => setPasswordFocused(true)}
               onBlur={() => setPasswordFocused(false)}
@@ -236,6 +249,7 @@ const Signup: React.FC = () => {
               onChange={(e) => {
                 clearError("confirmPassword");
                 setFormData({ ...formData, confirmPassword: e.target.value });
+                setError(null);
               }}
               className="block w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 outline-none"
               placeholder="Re-enter password"

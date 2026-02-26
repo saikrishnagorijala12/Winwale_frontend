@@ -71,6 +71,13 @@ export default function ClientsAndContractsPage() {
         setCurrentPage(1);
     }, [searchQuery, filterStatus]);
 
+    useEffect(() => {
+        if (detailsClient) {
+            const updated = clients.find((c) => c.id === detailsClient.id);
+            if (updated) setDetailsClient(updated);
+        }
+    }, [clients]);
+
     const getContractForClient = (clientId: number) =>
         contracts.find((c) => c.client_id === clientId) ?? null;
 

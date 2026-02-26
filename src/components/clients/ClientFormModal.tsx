@@ -126,7 +126,7 @@ export const ClientFormModal: React.FC<ClientFormModalProps> = ({
             <button
               type="button"
               onClick={currentStep === 1 ? onClose : onBack}
-              className="px-6 py-3 rounded-xl border-2 border-slate-300 font-bold text-slate-600 hover:bg-slate-100 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="btn-secondary"
               disabled={isSubmitting}
             >
               {currentStep === 1 ? "Cancel" : "Back"}
@@ -136,7 +136,7 @@ export const ClientFormModal: React.FC<ClientFormModalProps> = ({
               <button
                 type="button"
                 onClick={onNext}
-                className="px-6 py-3 rounded-xl bg-linear-to-br from-[#38A1DB] to-[#2D8BBF] text-white font-bold shadow-lg hover:shadow-xl transition-all active:scale-95"
+                className="btn-primary"
               >
                 Next
               </button>
@@ -144,7 +144,7 @@ export const ClientFormModal: React.FC<ClientFormModalProps> = ({
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="px-6 py-3 rounded-xl bg-linear-to-br from-[#38A1DB] to-[#2D8BBF] text-white font-bold shadow-lg hover:shadow-xl transition-all active:scale-95"
+                className="btn-primary"
               >
                 {isSubmitting ? "Processing..." : submitButtonText}
               </button>

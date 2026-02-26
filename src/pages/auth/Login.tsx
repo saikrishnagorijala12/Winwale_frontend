@@ -1,7 +1,7 @@
 import React, { useState, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { signIn, signOut } from "aws-amplify/auth";
-import { Mail, Lock, Eye, EyeOff, Loader2 } from "lucide-react";
+import { Mail, Lock, Eye, EyeOff, Loader2, X } from "lucide-react";
 import AuthLayout from "../../components/auth/AuthLayout";
 import { useAuth } from "../../context/AuthContext";
 import { validateEmail, validateRequired } from "@/src/utils/validators";
@@ -113,8 +113,17 @@ const Login: React.FC = () => {
   return (
     <AuthLayout title="Welcome back" subtitle="Sign in to access your dashboard">
       {error && (
-        <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 text-sm">
-          {error}
+        <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 text-sm flex items-center justify-between">
+          <div className="flex-1">
+            {error}
+          </div>
+          <button
+            onClick={() => setError(null)}
+            className="ml-3 text-red-500 hover:text-red-700 transition-colors p-1 rounded-md hover:bg-red-100"
+            aria-label="Dismiss error"
+          >
+            <X className="h-4 w-4" />
+          </button>
         </div>
       )}
 
@@ -133,6 +142,7 @@ const Login: React.FC = () => {
               onChange={(e) => {
                 setEmail(e.target.value);
                 setErrors((prev) => ({ ...prev, email: undefined }));
+                setError(null);
               }}
               className="block w-full pl-11 pr-4 py-3 rounded-xl outline-none transition-all bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-blue-500/20"
               placeholder="name@winvale.com"
@@ -157,6 +167,7 @@ const Login: React.FC = () => {
               onChange={(e) => {
                 setPassword(e.target.value);
                 setErrors((prev) => ({ ...prev, password: undefined }));
+                setError(null);
               }}
               className="block w-full pl-11 pr-11 py-3 rounded-xl outline-none transition-all bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-blue-500/20"
               placeholder="••••••••"

@@ -26,6 +26,7 @@ export default function AnalysisDetails() {
 
   const [job, setJob] = useState<AnalysisJob | null>(null);
   const [isFetchingJob, setIsFetchingJob] = useState(true);
+  const [isExporting, setIsExporting] = useState(false);
   const [activeTab, setActiveTab] = useState<string>("NEW_PRODUCT");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 7;
@@ -142,8 +143,10 @@ export default function AnalysisDetails() {
         onTabChange={handleTabChange}
         onPageChange={handlePageChange}
         isLoading={isFetchingJob}
+        isExporting={isExporting}
         onExport={async () => {
           try {
+            setIsExporting(true);
             const date = new Date()
               .toLocaleDateString("en-US", {
                 month: "2-digit",
@@ -164,6 +167,8 @@ export default function AnalysisDetails() {
           } catch (error) {
             console.error("Export failed:", error);
             toast.error("Failed to export analysis");
+          } finally {
+            setIsExporting(false);
           }
         }}
       />
@@ -171,7 +176,7 @@ export default function AnalysisDetails() {
       <div className="flex items-center justify-between ">
         <button
           onClick={() => navigate(-1)}
-          className="flex items-center gap-2 px-5 py-3 rounded-xl font-medium text-sm bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 transition-colors"
+          className="btn-secondary"
         >
           <ChevronLeft className="w-4 h-4" />
           Back

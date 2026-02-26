@@ -12,12 +12,11 @@ import {
   FileEdit,
   UserCheck,
   Upload,
-  File,
+  Package,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import api from "@/src/lib/axios";
-import { useAnalysis } from "../../context/AnalysisContext";
 import StatusBadge from "../../components/shared/StatusBadge";
 import { fetchAnalysisJobs } from "../../services/analysisService";
 import { AnalysisJobResponse } from "../../types/analysis.types";
@@ -29,7 +28,6 @@ const Skeleton = ({ className }) => (
 export default function UnifiedAdminDashboard() {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { setSelectedJobId } = useAnalysis();
 
   const [usersList, setUsersList] = useState([]);
   const [clients, setClients] = useState([]);
@@ -329,8 +327,8 @@ export default function UnifiedAdminDashboard() {
 
             <div className="space-y-3">
               {[
-                { label: "Add Client", icon: Building2, to: "/clients" },
-                { label: "Manage Contracts", icon: File, to: "/contracts" },
+                { label: "Manage Client Contracts", icon: FileText, to: "/client-contracts" },
+                { label: "View Products List", icon: Package, to: "/gsa-products" },
                 { label: "Upload Product Catalog", icon: Upload, to: "/gsa-products/upload" },
               ].map((action) => (
                 <button

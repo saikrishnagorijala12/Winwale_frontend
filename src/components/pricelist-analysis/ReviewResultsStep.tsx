@@ -50,7 +50,7 @@ export const ReviewResultsStep = ({
             <div className="flex justify-between items-center pt-4">
                 <button
                     onClick={onReset}
-                    className="px-6 py-3 rounded-xl border border-slate-200 bg-white text-slate-700 font-bold hover:bg-slate-50 transition-all shadow-sm"
+                    className="btn-secondary"
                 >
                     Start New Analysis
                 </button>

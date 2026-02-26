@@ -23,6 +23,23 @@
   .btn-primary:disabled {
     @apply opacity-70 cursor-not-allowed;
   }
+  .btn-secondary {
+    @apply flex items-center justify-center gap-2
+      px-6 py-2.5
+      bg-white
+      border border-slate-200
+      text-slate-600
+      font-medium
+      rounded-xl
+      transition-all
+      hover:bg-slate-50
+      hover:scale-[1.02]
+      active:scale-[0.98];
+  }
+
+  .btn-secondary:disabled {
+    @apply opacity-70 cursor-not-allowed;
+  }
 }
 
 @layer base {

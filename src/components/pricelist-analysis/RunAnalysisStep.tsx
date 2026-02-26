@@ -101,7 +101,7 @@ export const RunAnalysisStep = ({
                     <button
                         onClick={onBack}
                         disabled={isAnalyzing}
-                        className="h-11 flex items-center gap-2 px-6 py-3 rounded-xl border border-slate-200 bg-white text-slate-700 font-bold hover:bg-slate-50 transition-all shadow-sm"
+                        className="btn-secondary"
                     >
                         <ChevronLeft className="w-4 h-4" /> Back
                     </button>

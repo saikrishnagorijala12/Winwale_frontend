@@ -31,6 +31,7 @@ export default function AnalysisHistory() {
   const [totalItems, setTotalItems] = useState(0);
   const [updatingId, setUpdatingId] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
+  const [loadingClients, setLoadingClients] = useState(true);
   const [sortConfig, setSortConfig] = useState<SortConfig>({
     key: "date",
     direction: "desc",
@@ -45,10 +46,13 @@ export default function AnalysisHistory() {
 
   const fetchClients = async () => {
     try {
+      setLoadingClients(true);
       const response = await api.get<Client[]>("clients/approved");
       setClients(response.data);
     } catch (error) {
       console.error("Failed to fetch clients:", error);
+    } finally {
+      setLoadingClients(false);
     }
   };
 
@@ -208,6 +212,7 @@ export default function AnalysisHistory() {
         setDateTo={setDateTo}
         clients={clients}
         onClearFilters={clearFilters}
+        isLoading={loadingClients}
       />
 
       <AnalysisTable

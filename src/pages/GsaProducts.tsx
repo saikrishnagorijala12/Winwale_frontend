@@ -18,6 +18,7 @@ export default function ProductsPage() {
   const [clients, setClients] = useState<Client[]>([]);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
+  const [loadingClients, setLoadingClients] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
   const [currentPage, setCurrentPage] = useState(1);
@@ -26,6 +27,7 @@ export default function ProductsPage() {
   const [isConfirmExportOpen, setIsConfirmExportOpen] = useState(false);
   const [totalItems, setTotalItems] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
+  const [exportableCount, setExportableCount] = useState(0);
 
   const itemsPerPage = 50;
 
@@ -53,13 +55,31 @@ export default function ProductsPage() {
     }
   };
 
+  const fetchExportableCount = async (clientId?: number) => {
+    try {
+      const data = await productService.getAllProducts({
+        page: 1,
+        page_size: 1,
+        client_id: clientId,
+      });
+      setExportableCount(data.total);
+    } catch (err: any) {
+      console.error("Failed to fetch exportable count:", err);
+      // Fallback to totalItems if fetch fails, though they might differ due to search
+      setExportableCount(0);
+    }
+  };
+
   useEffect(() => {
     const initClients = async () => {
       try {
+        setLoadingClients(true);
         const clientRes = await clientService.getApprovedClients();
         setClients(clientRes);
       } catch (err: any) {
         toast.error(err?.message || "Failed to load clients.");
+      } finally {
+        setLoadingClients(false);
       }
     };
 
@@ -69,6 +89,10 @@ export default function ProductsPage() {
   useEffect(() => {
     fetchProducts(currentPage, debouncedSearchTerm, selectedClient?.client_id);
   }, [currentPage, debouncedSearchTerm, selectedClient]);
+
+  useEffect(() => {
+    fetchExportableCount(selectedClient?.client_id);
+  }, [selectedClient]);
 
   const handleClientSelect = (client: Client | null) => {
     setSelectedClient(client);
@@ -109,6 +133,7 @@ export default function ProductsPage() {
       document.body.removeChild(a);
 
       toast.success("Export completed successfully.");
+      setIsConfirmExportOpen(false);
     } catch (err: any) {
       toast.error(err?.message || "Failed to export products.");
     } finally {
@@ -132,6 +157,7 @@ export default function ProductsPage() {
           clients={clients}
           selectedClient={selectedClient}
           onClientSelect={handleClientSelect}
+          isLoading={loadingClients}
         />
 
         <ProductsTable
@@ -158,10 +184,7 @@ export default function ProductsPage() {
       <ConfirmationModal
         isOpen={isConfirmExportOpen}
         onClose={() => setIsConfirmExportOpen(false)}
-        onConfirm={() => {
-          setIsConfirmExportOpen(false);
-          handleExport();
-        }}
+        onConfirm={handleExport}
         title="Export GSA Products"
         message={
           selectedClient
@@ -170,7 +193,7 @@ export default function ProductsPage() {
         }
         details={[
           { label: "Client", value: selectedClient?.company_name ?? "All Clients" },
-          { label: "Total Products", value: totalItems.toLocaleString() },
+          { label: "Total Products", value: exportableCount.toLocaleString() },
         ]}
         confirmText="Yes, Export"
         cancelText="Cancel"

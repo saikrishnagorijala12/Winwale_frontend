@@ -109,7 +109,7 @@ export const FileUploadStep = ({
 
                 {isParsingFile && (
                     <div className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-4 flex items-center gap-3">
-                        <Loader2 className="w-5 h-5 animate-spin text-[#3399cc] shrink-0" />
+                        <Loader2 className="w-5 h-5 animate-spin text-[#24578f] shrink-0" />
                         <div className="flex-1">
                             <p className="text-xs font-bold text-slate-600 mb-1.5">Parsing file, please wait…</p>
                             <div className="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
@@ -132,7 +132,7 @@ export const FileUploadStep = ({
                                 <X className="w-4 h-4" />
                             </button>
                         </div>
-                        <div className="max-h-[420px] overflow-auto">
+                        <div className="max-h-105 overflow-auto">
                             <table className="w-full text-[11px] text-left border-collapse">
                                 <thead className="sticky top-0 z-10">
                                     <tr className="bg-slate-100 border-b border-slate-200">
@@ -177,7 +177,7 @@ export const FileUploadStep = ({
                 <div className="flex justify-between">
                     <button
                         onClick={onBack}
-                        className="h-11 flex items-center gap-2 px-6 py-3 rounded-xl border border-slate-200 bg-white text-slate-700 font-bold hover:bg-slate-50 transition-all shadow-sm"
+                        className="btn-secondary"
                     >
                         <ChevronLeft className="w-4 h-4" /> Back
                     </button>

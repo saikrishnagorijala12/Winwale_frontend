@@ -156,7 +156,7 @@ export default function ClientProducts() {
                     <td colSpan={6} className="px-6 py-20 text-center">
                       <div className="flex flex-col items-center justify-center gap-3">
                         <Loader2 className="w-8 h-8 animate-spin text-[#24578f]" />
-                        <span className="text-slate-400 font-bold">Loading Products...</span>
+                        <span className="text-sm text-slate-500 font-medium">Loading Products...</span>
                       </div>
                     </td>
                   </tr>

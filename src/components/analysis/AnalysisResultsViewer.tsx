@@ -23,8 +23,9 @@ interface AnalysisResultsViewerProps {
     activeTab: string;
     onTabChange: (tab: string) => void;
     onPageChange: (page: number) => void;
-    onExport: () => void;
+    onExport: () => Promise<void>;
     isLoading?: boolean;
+    isExporting?: boolean;
 }
 
 export const AnalysisResultsViewer = ({
@@ -38,6 +39,7 @@ export const AnalysisResultsViewer = ({
     onPageChange,
     onExport,
     isLoading = false,
+    isExporting = false,
 }: AnalysisResultsViewerProps) => {
     const [isConfirmExportOpen, setIsConfirmExportOpen] = useState(false);
     const itemsPerPage = 7;
@@ -109,14 +111,15 @@ export const AnalysisResultsViewer = ({
             <ConfirmationModal
                 isOpen={isConfirmExportOpen}
                 onClose={() => setIsConfirmExportOpen(false)}
-                onConfirm={() => {
+                onConfirm={async () => {
+                    await onExport();
                     setIsConfirmExportOpen(false);
-                    onExport();
                 }}
                 title="Export Analysis Results"
                 message="This will download all modification categories as an Excel file."
                 confirmText="Yes, Export"
                 cancelText="Cancel"
+                isSubmitting={isExporting}
                 variant="blue"
             />
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
@@ -223,7 +226,7 @@ export const AnalysisResultsViewer = ({
                                         <td colSpan={4} className="px-6 py-16 text-center">
                                             <div className="flex flex-col items-center justify-center gap-3">
                                                 <Loader2 className="w-8 h-8 animate-spin text-[#24578f]" />
-                                                <p className="text-slate-400 text-sm">Loading analysis results...</p>
+                                                <p className="text-sm text-slate-500 font-medium">Loading analysis results...</p>
                                             </div>
                                         </td>
                                     </tr>

@@ -662,7 +662,7 @@ const ClientActivation = () => {
           {loading ? (
             <div className="py-16 flex flex-col items-center justify-center gap-3">
               <Loader2 className="w-8 h-8 animate-spin text-[#24578f]" />
-              <p className="text-slate-400 text-sm">Loading clients...</p>
+              <p className="text-sm text-slate-500 font-medium">Loading clients...</p>
             </div>
           ) : paginatedClients.length === 0 ? (
             <div className="py-16 text-center text-slate-400 text-sm">

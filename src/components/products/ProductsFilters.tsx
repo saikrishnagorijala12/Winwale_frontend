@@ -1,5 +1,5 @@
 import React from "react";
-import { Search } from "lucide-react";
+import { Search, Loader2 } from "lucide-react";
 import { Client as ProductClient } from "../../types/product.types";
 import { ClientDropdown } from "../shared/ClientDropdown";
 
@@ -9,6 +9,7 @@ interface ProductsFiltersProps {
   clients: ProductClient[];
   selectedClient: ProductClient | null;
   onClientSelect: (client: ProductClient | null) => void;
+  isLoading?: boolean;
 }
 
 export default function ProductsFilters({
@@ -17,6 +18,7 @@ export default function ProductsFilters({
   clients,
   selectedClient,
   onClientSelect,
+  isLoading = false,
 }: ProductsFiltersProps) {
   const handleClientSelect = (clientId: number) => {
     if (clientId === 0) {
@@ -44,14 +46,21 @@ export default function ProductsFilters({
       </div>
 
       <div className="w-full lg:w-80">
-        <ClientDropdown
-          clients={clients}
-          selectedClient={selectedClient?.client_id ?? 0}
-          onClientSelect={handleClientSelect}
-          allowAll
-          allLabel="All Clients"
-          placeholder="Filter by client..."
-        />
+        {isLoading ? (
+          <div className="flex items-center gap-3 p-4 bg-slate-50 border border-slate-200 rounded-2xl">
+            <Loader2 className="w-5 h-5 animate-spin text-[#24578f]" />
+            <span className="text-slate-500 text-sm font-medium">Fetching approved clients...</span>
+          </div>
+        ) : (
+          <ClientDropdown
+            clients={clients}
+            selectedClient={selectedClient?.client_id ?? 0}
+            onClientSelect={handleClientSelect}
+            allowAll
+            allLabel="All Clients"
+            placeholder="Filter by client..."
+          />
+        )}
       </div>
     </div>
   );

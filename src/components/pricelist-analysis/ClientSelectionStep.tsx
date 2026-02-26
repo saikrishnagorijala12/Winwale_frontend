@@ -1,9 +1,9 @@
-import React from "react";
 import {
   Building2,
   ChevronRight,
   AlertCircle,
   ChevronDownIcon,
+  Loader2,
 } from "lucide-react";
 import { Client } from "../../types/pricelist.types";
 import { ClientDropdown } from "../../components/shared/ClientDropdown";
@@ -14,6 +14,7 @@ interface ClientSelectionStepProps {
   onClientSelect: (clientId: number | null) => void;
   onContinue: () => void;
   error: string | null;
+  isLoading?: boolean;
 }
 
 export const ClientSelectionStep = ({
@@ -22,6 +23,7 @@ export const ClientSelectionStep = ({
   onClientSelect,
   onContinue,
   error,
+  isLoading = false,
 }: ClientSelectionStepProps) => {
   return (
     <div className="group bg-white/80 backdrop-blur-md rounded-3xl border border-slate-200 shadow-2xl shadow-slate-200/60 overflow-visible z-10 relative">
@@ -38,11 +40,18 @@ export const ClientSelectionStep = ({
       </div>
 
       <div className="p-8 space-y-8 relative">
-        <ClientDropdown
-          clients={clients}
-          selectedClient={selectedClient}
-          onClientSelect={onClientSelect}
-        />
+        {isLoading ? (
+          <div className="flex items-center gap-3 p-4 bg-slate-50 border border-slate-200 rounded-2xl">
+            <Loader2 className="w-5 h-5 animate-spin text-[#24578f]" />
+            <span className="text-slate-500 text-sm font-medium">Fetching approved clients...</span>
+          </div>
+        ) : (
+          <ClientDropdown
+            clients={clients}
+            selectedClient={selectedClient}
+            onClientSelect={onClientSelect}
+          />
+        )}
 
         {error && (
           <div className="p-4 bg-red-50 text-red-700 rounded-xl flex items-center gap-2 animate-in fade-in slide-in-from-top-1">

@@ -111,7 +111,7 @@ export const DocumentWorkflowRenderer = () => {
           {currentStep === "load-config" ? (
             <div className="py-20 text-center bg-white rounded-3xl border border-slate-200">
               <Loader2 className="w-8 h-8 animate-spin m-auto text-[#24548f]" />
-              <p className="mt-4 text-slate-500 font-medium">
+              <p className="text-sm text-slate-500 font-medium">
                 Loading configuration...
               </p>
             </div>

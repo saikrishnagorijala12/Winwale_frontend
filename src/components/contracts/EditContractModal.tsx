@@ -489,7 +489,7 @@ export default function EditContractModal({
             <button
               type="button"
               onClick={() => (step === 1 ? handleClose() : setStep(1))}
-              className="px-6 py-3 rounded-xl border-2 border-slate-300 font-bold text-slate-600 hover:bg-slate-100 transition-all disabled:opacity-50"
+              className="btn-secondary"
               disabled={isSubmitting}
             >
               {step === 1 ? "Cancel" : "Back"}
@@ -498,7 +498,7 @@ export default function EditContractModal({
             <button
               type="submit"
               disabled={isSubmitting}
-              className="px-6 py-3 rounded-xl bg-linear-to-br from-[#38A1DB] to-[#2D8BBF] text-white font-bold shadow-lg hover:shadow-xl transition-all active:scale-95"
+              className="btn-primary"
             >
               {isSubmitting ? (
                 <>

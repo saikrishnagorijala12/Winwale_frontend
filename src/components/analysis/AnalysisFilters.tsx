@@ -1,5 +1,5 @@
 import React from "react";
-import { Search, Filter, CheckCircle2, ChevronDown } from "lucide-react";
+import { Search, Filter, CheckCircle2, ChevronDown, Loader2 } from "lucide-react";
 import { StatusFilter } from "../../types/analysis.types";
 import { Client } from "../../types/pricelist.types";
 import { ClientDropdown } from "../shared/ClientDropdown";
@@ -17,6 +17,7 @@ interface AnalysisFiltersProps {
   setDateTo: (value: Date | undefined) => void;
   clients: Client[];
   onClearFilters: () => void;
+  isLoading?: boolean;
 }
 
 export default function AnalysisFilters({
@@ -32,6 +33,7 @@ export default function AnalysisFilters({
   setDateTo,
   clients,
   onClearFilters,
+  isLoading = false,
 }: AnalysisFiltersProps) {
   const selectedClientId =
     clientFilter === "All"
@@ -87,15 +89,22 @@ export default function AnalysisFilters({
             <label className="text-[11px] font-black uppercase tracking-widest text-slate-400">
               Client
             </label>
-            <ClientDropdown
-              clients={clients}
-              selectedClient={selectedClientId}
-              onClientSelect={handleClientSelect}
-              allowAll
-              allLabel="All Clients"
-              placeholder="Filter by client..."
-              compact
-            />
+            {isLoading ? (
+              <div className="flex items-center gap-2 p-3 bg-slate-50 border border-slate-200 rounded-xl">
+                <Loader2 className="w-4 h-4 animate-spin text-[#24578f]" />
+                <span className="text-slate-500 text-xs font-medium">Fetching...</span>
+              </div>
+            ) : (
+              <ClientDropdown
+                clients={clients}
+                selectedClient={selectedClientId}
+                onClientSelect={handleClientSelect}
+                allowAll
+                allLabel="All Clients"
+                placeholder="Filter by client..."
+                compact
+              />
+            )}
           </div>
 
           {/* Status */}

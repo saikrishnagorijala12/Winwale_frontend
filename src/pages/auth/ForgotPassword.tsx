@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { resetPassword, confirmResetPassword } from "aws-amplify/auth";
-import { Mail, Lock, Loader2, ArrowRight, ArrowLeft } from "lucide-react";
+import { Mail, Lock, Loader2, ArrowRight, ArrowLeft, X, CheckCircle2 } from "lucide-react";
 import AuthLayout from "../../components/auth/AuthLayout";
 import { PASSWORD_RULES as passwordRules } from "@/src/utils/validators";
 import { validateEmail } from "@/src/utils/validators";
@@ -22,6 +22,7 @@ const ForgotPassword: React.FC = () => {
   const [passwordFocused, setPasswordFocused] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
   const [errors, setErrors] = useState<FormErrors>({});
 
   const hasFailedRules = Object.values(passwordRules).some(
@@ -59,14 +60,11 @@ const ForgotPassword: React.FC = () => {
     setLoading(true);
     try {
       await resetPassword({ username: email.trim() });
-      setStep("confirm");
     } catch (err: any) {
-      if (err?.name === "UserNotFoundException") {
-        setError("Email does not exist");
-      } else {
-        setError("Unable to process your request. Please try again.");
-      }
+      console.log("Reset request handled:", err?.name || "Success");
     } finally {
+      setSuccess("If an account exists for this email, a recovery code has been sent.");
+      setStep("confirm");
       setLoading(false);
     }
   };
@@ -101,8 +99,33 @@ const ForgotPassword: React.FC = () => {
   return (
     <AuthLayout title={title} subtitle={subtitle}>
       {error && (
-        <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 text-sm">
-          {error}
+        <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 text-sm flex items-center justify-between">
+          <div className="flex-1">
+            {error}
+          </div>
+          <button
+            onClick={() => setError(null)}
+            className="ml-3 text-red-500 hover:text-red-700 transition-colors p-1 rounded-md hover:bg-red-100"
+            aria-label="Dismiss error"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+      )}
+
+      {success && (
+        <div className="mb-6 p-4 bg-green-50 border-l-4 border-green-500 text-green-700 text-sm flex items-center justify-between">
+          <div className="flex items-center gap-2 flex-1">
+            <CheckCircle2 className="h-4 w-4" />
+            {success}
+          </div>
+          <button
+            onClick={() => setSuccess(null)}
+            className="ml-3 text-green-500 hover:text-green-700 transition-colors p-1 rounded-md hover:bg-green-100"
+            aria-label="Dismiss success message"
+          >
+            <X className="h-4 w-4" />
+          </button>
         </div>
       )}
 
@@ -122,6 +145,7 @@ const ForgotPassword: React.FC = () => {
                 onChange={(e) => {
                   setEmail(e.target.value);
                   setErrors((p) => ({ ...p, email: undefined }));
+                  setError(null);
                 }}
                 className="block w-full pl-11 pr-4 py-3 rounded-xl outline-none transition-all bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-blue-500/20"
                 placeholder="name@winvale.com"
@@ -158,6 +182,7 @@ const ForgotPassword: React.FC = () => {
               onChange={(e) => {
                 setOtp(e.target.value);
                 setErrors((p) => ({ ...p, otp: undefined }));
+                setError(null);
               }}
               className="block w-full text-center text-2xl tracking-[0.5em] font-mono py-4 rounded-xl outline-none transition-all
               bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-blue-500/20"
@@ -182,6 +207,7 @@ const ForgotPassword: React.FC = () => {
                 onChange={(e) => {
                   setNewPassword(e.target.value);
                   setErrors((p) => ({ ...p, newPassword: undefined }));
+                  setError(null);
                 }}
                 onFocus={() => setPasswordFocused(true)}
                 onBlur={() => setPasswordFocused(false)}
@@ -197,8 +223,8 @@ const ForgotPassword: React.FC = () => {
 
             <div
               className={`overflow-hidden transition-all duration-300 ${passwordFocused && newPassword.length > 0 && hasFailedRules
-                  ? "max-h-40 opacity-100"
-                  : "max-h-0 opacity-0"
+                ? "max-h-40 opacity-100"
+                : "max-h-0 opacity-0"
                 }`}
             >
               <ul className="mt-3 space-y-1 text-sm">
@@ -212,8 +238,8 @@ const ForgotPassword: React.FC = () => {
                     >
                       <span
                         className={`inline-flex h-4 w-4 items-center justify-center rounded-full border text-xs ${passed
-                            ? "border-green-600 bg-green-600 text-white"
-                            : "border-slate-300"
+                          ? "border-green-600 bg-green-600 text-white"
+                          : "border-slate-300"
                           }`}
                       >
                         {passed ? "✓" : ""}

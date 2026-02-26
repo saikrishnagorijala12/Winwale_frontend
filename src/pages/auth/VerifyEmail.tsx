@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate, Link } from "react-router-dom";
 import { confirmSignUp, resendSignUpCode, signIn } from "aws-amplify/auth";
-import { Mail, ArrowLeft, Loader2, CheckCircle2 } from "lucide-react";
+import { Mail, ArrowLeft, Loader2, CheckCircle2, X } from "lucide-react";
 import AuthLayout from "../../components/auth/AuthLayout";
 import { useAuth } from "../../context/AuthContext";
 
@@ -101,15 +101,33 @@ const VerifyEmail: React.FC = () => {
     return (
         <AuthLayout title="Verify your email" subtitle={`Enter the code sent to ${email}`}>
             {error && (
-                <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 text-sm">
-                    {error}
+                <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 text-sm flex items-center justify-between">
+                    <div className="flex-1">
+                        {error}
+                    </div>
+                    <button
+                        onClick={() => setError(null)}
+                        className="ml-3 text-red-500 hover:text-red-700 transition-colors p-1 rounded-md hover:bg-red-100"
+                        aria-label="Dismiss error"
+                    >
+                        <X className="h-4 w-4" />
+                    </button>
                 </div>
             )}
 
             {success && (
-                <div className="mb-6 p-4 bg-green-50 border-l-4 border-green-500 text-green-700 text-sm flex items-center gap-2">
-                    <CheckCircle2 className="h-4 w-4" />
-                    {success}
+                <div className="mb-6 p-4 bg-green-50 border-l-4 border-green-500 text-green-700 text-sm flex items-center justify-between">
+                    <div className="flex items-center gap-2 flex-1">
+                        <CheckCircle2 className="h-4 w-4" />
+                        {success}
+                    </div>
+                    <button
+                        onClick={() => setSuccess(null)}
+                        className="ml-3 text-green-500 hover:text-green-700 transition-colors p-1 rounded-md hover:bg-green-100"
+                        aria-label="Dismiss success message"
+                    >
+                        <X className="h-4 w-4" />
+                    </button>
                 </div>
             )}
 

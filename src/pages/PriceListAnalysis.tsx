@@ -62,10 +62,13 @@ export default function PriceListAnalysis() {
 
   const fetchClients = async () => {
     try {
+      setLoadingClients(true);
       const res = await api.get("/clients/approved");
       setClients(res.data);
     } catch (err) {
       console.error("Failed to fetch clients:", err);
+    } finally {
+      setLoadingClients(false);
     }
   };
 
@@ -213,6 +216,7 @@ export default function PriceListAnalysis() {
               setCurrentStep(2);
             }}
             error={error}
+            isLoading={loadingClients}
           />
         );
       case 2:

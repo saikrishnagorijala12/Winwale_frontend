@@ -304,7 +304,7 @@ export default function AddClientContractModal({
               type="button"
               onClick={step === 1 ? handleClose : handleBack}
               disabled={isSubmitting}
-              className="px-6 py-3 rounded-xl border-2 border-slate-300 font-bold text-slate-600 hover:bg-slate-100 transition-colors disabled:opacity-50"
+              className="btn-secondary"
             >
               {step === 1 ? "Cancel" : "Back"}
             </button>
@@ -312,7 +312,7 @@ export default function AddClientContractModal({
             <button
               type="submit"
               disabled={isSubmitting}
-              className="px-6 py-3 rounded-xl bg-linear-to-br from-[#38A1DB] to-[#2D8BBF] text-white font-bold shadow-lg hover:shadow-xl transition-all active:scale-95 flex items-center gap-2 disabled:opacity-60"
+              className="btn-primary"
             >
               {isSubmitting ? (
                 <>

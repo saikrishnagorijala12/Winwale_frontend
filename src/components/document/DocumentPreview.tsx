@@ -278,7 +278,7 @@ export const DocumentPreview = () => {
       <div className="mt-10 flex items-center justify-between pb-10 animate-slide-up">
         <button
           onClick={() => setCurrentStep("form-entry")}
-          className="flex items-center gap-2 px-6 py-3 rounded-xl border border-slate-200 bg-white text-slate-600 text-sm font-bold transition-all hover:bg-slate-50 active:scale-95 shadow-sm hover:text-slate-900"
+          className="btn-secondary"
         >
           <ChevronLeft className="w-4 h-4" strokeWidth={3} />
           Back to Form
