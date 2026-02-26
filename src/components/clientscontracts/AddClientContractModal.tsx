@@ -80,6 +80,14 @@ export default function AddClientContractModal({
     setClientErrors((prev) => ({ ...prev, [field]: undefined }));
   };
 
+  const handleContractChange = (data: ClientContractCreate) => {
+    setContractData(data);
+  };
+
+  const handleClearContractError = (field: keyof FormErrors) => {
+    setContractErrors((prev) => ({ ...prev, [field]: undefined }));
+  };
+
   const handleNext = (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -94,16 +102,9 @@ export default function AddClientContractModal({
       }
       setStep(3);
     } else if (step === 3) {
-      const errors: FormErrors = {};
-      const numErr = !contractData.contract_number
-        ? "Contract number is required"
-        : contractData.contract_number.length > 50
-          ? "Contract Number must be at most 50 characters"
-          : "";
-      if (numErr) errors.contract_number = numErr;
-
-      if (Object.keys(errors).length > 0) {
-        setContractErrors(errors);
+      const result = validateContractStep1(contractData, { skipClientId: true });
+      if (!result.isValid) {
+        setContractErrors(result.errors);
         return;
       }
       setContractErrors({});
@@ -278,7 +279,8 @@ export default function AddClientContractModal({
             {step === 3 && (
               <ContractStep1
                 contract={contractData}
-                onChange={setContractData}
+                onChange={handleContractChange}
+                onClearError={handleClearContractError}
                 clients={[]}
                 clientSearch={clientSearch}
                 setClientSearch={setClientSearch}
@@ -292,7 +294,8 @@ export default function AddClientContractModal({
             {step === 4 && (
               <ContractStep2
                 contract={contractData}
-                onChange={setContractData}
+                onChange={handleContractChange}
+                onClearError={handleClearContractError}
                 errors={contractErrors}
               />
             )}

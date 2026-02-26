@@ -120,7 +120,7 @@ export const ClientContractTable: React.FC<ClientContractTableProps> = ({
                   <div className="flex flex-col items-center gap-2">
                     <Loader2 className="w-8 h-8 animate-spin text-[#24578f]" />
                     <p className="text-sm text-slate-500 font-medium">
-                      Loading...
+                      Loading client contracts...
                     </p>
                   </div>
                 </td>
@@ -144,10 +144,11 @@ export const ClientContractTable: React.FC<ClientContractTableProps> = ({
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
                         <div
-                          className={`shrink-0 w-9 h-9 rounded-xl border border-slate-200 flex items-center justify-center text-white font-bold text-xs shadow-sm overflow-hidden ${client.logoUrl
-                            ? "bg-white"
-                            : "bg-linear-to-br from-[#3399cc] to-[#2980b9]"
-                            }`}
+                          className={`shrink-0 w-9 h-9 rounded-xl border border-slate-200 flex items-center justify-center text-white font-bold text-xs shadow-sm overflow-hidden ${
+                            client.logoUrl
+                              ? "bg-white"
+                              : "bg-linear-to-br from-[#3399cc] to-[#2980b9]"
+                          }`}
                         >
                           {client.logoUrl ? (
                             <img
@@ -394,9 +395,10 @@ export const ClientContractTable: React.FC<ClientContractTableProps> = ({
                     <button
                       onClick={() => onPageChange(Number(pageNum))}
                       className={`min-w-9 h-9 flex items-center justify-center rounded-lg text-sm font-bold transition-all
-                        ${currentPage === pageNum
-                          ? "bg-[#3399cc] text-white shadow-md shadow-[#3399cc]/30"
-                          : "text-slate-500 hover:bg-slate-100 hover:text-slate-900"
+                        ${
+                          currentPage === pageNum
+                            ? "bg-[#3399cc] text-white shadow-md shadow-[#3399cc]/30"
+                            : "text-slate-500 hover:bg-slate-100 hover:text-slate-900"
                         }`}
                     >
                       {pageNum}

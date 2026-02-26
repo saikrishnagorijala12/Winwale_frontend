@@ -8,6 +8,8 @@ import {
     ChevronLeft,
     ChevronRight,
     AlertCircle,
+    AlertTriangle,
+    Info,
     Loader2,
 } from "lucide-react";
 
@@ -17,7 +19,8 @@ interface FileUploadStepProps {
     previewData: any[] | null;
     totalRows: number;
     isParsingFile: boolean;
-    error: string | null;
+    error: React.ReactNode;
+    errorVariant?: "error" | "warning" | "info";
     onFileChange: (e: React.ChangeEvent<HTMLInputElement> | React.MouseEvent) => void;
     onFileDrop: (file: File) => void;
     onInvalidFile?: (reason: string) => void;
@@ -33,6 +36,7 @@ export const FileUploadStep = ({
     totalRows,
     isParsingFile,
     error,
+    errorVariant = "error",
     onFileChange,
     onFileDrop,
     onInvalidFile,
@@ -169,8 +173,22 @@ export const FileUploadStep = ({
                 )}
 
                 {error && (
-                    <div className="p-4 bg-red-50 text-red-700 rounded-xl flex items-center gap-2">
-                        <AlertCircle className="w-5 h-5" /> {error}
+                    <div
+                        className={`p-4 rounded-xl flex items-center gap-2 animate-in fade-in slide-in-from-top-1 ${errorVariant === "warning"
+                            ? "bg-amber-50 text-amber-700 border border-amber-100"
+                            : errorVariant === "info"
+                                ? "bg-blue-50 text-blue-700 border border-blue-100"
+                                : "bg-red-50 text-red-700 border border-red-100"
+                            }`}
+                    >
+                        {errorVariant === "warning" ? (
+                            <AlertTriangle className="w-5 h-5 shrink-0" />
+                        ) : errorVariant === "info" ? (
+                            <Info className="w-5 h-5 shrink-0" />
+                        ) : (
+                            <AlertCircle className="w-5 h-5 shrink-0" />
+                        )}
+                        <span className="text-sm font-medium">{error}</span>
                     </div>
                 )}
 

@@ -1,5 +1,5 @@
 import React from "react";
-import { Sparkles, Building2, FileSearch, FileText, Hash, ChevronLeft, Loader2, Play, AlertCircle } from "lucide-react";
+import { Sparkles, Building2, FileSearch, FileText, Hash, ChevronLeft, Loader2, Play, AlertCircle, AlertTriangle, Info } from "lucide-react";
 import { Client } from "../../types/pricelist.types";
 
 interface RunAnalysisStepProps {
@@ -7,7 +7,8 @@ interface RunAnalysisStepProps {
     uploadedFileName: string;
     totalRows: number;
     isAnalyzing: boolean;
-    error: string | null;
+    error: React.ReactNode;
+    errorVariant?: "error" | "warning" | "info";
     onBack: () => void;
     onRunAnalysis: () => void;
 }
@@ -18,6 +19,7 @@ export const RunAnalysisStep = ({
     totalRows,
     isAnalyzing,
     error,
+    errorVariant = "error",
     onBack,
     onRunAnalysis,
 }: RunAnalysisStepProps) => {
@@ -92,8 +94,22 @@ export const RunAnalysisStep = ({
                 </div>
 
                 {error && (
-                    <div className="p-4 bg-red-50 text-red-700 rounded-xl flex items-center gap-2">
-                        <AlertCircle className="w-5 h-5" /> {error}
+                    <div
+                        className={`p-4 rounded-xl flex items-center gap-2 animate-in fade-in slide-in-from-top-1 ${errorVariant === "warning"
+                            ? "bg-amber-50 text-amber-700 border border-amber-100"
+                            : errorVariant === "info"
+                                ? "bg-blue-50 text-blue-700 border border-blue-100"
+                                : "bg-red-50 text-red-700 border border-red-100"
+                            }`}
+                    >
+                        {errorVariant === "warning" ? (
+                            <AlertTriangle className="w-5 h-5 shrink-0" />
+                        ) : errorVariant === "info" ? (
+                            <Info className="w-5 h-5 shrink-0" />
+                        ) : (
+                            <AlertCircle className="w-5 h-5 shrink-0" />
+                        )}
+                        <span className="text-sm font-medium">{error}</span>
                     </div>
                 )}
 

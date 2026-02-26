@@ -199,7 +199,7 @@ export default function AppSidebar() {
           md:translate-x-0
         `}
       >
-        <div className="p-6 border-b border-slate-200 flex items-center justify-between">
+        <div className="p-6 flex items-center justify-between">
           <div
             onClick={() => {
               navigate("/dashboard");
@@ -287,7 +287,7 @@ export default function AppSidebar() {
         </nav>
 
         {/* Footer  */}
-        <div className="p-4 bg-slate-50/50 border-t border-slate-200">
+        <div className="p-4 bg-slate-50/50">
           <Link
             to="/settings"
             className="flex items-center gap-3 p-2.5 rounded-xl bg-white border border-slate-200 shadow-sm mb-3"

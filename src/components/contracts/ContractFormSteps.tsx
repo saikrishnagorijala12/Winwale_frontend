@@ -10,6 +10,7 @@ import { AlertCircle, X } from "lucide-react";
 interface Step1Props {
   contract: ClientContractCreate;
   onChange: (contract: ClientContractCreate) => void;
+  onClearError?: (field: keyof FormErrors) => void;
   clients: ClientListRead[];
   clientSearch: string;
   setClientSearch: (search: string) => void;
@@ -22,6 +23,7 @@ interface Step1Props {
 export function Step1({
   contract,
   onChange,
+  onClearError,
   clients,
   clientSearch,
   setClientSearch,
@@ -53,15 +55,16 @@ export function Step1({
         </label>
         <input
           type="text"
-          className={`w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 "
-          } outline-none`}
+          className={`w-full mt-2 px-4 py-3 rounded-xl border-2 transition-colors outline-none border-slate-200 "
+            }`}
           value={contract.contract_number}
-          onChange={(e) =>
-            onChange({ ...contract, contract_number: e.target.value })
-          }
+          onChange={(e) => {
+            onChange({ ...contract, contract_number: e.target.value });
+            onClearError?.("contract_number");
+          }}
         />
         {errors.contract_number && (
-          <div className="mt-1 text-xs text-red-600">
+          <div className="mt-1.5 text-xs text-red-600">
             <span>{errors.contract_number}</span>
           </div>
         )}
@@ -77,8 +80,8 @@ export function Step1({
             <input
               type="text"
               placeholder="Search by Client ID or Company Name"
-              className={`w-full mt-2 px-4 py-3 pr-10 rounded-xl border-2 border-slate-200  outline-none ${isClientSelected ? "bg-slate-50 cursor-not-allowed" : ""
-                }`}
+              className={`w-full mt-2 px-4 py-3 pr-10 rounded-xl border-2 transition-colors outline-none border-slate-200 "
+                } ${isClientSelected ? "bg-slate-50 cursor-not-allowed" : ""}`}
               value={clientSearch}
               readOnly={isClientSelected}
               onFocus={() => {
@@ -91,6 +94,7 @@ export function Step1({
                 setShowClientDropdown(true);
 
                 onChange({ ...contract, client_id: undefined });
+                onClearError?.("client_id");
               }}
             />
 
@@ -100,6 +104,7 @@ export function Step1({
                 className="absolute right-3 top-1/2 -translate-y-1/3 text-slate-400 hover:text-red-500"
                 onClick={() => {
                   onChange({ ...contract, client_id: undefined });
+                  onClearError?.("client_id");
                   setClientSearch("");
                   setShowClientDropdown(false);
                 }}
@@ -130,6 +135,7 @@ export function Step1({
                     className="w-full px-4 py-3 text-left hover:bg-blue-50 flex justify-between items-center"
                     onClick={() => {
                       onChange({ ...contract, client_id: client.client_id });
+                      onClearError?.("client_id");
                       setClientSearch(`${client.company_name}`);
                       setShowClientDropdown(false);
                     }}
@@ -145,23 +151,24 @@ export function Step1({
         </div>
       )}
 
-
       <div>
         <label className="text-sm font-bold text-slate-700">
           Contract Officer Name
         </label>
         <input
           type="text"
-          className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200  outline-none"
+          className={`w-full mt-2 px-4 py-3 rounded-xl border-2 transition-colors outline-none border-slate-200 "
+            }`}
           value={contract.contract_officer_name || ""}
-          onChange={(e) =>
-            onChange({ ...contract, contract_officer_name: e.target.value })
-          }
+          onChange={(e) => {
+            onChange({ ...contract, contract_officer_name: e.target.value });
+            onClearError?.("contract_officer_name");
+          }}
         />
         {errors.contract_officer_name && (
-          <p className="mt-1 text-xs text-red-600">
-            {errors.contract_officer_name}
-          </p>
+          <div className="mt-1 text-xs text-red-600">
+            <span>{errors.contract_officer_name}</span>
+          </div>
         )}
       </div>
 
@@ -171,16 +178,18 @@ export function Step1({
         </label>
         <input
           type="text"
-          className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200  outline-none"
+          className={`w-full mt-2 px-4 py-3 rounded-xl border-2 transition-colors outline-none border-slate-200 "
+            }`}
           value={contract.contract_officer_address || ""}
-          onChange={(e) =>
-            onChange({ ...contract, contract_officer_address: e.target.value })
-          }
+          onChange={(e) => {
+            onChange({ ...contract, contract_officer_address: e.target.value });
+            onClearError?.("contract_officer_address");
+          }}
         />
         {errors.contract_officer_address && (
-          <p className="mt-1 text-xs text-red-600">
-            {errors.contract_officer_address}
-          </p>
+          <div className="mt-1 text-xs text-red-600">
+            <span>{errors.contract_officer_address}</span>
+          </div>
         )}
       </div>
 
@@ -190,16 +199,18 @@ export function Step1({
         </label>
         <input
           type="text"
-          className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200  outline-none"
+          className={`w-full mt-2 px-4 py-3 rounded-xl border-2 transition-colors outline-none border-slate-200 "
+            }`}
           value={contract.contract_officer_city || ""}
-          onChange={(e) =>
-            onChange({ ...contract, contract_officer_city: e.target.value })
-          }
+          onChange={(e) => {
+            onChange({ ...contract, contract_officer_city: e.target.value });
+            onClearError?.("contract_officer_city");
+          }}
         />
         {errors.contract_officer_city && (
-          <p className="mt-1 text-xs text-red-600">
-            {errors.contract_officer_city}
-          </p>
+          <div className="mt-1 text-xs text-red-600">
+            <span>{errors.contract_officer_city}</span>
+          </div>
         )}
       </div>
 
@@ -208,32 +219,34 @@ export function Step1({
           <label className="text-sm font-bold text-slate-700">State</label>
           <input
             type="text"
-            className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200  outline-none"
+            className={`w-full mt-2 px-4 py-3 rounded-xl border-2 transition-colors outline-none border-slate-200 "
+              }`}
             value={contract.contract_officer_state || ""}
             onChange={(e) =>
               onChange({ ...contract, contract_officer_state: e.target.value })
             }
           />
           {errors.contract_officer_state && (
-            <p className="mt-1 text-xs text-red-600">
-              {errors.contract_officer_state}
-            </p>
+            <div className="mt-1 text-xs text-red-600">
+              <span>{errors.contract_officer_state}</span>
+            </div>
           )}
         </div>
         <div>
           <label className="text-sm font-bold text-slate-700">ZIP</label>
           <input
             type="text"
-            className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200  outline-none"
+            className={`w-full mt-2 px-4 py-3 rounded-xl border-2 transition-colors outline-none border-slate-200 "
+              }`}
             value={contract.contract_officer_zip || ""}
             onChange={(e) =>
               onChange({ ...contract, contract_officer_zip: e.target.value })
             }
           />
           {errors.contract_officer_zip && (
-            <p className="mt-1 text-xs text-red-600">
-              {errors.contract_officer_zip}
-            </p>
+            <div className="mt-1 text-xs text-red-600">
+              <span>{errors.contract_officer_zip}</span>
+            </div>
           )}
         </div>
       </div>
@@ -244,16 +257,23 @@ export function Step1({
 interface Step2Props {
   contract: ClientContractCreate;
   onChange: (contract: ClientContractCreate) => void;
+  onClearError?: (field: keyof FormErrors) => void;
   errors: FormErrors;
 }
 
-export function Step2({ contract, onChange, errors }: Step2Props) {
+export function Step2({
+  contract,
+  onChange,
+  onClearError,
+  errors,
+}: Step2Props) {
   return (
     <div className="grid md:grid-cols-2 gap-6">
       <div>
         <label className="text-sm font-bold text-slate-700">FOB Term</label>
         <select
-          className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200  outline-none bg-white"
+          className={`w-full mt-2 px-4 py-3 rounded-xl border-2 transition-colors outline-none bg-white border-slate-200 "
+            }`}
           value={contract.fob_term || "Origin"}
           onChange={(e) => onChange({ ...contract, fob_term: e.target.value })}
         >
@@ -262,7 +282,9 @@ export function Step2({ contract, onChange, errors }: Step2Props) {
           <option value="No Delivery">No Delivery</option>
         </select>
         {errors.fob_term && (
-          <p className="mt-1 text-xs text-red-600">{errors.fob_term}</p>
+          <div className="mt-1 text-xs text-red-600">
+            <span>{errors.fob_term}</span>
+          </div>
         )}
       </div>
 
@@ -271,20 +293,22 @@ export function Step2({ contract, onChange, errors }: Step2Props) {
           Energy Star Compliance
         </label>
         <select
-          className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200  outline-none bg-white"
+          className={`w-full mt-2 px-4 py-3 rounded-xl border-2 transition-colors outline-none bg-white border-slate-200 "
+            }`}
           value={contract.energy_star_compliance || "Yes"}
-          onChange={(e) =>
-            onChange({ ...contract, energy_star_compliance: e.target.value })
-          }
+          onChange={(e) => {
+            onChange({ ...contract, energy_star_compliance: e.target.value });
+            onClearError?.("energy_star_compliance");
+          }}
         >
           <option value="Yes">Yes</option>
           <option value="No">No</option>
           <option value="N/A">N/A</option>
         </select>
         {errors.energy_star_compliance && (
-          <p className="mt-1 text-xs text-red-600">
-            {errors.energy_star_compliance}
-          </p>
+          <div className="mt-1 text-xs text-red-600">
+            <span>{errors.energy_star_compliance}</span>
+          </div>
         )}
       </div>
       <div>
@@ -293,19 +317,21 @@ export function Step2({ contract, onChange, errors }: Step2Props) {
         </label>
         <input
           type="number"
-          className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200  outline-none"
+          className={`w-full mt-2 px-4 py-3 rounded-xl border-2 transition-colors outline-none border-slate-200 "
+            }`}
           value={contract.normal_delivery_time || 30}
-          onChange={(e) =>
+          onChange={(e) => {
             onChange({
               ...contract,
               normal_delivery_time: parseInt(e.target.value) || 0,
-            })
-          }
+            });
+            onClearError?.("normal_delivery_time");
+          }}
         />
         {errors.normal_delivery_time && (
-          <p className="mt-1 text-xs text-red-600">
-            {errors.normal_delivery_time}
-          </p>
+          <div className="mt-1 text-xs text-red-600">
+            <span>{errors.normal_delivery_time}</span>
+          </div>
         )}
       </div>
       <div>
@@ -314,19 +340,21 @@ export function Step2({ contract, onChange, errors }: Step2Props) {
         </label>
         <input
           type="number"
-          className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200  outline-none"
+          className={`w-full mt-2 px-4 py-3 rounded-xl border-2 transition-colors outline-none border-slate-200 "
+            }`}
           value={contract.expedited_delivery_time || 10}
-          onChange={(e) =>
+          onChange={(e) => {
             onChange({
               ...contract,
               expedited_delivery_time: parseInt(e.target.value) || 0,
-            })
-          }
+            });
+            onClearError?.("expedited_delivery_time");
+          }}
         />
         {errors.expedited_delivery_time && (
-          <p className="mt-1 text-xs text-red-600">
-            {errors.expedited_delivery_time}
-          </p>
+          <div className="mt-1 text-xs text-red-600">
+            <span>{errors.expedited_delivery_time}</span>
+          </div>
         )}
       </div>
       <div className="md:col-span-2">
@@ -334,14 +362,18 @@ export function Step2({ contract, onChange, errors }: Step2Props) {
           Quantity/Volume Discounts
         </label>
         <input
-          className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200  outline-none resize-none"
+          className={`w-full mt-2 px-4 py-3 rounded-xl border-2 transition-colors outline-none resize-none border-slate-200 "
+            }`}
           value={contract.q_v_discount || ""}
-          onChange={(e) =>
-            onChange({ ...contract, q_v_discount: e.target.value })
-          }
+          onChange={(e) => {
+            onChange({ ...contract, q_v_discount: e.target.value });
+            onClearError?.("q_v_discount");
+          }}
         />
         {errors.q_v_discount && (
-          <p className="mt-1 text-xs text-red-600">{errors.q_v_discount}</p>
+          <div className="mt-1 text-xs text-red-600">
+            <span>{errors.q_v_discount}</span>
+          </div>
         )}
       </div>
       <div className="md:col-span-2">
@@ -350,16 +382,18 @@ export function Step2({ contract, onChange, errors }: Step2Props) {
         </label>
         <textarea
           rows={2}
-          className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200  outline-none resize-none"
+          className={`w-full mt-2 px-4 py-3 rounded-xl border-2 transition-colors outline-none resize-none border-slate-200 "
+            }`}
           value={contract.additional_concessions || ""}
-          onChange={(e) =>
-            onChange({ ...contract, additional_concessions: e.target.value })
-          }
+          onChange={(e) => {
+            onChange({ ...contract, additional_concessions: e.target.value });
+            onClearError?.("additional_concessions");
+          }}
         />
         {errors.additional_concessions && (
-          <p className="mt-1 text-xs text-red-600">
-            {errors.additional_concessions}
-          </p>
+          <div className="mt-1 text-xs text-red-600">
+            <span>{errors.additional_concessions}</span>
+          </div>
         )}
       </div>
     </div>

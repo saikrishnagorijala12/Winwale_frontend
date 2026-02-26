@@ -1,14 +1,16 @@
 import React, { ChangeEvent, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 import api from "../lib/axios";
 import * as XLSX from "xlsx";
-import { exportPriceModifications, fetchAnalysisJobById } from "../services/analysisService";
+import {
+  exportPriceModifications,
+  fetchAnalysisJobById,
+} from "../services/analysisService";
 import { downloadBlob } from "../utils/downloadUtils";
 import { useAnalysis } from "../context/AnalysisContext";
 import { toast } from "sonner";
 import { processModifications } from "../utils/analysisUtils";
-
 
 import { AnalysisStepper } from "../components/pricelist-analysis/AnalysisStepper";
 import { ClientSelectionStep } from "../components/pricelist-analysis/ClientSelectionStep";
@@ -32,10 +34,12 @@ export default function PriceListAnalysis() {
   const [selectedClient, setSelectedClient] = useState<number | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
 
-
   const [clients, setClients] = useState<Client[]>([]);
   const [loadingClients, setLoadingClients] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<React.ReactNode | null>(null);
+  const [errorVariant, setErrorVariant] = useState<
+    "error" | "warning" | "info"
+  >("error");
 
   const [file, setFile] = useState<File | null>(null);
   const [uploadedFileName, setUploadedFileName] = useState<string>("");
@@ -118,6 +122,7 @@ export default function PriceListAnalysis() {
     setFile(selectedFile);
     setUploadedFileName(selectedFile.name);
     setError(null);
+    setErrorVariant("error");
     setPreviewData(null);
     setIsParsingFile(true);
 
@@ -149,6 +154,7 @@ export default function PriceListAnalysis() {
 
     setIsAnalyzing(true);
     setError(null);
+    setErrorVariant("error");
 
     const formData = new FormData();
     formData.append("file", file);
@@ -182,13 +188,12 @@ export default function PriceListAnalysis() {
     setPreviewData(null);
     setTotalRows(0);
     setError(null);
+    setErrorVariant("error");
     setActiveTab("NEW_PRODUCT"); // Reset active tab
     setCurrentPage(1); // Reset current page
   };
 
-  const activeClient = clients.find(
-    (c) => c.client_id === selectedClient,
-  );
+  const activeClient = clients.find((c) => c.client_id === selectedClient);
 
   const renderStepContent = () => {
     switch (currentStep) {
@@ -200,6 +205,7 @@ export default function PriceListAnalysis() {
             onClientSelect={(id) => {
               setSelectedClient(id);
               setError(null);
+              setErrorVariant("error");
             }}
             onContinue={() => {
               if (!activeClient) {
@@ -208,14 +214,26 @@ export default function PriceListAnalysis() {
               }
               if (!activeClient.has_products) {
                 setError(
-                  "Please complete uploading initial GSA products for selected client before running Price List Analysis.",
+                  <span>
+                    Please complete uploading initial GSA products for selected
+                    client before running Price List Analysis.{" "}
+                    <Link
+                      to="/gsa-products/upload"
+                      className="underline font-semibold hover:text-yellow-800 transition-colors"
+                    >
+                      Click here to upload
+                    </Link>
+                  </span>,
                 );
+                setErrorVariant("warning");
                 return;
               }
               setError(null);
+              setErrorVariant("error");
               setCurrentStep(2);
             }}
             error={error}
+            errorVariant={errorVariant}
             isLoading={loadingClients}
           />
         );
@@ -228,6 +246,7 @@ export default function PriceListAnalysis() {
             totalRows={totalRows}
             isParsingFile={isParsingFile}
             error={error}
+            errorVariant={errorVariant}
             onFileChange={handleFileChange}
             onFileDrop={handleFileDrop}
             onInvalidFile={(reason) => setError(reason)}
@@ -240,6 +259,7 @@ export default function PriceListAnalysis() {
             onContinue={() => {
               setCurrentStep(3);
               setError(null);
+              setErrorVariant("error");
             }}
             onClearFile={() => {
               setFile(null);
@@ -255,6 +275,7 @@ export default function PriceListAnalysis() {
             totalRows={totalRows}
             isAnalyzing={isAnalyzing}
             error={error}
+            errorVariant={errorVariant}
             onBack={() => {
               setCurrentStep(2);
               setUploadResult(null);
@@ -280,11 +301,13 @@ export default function PriceListAnalysis() {
             isLoading={isFetchingJob}
             onExport={async () => {
               try {
-                const date = new Date().toLocaleDateString("en-US", {
-                  month: "2-digit",
-                  day: "2-digit",
-                  year: "numeric",
-                }).replace(/\//g, "-");
+                const date = new Date()
+                  .toLocaleDateString("en-US", {
+                    month: "2-digit",
+                    day: "2-digit",
+                    year: "numeric",
+                  })
+                  .replace(/\//g, "-");
 
                 const clientName =
                   activeClient?.company_name.replace(/\s+/g, "-") || "Client";
@@ -303,7 +326,9 @@ export default function PriceListAnalysis() {
               }
             }}
             onReset={handleReset}
-            onGenerateDocuments={() => navigate(`/documents?job_id=${uploadResult?.job_id}`)}
+            onGenerateDocuments={() =>
+              navigate(`/documents?job_id=${uploadResult?.job_id}`)
+            }
           />
         );
       default:

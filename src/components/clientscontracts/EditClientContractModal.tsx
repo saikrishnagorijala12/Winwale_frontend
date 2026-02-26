@@ -118,6 +118,14 @@ export default function EditClientContractModal({
         setClientErrors((prev) => ({ ...prev, [field]: undefined }));
     };
 
+    const handleContractChange = (data: any) => {
+        setContractData(data);
+    };
+
+    const handleClearContractError = (field: keyof FormErrors) => {
+        setContractErrors((prev) => ({ ...prev, [field]: undefined }));
+    };
+
     const handleNext = (e: React.FormEvent) => {
         e.preventDefault();
 
@@ -132,16 +140,9 @@ export default function EditClientContractModal({
             }
             setStep(3);
         } else if (step === 3) {
-            const errors: FormErrors = {};
-            const numErr = !contractData.contract_number
-                ? "Contract number is required"
-                : contractData.contract_number.length > 50
-                    ? "Contract Number must be at most 50 characters"
-                    : "";
-            if (numErr) errors.contract_number = numErr;
-
-            if (Object.keys(errors).length > 0) {
-                setContractErrors(errors);
+            const result = validateContractStep2Step1(contractData, { skipClientId: true });
+            if (!result.isValid) {
+                setContractErrors(result.errors);
                 return;
             }
             setContractErrors({});
@@ -304,7 +305,8 @@ export default function EditClientContractModal({
                         {step === 3 && (
                             <ContractStep1
                                 contract={contractData}
-                                onChange={setContractData}
+                                onChange={handleContractChange}
+                                onClearError={handleClearContractError}
                                 clients={[]}
                                 clientSearch=""
                                 setClientSearch={() => { }}
@@ -318,7 +320,8 @@ export default function EditClientContractModal({
                         {step === 4 && (
                             <ContractStep2
                                 contract={contractData}
-                                onChange={setContractData}
+                                onChange={handleContractChange}
+                                onClearError={handleClearContractError}
                                 errors={contractErrors}
                             />
                         )}
