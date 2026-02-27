@@ -72,7 +72,7 @@ export const DocumentPreview = () => {
 
     try {
       await convertTiptapToDocx(editorJson, {
-        logoUrl: "/logo.png",
+        logoUrl: (formData.companyLogo as string),
         fileName: (() => {
           const clientName = (formData.companyName || "Client").toString();
           const contractNumber = (formData.contractNumber || "Contract")
@@ -219,11 +219,10 @@ export const DocumentPreview = () => {
             <button
               onClick={() => setIsEditingContent(!isEditingContent)}
               className={`flex items-center gap-2 px-5 py-2.5 rounded-xl transition-all active:scale-95 font-bold text-sm shadow-sm
-            ${
-              isEditingContent
-                ? "btn-primary"
-                : "bg-white text-slate-600 border border-slate-300 hover:bg-slate-50 hover:text-slate-900"
-            }`}
+            ${isEditingContent
+                  ? "btn-primary"
+                  : "bg-white text-slate-600 border border-slate-300 hover:bg-slate-50 hover:text-slate-900"
+                }`}
             >
               {isEditingContent ? (
                 <>
@@ -278,7 +277,7 @@ export const DocumentPreview = () => {
       <div className="mt-10 flex items-center justify-between pb-10 animate-slide-up">
         <button
           onClick={() => setCurrentStep("form-entry")}
-          className="btn-secondary"
+          className="flex items-center gap-2 px-6 py-3 rounded-xl border border-slate-200 bg-white text-slate-600 text-sm font-bold transition-all hover:bg-slate-50 active:scale-95 shadow-sm hover:text-slate-900"
         >
           <ChevronLeft className="w-4 h-4" strokeWidth={3} />
           Back to Form

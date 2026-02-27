@@ -1,7 +1,11 @@
 export const ProductDescriptiveChangeTemplate = ({ data }: { data: any }) => (
   <div className="relative text-[13px] leading-[1.6] text-foreground px-8 py-6">
-    <div className="absolute top-6 right-8">
-      <img src="logo.png" alt="Winvale" className="h-10 w-35 object-contain" />
+    <div className="absolute top-8 right-10">
+      <img
+        src={data.companyLogo}
+        alt="Company Logo"
+        className="h-[70px] w-auto object-contain"
+      />
     </div>
 
     <p className="mb-4">{data.submissionDate}</p>
@@ -30,8 +34,8 @@ export const ProductDescriptiveChangeTemplate = ({ data }: { data: any }) => (
     <p className="mb-4">
       The purpose of this letter is to request your approval of a product
       descriptive modification to GSA Schedule Contract{" "}
-      <strong>{data.contractNumber}</strong> under SIN{" "}
-      <strong>{data.sin_description_change}</strong>. The modification consists
+      <strong>{data.contractNumber}</strong> under{" "}
+      <strong>{data.totalSins}</strong> SIN(s) [<strong>{data.sin_description_change}</strong>]. The modification consists
       of descriptive changes for <strong>{data.descriptionChanged}</strong>{" "}
       item(s) due to <strong>{data.modificationRationale}</strong>. These
       revisions will not result in any changes to the GSA price.

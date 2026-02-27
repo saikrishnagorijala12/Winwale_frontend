@@ -4,8 +4,12 @@ export const PriceDecreaseEpaTemplate = ({ data }: { data: any }) => (
     style={{ fontFamily: "'Times New Roman', Times, serif" }}
   >
     {/* Logo */}
-    <div className="absolute top-6 right-8">
-      <img src="logo.png" alt="Winvale" className="h-10 w-35 object-contain" />
+    <div className="absolute top-8 right-10">
+      <img
+        src={data.companyLogo}
+        alt="Company Logo"
+        className="h-[70px] w-auto object-contain"
+      />
     </div>
 
     {/* Submission Date */}
@@ -40,8 +44,8 @@ export const PriceDecreaseEpaTemplate = ({ data }: { data: any }) => (
     <p className="mb-4">
       The purpose of this letter is to request your approval of a price
       reduction modification based on a Commercial Price List to GSA Schedule
-      Contract <strong>{data.contractNumber}</strong> under SIN{" "}
-      <strong>{data.sin_price_decrease}</strong>. This request is in accordance
+      Contract <strong>{data.contractNumber}</strong> under{" "}
+      <strong>{data.totalSins}</strong> SIN(s) [<strong>{data.sin_price_decrease}</strong>]. This request is in accordance
       with EPA Clause GSAM 538.270-4(a)(3). The modification consists of a price
       decrease of{" "}
       <strong>{data.requestedDecrease || data.priceDecreasePercent}%</strong>{" "}

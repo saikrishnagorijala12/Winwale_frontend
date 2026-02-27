@@ -3,8 +3,12 @@ export const PriceIncreaseEpaTemplate = ({ data }: { data: any }) => (
     className="relative text-[14px] leading-[1.6] text-foreground px-12 py-10"
     style={{ fontFamily: "'Times New Roman', Times, serif" }}
   >
-    <div className="absolute top-6 right-8">
-      <img src="logo.png" alt="Winvale" className="h-10 w-35 object-contain" />
+    <div className="absolute top-8 right-10">
+      <img
+        src={data.companyLogo}
+        alt="Company Logo"
+        className="h-[70px] w-auto object-contain"
+      />
     </div>
 
     <p className="mb-6">{data.submissionDate}</p>
@@ -34,8 +38,8 @@ export const PriceIncreaseEpaTemplate = ({ data }: { data: any }) => (
     <p className="mb-4">
       The purpose of this letter is to request your approval of an Economic
       Price Adjustment (EPA) increase based on a Commercial Price List to GSA
-      Schedule Contract <strong>{data.contractNumber}</strong> under SIN{" "}
-      <strong>{data.sin_price_increase}</strong>. This request is in accordance
+      Schedule Contract <strong>{data.contractNumber}</strong> under{" "}
+      <strong>{data.totalSins}</strong> SIN(s) [<strong>{data.sin_price_increase}</strong>]. This request is in accordance
       with EPA Clause GSAM 538.270-4(a)(3). The modification consists of a price
       increase of{" "}
       <strong>{data.requestedIncrease || data.priceIncreasePercent}%</strong>{" "}

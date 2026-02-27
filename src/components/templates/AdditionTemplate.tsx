@@ -3,8 +3,12 @@ export const AdditionTemplate = ({ data }: { data: any }) => (
     className="relative text-[14px] leading-[1.6] text-foreground px-12 py-10"
     style={{ fontFamily: "'Times New Roman', Times, serif" }}
   >
-    <div className="absolute top-6 right-8">
-      <img src="logo.png" alt="Winvale" className="h-10 w-10" />
+    <div className="absolute top-8 right-10">
+      <img
+        src={data.companyLogo}
+        alt="Company Logo"
+        className="h-[70px] w-auto object-contain"
+      />
     </div>
 
     <p className="mb-6">{data.submissionDate}</p>
@@ -36,8 +40,8 @@ export const AdditionTemplate = ({ data }: { data: any }) => (
       Modification to GSA Schedule Contract{" "}
       <strong>{data.contractNumber}</strong>.{" "}
       <strong>{data.companyName}</strong> would like to add{" "}
-      <strong>{data.numberOfProductsAdded}</strong> products under SIN(s){" "}
-      <strong>{data.sin_additions}</strong>. We would like to add these products
+      <strong>{data.numberOfProductsAdded}</strong> products under{" "}
+      <strong>{data.totalSins}</strong> SIN(s) [<strong>{data.sin_additions}</strong>]. We would like to add these products
       because <strong>{data.additionRationale}</strong>.
     </p>
 

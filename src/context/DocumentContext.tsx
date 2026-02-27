@@ -28,6 +28,7 @@ const mapJobDetailsToForm = (api: any) => {
 
   return {
     companyName: client.company_name,
+    companyLogo: client.logo,
     contractNumber: contract.contract_number,
 
     contractorName: contract.contract_officer_name,
@@ -74,6 +75,30 @@ const mapJobDetailsToForm = (api: any) => {
     priceDecreased: modificationSummary.price_decreased,
     requestedIncrease: modificationSummary.price_increased > 0 ? "" : undefined,
     requestedDecrease: modificationSummary.price_decreased > 0 ? "" : undefined,
+
+    totalSins: api.total_sins,
+    ...(() => {
+      const getFormatted = (actionKey: string, fallbackGroups: any) => {
+        const actionSins = api.sin_groups_by_action?.[actionKey];
+        if (Array.isArray(actionSins)) return actionSins.join(", ");
+
+        if (Array.isArray(fallbackGroups)) return fallbackGroups.join(", ");
+        if (fallbackGroups && typeof fallbackGroups === "object")
+          return Object.keys(fallbackGroups).join(", ");
+        return "";
+      };
+
+      const legacyGroups = api.sin_groups;
+
+      return {
+        sinsFormatted: getFormatted("ALL", legacyGroups), // Or join all actions
+        sin_additions: getFormatted("ADDED_PRODUCT", legacyGroups),
+        sin_deletions: getFormatted("REMOVED_PRODUCT", legacyGroups),
+        sin_price_increase: getFormatted("PRICE_INCREASE", legacyGroups),
+        sin_price_decrease: getFormatted("PRICE_DECREASE", legacyGroups),
+        sin_description_change: getFormatted("DESCRIPTION_CHANGE", legacyGroups),
+      };
+    })(),
   };
 };
 
@@ -159,6 +184,11 @@ export const DocumentProvider: React.FC<{ children: React.ReactNode }> = ({
               merged[key] = newValues[key];
             }
           });
+
+          if (mappedData.companyLogo) {
+            merged.companyLogo = mappedData.companyLogo;
+          }
+
           return merged;
         });
       } catch (error) {

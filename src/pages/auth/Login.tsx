@@ -41,7 +41,6 @@ const Login: React.FC = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (loading || isAuthProcessed.current) return;
@@ -60,7 +59,7 @@ const Login: React.FC = () => {
 
       if (nextStep.signInStep === "CONFIRM_SIGN_UP") {
         navigate(`/verify-email?email=${encodeURIComponent(email.trim())}`, {
-          state: { password }
+          state: { password },
         });
         return;
       }
@@ -70,19 +69,31 @@ const Login: React.FC = () => {
       try {
         await refreshUser();
       } catch (refreshErr: any) {
+        isAuthProcessed.current = false;
         const msg = refreshErr.message || "";
-        if (msg.includes("UserNotConfirmedException") || msg.includes("NotConfirmed")) {
-          navigate(`/verify-email?email=${encodeURIComponent(email.trim())}`, {
-            state: { password }
-          });
+        if (!refreshErr.response) {
+          setError("Server is currently unavailable. Please try again later.");
           return;
         }
-        setError(refreshErr.message || "Login successful, but profile could not be loaded.");
+
+        if (refreshErr.response.status >= 500) {
+          setError("Server error. Please try again later.");
+          return;
+        }
+
+        if (refreshErr.response.status === 401) {
+          setError("Session expired. Please log in again.");
+          return;
+        }
+        setError(
+          refreshErr.response?.data?.message ||
+            "Login successful, but profile could not be loaded.",
+        );
       }
     } catch (err: any) {
       if (err.name === "UserNotConfirmedException") {
         navigate(`/verify-email?email=${encodeURIComponent(email.trim())}`, {
-          state: { password }
+          state: { password },
         });
         return;
       }
@@ -103,7 +114,7 @@ const Login: React.FC = () => {
         return;
       }
       setError(
-        err?.message || "Failed to sign in. Please check your credentials."
+        err?.message || "Failed to sign in. Please check your credentials.",
       );
     } finally {
       setLoading(false);
@@ -111,12 +122,13 @@ const Login: React.FC = () => {
   };
 
   return (
-    <AuthLayout title="Welcome back" subtitle="Sign in to access your dashboard">
+    <AuthLayout
+      title="Welcome back"
+      subtitle="Sign in to access your dashboard"
+    >
       {error && (
         <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 text-sm flex items-center justify-between">
-          <div className="flex-1">
-            {error}
-          </div>
+          <div className="flex-1">{error}</div>
           <button
             onClick={() => setError(null)}
             className="ml-3 text-red-500 hover:text-red-700 transition-colors p-1 rounded-md hover:bg-red-100"
@@ -203,11 +215,7 @@ const Login: React.FC = () => {
           disabled={loading}
           className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-[#3498db] hover:bg-[#2980b9] text-white font-semibold rounded-xl shadow-lg shadow-blue-500/30 transition-all active:scale-[0.98] disabled:opacity-70"
         >
-          {loading ? (
-            <Loader2 className="h-5 w-5 animate-spin" />
-          ) : (
-            "Sign in"
-          )}
+          {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : "Sign in"}
         </button>
       </form>
 
