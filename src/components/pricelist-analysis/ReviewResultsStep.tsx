@@ -16,6 +16,7 @@ interface ReviewResultsStepProps {
     onReset: () => void;
     onGenerateDocuments: () => void;
     isLoading?: boolean;
+    isExporting?: boolean;
 }
 
 export const ReviewResultsStep = ({
@@ -31,6 +32,7 @@ export const ReviewResultsStep = ({
     onReset,
     onGenerateDocuments,
     isLoading = false,
+    isExporting = false,
 }: ReviewResultsStepProps) => {
     return (
         <div className="space-y-6">
@@ -45,6 +47,7 @@ export const ReviewResultsStep = ({
                 onPageChange={onPageChange}
                 onExport={onExport}
                 isLoading={isLoading}
+                isExporting={isExporting}
             />
 
             <div className="flex justify-between items-center pt-4">

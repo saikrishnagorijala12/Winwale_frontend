@@ -64,7 +64,7 @@ export const navSections = [
       //   roles: [ROLES.ADMIN, ROLES.USER],
       // },
       {
-        to: "/client-contracts",
+        to: "/client-profiles",
         icon: FileText,
         label: "Client Profiles",
         roles: [ROLES.ADMIN, ROLES.USER],

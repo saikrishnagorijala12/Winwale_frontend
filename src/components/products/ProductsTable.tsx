@@ -2,7 +2,7 @@ import React from "react";
 import { Loader2, Inbox } from "lucide-react";
 import { Product, Client } from "../../types/product.types";
 import ProductTableRow from "./ProductTableRow";
-import Pagination from "./Pagination";
+import Pagination from "../shared/Pagination";
 
 interface ProductsTableProps {
   products: Product[];
@@ -98,16 +98,13 @@ export default function ProductsTable({
         </table>
       </div>
 
-      {totalItems > itemsPerPage && (
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          itemsPerPage={itemsPerPage}
-          startIndex={startIndex}
-          totalItems={totalItems}
-          onPageChange={onPageChange}
-        />
-      )}
+      <Pagination
+        currentPage={currentPage}
+        totalItems={totalItems}
+        itemsPerPage={itemsPerPage}
+        onPageChange={onPageChange}
+        label="products"
+      />
     </div>
   );
 }

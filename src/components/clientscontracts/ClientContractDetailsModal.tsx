@@ -22,6 +22,7 @@ import api from "../../lib/axios";
 import { Client } from "../../types/client.types";
 import { ClientContractRead } from "../../types/contract.types";
 import StatusBadge from "../shared/StatusBadge";
+import { useClickOutside } from "../../hooks/useClickOutside";
 
 interface ClientContractDetailsModalProps {
   client: Client | null;
@@ -91,6 +92,9 @@ export const ClientContractDetailsModal: React.FC<
 > = ({ client, contract, onClose, onEdit, onSuccess }) => {
   const [isUploading, setIsUploading] = React.useState(false);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
+  const modalRef = React.useRef<HTMLDivElement>(null);
+
+  useClickOutside(modalRef, onClose);
 
   if (!client) return null;
 
@@ -141,16 +145,18 @@ export const ClientContractDetailsModal: React.FC<
 
   return (
     <div className="fixed inset-0 bg-slate-900/40 z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-5xl w-full max-h-[92vh] overflow-hidden flex flex-col animate-in fade-in zoom-in duration-200">
+      <div
+        ref={modalRef}
+        className="bg-white rounded-2xl shadow-2xl max-w-5xl w-full max-h-[92vh] overflow-hidden flex flex-col animate-in fade-in zoom-in duration-200"
+      >
         <div className="p-6 md:p-8 border-b border-slate-100 flex items-start justify-between">
           <div className="flex items-center gap-6">
             <div className="relative group">
               <div
-                className={`w-16 h-16 rounded-2xl border border-slate-200 flex items-center justify-center text-white font-bold text-2xl shadow-lg shadow-blue-100 overflow-hidden ${
-                  client.logoUrl
+                className={`w-16 h-16 rounded-2xl border border-slate-200 flex items-center justify-center text-white font-bold text-2xl shadow-lg shadow-blue-100 overflow-hidden ${client.logoUrl
                     ? "bg-slate-50/50"
                     : "bg-linear-to-br from-[#3399cc] to-[#2980b9]"
-                }`}
+                  }`}
               >
                 {client.logoUrl ? (
                   <img

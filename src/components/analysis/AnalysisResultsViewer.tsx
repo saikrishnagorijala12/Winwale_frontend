@@ -13,6 +13,7 @@ import {
 import { ModificationAction } from "../../types/analysis.types";
 import { StatCard } from "../pricelist-analysis/StatCard";
 import ConfirmationModal from "../shared/ConfirmationModal";
+import Pagination from "../shared/Pagination";
 
 const tabs = [
     {
@@ -88,21 +89,6 @@ export const AnalysisResultsViewer = ({
         }
     }, [actionSummary]);
 
-    const getPageNumbers = (totalPages: number) => {
-        const pages: (number | "...")[] = [];
-        if (totalPages <= 7) {
-            for (let i = 1; i <= totalPages; i++) pages.push(i);
-            return pages;
-        }
-        pages.push(1);
-        if (currentPage > 4) pages.push("...");
-        const start = Math.max(2, currentPage - 1);
-        const end = Math.min(totalPages - 1, currentPage + 1);
-        for (let i = start; i <= end; i++) pages.push(i);
-        if (currentPage < totalPages - 3) pages.push("...");
-        pages.push(totalPages);
-        return pages;
-    };
 
     const isDescChange = activeTab === "DESCRIPTION_CHANGE";
     const isPriceChange =
@@ -122,7 +108,7 @@ export const AnalysisResultsViewer = ({
                     setIsConfirmExportOpen(false);
                 }}
                 title="Export Analysis Results"
-                message="This will download all modification categories as an Excel file."
+                message="This will download the selected modification categories as an Excel file."
                 confirmText="Yes, Export"
                 cancelText="Cancel"
                 isSubmitting={isExporting}
@@ -360,68 +346,12 @@ export const AnalysisResultsViewer = ({
                     </div>
                 </div>
 
-                {totalActions > itemsPerPage && (
-                    <div className="px-6 py-5 bg-white border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
-                        <div className="text-sm text-slate-500 font-medium">
-                            Showing{" "}
-                            <span className="text-slate-900 font-semibold">
-                                {startIndex + 1}
-                            </span>{" "}
-                            to{" "}
-                            <span className="text-slate-900 font-semibold">
-                                {Math.min(startIndex + itemsPerPage, totalActions)}
-                            </span>{" "}
-                            of{" "}
-                            <span className="text-slate-900 font-semibold">
-                                {totalActions}
-                            </span>{" "}
-                            results
-                        </div>
-
-                        <div className="flex items-center gap-1.5">
-                            <button
-                                disabled={currentPage === 1}
-                                onClick={() => onPageChange(currentPage - 1)}
-                                className="p-2 rounded-lg border border-slate-200 text-slate-400 hover:bg-slate-50 hover:text-slate-600 disabled:opacity-30 disabled:hover:bg-transparent transition-all mr-2"
-                            >
-                                <ChevronLeft size={18} />
-                            </button>
-
-                            <div className="flex items-center gap-1">
-                                {getPageNumbers(totalPages).map((page, idx) =>
-                                    page === "..." ? (
-                                        <span
-                                            key={idx}
-                                            className="min-w-9 h-9 flex items-center justify-center text-slate-400 font-bold"
-                                        >
-                                            …
-                                        </span>
-                                    ) : (
-                                        <button
-                                            key={idx}
-                                            onClick={() => onPageChange(page as number)}
-                                            className={`min-w-9 h-9 flex items-center justify-center rounded-lg text-sm font-bold transition-all
-      ${currentPage === page
-                                                    ? "bg-[#3399cc] text-white shadow-md shadow-[#3399cc]/30"
-                                                    : "text-slate-500 hover:bg-slate-100 hover:text-slate-900"
-                                                }`}
-                                        >
-                                            {page}
-                                        </button>
-                                    ),
-                                )}
-                            </div>
-
-                            <button
-                                disabled={currentPage === totalPages}
-                                onClick={() => onPageChange(currentPage + 1)}
-                                className="p-2 rounded-lg border border-slate-200 text-slate-400 hover:bg-slate-50 hover:text-slate-600 disabled:opacity-30 disabled:hover:bg-transparent transition-all ml-2"
-                            >
-                                <ChevronRight size={18} />
-                            </button>
-                        </div>
-                    </div>
-                )}
+                <Pagination
+                    currentPage={currentPage}
+                    totalItems={totalActions}
+                    itemsPerPage={itemsPerPage}
+                    onPageChange={onPageChange}
+                />
             </div>
         </div>
     );

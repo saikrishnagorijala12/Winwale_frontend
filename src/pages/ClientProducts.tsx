@@ -16,6 +16,8 @@ import { Product } from "../types/product.types";
 import { productService } from "../services/productService";
 import { toast } from "sonner";
 import { useDebounce } from "../hooks/useDebounce";
+import StatusBadge from "../components/shared/StatusBadge";
+import Pagination from "../components/shared/Pagination";
 
 export default function ClientProducts() {
   const navigate = useNavigate();
@@ -227,80 +229,13 @@ export default function ClientProducts() {
               </tbody>
             </table>
           </div>
-          {totalPages > 1 && (
-            <div className="flex items-center justify-between px-6 py-5 bg-white border-t border-slate-100">
-              <div className="hidden sm:block">
-                <p className="text-sm text-slate-500">
-                  Showing{" "}
-                  <span className="font-semibold text-slate-900">
-                    {startIndex + 1}
-                  </span>{" "}
-                  to{" "}
-                  <span className="font-semibold text-slate-900">
-                    {Math.min(
-                      startIndex + itemsPerPage,
-                      totalItems,
-                    )}
-                  </span>{" "}
-                  of{" "}
-                  <span className="font-semibold text-slate-900">
-                    {totalItems}
-                  </span>{" "}
-                  products
-                </p>
-              </div>
-
-              <div className="flex items-center gap-1.5">
-                <button
-                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                  disabled={currentPage === 1}
-                  className="inline-flex items-center justify-center w-10 h-10 rounded-xl border border-slate-200 bg-white text-slate-600 transition-all hover:bg-slate-50 hover:border-slate-300 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white active:scale-95"
-                >
-                  <ChevronLeft size={18} />
-                </button>
-
-                <div className="flex items-center gap-1.5 mx-1">
-                  {Array.from({ length: totalPages }, (_, i) => i + 1)
-                    .filter((page) => {
-                      return (
-                        page === 1 ||
-                        page === totalPages ||
-                        (page >= currentPage - 1 && page <= currentPage + 1)
-                      );
-                    })
-                    .map((page, index, array) => (
-                      <React.Fragment key={page}>
-                        {index > 0 && array[index - 1] !== page - 1 && (
-                          <span className="px-2 text-slate-400 font-medium">
-                            ...
-                          </span>
-                        )}
-
-                        <button
-                          onClick={() => setCurrentPage(page)}
-                          className={`inline-flex items-center justify-center min-w-10 h-10 px-3 rounded-xl text-sm font-bold transition-all active:scale-95 ${page === currentPage
-                            ? "bg-[#3399cc] text-white shadow-blue-200 "
-                            : "bg-transparent text-slate-600 hover:bg-slate-100 hover:text-slate-900"
-                            }`}
-                        >
-                          {page}
-                        </button>
-                      </React.Fragment>
-                    ))}
-                </div>
-
-                <button
-                  onClick={() =>
-                    setCurrentPage((p) => Math.min(totalPages, p + 1))
-                  }
-                  disabled={currentPage === totalPages}
-                  className="inline-flex items-center justify-center w-10 h-10 rounded-xl border border-slate-200 bg-white text-slate-600 transition-all hover:bg-slate-50 hover:border-slate-300 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white active:scale-95"
-                >
-                  <ChevronRight size={18} />
-                </button>
-              </div>
-            </div>
-          )}
+          <Pagination
+            currentPage={currentPage}
+            totalItems={totalItems}
+            itemsPerPage={itemsPerPage}
+            onPageChange={setCurrentPage}
+            label="products"
+          />
         </div>
       </div>
       {selectedProduct && (

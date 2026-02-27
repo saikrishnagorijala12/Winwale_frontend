@@ -323,7 +323,7 @@ export default function UnifiedAdminDashboard() {
 
             <div className="space-y-3">
               {[
-                { label: "Manage Client Profiles", icon: FileText, to: "/client-contracts" },
+                { label: "Manage Client Profiles", icon: FileText, to: "/client-profiles" },
                 { label: "View Products List", icon: Package, to: "/gsa-products" },
                 { label: "Upload Product Catalog", icon: Upload, to: "/gsa-products/upload" },
               ].map((action) => (

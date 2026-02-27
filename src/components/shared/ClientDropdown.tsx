@@ -72,10 +72,7 @@ export const ClientDropdown: React.FC<ClientDropdownProps> = ({
           disabled
             ? "opacity-60 cursor-not-allowed bg-slate-50"
             : "cursor-pointer"
-        } ${
-          isOpen
-            ? "border-[#3399cc] ring-4 ring-[#3399cc]/10 shadow-lg shadow-[#3399cc]/5"
-            : "border-slate-200 hover:border-slate-300"
+        } border-slate-200 hover:border-slate-300"
         }`}
       >
         <div className="flex items-center text-sm gap-3 w-full overflow-hidden">

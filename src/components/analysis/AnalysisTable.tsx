@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import ModificationsSummary from "./ModificationsSummary";
 import AnalysisActionsMenu from "./AnalysisActionsMenu";
-import Pagination from "./Pagination";
+import Pagination from "../shared/Pagination";
 import { useAnalysis } from "../../context/AnalysisContext";
 import { normalizeStatus } from "../../utils/statusUtils";
 import StatusBadge from "../shared/StatusBadge";
@@ -141,10 +141,11 @@ export default function AnalysisTable({
                       <td className="p-4">
                         <div className="flex items-center gap-3">
                           <div
-                            className={`shrink-0 w-9 h-9 rounded-xl border border-slate-200 flex items-center justify-center text-white font-bold text-xs shadow-sm overflow-hidden ${item.client_logo_url
-                              ? "bg-white"
-                              : "bg-linear-to-br from-[#3399cc] to-[#2980b9]"
-                              }`}
+                            className={`shrink-0 w-9 h-9 rounded-xl border border-slate-200 flex items-center justify-center text-white font-bold text-xs shadow-sm overflow-hidden ${
+                              item.client_logo_url
+                                ? "bg-white"
+                                : "bg-linear-to-br from-[#3399cc] to-[#2980b9]"
+                            }`}
                           >
                             {item.client_logo_url ? (
                               <img
@@ -152,8 +153,10 @@ export default function AnalysisTable({
                                 alt={item.client || "Client"}
                                 className="w-full h-full object-contain"
                               />
+                            ) : item.client ? (
+                              item.client.substring(0, 2).toUpperCase()
                             ) : (
-                              item.client ? item.client.substring(0, 2).toUpperCase() : <Building2 className="h-4 w-4" />
+                              <Building2 className="h-4 w-4" />
                             )}
                           </div>
 
@@ -196,32 +199,36 @@ export default function AnalysisTable({
                         </span>
                       </td>
 
-                      <td className="p-4 relative">
+                      <td className="p-4">
                         <div className="flex justify-end">
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setOpenMenuId(
-                                openMenuId === item.job_id ? null : item.job_id,
-                              );
-                            }}
-                            className="p-2 hover:bg-slate-100 rounded-full transition-colors text-slate-500"
-                          >
-                            <MoreVertical className="w-5 h-5" />
-                          </button>
+                          <div className="relative">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setOpenMenuId(
+                                  openMenuId === item.job_id
+                                    ? null
+                                    : item.job_id,
+                                );
+                              }}
+                              className="p-2 hover:bg-slate-200 rounded-xl transition-colors text-slate-500"
+                            >
+                              <MoreVertical className="w-5 h-5" />
+                            </button>
 
-                          {openMenuId === item.job_id && (
-                            <AnalysisActionsMenu
-                              item={item}
-                              updatingId={updatingId}
-                              onUpdateStatus={onUpdateStatus}
-                              onClose={() => setOpenMenuId(null)}
-                              openUpwards={
-                                analysisHistory.indexOf(item) >=
-                                analysisHistory.length - 3
-                              }
-                            />
-                          )}
+                            {openMenuId === item.job_id && (
+                              <AnalysisActionsMenu
+                                item={item}
+                                updatingId={updatingId}
+                                onUpdateStatus={onUpdateStatus}
+                                onClose={() => setOpenMenuId(null)}
+                                openUpwards={
+                                  analysisHistory.indexOf(item) >=
+                                  analysisHistory.length - 3
+                                }
+                              />
+                            )}
+                          </div>
                         </div>
                       </td>
                     </tr>
@@ -231,15 +238,13 @@ export default function AnalysisTable({
             </tbody>
           </table>
         </div>
-        {totalItems > itemsPerPage && (
-          <Pagination
-            currentPage={currentPage}
-            setCurrentPage={setCurrentPage}
-            totalItems={totalItems}
-            itemsPerPage={itemsPerPage}
-            startIndex={startIndex}
-          />
-        )}
+        <Pagination
+          currentPage={currentPage}
+          totalItems={totalItems}
+          itemsPerPage={itemsPerPage}
+          onPageChange={setCurrentPage}
+          label="analyses"
+        />
       </div>
 
       {/* Mobile/Tablet Card View */}
@@ -289,39 +294,42 @@ export default function AnalysisTable({
                     </div>
                     <div className="flex items-center gap-2">
                       <StatusBadge status={item.status} />
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setOpenMenuId(
-                            openMenuId === item.job_id ? null : item.job_id,
-                          );
-                        }}
-                        className="p-2 hover:bg-slate-100 rounded-full transition-colors text-slate-500"
-                      >
-                        <MoreVertical className="w-5 h-5" />
-                      </button>
-                      {openMenuId === item.job_id && (
-                        <AnalysisActionsMenu
-                          item={item}
-                          updatingId={updatingId}
-                          onUpdateStatus={onUpdateStatus}
-                          onClose={() => setOpenMenuId(null)}
-                          openUpwards={
-                            analysisHistory.indexOf(item) >=
-                            analysisHistory.length - 3
-                          }
-                        />
-                      )}
+                      <div className="relative">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setOpenMenuId(
+                              openMenuId === item.job_id ? null : item.job_id,
+                            );
+                          }}
+                          className="p-2 hover:bg-slate-100 rounded-full transition-colors text-slate-500"
+                        >
+                          <MoreVertical className="w-5 h-5" />
+                        </button>
+                        {openMenuId === item.job_id && (
+                          <AnalysisActionsMenu
+                            item={item}
+                            updatingId={updatingId}
+                            onUpdateStatus={onUpdateStatus}
+                            onClose={() => setOpenMenuId(null)}
+                            openUpwards={
+                              analysisHistory.indexOf(item) >=
+                              analysisHistory.length - 3
+                            }
+                          />
+                        )}
+                      </div>
                     </div>
                   </div>
 
                   {/* Client Info */}
                   <div className="flex items-center gap-3 mb-3">
                     <div
-                      className={`shrink-0 w-10 h-10 rounded-xl border border-slate-200 flex items-center justify-center text-white font-bold text-sm shadow-sm overflow-hidden ${item.client_logo_url
-                        ? "bg-white"
-                        : "bg-linear-to-br from-[#3399cc] to-[#2980b9]"
-                        }`}
+                      className={`shrink-0 w-10 h-10 rounded-xl border border-slate-200 flex items-center justify-center text-white font-bold text-sm shadow-sm overflow-hidden ${
+                        item.client_logo_url
+                          ? "bg-white"
+                          : "bg-linear-to-br from-[#3399cc] to-[#2980b9]"
+                      }`}
                     >
                       {item.client_logo_url ? (
                         <img
@@ -329,8 +337,10 @@ export default function AnalysisTable({
                           alt={item.client || "Client"}
                           className="w-full h-full object-contain"
                         />
+                      ) : item.client ? (
+                        item.client.substring(0, 2).toUpperCase()
                       ) : (
-                        item.client ? item.client.substring(0, 2).toUpperCase() : <Building2 className="h-5 w-5" />
+                        <Building2 className="h-5 w-5" />
                       )}
                     </div>
                     <div className="leading-tight min-w-0 flex-1">
@@ -364,17 +374,13 @@ export default function AnalysisTable({
           </div>
         )}
 
-        {totalItems > itemsPerPage && (
-          <div className="border-t border-slate-100">
-            <Pagination
-              currentPage={currentPage}
-              setCurrentPage={setCurrentPage}
-              totalItems={totalItems}
-              itemsPerPage={itemsPerPage}
-              startIndex={startIndex}
-            />
-          </div>
-        )}
+        <Pagination
+          currentPage={currentPage}
+          totalItems={totalItems}
+          itemsPerPage={itemsPerPage}
+          onPageChange={setCurrentPage}
+          label="analyses"
+        />
       </div>
     </div>
   );

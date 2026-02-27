@@ -33,6 +33,7 @@ export default function PriceListAnalysis() {
   const [currentStep, setCurrentStep] = useState(1);
   const [selectedClient, setSelectedClient] = useState<number | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
 
   const [clients, setClients] = useState<Client[]>([]);
   const [loadingClients, setLoadingClients] = useState<boolean>(true);
@@ -292,14 +293,16 @@ export default function PriceListAnalysis() {
             totalPages={jobDetails?.total_pages || 0}
             currentPage={currentPage}
             activeTab={activeTab}
+            isLoading={isFetchingJob}
+            isExporting={isExporting}
             onTabChange={(tab) => {
               setActiveTab(tab);
               setCurrentPage(1);
             }}
             onPageChange={(page) => setCurrentPage(page)}
-            isLoading={isFetchingJob}
             onExport={async (selectedTypes) => {
               try {
+                setIsExporting(true);
                 const date = new Date()
                   .toLocaleDateString("en-US", {
                     month: "2-digit",
@@ -314,7 +317,6 @@ export default function PriceListAnalysis() {
                 const fileName = `${clientName}_${contract}_modifications_${date}.xlsx`;
 
                 const blob = await exportPriceModifications({
-                  client_id: selectedClient,
                   job_id: uploadResult?.job_id,
                   types: selectedTypes,
                 });
@@ -323,6 +325,8 @@ export default function PriceListAnalysis() {
               } catch (error) {
                 console.error("Export failed:", error);
                 toast.error("Failed to export analysis");
+              } finally {
+                setIsExporting(false);
               }
             }}
             onReset={handleReset}

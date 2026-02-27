@@ -407,7 +407,7 @@ export default function Dashboard() {
                 {
                   label: "Manage Client Profiles",
                   icon: FileText,
-                  to: "/client-contracts",
+                  to: "/client-profiles",
                 },
                 {
                   label: "View Products List",

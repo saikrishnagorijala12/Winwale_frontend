@@ -48,13 +48,13 @@ export const CompanyFormStep: React.FC<CompanyFormStepProps> = ({
 
   return (
     <div className="grid md:grid-cols-2 gap-5">
-      <div className="md:col-span-2 flex items-center gap-6 p-5 bg-slate-50 border border-slate-200 rounded-2xl mb-2">
+      <div className="md:col-span-2 flex items-center gap-6 p-5 bg-slate-50/50 border border-slate-200 rounded-2xl mb-2">
         <div className="relative group">
           <div
-            className={`w-24 h-24 rounded-2xl border-2 border-white shadow-md overflow-hidden bg-white flex items-center justify-center transition-all ${
+            className={`w-24 h-24 rounded-2xl border-2 overflow-hidden bg-white flex items-center justify-center transition-all ${
               !formData.logoUrl
                 ? "border-dashed border-slate-300"
-                : "border-solid"
+                : "border-solid border-white"
             }`}
           >
             {formData.logoUrl ? (
@@ -96,7 +96,7 @@ export const CompanyFormStep: React.FC<CompanyFormStepProps> = ({
               <button
                 type="button"
                 onClick={removeLogo}
-                className="px-3 py-2 text-red-500 hover:bg-red-50 rounded-lg text-xs font-bold transition-colors flex items-center gap-1"
+                className="px-3 py-2 text-red-500 hover:bg-red-50/50 rounded-lg text-xs font-bold transition-colors flex items-center gap-1"
               >
                 <X className="w-3.5 h-3.5" />
                 Remove

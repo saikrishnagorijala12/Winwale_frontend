@@ -110,9 +110,9 @@ const AppRoutes: React.FC = () => {
                     />
                   }
                 >
-                  <Route path="/clients" element={<Clients />} />
-                  <Route path="/contracts" element={<ContractsPage />} />
-                  <Route path="/client-contracts" element={<ClientsAndContractsPage />} />
+                  {/* <Route path="/clients" element={<Clients />} />
+                  <Route path="/contracts" element={<ContractsPage />} /> */}
+                  <Route path="/client-profiles" element={<ClientsAndContractsPage />} />
                   <Route
                     path="/clients/products"
                     element={<ClientProducts />}

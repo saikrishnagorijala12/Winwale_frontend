@@ -20,6 +20,7 @@ import {
   ChevronLeft,
 } from "lucide-react";
 import StatusBadge from "../components/shared/StatusBadge";
+import Pagination from "../components/shared/Pagination";
 import { toast } from "sonner";
 import api from "../lib/axios";
 import ConfirmationModal from "../components/shared/ConfirmationModal";
@@ -38,8 +39,6 @@ import {
 } from "../utils/clientUtils";
 
 type TabType = "all" | "pending" | "approved" | "rejected";
-
-
 
 interface ActionDropdownProps {
   client: any;
@@ -153,10 +152,11 @@ const ActionDropdown: React.FC<ActionDropdownProps> = ({
                 isApproved ? onReject() : onApprove();
                 setIsOpen(false);
               }}
-              className={`w-full px-4 py-2 text-left text-sm font-medium flex items-center gap-2 transition-colors ${isApproved
-                ? "text-red-600 hover:bg-rose-50"
-                : "text-emerald-600 hover:bg-emerald-50"
-                }`}
+              className={`w-full px-4 py-2 text-left text-sm font-medium flex items-center gap-2 transition-colors ${
+                isApproved
+                  ? "text-red-600 hover:bg-rose-50"
+                  : "text-emerald-600 hover:bg-emerald-50"
+              }`}
             >
               {isApproved ? (
                 <>
@@ -200,10 +200,11 @@ const ClientCard: React.FC<ClientCardProps> = ({
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center gap-3 flex-1 min-w-0">
           <div
-            className={`shrink-0 w-12 h-12 rounded-xl border border-slate-200 flex items-center justify-center text-white font-bold text-sm shadow-sm overflow-hidden ${client.company_logo_url
-              ? "bg-white"
-              : "bg-linear-to-br from-[#3399cc] to-[#2980b9]"
-              }`}
+            className={`shrink-0 w-12 h-12 rounded-xl border border-slate-200 flex items-center justify-center text-white font-bold text-sm shadow-sm overflow-hidden ${
+              client.company_logo_url
+                ? "bg-white"
+                : "bg-linear-to-br from-[#3399cc] to-[#2980b9]"
+            }`}
           >
             {client.company_logo_url ? (
               <img
@@ -313,7 +314,8 @@ const ClientActivation = () => {
   }, [activeTab, searchQuery]);
 
   const handleApiError = (err: any, context: string = "operation") => {
-    const errorMessage = err.message || `Failed to ${context}. Please try again.`;
+    const errorMessage =
+      err.message || `Failed to ${context}. Please try again.`;
 
     if (err.status === 409) {
       setCurrentStep(1);
@@ -322,7 +324,6 @@ const ClientActivation = () => {
     setBackendError(errorMessage);
     toast.error(errorMessage);
   };
-
 
   const openConfirmModal = (client: any, action: "approve" | "reject") => {
     setConfirmModal({ isOpen: true, client, action });
@@ -414,7 +415,9 @@ const ClientActivation = () => {
 
       const finalPayload = {
         ...clientPayload,
-        company_logo_url: logoUrl?.startsWith("data:") ? undefined : (logoUrl || null)
+        company_logo_url: logoUrl?.startsWith("data:")
+          ? undefined
+          : logoUrl || null,
       };
 
       await api.put(`/clients/${editingClient.id}`, finalPayload);
@@ -473,7 +476,6 @@ const ClientActivation = () => {
   );
   const totalPages = Math.ceil(totalItems / itemsPerPage);
 
-
   const getTabTitle = () => {
     switch (activeTab) {
       case "all":
@@ -504,8 +506,6 @@ const ClientActivation = () => {
     }
   };
 
-
-
   return (
     <div className="min-h-screen bg-linear-to-br from-slate-50 via-blue-50/30 to-slate-100 p-4 sm:p-6 lg:p-10 space-y-6 sm:space-y-8 lg:space-y-10">
       <ConfirmationModal
@@ -516,7 +516,10 @@ const ClientActivation = () => {
         message={
           <>
             Are you sure you want to {confirmModal.action}{" "}
-            <span className="font-bold text-slate-700">{confirmModal.client?.company_name}</span>?
+            <span className="font-bold text-slate-700">
+              {confirmModal.client?.company_name}
+            </span>
+            ?
           </>
         }
         details={[
@@ -655,10 +658,11 @@ const ClientActivation = () => {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as TabType)}
-                className={`px-4 sm:px-6 py-2 sm:py-3 rounded-t-xl font-bold text-xs sm:text-sm transition-all whitespace-nowrap ${activeTab === tab.id
-                  ? `bg-${tab.color}-50 text-${tab.color}-600 border-b-2 border-${tab.color}-600`
-                  : "text-slate-500 hover:text-slate-700 hover:bg-slate-50"
-                  }`}
+                className={`px-4 sm:px-6 py-2 sm:py-3 rounded-t-xl font-bold text-xs sm:text-sm transition-all whitespace-nowrap ${
+                  activeTab === tab.id
+                    ? `bg-${tab.color}-50 text-${tab.color}-600 border-b-2 border-${tab.color}-600`
+                    : "text-slate-500 hover:text-slate-700 hover:bg-slate-50"
+                }`}
               >
                 {tab.label} ({tab.count})
               </button>
@@ -688,7 +692,9 @@ const ClientActivation = () => {
           {loading ? (
             <div className="py-16 flex flex-col items-center justify-center gap-3">
               <Loader2 className="w-8 h-8 animate-spin text-[#24578f]" />
-              <p className="text-sm text-slate-500 font-medium">Loading clients...</p>
+              <p className="text-sm text-slate-500 font-medium">
+                Loading clients...
+              </p>
             </div>
           ) : paginatedClients.length === 0 ? (
             <div className="py-16 text-center text-slate-400 text-sm">
@@ -738,13 +744,18 @@ const ClientActivation = () => {
                   <td colSpan={6} className="px-6 py-20 text-center">
                     <div className="flex flex-col items-center justify-center gap-3">
                       <Loader2 className="w-8 h-8 animate-spin text-[#24578f]" />
-                      <p className="text-slate-400 text-sm">Loading clients...</p>
+                      <p className="text-slate-400 text-sm">
+                        Loading clients...
+                      </p>
                     </div>
                   </td>
                 </tr>
               ) : paginatedClients.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-20 text-center text-slate-400">
+                  <td
+                    colSpan={6}
+                    className="px-6 py-20 text-center text-slate-400"
+                  >
                     No clients found.
                   </td>
                 </tr>
@@ -758,10 +769,11 @@ const ClientActivation = () => {
                     <td className="px-4 py-5">
                       <div className="flex items-center gap-3">
                         <div
-                          className={`shrink-0 w-10 h-10 rounded-xl border border-slate-200 flex items-center justify-center text-white font-bold text-xs shadow-sm overflow-hidden ${client.company_logo_url
-                            ? "bg-white"
-                            : "bg-linear-to-br from-[#3399cc] to-[#2980b9]"
-                            }`}
+                          className={`shrink-0 w-10 h-10 rounded-xl border border-slate-200 flex items-center justify-center text-white font-bold text-xs shadow-sm overflow-hidden ${
+                            client.company_logo_url
+                              ? "bg-white"
+                              : "bg-linear-to-br from-[#3399cc] to-[#2980b9]"
+                          }`}
                         >
                           {client.company_logo_url ? (
                             <img
@@ -794,7 +806,9 @@ const ClientActivation = () => {
                         {client.company_city}, {client.company_state}
                       </div>
                     </td>
-                    <td className="px-4 py-5"><StatusBadge status={client.status} /></td>
+                    <td className="px-4 py-5">
+                      <StatusBadge status={client.status} />
+                    </td>
                     <td className="px-4 py-5">
                       <div className="flex items-center gap-2 text-sm text-slate-400 font-medium">
                         <Calendar className="w-4 h-4" />
@@ -827,79 +841,13 @@ const ClientActivation = () => {
             </tbody>
           </table>
         </div>
-        {totalItems > itemsPerPage && (
-          <div className="px-6 py-5 bg-white border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div className="text-sm text-slate-500 font-medium">
-              Showing{" "}
-              <span className="text-slate-900 font-semibold">
-                {startIndex + 1}
-              </span>{" "}
-              to{" "}
-              <span className="text-slate-900 font-semibold">
-                {Math.min(startIndex + itemsPerPage, totalItems)}
-              </span>{" "}
-              of{" "}
-              <span className="text-slate-900 font-semibold">{totalItems}</span>{" "}
-              users
-            </div>
-
-            <div className="flex items-center gap-1.5">
-              <button
-                disabled={currentPage === 1}
-                onClick={() => setCurrentPage(currentPage - 1)}
-                className="p-2 rounded-lg border border-slate-200 text-slate-400 hover:bg-slate-50 hover:text-slate-600 disabled:opacity-30 disabled:hover:bg-transparent transition-all mr-2"
-              >
-                <ChevronLeft size={18} />
-              </button>
-
-              <div className="flex items-center gap-1">
-                {(() => {
-                  const pages = [];
-                  const delta = 1;
-                  for (let i = 1; i <= totalPages; i++) {
-                    if (
-                      i === 1 ||
-                      i === totalPages ||
-                      (i >= currentPage - delta && i <= currentPage + delta)
-                    ) {
-                      pages.push(i);
-                    } else if (pages[pages.length - 1] !== "...") {
-                      pages.push("...");
-                    }
-                  }
-                  return pages.map((pageNum, idx) => (
-                    <React.Fragment key={idx}>
-                      {pageNum === "..." ? (
-                        <span className="px-2 text-slate-400 font-medium">
-                          ...
-                        </span>
-                      ) : (
-                        <button
-                          onClick={() => setCurrentPage(Number(pageNum))}
-                          className={`min-w-9 h-9 flex items-center justify-center rounded-lg text-sm font-bold transition-all
-                            ${currentPage === pageNum
-                              ? "bg-[#3399cc] text-white shadow-md shadow-[#3399cc]/30"
-                              : "text-slate-500 hover:bg-slate-100 hover:text-slate-900"
-                            }`}
-                        >
-                          {pageNum}
-                        </button>
-                      )}
-                    </React.Fragment>
-                  ));
-                })()}
-              </div>
-
-              <button
-                disabled={currentPage === totalPages}
-                onClick={() => setCurrentPage(currentPage + 1)}
-                className="p-2 rounded-lg border border-slate-200 text-slate-400 hover:bg-slate-50 hover:text-slate-600 disabled:opacity-30 disabled:hover:bg-transparent transition-all ml-2"
-              >
-                <ChevronRight size={18} />
-              </button>
-            </div>
-          </div>
-        )}
+        <Pagination
+              currentPage={currentPage}
+              totalItems={totalItems}
+              itemsPerPage={itemsPerPage}
+              onPageChange={setCurrentPage}
+              label="clients"
+            />
       </div>
     </div>
   );

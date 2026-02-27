@@ -34,7 +34,7 @@ export default function AnalysisActionsMenu({
 
   return (
     <div
-      className={`absolute right-12 ${openUpwards ? "bottom-4" : "top-4"
+      className={`absolute right-0 ${openUpwards ? "bottom-full mb-2" : "top-full mt-2"
         } w-48 bg-white border border-slate-200 rounded-xl shadow-xl z-50 py-2 animate-in fade-in zoom-in duration-100`}
       onClick={(e) => e.stopPropagation()}
     >
@@ -45,7 +45,7 @@ export default function AnalysisActionsMenu({
         }}
         className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors font-medium"
       >
-        <Eye className="w-4 h-4 text-slate-400" />
+        <Eye className="w-4 h-4 text-[#38A1DB]" />
         View Details
       </button>
       <button
@@ -55,7 +55,7 @@ export default function AnalysisActionsMenu({
         }}
         className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors font-medium"
       >
-        <FileText className="w-4 h-4 text-slate-400" />
+        <FileText className="w-4 h-4 text-[#38A1DB]" />
         Generate Docs
       </button>
 

@@ -33,7 +33,7 @@ export const ClientActionsMenu: React.FC<ClientActionsMenuProps> = ({
       />
 
       <div
-        className={`absolute right-8 ${openUpwards ? "bottom-12" : "top-12"
+        className={`absolute right-0 ${openUpwards ? "bottom-full mb-2" : "top-full mt-2"
           } z-50 w-52 bg-white border border-slate-100 rounded-2xl shadow-xl py-2`}
         onClick={(e) => e.stopPropagation()}
       >
