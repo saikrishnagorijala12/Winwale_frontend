@@ -77,7 +77,6 @@ export default function ClientProducts() {
   return (
     <div className="min-h-screen bg-linear-to-br from-slate-50 to-slate-100 p-6">
       <div className="mx-auto">
-        {/* Navigation & Header */}
         <div className="mb-8">
           <button
             onClick={() => navigate(-1)}
@@ -124,7 +123,6 @@ export default function ClientProducts() {
           </div>
         </div>
 
-        {/* Table */}
         <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
@@ -229,10 +227,8 @@ export default function ClientProducts() {
               </tbody>
             </table>
           </div>
-          {/* Pagination */}
           {totalPages > 1 && (
             <div className="flex items-center justify-between px-6 py-5 bg-white border-t border-slate-100">
-              {/* Left Side: Summary */}
               <div className="hidden sm:block">
                 <p className="text-sm text-slate-500">
                   Showing{" "}
@@ -254,7 +250,6 @@ export default function ClientProducts() {
                 </p>
               </div>
 
-              {/* Right Side: Navigation */}
               <div className="flex items-center gap-1.5">
                 <button
                   onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
@@ -264,7 +259,6 @@ export default function ClientProducts() {
                   <ChevronLeft size={18} />
                 </button>
 
-                {/* Page Numbers */}
                 <div className="flex items-center gap-1.5 mx-1">
                   {Array.from({ length: totalPages }, (_, i) => i + 1)
                     .filter((page) => {
@@ -295,7 +289,6 @@ export default function ClientProducts() {
                     ))}
                 </div>
 
-                {/* Next Button */}
                 <button
                   onClick={() =>
                     setCurrentPage((p) => Math.min(totalPages, p + 1))
@@ -310,7 +303,6 @@ export default function ClientProducts() {
           )}
         </div>
       </div>
-      {/* RIGHT DRAWER */}
       {selectedProduct && (
         <div className="fixed inset-0 z-50 flex justify-end">
           <div
@@ -351,7 +343,6 @@ export default function ClientProducts() {
             </div>
 
             <div className="flex-1 overflow-y-auto p-8 space-y-10 scrollbar-thin">
-              {/* Product Photo - If available */}
               {selectedProduct.photo_path && (
                 <div className="w-full h-48 bg-slate-50 rounded-2xl border border-slate-100 overflow-hidden flex items-center justify-center">
                   <img

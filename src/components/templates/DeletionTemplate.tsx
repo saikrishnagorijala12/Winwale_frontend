@@ -7,19 +7,16 @@ export const DeletionTemplate = ({ data }: { data: any }) => {
       className="relative text-[14px] leading-[1.6] text-foreground px-12 py-10"
       style={{ fontFamily: "'Times New Roman', Times, serif" }}
     >
-      {/* Logo */}
       <div className="absolute top-8 right-10">
         <img
           src={data?.companyLogo}
           alt="Company Logo"
-          className="h-[70px] w-auto object-contain"
+          className="h-17.5 w-auto object-contain"
         />
       </div>
 
-      {/* Date */}
       <p className="mb-6">{data?.submissionDate || "DATE"}</p>
 
-      {/* Address Block */}
       <p className="mb-6">
         Attn: {data?.contractorName} ({data?.contractNumber}) <br />
         General Services Administration <br />
@@ -27,7 +24,6 @@ export const DeletionTemplate = ({ data }: { data: any }) => {
         {data?.gsaOfficeCityStateZip}
       </p>
 
-      {/* Subject */}
       <div className="mb-6">
         <p>
           <strong>Re:</strong> <strong>{data?.companyName}</strong>
@@ -43,7 +39,6 @@ export const DeletionTemplate = ({ data }: { data: any }) => {
         Dear {data?.salutation} {data?.contractorName}
       </p>
 
-      {/* Body */}
       <p className="mb-4">
         The purpose of this letter is to request your approval of a Deletion
         Modification to GSA Schedule Contract{" "}
@@ -71,7 +66,6 @@ export const DeletionTemplate = ({ data }: { data: any }) => {
         same.
       </p>
 
-      {/* Contact */}
       <p className="mb-4">
         If you have any questions regarding this request, please contact{" "}
         <strong>{data?.consultantName}</strong> of The Winvale Group at{" "}
@@ -79,7 +73,6 @@ export const DeletionTemplate = ({ data }: { data: any }) => {
         <strong>{data?.consultantEmail}</strong>.
       </p>
 
-      {/* Signature */}
       <p className="mb-4">Sincerely,</p>
 
       <div>

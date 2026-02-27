@@ -17,7 +17,7 @@ import {
     validateStep2 as validateClientStep2,
 } from "../../utils/clientValidations";
 import {
-    validateStep1 as validateContractStep2Step1, // renamed for clarity
+    validateStep1 as validateContractStep2Step1,
     validateStep2 as validateContractStep2,
 } from "../../utils/contractValidations";
 import { getInitialFormData } from "../../utils/clientUtils";
@@ -56,7 +56,6 @@ export default function EditClientContractModal({
     const [submitError, setSubmitError] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    // Initial load
     useEffect(() => {
         if (isOpen && client) {
             const addrParts = client.address.split(", ");
@@ -110,7 +109,7 @@ export default function EditClientContractModal({
         }
     }, [isOpen, client, contract]);
 
-    const handleClientChange = (field: keyof ClientFormData, value: string) => {
+    const handleClientChange = (field: keyof ClientFormData, value: any) => {
         setClientData((prev) => ({ ...prev, [field]: value }));
     };
 
@@ -167,9 +166,14 @@ export default function EditClientContractModal({
 
         try {
             const { logoFile, logoUrl, ...clientPayload } = clientData;
-            await api.put(`/clients/${client.id}`, clientPayload);
 
-            // Upload logo if a NEW file was selected
+            const finalPayload = {
+                ...clientPayload,
+                company_logo_url: logoUrl?.startsWith("data:") ? undefined : (logoUrl || null)
+            };
+
+            await api.put(`/clients/${client.id}`, finalPayload);
+
             if (logoFile) {
                 const logoFormData = new FormData();
                 logoFormData.append("file", logoFile);
@@ -192,7 +196,7 @@ export default function EditClientContractModal({
                 await contractService.createContract(client.id, payload);
             }
 
-            toast.success("Client & Contract updated successfully");
+            toast.success("Client Profile updated successfully");
             onSuccess();
             onClose();
         } catch (err: any) {
@@ -209,12 +213,11 @@ export default function EditClientContractModal({
     return (
         <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-none z-50 flex items-center justify-center p-4">
             <div className="bg-white rounded-3xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-hidden flex flex-col">
-                {/* Header */}
                 <div className="bg-slate-50 py-5 px-8 shrink-0">
                     <div className="flex items-center justify-between">
                         <div>
                             <h2 className="text-2xl font-bold text-slate-700">
-                                Edit Client & Contract
+                                Edit Client Profile
                             </h2>
                             <p className="text-slate-500 text-sm opacity-80 mt-0.5">
                                 Update client profile and their GSA contract
@@ -231,7 +234,6 @@ export default function EditClientContractModal({
                     </div>
                 </div>
 
-                {/* Step bar */}
                 <div className="flex items-center justify-between px-8 py-4 shrink-0 border-b border-slate-100 bg-white">
                     {STEPS.map((label, i) => {
                         const stepNum = i + 1;
@@ -270,7 +272,6 @@ export default function EditClientContractModal({
                     })}
                 </div>
 
-                {/* Form */}
                 <form
                     onSubmit={isLastStep ? handleSubmit : handleNext}
                     noValidate
@@ -327,7 +328,6 @@ export default function EditClientContractModal({
                         )}
                     </div>
 
-                    {/* Footer */}
                     <div className="sticky bottom-0 bg-slate-50 p-6 flex justify-between border-t border-slate-100 shrink-0">
                         <button
                             type="button"
@@ -349,7 +349,7 @@ export default function EditClientContractModal({
                                     Updating...
                                 </>
                             ) : isLastStep ? (
-                                "Update Client & Contract"
+                                "Update Client Profile"
                             ) : (
                                 "Next"
                             )}

@@ -100,7 +100,6 @@ export const ClientContractDetailsModal: React.FC<
     const file = event.target.files?.[0];
     if (!file) return;
 
-    // Validate file type
     if (!file.type.startsWith("image/")) {
       toast.error("Please upload an image file");
       return;
@@ -143,7 +142,6 @@ export const ClientContractDetailsModal: React.FC<
   return (
     <div className="fixed inset-0 bg-slate-900/40 z-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-2xl max-w-5xl w-full max-h-[92vh] overflow-hidden flex flex-col animate-in fade-in zoom-in duration-200">
-        {/* Header */}
         <div className="p-6 md:p-8 border-b border-slate-100 flex items-start justify-between">
           <div className="flex items-center gap-6">
             <div className="relative group">
@@ -216,10 +214,8 @@ export const ClientContractDetailsModal: React.FC<
           </button>
         </div>
 
-        {/* Scrollable Content */}
         <div className="flex-1 overflow-y-auto p-6 md:p-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Left Column */}
             <div className="space-y-6">
               <Section icon={Building2} title="Company Details">
                 <DetailItem icon={Phone} label="Phone" value={client.phone} />
@@ -262,7 +258,6 @@ export const ClientContractDetailsModal: React.FC<
               </Section>
             </div>
 
-            {/* Right Column */}
             <div className="space-y-6">
               {contract ? (
                 <>
@@ -332,7 +327,6 @@ export const ClientContractDetailsModal: React.FC<
           </div>
         </div>
 
-        {/* Footer */}
         <div className="p-6 md:p-8 bg-slate-50 border-t border-slate-100 flex flex-col sm:flex-row justify-between items-center gap-4">
           <div className="flex items-center gap-2 text-[11px] font-bold text-slate-400 uppercase tracking-widest">
             <Calendar className="w-3.5 h-3.5" />

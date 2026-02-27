@@ -291,7 +291,6 @@ export const ClientTable: React.FC<ClientTableProps> = ({
         )}
       </div>
 
-      {/*PAGINATION*/}
       {!loading && totalClients > itemsPerPage && (
         <div className="px-6 py-5 bg-white border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="text-sm text-slate-500 font-medium">

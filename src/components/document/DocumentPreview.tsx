@@ -111,7 +111,6 @@ export const DocumentPreview = () => {
       className="min-h-screen p-6 lg:p-10 animate-fade-in"
       style={{ backgroundColor: colors.bg }}
     >
-      {/* Header Section */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10 animate-slide-up">
         <div className="space-y-1">
           <h1
@@ -126,7 +125,6 @@ export const DocumentPreview = () => {
         </div>
       </div>
 
-      {/* Validation Warning */}
       {!isValid && (
         <div
           className="flex items-center gap-4 p-4 mb-8 rounded-2xl border animate-slide-up"
@@ -149,9 +147,7 @@ export const DocumentPreview = () => {
         </div>
       )}
 
-      {/* Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 items-start">
-        {/* Left: Field Values (2/5 width) */}
         <div className="lg:col-span-2 bg-white  shadow-sm border border-transparent overflow-hidden animate-slide-up">
           <div
             className="px-6 py-5.5 border-b"
@@ -198,7 +194,6 @@ export const DocumentPreview = () => {
           </div>
         </div>
 
-        {/* Right: Document Preview (3/5 width) */}
         <div className="lg:col-span-3 bg-white shadow-sm border border-transparent overflow-hidden animate-slide-up">
           <div
             className="px-8 py-3 border-b flex items-center justify-between gap-3"
@@ -250,7 +245,6 @@ export const DocumentPreview = () => {
               </div>
             )}
 
-            {/* Hidden renderer to capture initial HTML */}
             <div ref={previewRef} className="hidden">
               <DocumentBodyRenderer
                 documentId={documentConfig.id}
@@ -273,7 +267,6 @@ export const DocumentPreview = () => {
         </div>
       </div>
 
-      {/* Footer Navigation */}
       <div className="mt-10 flex items-center justify-between pb-10 animate-slide-up">
         <button
           onClick={() => setCurrentStep("form-entry")}
@@ -301,7 +294,6 @@ export const DocumentPreview = () => {
         </button>
       </div>
 
-      {/* Confirmation Modal */}
       {showConfirmModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 ">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 space-y-5 animate-in fade-in zoom-in">
@@ -339,7 +331,6 @@ export const DocumentPreview = () => {
         </div>
       )}
 
-      {/* Re-Download Confirmation Modal */}
       {showReDownloadModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 ">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 space-y-5 animate-in fade-in zoom-in">

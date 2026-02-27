@@ -65,7 +65,6 @@ export default function ProductsPage() {
       setExportableCount(data.total);
     } catch (err: any) {
       console.error("Failed to fetch exportable count:", err);
-      // Fallback to totalItems if fetch fails, though they might differ due to search
       setExportableCount(0);
     }
   };

@@ -106,14 +106,12 @@ export const RichTextEditor = ({ content, onChange, editable = true }: RichTextE
         },
     });
 
-    // Sync editable mode
     React.useEffect(() => {
         if (editor) {
             editor.setEditable(editable);
         }
     }, [editor, editable]);
 
-    // Force inline styles on images for consistent sizing
     React.useEffect(() => {
         if (!editor) return;
 

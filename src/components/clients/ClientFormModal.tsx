@@ -60,7 +60,6 @@ export const ClientFormModal: React.FC<ClientFormModalProps> = ({
   return (
     <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-none z-50 flex items-center justify-center p-4 h-full">
       <div className="relative bg-white rounded-3xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-hidden flex flex-col">
-        {/* Header */}
         <div className="bg-linear-to-br bg-slate-50 py-4 px-8 shrink-0">
           <div className="flex items-center justify-between">
             <div>

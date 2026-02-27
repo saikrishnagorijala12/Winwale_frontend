@@ -9,10 +9,6 @@ interface StatusBadgeProps {
     status: string;
 }
 
-/**
- * Renders a status badge pill using the shared STATUS_MAP config.
- * Works for: pending, active, inactive, approved, rejected.
- */
 const StatusBadge: React.FC<StatusBadgeProps> = ({ status }) => {
     const slug = normalizeStatus(status);
     const config = slug !== "unknown" ? STATUS_MAP[slug] : null;

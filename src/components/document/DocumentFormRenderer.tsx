@@ -125,7 +125,6 @@ export default function DocumentFormRenderer() {
 
   return (
     <div className="animate-fade-in  mx-auto">
-      {/* Tab Navigation */}
       <div className="flex flex-wrap gap-2 mb-6 border-b border-slate-200">
         {sections.map((section) => {
           const isActive = activeTab === section;
@@ -153,7 +152,6 @@ export default function DocumentFormRenderer() {
         })}
       </div>
 
-      {/* Active Tab Content */}
       <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden min-h-100 animate-slide-up">
         <div className="p-8 flex flex-wrap -mx-4 gap-y-6">
           {fieldsBySection[activeTab]?.map((field) => {
@@ -248,7 +246,6 @@ export default function DocumentFormRenderer() {
         </div>
       </div>
 
-      {/* Footer Actions */}
       <div className="mt-8 flex items-center justify-between pb-10">
         {activeIndex === 0 ? (
           <button

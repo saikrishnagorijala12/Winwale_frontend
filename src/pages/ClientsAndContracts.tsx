@@ -125,11 +125,10 @@ export default function ClientsAndContractsPage() {
 
     return (
         <div className="min-h-screen bg-linear-to-br from-slate-50 via-blue-50/30 to-slate-100 p-6 lg:p-10 space-y-6">
-            {/* Header */}
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
                 <div>
                     <h1 className="text-3xl font-extrabold tracking-tight text-slate-800">
-                        Client Contracts
+                        Client Profiles
                     </h1>
                     <p className="text-slate-500 font-medium mt-1">
                         Manage client profiles and their GSA contract details
@@ -140,7 +139,7 @@ export default function ClientsAndContractsPage() {
                     className="flex items-center justify-center gap-2 bg-[#38A1DB] hover:bg-[#2D8BBF] text-white px-7 py-3 rounded-xl shadow-lg shadow-blue-200 transition-all active:scale-95 font-bold"
                 >
                     <Plus className="w-5 h-5 stroke-[3px]" />
-                    Add Client Contract
+                    Add Client Profile
                 </button>
             </div>
 

@@ -30,7 +30,6 @@ const deepTrim = (data: any): any => {
   return data;
 };
 
-// -------------------- REQUEST --------------------
 api.interceptors.request.use(async (config) => {
   const session = await fetchAuthSession();
   const idToken = session.tokens?.idToken?.toString();

@@ -130,7 +130,6 @@ export default function UnifiedAdminDashboard() {
       className="min-h-screen p-6 lg:p-10 animate-fade-in"
       style={{ backgroundColor: colors.bg }}
     >
-      {/* Header Section */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10 animate-slide-up">
         <div className="space-y-1">
           {loading ? (
@@ -163,7 +162,6 @@ export default function UnifiedAdminDashboard() {
         )}
       </div>
 
-      {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 animate-slide-up">
         {loading
           ? Array(4)
@@ -212,7 +210,6 @@ export default function UnifiedAdminDashboard() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-        {/* Left: Analysis History */}
         <div className="lg:col-span-2 bg-white p-8 rounded-2xl animate-slide-up shadow-sm ">
           <div className="flex items-center justify-between mb-8">
             <div>
@@ -316,7 +313,6 @@ export default function UnifiedAdminDashboard() {
           </div>
         </div>
 
-        {/* Right: Administrative Sidebar */}
         <div className="space-y-8">
           <div
             className="rounded-4xl p-8 shadow-xl text-white"
@@ -327,7 +323,7 @@ export default function UnifiedAdminDashboard() {
 
             <div className="space-y-3">
               {[
-                { label: "Manage Client Contracts", icon: FileText, to: "/client-contracts" },
+                { label: "Manage Client Profiles", icon: FileText, to: "/client-contracts" },
                 { label: "View Products List", icon: Package, to: "/gsa-products" },
                 { label: "Upload Product Catalog", icon: Upload, to: "/gsa-products/upload" },
               ].map((action) => (

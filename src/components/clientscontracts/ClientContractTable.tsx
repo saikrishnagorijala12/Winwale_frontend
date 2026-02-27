@@ -120,7 +120,7 @@ export const ClientContractTable: React.FC<ClientContractTableProps> = ({
                   <div className="flex flex-col items-center gap-2">
                     <Loader2 className="w-8 h-8 animate-spin text-[#24578f]" />
                     <p className="text-sm text-slate-500 font-medium">
-                      Loading client contracts...
+                      Loading client profiles...
                     </p>
                   </div>
                 </td>
@@ -140,7 +140,6 @@ export const ClientContractTable: React.FC<ClientContractTableProps> = ({
                     onClick={() => onRowClick(client)}
                     className="group hover:bg-blue-50/30 cursor-pointer transition-all duration-200"
                   >
-                    {/* Client name */}
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
                         <div
@@ -172,7 +171,6 @@ export const ClientContractTable: React.FC<ClientContractTableProps> = ({
                       </div>
                     </td>
 
-                    {/* Contract number */}
                     <td className="px-6 py-4">
                       {contract ? (
                         <div className="flex items-center gap-2">
@@ -188,12 +186,10 @@ export const ClientContractTable: React.FC<ClientContractTableProps> = ({
                       )}
                     </td>
 
-                    {/* Status */}
                     <td className="px-4 py-4">
                       <StatusBadge status={client.status} />
                     </td>
 
-                    {/* Contact */}
                     <td className="px-6 py-4">
                       {!client.contact ? (
                         <span className="text-[10px] italic font-medium text-gray-400 uppercase">
@@ -211,7 +207,6 @@ export const ClientContractTable: React.FC<ClientContractTableProps> = ({
                       )}
                     </td>
 
-                    {/* FOB term */}
                     <td className="px-6 py-4">
                       {contract ? (
                         <span className="text-sm font-medium text-slate-700">
@@ -222,7 +217,6 @@ export const ClientContractTable: React.FC<ClientContractTableProps> = ({
                       )}
                     </td>
 
-                    {/* Last Modified */}
                     <td className="hidden xl:table-cell px-6 py-4 text-sm text-slate-500">
                       <div className="flex items-center gap-1.5">
                         <Calendar className="w-3.5 h-3.5 text-slate-400" />
@@ -230,7 +224,6 @@ export const ClientContractTable: React.FC<ClientContractTableProps> = ({
                       </div>
                     </td>
 
-                    {/* Actions */}
                     <td className="p-5 relative text-right">
                       <button
                         onClick={(e) => {

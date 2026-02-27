@@ -30,6 +30,7 @@ export interface AnalysisJobResponse {
   client_id: number;
   contract_number: string;
   client: string;
+  client_logo_url?: string | null;
   user_id: number;
   user: string;
   status: "pending" | "approved" | "rejected";

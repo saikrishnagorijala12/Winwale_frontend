@@ -199,8 +199,21 @@ const ClientCard: React.FC<ClientCardProps> = ({
     >
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center gap-3 flex-1 min-w-0">
-          <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center shrink-0">
-            <Building2 className="w-6 h-6 text-blue-500" />
+          <div
+            className={`shrink-0 w-12 h-12 rounded-xl border border-slate-200 flex items-center justify-center text-white font-bold text-sm shadow-sm overflow-hidden ${client.company_logo_url
+              ? "bg-white"
+              : "bg-linear-to-br from-[#3399cc] to-[#2980b9]"
+              }`}
+          >
+            {client.company_logo_url ? (
+              <img
+                src={client.company_logo_url}
+                alt={client.company_name}
+                className="w-full h-full object-contain"
+              />
+            ) : (
+              client.company_name.substring(0, 2).toUpperCase()
+            )}
           </div>
           <div className="flex-1 min-w-0">
             <h3 className="font-bold text-slate-800 text-base truncate">
@@ -362,6 +375,8 @@ const ClientActivation = () => {
       contact_officer_state: client.contact?.address?.split(", ")[2] || "",
       contact_officer_zip: client.contact?.address?.split(", ")[3] || "",
       status: client.status,
+      logoUrl: client.logoUrl || "",
+      logoFile: null,
     });
     setIsEditModalOpen(true);
     setCurrentStep(1);
@@ -395,7 +410,23 @@ const ClientActivation = () => {
 
     setIsSubmitting(true);
     try {
-      await api.put(`/clients/${editingClient.id}`, editingClient);
+      const { logoFile, logoUrl, ...clientPayload } = editingClient;
+
+      const finalPayload = {
+        ...clientPayload,
+        company_logo_url: logoUrl?.startsWith("data:") ? undefined : (logoUrl || null)
+      };
+
+      await api.put(`/clients/${editingClient.id}`, finalPayload);
+
+      if (logoFile) {
+        const logoFormData = new FormData();
+        logoFormData.append("file", logoFile);
+        await api.post(`/clients/${editingClient.id}/logo`, logoFormData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+      }
+
       toast.success("Client updated successfully");
       await fetchClients();
       setIsEditModalOpen(false);
@@ -533,7 +564,6 @@ const ClientActivation = () => {
         />
       )}
 
-      {/* Header */}
       <div className="mx-auto">
         <h1 className="text-3xl  font-extrabold tracking-tight text-slate-800">
           Client Management
@@ -543,7 +573,6 @@ const ClientActivation = () => {
         </p>
       </div>
 
-      {/* Stats Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
         {[
           {
@@ -594,7 +623,6 @@ const ClientActivation = () => {
         ))}
       </div>
 
-      {/* Main Content Card */}
       <div className="bg-white rounded-2xl sm:rounded-3xl shadow-sm border border-slate-100 ">
         <div className="border-b border-slate-100 px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6 overflow-x-auto">
           <div className="flex gap-1 sm:gap-2 min-w-max ">
@@ -638,7 +666,6 @@ const ClientActivation = () => {
           </div>
         </div>
 
-        {/* Search Header */}
         <div className="p-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <h2 className="text-xl font-bold">{getTabTitle()}</h2>
@@ -657,7 +684,6 @@ const ClientActivation = () => {
           </div>
         </div>
 
-        {/* Mobile Card View (< lg) */}
         <div className="lg:hidden px-4 sm:px-6 pb-4 sm:pb-6 space-y-3 sm:space-y-4">
           {loading ? (
             <div className="py-16 flex flex-col items-center justify-center gap-3">
@@ -682,7 +708,6 @@ const ClientActivation = () => {
           )}
         </div>
 
-        {/* Desktop Table View  */}
         <div className="hidden lg:block  px-6 pb-6 ">
           <table className="w-full border-collapse bg-white rounded-2xl shadow-sm">
             <thead>
@@ -732,8 +757,21 @@ const ClientActivation = () => {
                   >
                     <td className="px-4 py-5">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center">
-                          <Building2 className="w-5 h-5 text-blue-500" />
+                        <div
+                          className={`shrink-0 w-10 h-10 rounded-xl border border-slate-200 flex items-center justify-center text-white font-bold text-xs shadow-sm overflow-hidden ${client.company_logo_url
+                            ? "bg-white"
+                            : "bg-linear-to-br from-[#3399cc] to-[#2980b9]"
+                            }`}
+                        >
+                          {client.company_logo_url ? (
+                            <img
+                              src={client.company_logo_url}
+                              alt={client.company_name}
+                              className="w-full h-full object-contain"
+                            />
+                          ) : (
+                            client.company_name.substring(0, 2).toUpperCase()
+                          )}
                         </div>
                         <div>
                           <p className="font-bold text-sm text-slate-800">

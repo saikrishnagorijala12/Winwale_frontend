@@ -231,7 +231,6 @@ export default function AddContractModal({
             )}
           </div>
 
-          {/* FOOTER ACTIONS */}
           <div className="sticky bottom-0 bg-slate-50 p-6 flex justify-between border-t border-slate-100 shrink-0">
             <button
               type="button"

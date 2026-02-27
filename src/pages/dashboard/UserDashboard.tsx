@@ -39,10 +39,8 @@ export default function Dashboard() {
   const [jobs, setJobs] = useState<AnalysisJobResponse[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Stats totals
   const [totalApproved, setTotalApproved] = useState(0);
   const [totalPending, setTotalPending] = useState(0);
-  const [totalAllJobs, setTotalAllJobs] = useState(0);
   const [totalProducts, setTotalProducts] = useState(0);
 
   const colors = {
@@ -141,7 +139,6 @@ export default function Dashboard() {
       className="min-h-screen p-6 lg:p-10 animate-fade-in"
       style={{ backgroundColor: colors.bg }}
     >
-      {/* Header Section */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10 animate-slide-up">
         <div className="space-y-1">
           {loading ? (
@@ -174,7 +171,6 @@ export default function Dashboard() {
         )}
       </div>
 
-      {/* Metric Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 animate-slide-up">
         {loading
           ? Array(4)
@@ -226,7 +222,6 @@ export default function Dashboard() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-        {/* Left: Recent Analyses */}
         <div className="lg:col-span-2 bg-white p-8 rounded-2xl animate-slide-up shadow-sm ">
           <div className="flex items-center justify-between mb-8">
             <div>
@@ -398,7 +393,6 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Right Sidebar */}
         <div className="space-y-8 animate-slide-in-right">
           <div
             className="rounded-4xl p-8 shadow-xl text-white"
@@ -411,7 +405,7 @@ export default function Dashboard() {
             <div className="space-y-3">
               {[
                 {
-                  label: "Manage Client Contracts",
+                  label: "Manage Client Profiles",
                   icon: FileText,
                   to: "/client-contracts",
                 },
@@ -440,7 +434,6 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* Contract Status List */}
           <div className="bg-white p-8 rounded-2xl shadow-sm ">
             <h3
               className="text-xs font-black uppercase tracking-widest mb-6"

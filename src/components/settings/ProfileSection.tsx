@@ -83,7 +83,6 @@ export const ProfileSection = ({
   return (
     <section className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100/80 overflow-hidden">
       <div className="p-8 space-y-8">
-        {/* Header */}
         <div className="flex flex-col sm:flex-row items-center gap-8">
           <div className="w-28 h-28 rounded-3xl bg-[#3498db]/10 flex items-center justify-center text-4xl font-bold text-[#3498db] border-4 border-white shadow-xl">
             {user?.name?.charAt(0) || "U"}
@@ -100,9 +99,7 @@ export const ProfileSection = ({
           </div>
         </div>
 
-        {/* Form */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Full Name */}
           <div>
             <label className="text-sm font-bold text-slate-700 ml-1">
               Full Name
@@ -121,7 +118,6 @@ export const ProfileSection = ({
             )}
           </div>
 
-          {/* Email */}
           <div>
             <label className="text-sm font-bold text-slate-700 ml-1">
               Email
@@ -136,7 +132,6 @@ export const ProfileSection = ({
             />
           </div>
 
-          {/* Phone */}
           <div>
             <label className="text-sm font-bold text-slate-700 ml-1">
               Phone Number
@@ -156,7 +151,6 @@ export const ProfileSection = ({
             )}
           </div>
 
-          {/* Status */}
           <div>
             <label className="text-sm font-bold text-slate-700 ml-1">
               Status
@@ -173,7 +167,6 @@ export const ProfileSection = ({
             <p className="text-sm text-red-600">{formError}</p>
           </div>
         )}
-        {/* Actions */}
         <div className="flex justify-end pt-4">
           <button
             onClick={handleSave}

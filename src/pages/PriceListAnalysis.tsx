@@ -166,7 +166,6 @@ export default function PriceListAnalysis() {
 
       setUploadResult(response.data);
       setSelectedJobId(response.data.job_id);
-      // fetchJobDetails will be called by the useEffect when currentStep changes to 4
       setCurrentStep(4);
 
       setIsAnalyzing(false);
@@ -189,8 +188,8 @@ export default function PriceListAnalysis() {
     setTotalRows(0);
     setError(null);
     setErrorVariant("error");
-    setActiveTab("NEW_PRODUCT"); // Reset active tab
-    setCurrentPage(1); // Reset current page
+    setActiveTab("NEW_PRODUCT");
+    setCurrentPage(1);
   };
 
   const activeClient = clients.find((c) => c.client_id === selectedClient);
@@ -299,7 +298,7 @@ export default function PriceListAnalysis() {
             }}
             onPageChange={(page) => setCurrentPage(page)}
             isLoading={isFetchingJob}
-            onExport={async () => {
+            onExport={async (selectedTypes) => {
               try {
                 const date = new Date()
                   .toLocaleDateString("en-US", {
@@ -317,6 +316,7 @@ export default function PriceListAnalysis() {
                 const blob = await exportPriceModifications({
                   client_id: selectedClient,
                   job_id: uploadResult?.job_id,
+                  types: selectedTypes,
                 });
                 downloadBlob(blob, fileName);
                 toast.success("Analysis export complete");

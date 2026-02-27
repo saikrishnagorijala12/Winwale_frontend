@@ -49,7 +49,6 @@ export default function ProductDrawer({
         </div>
 
         <div className="flex-1 overflow-y-auto p-8 space-y-10 scrollbar-thin">
-          {/* Product Photo - If available */}
           {product.photo_path && (
             <div className="w-full h-48 bg-slate-50 rounded-2xl border border-slate-100 overflow-hidden flex items-center justify-center">
               <img

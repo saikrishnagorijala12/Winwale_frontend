@@ -11,7 +11,6 @@ interface AuthLayoutProps {
 const AuthLayout: React.FC<AuthLayoutProps> = ({ title, subtitle, children }) => {
   return (
     <div className="flex min-h-screen bg-white">
-      {/* Left Side - Brand Branding */}
       <div className="hidden lg:flex lg:w-1/2 bg-[#1d4e89] flex-col p-12 justify-between">
         <div className="flex items-center gap-3">
           {/* <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0">
@@ -31,7 +30,6 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({ title, subtitle, children }) =>
         </div>
       </div>
 
-      {/* Right Side - Form Container */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-[#f8fafc]">
         <div className="max-w-md w-full">
           <div className="lg:hidden flex items-center justify-center gap-3 mb-6">

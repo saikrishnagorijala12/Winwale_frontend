@@ -87,7 +87,6 @@ export default function AnalysisDetails() {
 
   return (
     <div className="min-h-screen bg-linear-to-br from-slate-50 via-blue-50/30 to-slate-100 p-6 lg:p-10 space-y-10">
-      {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-12 mx-auto">
         <div>
           <div className="flex items-center gap-3 mb-2">
@@ -144,7 +143,7 @@ export default function AnalysisDetails() {
         onPageChange={handlePageChange}
         isLoading={isFetchingJob}
         isExporting={isExporting}
-        onExport={async () => {
+        onExport={async (selectedTypes) => {
           try {
             setIsExporting(true);
             const date = new Date()
@@ -161,6 +160,7 @@ export default function AnalysisDetails() {
 
             const blob = await exportPriceModifications({
               job_id: Number(jobId),
+              types: selectedTypes,
             });
             downloadBlob(blob, fileName);
             toast.success("Analysis export complete");

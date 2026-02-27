@@ -66,7 +66,7 @@ export const navSections = [
       {
         to: "/client-contracts",
         icon: FileText,
-        label: "Client Contracts",
+        label: "Client Profiles",
         roles: [ROLES.ADMIN, ROLES.USER],
       },
       {

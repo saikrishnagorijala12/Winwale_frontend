@@ -120,7 +120,6 @@ export function Step1({
             </div>
           )}
 
-          {/* DROPDOWN */}
           {showClientDropdown && !isClientSelected && (
             <div className="absolute z-50 mt-2 w-full max-h-60 overflow-y-auto bg-white border border-slate-200 rounded-xl shadow-lg">
               {filteredClients.length === 0 ? (

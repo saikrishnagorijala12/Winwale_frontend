@@ -99,7 +99,6 @@ const Signup: React.FC = () => {
         },
       });
 
-      // Redirect to shared verification page
       navigate(`/verify-email?email=${encodeURIComponent(formData.email.trim())}`, {
         state: { password: formData.password }
       });

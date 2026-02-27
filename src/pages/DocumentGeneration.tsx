@@ -74,7 +74,6 @@ export const DocumentWorkflowRenderer = () => {
   return (
     <div className="min-h-screen bg-slate-50/50 p-6 lg:p-10 space-y-8 animate-fade-in">
       <div className="mx-auto  space-y-10">
-        {/* Header */}
         <div className="space-y-1">
           <h1 className="text-3xl font-bold tracking-tight text-slate-900">
             Generate Documents
@@ -117,9 +116,6 @@ export const DocumentWorkflowRenderer = () => {
             </div>
           ) : modificationMessage ? (
             <div className="py-24 text-center bg-white rounded-3xl border border-slate-200 shadow-sm animate-fade-in">
-              {/* <div className="w-20 h-20 bg-slate-50 rounded-3xl flex items-center justify-center m-auto mb-6 border border-slate-100 shadow-inner">
-                <span className="text-3xl">info</span>
-              </div> */}
               <h3 className="text-xl font-bold text-slate-900 mb-2">
                 No Modifications Found
               </h3>

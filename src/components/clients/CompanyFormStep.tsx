@@ -48,7 +48,6 @@ export const CompanyFormStep: React.FC<CompanyFormStepProps> = ({
 
   return (
     <div className="grid md:grid-cols-2 gap-5">
-      {/* Enhanced Compact Logo Section */}
       <div className="md:col-span-2 flex items-center gap-6 p-5 bg-slate-50 border border-slate-200 rounded-2xl mb-2">
         <div className="relative group">
           <div
@@ -69,7 +68,6 @@ export const CompanyFormStep: React.FC<CompanyFormStepProps> = ({
             )}
           </div>
 
-          {/* Hover Overlay */}
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
@@ -130,7 +128,7 @@ export const CompanyFormStep: React.FC<CompanyFormStepProps> = ({
           }}
         />
         {errors.company_name && (
-          <p className="mt-1 text-xs text-red-600 font-medium">
+          <p className="mt-1 text-xs text-red-600 ">
             {errors.company_name}
           </p>
         )}
@@ -150,7 +148,7 @@ export const CompanyFormStep: React.FC<CompanyFormStepProps> = ({
           }}
         />
         {errors.company_email && (
-          <p className="mt-1 text-xs text-red-600 font-medium">
+          <p className="mt-1 text-xs text-red-600 ">
             {errors.company_email}
           </p>
         )}
@@ -170,7 +168,7 @@ export const CompanyFormStep: React.FC<CompanyFormStepProps> = ({
           }}
         />
         {errors.company_phone_no && (
-          <p className="mt-1 text-xs text-red-600 font-medium">
+          <p className="mt-1 text-xs text-red-600 ">
             {errors.company_phone_no}
           </p>
         )}
@@ -190,7 +188,7 @@ export const CompanyFormStep: React.FC<CompanyFormStepProps> = ({
           }}
         />
         {errors.company_address && (
-          <p className="mt-1 text-xs text-red-600 font-medium">
+          <p className="mt-1 text-xs text-red-600 ">
             {errors.company_address}
           </p>
         )}
@@ -205,10 +203,11 @@ export const CompanyFormStep: React.FC<CompanyFormStepProps> = ({
             type="text"
             className={inputClass("company_city")}
             value={formData.company_city}
-            onChange={(e) => onChange("company_city", e.target.value)}
+            onChange={(e) => {onChange("company_city", e.target.value);
+            onClearError("company_city");}}
           />
           {errors.company_city && (
-            <p className="mt-1 text-xs text-red-600 font-medium">
+            <p className="mt-1 text-xs text-red-600 ">
               {errors.company_city}
             </p>
           )}
@@ -221,10 +220,11 @@ export const CompanyFormStep: React.FC<CompanyFormStepProps> = ({
             type="text"
             className={inputClass("company_state")}
             value={formData.company_state}
-            onChange={(e) => onChange("company_state", e.target.value)}
+            onChange={(e) => {onChange("company_state", e.target.value);
+            onClearError("company_state");}}
           />
           {errors.company_state && (
-            <p className="mt-1 text-xs text-red-600 font-medium">
+            <p className="mt-1 text-xs text-red-600 ">
               {errors.company_state}
             </p>
           )}
@@ -237,10 +237,11 @@ export const CompanyFormStep: React.FC<CompanyFormStepProps> = ({
             type="text"
             className={inputClass("company_zip")}
             value={formData.company_zip}
-            onChange={(e) => onChange("company_zip", e.target.value)}
+            onChange={(e) => {onChange("company_zip", e.target.value);
+            onClearError("company_zip");}}
           />
           {errors.company_zip && (
-            <p className="mt-1 text-xs text-red-600 font-medium">
+            <p className="mt-1 text-xs text-red-600 ">
               {errors.company_zip}
             </p>
           )}

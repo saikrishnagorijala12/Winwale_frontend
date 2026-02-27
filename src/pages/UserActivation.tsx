@@ -513,7 +513,6 @@ export default function UserActivation() {
         </p>
       </div>
 
-      {/* Stats Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
         {[
           {
@@ -564,9 +563,7 @@ export default function UserActivation() {
         ))}
       </div>
 
-      {/* Main Table Card */}
       <div className="bg-white rounded-2xl sm:rounded-3xl shadow-sm border border-slate-100 ">
-        {/* Tabs */}
         <div className="border-b border-slate-100 px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6 overflow-x-auto">
           <div className="flex gap-1 sm:gap-2 min-w-max">
             {[
@@ -609,7 +606,6 @@ export default function UserActivation() {
           </div>
         </div>
 
-        {/* Table Header Area */}
         <div className="p-4 sm:p-6 lg:p-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <h2 className="text-xl font-bold text-slate-900">
@@ -630,7 +626,6 @@ export default function UserActivation() {
           </div>
         </div>
 
-        {/* Mobile Card View  */}
         <div className="lg:hidden px-4 sm:px-6 pb-4 sm:pb-6 space-y-3 sm:space-y-4">
           {loading ? (
             <div className="py-16 flex flex-col items-center justify-center gap-3">
@@ -655,7 +650,6 @@ export default function UserActivation() {
           )}
         </div>
 
-        {/* Desktop Table View */}
         <div className="hidden lg:block  px-6 pb-6">
           <table className="w-full border-collapse bg-white rounded-2xl shadow-sm">
             <thead>

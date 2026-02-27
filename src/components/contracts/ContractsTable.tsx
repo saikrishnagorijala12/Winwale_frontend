@@ -130,9 +130,6 @@ export default function ContractTable({
                         <span className="font-bold text-slate-800 text-sm transition-colors">
                           {contract.client}
                         </span>
-                        {/* <span className="text-[11px] text-slate-400 font-medium">
-                          ID: #{contract.client_id}
-                        </span> */}
                       </div>
                     </div>
                   </td>
@@ -194,7 +191,6 @@ export default function ContractTable({
         </table>
       </div>
 
-      {/* MOBILE CARDS  */}
       <div className="md:hidden divide-y divide-slate-100">
         {loading ? (
           <div className="py-20 text-center">

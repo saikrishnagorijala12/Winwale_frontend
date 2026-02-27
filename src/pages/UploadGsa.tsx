@@ -250,7 +250,6 @@ const UploadGsa: React.FC = () => {
                 )}
               </div>
 
-              {/* Step 2: File Dropzone */}
               <div className="space-y-3">
                 <div className="flex items-center gap-2 mb-2">
                   <span className="w-6 h-6 rounded-full bg-[#3399cc] text-white flex items-center justify-center text-xs font-bold">
@@ -349,7 +348,6 @@ const UploadGsa: React.FC = () => {
             </div>
           </div>
 
-          {/* Preview Table Section */}
           {previewData && previewData.length > 0 && (
             <div className="bg-white rounded-4xl shadow-sm border border-slate-200 overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
               <div className="p-6 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">

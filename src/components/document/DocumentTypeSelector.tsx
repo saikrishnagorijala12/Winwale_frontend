@@ -144,7 +144,6 @@ export const DocumentTypeCard = ({
         }
       `}
     >
-      {/* Gradient overlay for selected state */}
       {isSelected && (
         <div
           className="absolute inset-0 pointer-events-none opacity-10"
@@ -197,7 +196,6 @@ export const DocumentTypeCard = ({
         </div>
       </div>
 
-      {/* Selection indicator */}
       {isSelected && (
         <div className={`absolute top-4 right-4 w-2 h-2 rounded-full ${styles.dotBg} animate-pulse`} />
       )}
@@ -222,7 +220,6 @@ export const DocumentTypeSelector = () => {
   return (
     <div className="min-h-screen bg-linear-to-br from-slate-50 via-cyan-50/30 to-slate-100 p-6 lg:p-10">
       <div className="mx-auto max-w-6xl">
-        {/* Header Section */}
         <div className="mb-10 space-y-1">
           <h1 className="text-3xl font-bold tracking-tight text-slate-900">
             Select Document Type
@@ -232,7 +229,6 @@ export const DocumentTypeSelector = () => {
           </p>
         </div>
 
-        {/* Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {documentConfigs.map((config, index) => (
             <div

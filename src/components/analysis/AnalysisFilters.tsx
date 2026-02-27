@@ -51,7 +51,6 @@ export default function AnalysisFilters({
 
   return (
     <div className="bg-white rounded-3xl shadow-sm border border-slate-200">
-      {/* Header */}
       <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100">
         <div className="flex items-center gap-2">
           <Filter className="w-4 h-4 text-[#3399cc]" />
@@ -65,10 +64,8 @@ export default function AnalysisFilters({
         </button>
       </div>
 
-      {/* Inputs */}
       <div className="p-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {/* Search */}
           <div className="space-y-1">
             <label className="text-[11px] font-black uppercase tracking-widest text-slate-400">
               Search
@@ -84,7 +81,6 @@ export default function AnalysisFilters({
             </div>
           </div>
 
-          {/* Client */}
           <div className="space-y-1 overflow-visible">
             <label className="text-[11px] font-black uppercase tracking-widest text-slate-400">
               Client
@@ -107,7 +103,6 @@ export default function AnalysisFilters({
             )}
           </div>
 
-          {/* Status */}
           <div className="space-y-1">
             <label className="text-[11px] font-black uppercase tracking-widest text-slate-400">
               Status
@@ -130,7 +125,6 @@ export default function AnalysisFilters({
             </div>
           </div>
 
-          {/* Date Range */}
           <div className="space-y-1">
             <label className="text-[11px] font-black uppercase tracking-widest text-slate-400">
               Date Range

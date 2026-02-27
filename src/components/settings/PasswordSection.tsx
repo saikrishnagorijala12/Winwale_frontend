@@ -122,7 +122,6 @@ export const PasswordSection = ({
             </button>
           </div>
 
-          {/* Current password */}
           <div>
             <div className="relative">
               <input
@@ -150,7 +149,6 @@ export const PasswordSection = ({
             )}
           </div>
 
-          {/* New password */}
           <div>
             <div className="relative">
               <input
@@ -180,7 +178,6 @@ export const PasswordSection = ({
               <p className="text-xs text-red-600 mt-1 ml-1">{newError}</p>
             )}
 
-            {/* Password checklist */}
             <div
               className={`overflow-hidden transition-all duration-300 ease-in-out ${newPasswordFocused && newPassword.length > 0 && hasFailedRules
                   ? "max-h-40 opacity-100"
@@ -212,7 +209,6 @@ export const PasswordSection = ({
             </div>
           </div>
 
-          {/* Confirm password */}
           <div>
             <div className="relative">
               <input
@@ -241,7 +237,6 @@ export const PasswordSection = ({
             )}
           </div>
 
-          {/* Actions */}
           <div className="flex gap-3">
             <button
               onClick={handleSubmit}

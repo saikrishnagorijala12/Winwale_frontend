@@ -136,7 +136,6 @@ export default function AddClientContractModal({
       const clientRes = await api.post("/clients", clientPayload);
       const newClientId: number = clientRes.data.client_id;
 
-      // Upload logo if present
       if (logoFile) {
         const logoFormData = new FormData();
         logoFormData.append("file", logoFile);
@@ -155,7 +154,7 @@ export default function AddClientContractModal({
       };
       await contractService.createContract(newClientId, contractPayload);
 
-      toast.success("Client & Contract created successfully");
+      toast.success("Client Profile created successfully");
       onSuccess();
       handleClose();
     } catch (err: any) {
@@ -183,12 +182,11 @@ export default function AddClientContractModal({
   return (
     <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-none z-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-3xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-hidden flex flex-col">
-        {/* Header */}
         <div className="bg-slate-50 py-5 px-8 shrink-0">
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-2xl font-bold text-slate-700">
-                Add Client & Contract
+                Add Client Profile
               </h2>
               <p className="text-slate-500 text-sm opacity-80 mt-0.5">
                 Set up a new client profile and their GSA contract
@@ -205,7 +203,6 @@ export default function AddClientContractModal({
           </div>
         </div>
 
-        {/* Step bar */}
         <div className="flex items-center justify-between px-8 py-4 shrink-0 border-b border-slate-100 bg-white">
           {STEPS.map((label, i) => {
             const stepNum = i + 1;
@@ -244,7 +241,6 @@ export default function AddClientContractModal({
           })}
         </div>
 
-        {/* Form */}
         <form
           onSubmit={isLastStep ? handleSubmit : handleNext}
           noValidate
@@ -301,7 +297,6 @@ export default function AddClientContractModal({
             )}
           </div>
 
-          {/* Footer */}
           <div className="sticky bottom-0 bg-slate-50 p-6 flex justify-between border-t border-slate-100 shrink-0">
             <button
               type="button"
@@ -323,7 +318,7 @@ export default function AddClientContractModal({
                   Creating...
                 </>
               ) : isLastStep ? (
-                "Create Client & Contract"
+                "Create Client Profile"
               ) : (
                 "Next"
               )}

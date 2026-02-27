@@ -106,7 +106,6 @@ export const ClientDropdown: React.FC<ClientDropdownProps> = ({
         />
       </div>
 
-      {/* Dropdown Menu */}
       {isOpen && (
         <div className="absolute top-full left-0 w-full mt-2 bg-white border border-slate-100 rounded-2xl shadow-xl overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200 origin-top">
           <div className="p-3 border-b border-slate-100 bg-slate-50/50">

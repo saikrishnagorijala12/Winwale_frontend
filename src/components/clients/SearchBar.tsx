@@ -18,7 +18,6 @@ export const SearchBar: React.FC<SearchBarProps> = ({
 
   return (
     <div className="mx-auto bg-white p-4 rounded-4xl shadow-sm border border-slate-200 mb-8 flex flex-col lg:flex-row gap-4 items-center">
-      {/* Search Input Container */}
       <div className="relative flex-1 w-full">
         <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
         <input
@@ -30,7 +29,6 @@ export const SearchBar: React.FC<SearchBarProps> = ({
         />
       </div>
 
-      {/* Filter Buttons Container */}
       <div className="flex p-1.5 bg-slate-100 rounded-2xl w-full lg:w-auto overflow-x-auto no-scrollbar">
         {statuses.map((status) => {
           const isActive = filterStatus === status;

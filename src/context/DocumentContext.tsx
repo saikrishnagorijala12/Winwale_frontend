@@ -25,6 +25,7 @@ const mapJobDetailsToForm = (api: any) => {
   const delivery = contract.delivery || {};
   const address = contract.address || {};
   const other = contract.other || {};
+  const negotiator=api.negotiator||{};
 
   return {
     companyName: client.company_name,
@@ -43,7 +44,7 @@ const mapJobDetailsToForm = (api: any) => {
     gsaOfficeZip: address.contract_officer_zip,
     gsaOfficeCityStateZip:
       `${address.contract_officer_city || ""}, ${address.contract_officer_state || ""}, ${address.contract_officer_zip || ""}`.trim(),
-
+    negotiatorName:negotiator.name,
     deliveryAroNormal: delivery.normal_delivery_time,
     deliveryAroExpedited: delivery.expedited_delivery_time,
 
@@ -91,7 +92,7 @@ const mapJobDetailsToForm = (api: any) => {
       const legacyGroups = api.sin_groups;
 
       return {
-        sinsFormatted: getFormatted("ALL", legacyGroups), // Or join all actions
+        sinsFormatted: getFormatted("ALL", legacyGroups),
         sin_additions: getFormatted("ADDED_PRODUCT", legacyGroups),
         sin_deletions: getFormatted("REMOVED_PRODUCT", legacyGroups),
         sin_price_increase: getFormatted("PRICE_INCREASE", legacyGroups),

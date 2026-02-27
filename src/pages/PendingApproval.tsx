@@ -15,12 +15,10 @@ const PendingApproval: React.FC = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#f5f6f7] px-4">
       <div className="w-full max-w-md bg-white border border-slate-200 rounded-md p-10 text-center">
-        {/* Logo */}
         <div className="flex justify-center mb-8">
           <img src="/logo.png" alt="Winvale" className="h-9 object-contain" />
         </div>
- 
-        {/* Message */}
+
         <p className="text-base text-slate-800 leading-relaxed">
           <span className="font-semibold">
             Your account has been created and is awaiting approval.
@@ -31,8 +29,7 @@ const PendingApproval: React.FC = () => {
           reviewed and approved by the{" "}
           <span className="font-semibold">Winvale Administration team</span>.
         </p>
- 
-        {/* Action */}
+
         <div className="mt-10">
           <button onClick={logout} className="w-full btn-primary">
             Done

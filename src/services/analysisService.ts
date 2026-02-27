@@ -67,9 +67,13 @@ export const rejectAnalysisJob = async (
 export const exportPriceModifications = async (params: {
   client_id?: number | null;
   job_id?: number | null;
+  types?: string[];
 }): Promise<Blob> => {
   const response = await api.get("/export/price-modifications", {
     params,
+    paramsSerializer: {
+      indexes: null,
+    },
     responseType: "blob",
   });
   return response.data;

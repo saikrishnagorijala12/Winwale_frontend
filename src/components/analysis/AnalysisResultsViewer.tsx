@@ -14,6 +14,39 @@ import { ModificationAction } from "../../types/analysis.types";
 import { StatCard } from "../pricelist-analysis/StatCard";
 import ConfirmationModal from "../shared/ConfirmationModal";
 
+const tabs = [
+    {
+        id: "NEW_PRODUCT",
+        label: "Additions",
+        icon: Plus,
+        variant: "emerald" as const,
+    },
+    {
+        id: "REMOVED_PRODUCT",
+        label: "Deletions",
+        icon: Minus,
+        variant: "red" as const,
+    },
+    {
+        id: "PRICE_INCREASE",
+        label: " Price Increases",
+        icon: TrendingUp,
+        variant: "amber" as const,
+    },
+    {
+        id: "PRICE_DECREASE",
+        label: "Price Decreases",
+        icon: TrendingDown,
+        variant: "cyan" as const,
+    },
+    {
+        id: "DESCRIPTION_CHANGE",
+        label: "Description Changes",
+        icon: FileEdit,
+        variant: "blue" as const,
+    },
+];
+
 interface AnalysisResultsViewerProps {
     actions: ModificationAction[];
     actionSummary: Record<string, number>;
@@ -23,7 +56,7 @@ interface AnalysisResultsViewerProps {
     activeTab: string;
     onTabChange: (tab: string) => void;
     onPageChange: (page: number) => void;
-    onExport: () => Promise<void>;
+    onExport: (selectedTypes: string[]) => Promise<void>;
     isLoading?: boolean;
     isExporting?: boolean;
 }
@@ -42,7 +75,18 @@ export const AnalysisResultsViewer = ({
     isExporting = false,
 }: AnalysisResultsViewerProps) => {
     const [isConfirmExportOpen, setIsConfirmExportOpen] = useState(false);
+    const [selectedExportTypes, setSelectedExportTypes] = useState<string[]>([]);
     const itemsPerPage = 7;
+
+    React.useEffect(() => {
+        const nonZeroTypes = tabs
+            .filter((t) => (actionSummary[t.id] || 0) > 0)
+            .map((t) => t.id);
+
+        if (nonZeroTypes.length > 0 && selectedExportTypes.length === 0) {
+            setSelectedExportTypes(nonZeroTypes);
+        }
+    }, [actionSummary]);
 
     const getPageNumbers = (totalPages: number) => {
         const pages: (number | "...")[] = [];
@@ -60,44 +104,6 @@ export const AnalysisResultsViewer = ({
         return pages;
     };
 
-    const tabs = [
-        {
-            id: "NEW_PRODUCT",
-            label: "Additions",
-            icon: Plus,
-            variant: "emerald" as const,
-            count: actionSummary.NEW_PRODUCT || 0,
-        },
-        {
-            id: "REMOVED_PRODUCT",
-            label: "Deletions",
-            icon: Minus,
-            variant: "red" as const,
-            count: actionSummary.REMOVED_PRODUCT || 0,
-        },
-        {
-            id: "PRICE_INCREASE",
-            label: "Increases",
-            icon: TrendingUp,
-            variant: "amber" as const,
-            count: actionSummary.PRICE_INCREASE || 0,
-        },
-        {
-            id: "PRICE_DECREASE",
-            label: "Decreases",
-            icon: TrendingDown,
-            variant: "cyan" as const,
-            count: actionSummary.PRICE_DECREASE || 0,
-        },
-        {
-            id: "DESCRIPTION_CHANGE",
-            label: "Descriptions",
-            icon: FileEdit,
-            variant: "blue" as const,
-            count: actionSummary.DESCRIPTION_CHANGE || 0,
-        },
-    ];
-
     const isDescChange = activeTab === "DESCRIPTION_CHANGE";
     const isPriceChange =
         activeTab === "PRICE_INCREASE" || activeTab === "PRICE_DECREASE";
@@ -112,7 +118,7 @@ export const AnalysisResultsViewer = ({
                 isOpen={isConfirmExportOpen}
                 onClose={() => setIsConfirmExportOpen(false)}
                 onConfirm={async () => {
-                    await onExport();
+                    await onExport(selectedExportTypes);
                     setIsConfirmExportOpen(false);
                 }}
                 title="Export Analysis Results"
@@ -127,7 +133,7 @@ export const AnalysisResultsViewer = ({
                     <StatCard
                         key={tab.id}
                         label={tab.label}
-                        value={tab.count}
+                        value={actionSummary[tab.id] || 0}
                         icon={<tab.icon className="w-4 h-4" />}
                         variant={tab.variant}
                     />
@@ -136,19 +142,72 @@ export const AnalysisResultsViewer = ({
 
             <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
                 <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between gap-4">
-                    <h3 className="text-xl font-bold text-slate-900">
-                        Analysis Results
-                    </h3>
+                    <h3 className="text-xl font-bold text-slate-900">Analysis Results</h3>
 
-                    <button
-                        onClick={() => setIsConfirmExportOpen(true)}
-                        className="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-50 text-slate-700 text-sm font-bold border border-slate-200 hover:bg-slate-100 transition-all"
-                    >
-                        <Download size={16} /> Export All
-                    </button>
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                        <div className="flex flex-wrap gap-3 p-1.5 bg-slate-50 border border-slate-200 rounded-xl">
+                            {tabs.map((tab) => {
+                                const hasItems = (actionSummary[tab.id] || 0) > 0;
+                                const isChecked = selectedExportTypes.includes(tab.id);
+
+                                return (
+                                    <label
+                                        key={tab.id}
+                                        className={`flex items-center gap-2 px-3 py-1.5 rounded-lg transition-all border ${isChecked
+                                            ? `bg-white border-${tab.variant}-200 text-slate-900 shadow-xs`
+                                            : "bg-transparent border-transparent text-slate-400"
+                                            } ${hasItems ? "cursor-pointer hover:text-slate-600" : "opacity-40 cursor-not-allowed"}`}
+                                    >
+                                        <input
+                                            type="checkbox"
+                                            className="sr-only"
+                                            checked={isChecked}
+                                            disabled={!hasItems}
+                                            onChange={() => {
+                                                if (!hasItems) return;
+                                                setSelectedExportTypes((prev) =>
+                                                    prev.includes(tab.id)
+                                                        ? prev.filter((id) => id !== tab.id)
+                                                        : [...prev, tab.id],
+                                                );
+                                            }}
+                                        />
+                                        <div
+                                            className={`w-4 h-4 rounded border flex items-center justify-center transition-all ${isChecked
+                                                ? `bg-${tab.variant}-100/50 border-${tab.variant}-500 text-${tab.variant}-600`
+                                                : "bg-white border-slate-300"
+                                                }`}
+                                        >
+                                            {isChecked && (
+                                                <svg className="w-3 h-3 fill-current" viewBox="0 0 20 20">
+                                                    <path d="M0 11l2-2 5 5L18 3l2 2L7 18z" />
+                                                </svg>
+                                            )}
+                                        </div>
+                                        <span className="text-xs font-bold leading-none select-none">
+                                            {tab.label}
+                                        </span>
+                                    </label>
+                                );
+                            })}
+                        </div>
+
+                        <button
+                            onClick={() => setIsConfirmExportOpen(true)}
+                            disabled={selectedExportTypes.length === 0 || isExporting}
+                            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-sm transition-all border ${selectedExportTypes.length === 0
+                                ? "bg-slate-50 text-slate-300 border-slate-100 cursor-not-allowed"
+                                : "bg-white text-slate-700 border-slate-200 hover:bg-slate-100 active:scale-95"
+                                }`}
+                        >
+                            <Download size={16} />
+                            {selectedExportTypes.length === tabs.length
+                                ? "Export All"
+                                : `Export (${selectedExportTypes.length})`}
+                        </button>
+                    </div>
                 </div>
 
-                {/* Tab Bar */}
                 <div className="px-6 pt-4">
                     <div className="bg-slate-100/80 p-1 rounded-2xl flex items-center w-full ">
                         {tabs.map((tab) => (
@@ -226,7 +285,9 @@ export const AnalysisResultsViewer = ({
                                         <td colSpan={4} className="px-6 py-16 text-center">
                                             <div className="flex flex-col items-center justify-center gap-3">
                                                 <Loader2 className="w-8 h-8 animate-spin text-[#24578f]" />
-                                                <p className="text-sm text-slate-500 font-medium">Loading analysis results...</p>
+                                                <p className="text-sm text-slate-500 font-medium">
+                                                    Loading analysis results...
+                                                </p>
                                             </div>
                                         </td>
                                     </tr>
@@ -299,7 +360,6 @@ export const AnalysisResultsViewer = ({
                     </div>
                 </div>
 
-                {/* Pagination */}
                 {totalActions > itemsPerPage && (
                     <div className="px-6 py-5 bg-white border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
                         <div className="text-sm text-slate-500 font-medium">

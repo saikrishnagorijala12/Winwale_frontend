@@ -12,7 +12,7 @@ interface ReviewResultsStepProps {
     activeTab: string;
     onTabChange: (tab: string) => void;
     onPageChange: (page: number) => void;
-    onExport: () => Promise<void>;
+    onExport: (selectedTypes: string[]) => Promise<void>;
     onReset: () => void;
     onGenerateDocuments: () => void;
     isLoading?: boolean;

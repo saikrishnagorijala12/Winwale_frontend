@@ -140,8 +140,21 @@ export default function AnalysisTable({
                       </td>
                       <td className="p-4">
                         <div className="flex items-center gap-3">
-                          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-600/10">
-                            <Building2 className="h-4 w-4 text-[#24578f]" />
+                          <div
+                            className={`shrink-0 w-9 h-9 rounded-xl border border-slate-200 flex items-center justify-center text-white font-bold text-xs shadow-sm overflow-hidden ${item.client_logo_url
+                              ? "bg-white"
+                              : "bg-linear-to-br from-[#3399cc] to-[#2980b9]"
+                              }`}
+                          >
+                            {item.client_logo_url ? (
+                              <img
+                                src={item.client_logo_url}
+                                alt={item.client || "Client"}
+                                className="w-full h-full object-contain"
+                              />
+                            ) : (
+                              item.client ? item.client.substring(0, 2).toUpperCase() : <Building2 className="h-4 w-4" />
+                            )}
                           </div>
 
                           <div className="leading-tight">
@@ -304,6 +317,22 @@ export default function AnalysisTable({
 
                   {/* Client Info */}
                   <div className="flex items-center gap-3 mb-3">
+                    <div
+                      className={`shrink-0 w-10 h-10 rounded-xl border border-slate-200 flex items-center justify-center text-white font-bold text-sm shadow-sm overflow-hidden ${item.client_logo_url
+                        ? "bg-white"
+                        : "bg-linear-to-br from-[#3399cc] to-[#2980b9]"
+                        }`}
+                    >
+                      {item.client_logo_url ? (
+                        <img
+                          src={item.client_logo_url}
+                          alt={item.client || "Client"}
+                          className="w-full h-full object-contain"
+                        />
+                      ) : (
+                        item.client ? item.client.substring(0, 2).toUpperCase() : <Building2 className="h-5 w-5" />
+                      )}
+                    </div>
                     <div className="leading-tight min-w-0 flex-1">
                       <div className="font-semibold text-slate-800 truncate">
                         {item.client || "—"}
