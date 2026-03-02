@@ -34,7 +34,7 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({ title, subtitle, children }) =>
         <div className="max-w-md w-full">
           <div className="lg:hidden flex items-center justify-center gap-3 mb-6">
             <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0">
-              <img src="logo.png" alt='Winvale Logo' />
+              <img src="/logo.png" alt='Winvale Logo' />
             </div>
             <span className="text-2xl font-bold text-slate-900">Winvale</span>
           </div>

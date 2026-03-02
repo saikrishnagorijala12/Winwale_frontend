@@ -207,7 +207,7 @@ export default function AppSidebar() {
             }}
             className="flex items-center gap-3 cursor-pointer"
           >
-            <img src="logo.png" alt="Logo" className="w-8 h-8 object-contain" />
+            <img src="/logo.png" alt="Logo" className="w-8 h-8 object-contain" />
             <span className="text-2xl font-bold text-[#1e293b] tracking-tight">
               Winvale
             </span>
@@ -237,8 +237,8 @@ export default function AppSidebar() {
                   disabled={!isAdmin}
                   onClick={() => toggleSection(section.label)}
                   className={`w-full flex items-center justify-between px-6 mb-1 text-[10px] font-bold uppercase tracking-widest transition-colors ${isAdmin
-                      ? "hover:text-slate-900 cursor-pointer text-slate-400"
-                      : "text-slate-400"
+                    ? "hover:text-slate-900 cursor-pointer text-slate-400"
+                    : "text-slate-400"
                     }`}
                 >
                   <span>{section.label}</span>

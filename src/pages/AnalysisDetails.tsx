@@ -49,9 +49,10 @@ export default function AnalysisDetails() {
           summary: processModifications(data.action_summary),
         };
         setJob(jobData);
-      } catch (error) {
-        console.error("Failed to fetch job:", error);
-        toast.error("Failed to load analysis details");
+      } catch (error: any) {
+        if (error?.status !== 404) {
+          toast.error("Failed to load analysis details");
+        }
       } finally {
         setIsFetchingJob(false);
       }

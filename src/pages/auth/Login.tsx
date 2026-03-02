@@ -67,7 +67,12 @@ const Login: React.FC = () => {
       isAuthProcessed.current = true;
 
       try {
-        await refreshUser();
+        const userData = await refreshUser();
+        if (userData.is_active) {
+          navigate("/dashboard");
+        } else {
+          navigate("/pending-approval");
+        }
       } catch (refreshErr: any) {
         isAuthProcessed.current = false;
         const msg = refreshErr.message || "";
@@ -87,7 +92,7 @@ const Login: React.FC = () => {
         }
         setError(
           refreshErr.response?.data?.message ||
-            "Login successful, but profile could not be loaded.",
+          "Login successful, but profile could not be loaded.",
         );
       }
     } catch (err: any) {
@@ -110,7 +115,12 @@ const Login: React.FC = () => {
           return;
         }
         isAuthProcessed.current = true;
-        await refreshUser();
+        const userData = await refreshUser();
+        if (userData.is_active) {
+          navigate("/dashboard");
+        } else {
+          navigate("/pending-approval");
+        }
         return;
       }
       setError(

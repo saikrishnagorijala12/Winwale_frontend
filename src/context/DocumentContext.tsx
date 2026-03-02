@@ -10,6 +10,7 @@ import { getDocumentConfig } from "../types/documentConfigs";
 import api from "../lib/axios";
 import { useAuth } from "./AuthContext";
 import * as validators from "../utils/validators";
+import { toast } from "sonner";
 
 const fetchJobDetails = async (jobId: number) => {
   const response = await api.get(`/generate/${jobId}`);
@@ -194,8 +195,10 @@ export const DocumentProvider: React.FC<{ children: React.ReactNode }> = ({
         });
 
         setCurrentStep("form-entry");
-      } catch (error) {
+      } catch (error: any) {
         console.error("Prefill failed:", error);
+        toast.error(error?.message || "Failed to load document configuration");
+        setCurrentStep("select-type");
       }
     },
     [user, loadedJobId, cachedJobDetails, setCurrentStep],

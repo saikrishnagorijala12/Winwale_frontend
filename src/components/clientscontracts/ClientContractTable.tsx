@@ -77,7 +77,7 @@ export const ClientContractTable: React.FC<ClientContractTableProps> = ({
                 Status
               </th>
               <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                Contact
+                Negotiator Contact
               </th>
 
               <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">

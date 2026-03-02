@@ -22,7 +22,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
         <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
         <input
           type="text"
-          placeholder="Search by name, email, contact, or contract number..."
+          placeholder="Search by  name, email, negotiator, or contract number..."
           className="w-full pl-14 pr-6 py-3.5 rounded-2xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20  bg-slate-50/50 text-slate-700 placeholder:text-slate-400 transition-all font-medium"
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}

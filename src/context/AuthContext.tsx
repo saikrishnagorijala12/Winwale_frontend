@@ -16,7 +16,7 @@ interface AuthContextType {
   isActive: boolean;
   setUser: (user: UserProfile | null) => void;
   status: AuthStatus;
-  refreshUser: () => Promise<void>;
+  refreshUser: () => Promise<UserProfile>;
   logout: () => Promise<void>;
 }
 
@@ -31,13 +31,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const bootstrapped = useRef(false);
 
-  const refreshUser = async () => {
+  const refreshUser = async (): Promise<UserProfile> => {
     const response = await api.get("/users/me");
     const userData = response.data;
 
     setUser(userData);
     setIsActive(!!userData.is_active);
     setStatus("authenticated");
+    return userData;
   };
 
   useEffect(() => {
@@ -62,7 +63,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         await refreshUser();
       } catch (err) {
         console.error("Auth bootstrap failed:", err);
-        await signOut().catch(() => {});
+        await signOut().catch(() => { });
         setUser(null);
         setIsActive(false);
         setStatus("unauthenticated");

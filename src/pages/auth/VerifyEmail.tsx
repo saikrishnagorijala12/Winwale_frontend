@@ -56,8 +56,12 @@ const VerifyEmail: React.FC = () => {
                         username: email.trim(),
                         password: password,
                     });
-                    await refreshUser();
-                    navigate("/dashboard");
+                    const userData = await refreshUser();
+                    if (userData.is_active) {
+                        navigate("/dashboard");
+                    } else {
+                        navigate("/pending-approval");
+                    }
                     return;
                 } catch (loginErr: any) {
                     console.error("Auto-login failed:", loginErr);
