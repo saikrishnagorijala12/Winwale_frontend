@@ -7,6 +7,7 @@ import { documentConfigs } from "../types/documentConfigs";
 import { useSearchParams } from "react-router-dom";
 import { useEffect } from "react";
 import { useAnalysis } from "../context/AnalysisContext";
+import { DocumentFormSkeleton } from "../components/document/DocumentFormSkeleton";
 
 export const DocumentWorkflowRenderer = () => {
   const {
@@ -31,13 +32,11 @@ export const DocumentWorkflowRenderer = () => {
   useEffect(() => {
     if (!selectedDocumentType && documentConfigs.length > 0) {
       loadDocumentConfig(documentConfigs[0].id, jobId || undefined);
-      setCurrentStep("form-entry");
     }
   }, [selectedDocumentType, loadDocumentConfig, jobId, setCurrentStep]);
 
   const handleSelect = (configId: string) => {
     loadDocumentConfig(configId, jobId || undefined);
-    setCurrentStep("form-entry");
   };
 
   const getModificationMessage = () => {
@@ -108,12 +107,7 @@ export const DocumentWorkflowRenderer = () => {
 
         <div className="pt-2">
           {currentStep === "load-config" ? (
-            <div className="py-20 text-center bg-white rounded-3xl border border-slate-200">
-              <Loader2 className="w-8 h-8 animate-spin m-auto text-[#24548f]" />
-              <p className="text-sm text-slate-500 font-medium">
-                Loading configuration...
-              </p>
-            </div>
+            <DocumentFormSkeleton />
           ) : modificationMessage ? (
             <div className="py-24 text-center bg-white rounded-3xl border border-slate-200 shadow-sm animate-fade-in">
               <h3 className="text-xl font-bold text-slate-900 mb-2">

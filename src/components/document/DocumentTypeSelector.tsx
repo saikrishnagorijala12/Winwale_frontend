@@ -107,7 +107,7 @@ export const DocumentTypeCard = ({
               : `bg-slate-100 group-hover:${styles.bg}`
             }
           `}
-          
+
         >
           <IconComponent
             className={`w-5 h-5 transition-all duration-300 ${isSelected ? "scale-110" : "group-hover:scale-110"
@@ -212,9 +212,6 @@ export const DocumentTypeSelector = () => {
 
   const handleSelect = (configId: string) => {
     loadDocumentConfig(configId, jobId);
-    setTimeout(() => {
-      setCurrentStep("form-entry");
-    }, 500);
   };
 
   return (

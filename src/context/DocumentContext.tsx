@@ -25,7 +25,7 @@ const mapJobDetailsToForm = (api: any) => {
   const delivery = contract.delivery || {};
   const address = contract.address || {};
   const other = contract.other || {};
-  const negotiator=api.negotiator||{};
+  const negotiator = api.negotiator || {};
 
   return {
     companyName: client.company_name,
@@ -44,7 +44,7 @@ const mapJobDetailsToForm = (api: any) => {
     gsaOfficeZip: address.contract_officer_zip,
     gsaOfficeCityStateZip:
       `${address.contract_officer_city || ""}, ${address.contract_officer_state || ""}, ${address.contract_officer_zip || ""}`.trim(),
-    negotiatorName:negotiator.name,
+    negotiatorName: negotiator.name,
     deliveryAroNormal: delivery.normal_delivery_time,
     deliveryAroExpedited: delivery.expedited_delivery_time,
 
@@ -192,6 +192,8 @@ export const DocumentProvider: React.FC<{ children: React.ReactNode }> = ({
 
           return merged;
         });
+
+        setCurrentStep("form-entry");
       } catch (error) {
         console.error("Prefill failed:", error);
       }
