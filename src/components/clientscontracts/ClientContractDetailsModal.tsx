@@ -190,7 +190,7 @@ export const ClientContractDetailsModal: React.FC<
             </div>
             <div>
               <div className="flex items-center gap-3 mb-1">
-                <h2 className="text-2xl font-bold text-slate-800 tracking-tight">
+                <h2 className="text-2xl uppercase font-bold text-slate-800 tracking-tight">
                   {client.name}
                 </h2>
                 <StatusBadge status={client.status} />

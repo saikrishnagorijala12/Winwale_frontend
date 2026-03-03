@@ -543,20 +543,20 @@ export default function UserActivation() {
         ].map((stat) => (
           <div
             key={stat.label}
-            className="bg-white p-4 sm:p-6 lg:p-8 rounded-2xl sm:rounded-3xl shadow-sm flex items-center gap-3 sm:gap-5 border border-slate-100"
+            className="bg-white p-4 sm:p-6 rounded-2xl sm:rounded-3xl shadow-sm flex items-center gap-3 sm:gap-5 border border-slate-100"
           >
             <div
-              className={`w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 bg-${stat.color}-50 rounded-full flex items-center justify-center shrink-0`}
+              className={`w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-${stat.color}-50 rounded-xl flex items-center justify-center shrink-0`}
             >
               <stat.icon
-                className={`w-5 h-5 sm:w-6 sm:h-6 lg:w-7 lg:h-7 text-${stat.color}-600`}
+                className={`w-4 h-4 sm:w-4 sm:h-4 lg:w-6 lg:h-6 text-${stat.color}-600`}
               />
             </div>
             <div className="min-w-0 flex-1">
               <p className="text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-slate-400 truncate">
                 {stat.label}
               </p>
-              <p className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900">
+              <p className="text-xl sm:text-2xl lg:text-3xl font-bold">
                 {stat.count}
               </p>
             </div>

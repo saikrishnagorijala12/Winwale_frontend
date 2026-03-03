@@ -217,7 +217,7 @@ export const ClientTable: React.FC<ClientTableProps> = ({
                     )}
                   </div>
                   <div>
-                    <h3 className="font-bold text-slate-900 text-lg">
+                    <h3 className="font-bold uppercase text-slate-900 text-lg">
                       {client.name}
                     </h3>
                     <div className="mt-1"><StatusBadge status={client.status} /></div>

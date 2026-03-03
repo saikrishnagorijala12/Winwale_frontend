@@ -37,7 +37,7 @@ const EmptyState = () => (
     <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center mb-4 border border-slate-100">
       <Inbox className="w-8 h-8 text-slate-300" />
     </div>
-    <h3 className="text-base font-bold text-slate-500">No records found</h3>
+    <h3 className="text-base font-bold text-slate-500">No client profiles found</h3>
   </div>
 );
 
@@ -119,11 +119,10 @@ export const ClientContractTable: React.FC<ClientContractTableProps> = ({
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
                         <div
-                          className={`shrink-0 w-9 h-9 rounded-xl border border-slate-200 flex items-center justify-center text-white font-bold text-xs shadow-sm overflow-hidden ${
-                            client.logoUrl
+                          className={`shrink-0 w-9 h-9 rounded-xl border border-slate-200 flex items-center justify-center text-white font-bold text-xs shadow-sm overflow-hidden ${client.logoUrl
                               ? "bg-white"
                               : "bg-linear-to-br from-[#3399cc] to-[#2980b9]"
-                          }`}
+                            }`}
                         >
                           {client.logoUrl ? (
                             <img
@@ -137,7 +136,7 @@ export const ClientContractTable: React.FC<ClientContractTableProps> = ({
                         </div>
 
                         <div className="min-w-0">
-                          <p className="font-semibold text-slate-900 group-hover:text-[#38A1DB] transition-colors truncate max-w-40">
+                          <p className="font-semibold text-slate-900 uppercase group-hover:text-[#38A1DB] transition-colors truncate max-w-40">
                             {client.name}
                           </p>
                           <p className="text-xs text-slate-400 truncate max-w-40">
@@ -253,11 +252,10 @@ export const ClientContractTable: React.FC<ClientContractTableProps> = ({
                 <div className="flex justify-between items-start mb-4">
                   <div className="flex items-center gap-3">
                     <div
-                      className={`w-12 h-12 rounded-2xl bg-linear-to-br flex items-center justify-center text-white font-bold text-lg shadow-blue-100 shadow-lg overflow-hidden${
-                        client.logoUrl
+                      className={`w-12 h-12 rounded-2xl bg-linear-to-br flex items-center justify-center text-white font-bold text-lg shadow-blue-100 shadow-lg overflow-hidden${client.logoUrl
                           ? "bg-white"
                           : "bg-linear-to-br from-[#3399cc] to-[#2980b9]"
-                      }`}
+                        }`}
                     >
                       {client.logoUrl ? (
                         <img

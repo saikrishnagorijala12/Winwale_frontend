@@ -87,103 +87,111 @@ export default function AnalysisDetails() {
   }
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-slate-50 via-blue-50/30 to-slate-100 p-6 lg:p-10 space-y-10">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-12 mx-auto">
-        <div>
-          <div className="flex items-center gap-3 mb-2">
-            <h1 className="text-3xl font-extrabold tracking-tight text-slate-800">
+    <div className="min-h-screen bg-slate-50/50 p-6 lg:p-10 space-y-8">
+      {/* Header Section */}
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+        <div className="space-y-1">
+          <div className="flex items-center gap-3">
+            <h1 className="text-3xl font-black tracking-tight text-slate-800">
               Analysis Details
             </h1>
           </div>
           <p className="text-slate-500 font-medium">
             {jobId
-              ? `Review the analysis results of ANAL-JOB-${jobId}`
-              : "Please select an analysis from the History page"}
+              ? `Reviewing results for ANAL-JOB-${jobId}`
+              : "Please select an analysis from history"}
           </p>
         </div>
+
         {job && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-3 gap-x-8 text-sm bg-white p-6 rounded-3xl border border-white shadow-sm">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
-                <User className="w-4 h-4 text-blue-600" />
+          <div className="flex items-center gap-4 bg-white/80 backdrop-blur-md p-1.5 rounded-2xl border border-white shadow-sm ring-1 ring-slate-200/50">
+            <div className="flex items-center gap-3 px-4 py-2 border-r border-slate-100 last:border-0">
+              <div className="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 shadow-sm shadow-blue-100">
+                <User size={18} />
               </div>
-              <div>
-                <p className="text-[10px] font-bold text-slate-400 uppercase">
+              <div className="flex flex-col">
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                   Client
-                </p>
-                <p className="font-bold text-slate-700">
+                </span>
+                <span className="text-sm font-bold text-slate-700">
                   {job.client || "N/A"}
-                </p>
+                </span>
               </div>
             </div>
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center">
-                <FileText className="w-4 h-4 text-emerald-600" />
+            <div className="flex items-center gap-3 px-4 py-2 border-r border-slate-100 last:border-0">
+              <div className="w-9 h-9 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600 shadow-sm shadow-emerald-100">
+                <FileText size={18} />
               </div>
-              <div>
-                <p className="text-[10px] font-bold text-slate-400 uppercase">
+              <div className="flex flex-col">
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                   Contract
-                </p>
-                <p className="font-bold text-slate-700">
+                </span>
+                <span className="text-sm font-bold text-slate-700">
                   {job.contract_number || "N/A"}
-                </p>
+                </span>
               </div>
             </div>
           </div>
         )}
       </div>
 
-      <AnalysisResultsViewer
-        actions={job?.modifications_actions || []}
-        actionSummary={job?.action_summary || {}}
-        totalActions={job?.total_actions || 0}
-        totalPages={job?.total_pages || 0}
-        currentPage={currentPage}
-        activeTab={activeTab}
-        onTabChange={handleTabChange}
-        onPageChange={handlePageChange}
-        isLoading={isFetchingJob}
-        isExporting={isExporting}
-        onExport={async (selectedTypes) => {
-          try {
-            setIsExporting(true);
-            const date = new Date()
-              .toLocaleDateString("en-US", {
-                month: "2-digit",
-                day: "2-digit",
-                year: "numeric",
-              })
-              .replace(/\//g, "-");
+      <div className="relative">
+        <AnalysisResultsViewer
+          actions={job?.modifications_actions || []}
+          actionSummary={job?.action_summary || {}}
+          totalActions={job?.total_actions || 0}
+          totalPages={job?.total_pages || 0}
+          currentPage={currentPage}
+          activeTab={activeTab}
+          onTabChange={handleTabChange}
+          onPageChange={handlePageChange}
+          isLoading={isFetchingJob}
+          isExporting={isExporting}
+          onExport={async (selectedTypes) => {
+            try {
+              setIsExporting(true);
+              const date = new Date()
+                .toLocaleDateString("en-US", {
+                  month: "2-digit",
+                  day: "2-digit",
+                  year: "numeric",
+                })
+                .replace(/\//g, "-");
 
-            const clientName = job?.client?.replace(/\s+/g, "-") || "Client";
-            const contract = job?.contract_number || "NoContract";
-            const fileName = `${clientName}_${contract}_modifications_${date}.xlsx`;
+              const clientName = job?.client?.replace(/\s+/g, "-") || "Client";
+              const contract = job?.contract_number || "NoContract";
+              const fileName = `${clientName}_${contract}_modifications_${date}.xlsx`;
 
-            const blob = await exportPriceModifications({
-              job_id: Number(jobId),
-              types: selectedTypes,
-            });
-            downloadBlob(blob, fileName);
-            toast.success("Analysis export complete");
-          } catch (error) {
-            console.error("Export failed:", error);
-            toast.error("Failed to export analysis");
-          } finally {
-            setIsExporting(false);
-          }
-        }}
-      />
+              const blob = await exportPriceModifications({
+                job_id: Number(jobId),
+                types: selectedTypes,
+              });
+              downloadBlob(blob, fileName);
+              toast.success("Analysis export complete");
+            } catch (error) {
+              console.error("Export failed:", error);
+              toast.error("Failed to export analysis");
+            } finally {
+              setIsExporting(false);
+            }
+          }}
+        />
+      </div>
 
-      <div className="flex items-center justify-between ">
+      <div className="flex items-center justify-between">
         <button
           onClick={() => navigate(-1)}
-          className="btn-secondary"
+          className="group flex items-center gap-2 px-6 py-2.5 bg-white border border-slate-200 text-slate-600 font-bold rounded-xl transition-all hover:bg-slate-50 hover:text-slate-900 active:scale-95 shadow-sm"
         >
-          <ChevronLeft className="w-4 h-4" />
+          <ChevronLeft className="w-4 h-4 transition-transform group-hover:-translate-x-0.5" />
           Back
         </button>
-        <button onClick={() => navigate(`/documents?job_id=${jobId}`)} className="btn-primary">
-          Generate Documents <ArrowRight className="w-5 h-5" />
+        <button
+          onClick={() => navigate(`/documents?job_id=${jobId}`)}
+          className="group flex items-center gap-2 px-8 py-3 bg-[#3399cc] hover:bg-[#2980b9] text-white font-bold rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-blue-500/20"
+        >
+          Generate Documents
+          <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-0.5" />
         </button>
       </div>
     </div>

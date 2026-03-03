@@ -42,7 +42,7 @@ export const WorkflowStepper = () => {
 
             return (
               <div key={step.id} className="flex items-center flex-1">
-                <div className="flex flex-col items-center min-w-[120px] group">
+                <div className="flex flex-col items-center min-w-30 group">
                   <div
                     className={`
                       w-11 h-11 rounded-full flex items-center justify-center
@@ -50,7 +50,7 @@ export const WorkflowStepper = () => {
                       transition-all duration-300 ease-out
                       ${
                         isComplete
-                          ? "bg-gradient-to-br from-emerald-500 to-emerald-600 text-white shadow-md"
+                          ? "bg-linear-to-br from-emerald-500 to-emerald-600 text-white shadow-md"
                           : isActive
                           ? "text-white ring-4 shadow-lg scale-105"
                           : "bg-white border border-slate-300 text-slate-400"
@@ -90,7 +90,7 @@ export const WorkflowStepper = () => {
 
                 {index < steps.length - 1 && (
                   <div className="flex-1 px-4">
-                    <div className="relative h-[3px] rounded-full bg-slate-200 overflow-hidden">
+                    <div className="relative h-0.75 rounded-full bg-slate-200 overflow-hidden">
                       <div
                         className="absolute inset-y-0 left-0 rounded-full transition-all duration-500 ease-out"
                         style={{

@@ -64,7 +64,7 @@ export const ClientDetailsModal: React.FC<ClientDetailsModalProps> = ({
               <p className="text-blue-400 text-sm font-medium uppercase tracking-widest mb-1">
                 Client Profile
               </p>
-              <h2 className="text-3xl font-bold text-slate-700 tracking-tight">
+              <h2 className="text-3xl uppercase font-bold text-slate-700 tracking-tight">
                 {client.name}
               </h2>
             </div>

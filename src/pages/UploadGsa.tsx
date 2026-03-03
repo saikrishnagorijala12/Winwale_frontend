@@ -29,6 +29,23 @@ interface UploadResult {
 
 type PreviewRow = Record<string, unknown>;
 
+const GSA_BASE_HEADERS = [
+  "item_type", "manufacturer", "manufacturer_part_number",
+  "vendor_part_number", "sin", "item_name", "item_description",
+  "recycled_content_percent", "uom", "quantity_per_pack",
+  "quantity_unit_uom", "commercial_price", "mfc_name", "mfc_price",
+  "govt_price_no_fee", "govt_price_with_fee", "country_of_origin",
+  "delivery_days", "lead_time_code", "fob_us", "fob_ak",
+  "fob_hi", "fob_pr", "nsn", "upc", "unspsc",
+  "sale_price_with_fee", "start_date", "stop_date",
+  "default_photo", "photo_2", "photo_3", "photo_4",
+  "product_url", "warranty_period", "warranty_unit_of_time",
+  "length", "width", "height", "physical_uom", "weight_lbs",
+  "product_info_code", "url_508", "hazmat",
+  "dealer_cost", "mfc_markup_percentage",
+  "govt_markup_percentage",
+];
+
 const UploadGsa: React.FC = () => {
   const navigate = useNavigate();
   const [clients, setClients] = useState<Client[]>([]);
@@ -87,18 +104,73 @@ const UploadGsa: React.FC = () => {
       const data = new Uint8Array(arrayBuffer);
       const workbook = XLSX.read(data, { type: "array" });
       const productsSheetName = workbook.SheetNames.find(
-        (name) => name.trim().toUpperCase() === "PRODUCTS"
+        (name) => name.trim().toUpperCase() === "PRODUCTS",
       );
+
       if (!productsSheetName) {
         setPreviewData(null);
         setError("No 'PRODUCTS' tab found in the uploaded file.");
         return;
       }
+
       const sheet = workbook.Sheets[productsSheetName];
+
+      const rows = XLSX.utils.sheet_to_json<any[]>(sheet, {
+        header: 1,
+        defval: "",
+      });
+
+      if (rows.length === 0) {
+        setPreviewData(null);
+        setError("The uploaded file is empty.");
+        return;
+      }
+
+      let headerRowIndex = -1;
+
+      for (let i = 0; i < Math.min(rows.length, 2); i++) {
+        const row = rows[i];
+        if (!Array.isArray(row)) continue;
+
+        const actualHeaders = row.map((h) => String(h).trim().toLowerCase());
+        const missingHeaders = GSA_BASE_HEADERS.filter(
+          (h) => !actualHeaders.includes(h),
+        );
+
+        if (missingHeaders.length === 0) {
+          headerRowIndex = i;
+          break;
+        }
+      }
+
+      if (headerRowIndex === -1) {
+        setPreviewData(null);
+        setError(
+          "Required headers are missing or incorrect. Please ensure your GSA headers are present.",
+        );
+        return;
+      }
+
+      const dataStartIndex = headerRowIndex + 1;
+
+      const dataRows = rows.slice(dataStartIndex);
+      const hasData = dataRows.some((row) =>
+        row.some((cell) => cell !== null && String(cell).trim() !== ""),
+      );
+
+      if (!hasData) {
+        setPreviewData(null);
+        setError(
+          "The file contains headers but no product data was found.",
+        );
+        return;
+      }
+
       const jsonData = XLSX.utils.sheet_to_json<PreviewRow>(sheet);
       setPreviewData(jsonData.slice(0, 10));
     } catch (err) {
       console.error("Preview failed:", err);
+      setError("Failed to process the Excel file. Please try again.");
       setPreviewData(null);
     }
   };

@@ -5,6 +5,7 @@ import {
   TextRun,
   AlignmentType,
   ImageRun,
+  Header,
 } from "docx";
 import { saveAs } from "file-saver";
 
@@ -13,22 +14,65 @@ export const convertTiptapToDocx = async (
   options: { logoUrl?: string; fileName: string },
 ) => {
   const children: any[] = [];
+  let header: Header | undefined;
 
   if (options.logoUrl) {
     try {
-      const response = await fetch(options.logoUrl);
+      const response = await fetch(options.logoUrl, {
+        cache: "reload",
+      });
+
+      if (!response.ok) {
+        throw new Error(`Logo fetch failed with status: ${response.status}`);
+      }
+      const contentType = response.headers.get("content-type");
+
+      let imageType: "png" | "jpg" | "gif";
+
+      if (contentType?.includes("png")) imageType = "png";
+      else if (contentType?.includes("jpeg")) imageType = "jpg";
+      else if (contentType?.includes("gif")) imageType = "gif";
+      else imageType = "png";
+
       const buffer = await response.arrayBuffer();
-      children.push(
-        new Paragraph({
-          children: [
-            new ImageRun({
-              data: buffer,
-              transformation: { width: 120, height: 60 },
-            } as any),
-          ],
-          alignment: AlignmentType.RIGHT,
-        }),
-      );
+
+      // Create a temporary image to read natural size
+      const blob = new Blob([buffer]);
+      const imageBitmap = await createImageBitmap(blob);
+
+      const naturalWidth = imageBitmap.width;
+      const naturalHeight = imageBitmap.height;
+
+      const maxWidth = 120;
+      const maxHeight = 80;
+
+      let width = naturalWidth;
+      let height = naturalHeight;
+
+      const widthRatio = maxWidth / width;
+      const heightRatio = maxHeight / height;
+      const scale = Math.min(widthRatio, heightRatio);
+
+      const finalWidth = Math.round(width * scale);
+      const finalHeight = Math.round(height * scale);
+
+      header = new Header({
+        children: [
+          new Paragraph({
+            children: [
+              new ImageRun({
+                data: buffer,
+                transformation: {
+                  width: finalWidth,
+                  height: finalHeight,
+                },
+                type: imageType,
+              }),
+            ],
+            alignment: AlignmentType.RIGHT,
+          }),
+        ],
+      });
     } catch (e) {
       console.error("Failed to load logo for DOCX", e);
     }
@@ -114,7 +158,7 @@ export const convertTiptapToDocx = async (
               text: child.text,
               bold: true,
               font: "Times New Roman",
-              size: 32 - node.attrs.level * 2,
+              size: 32 - (node.attrs.level || 1) * 2,
             });
           }
           return null;
@@ -147,7 +191,12 @@ export const convertTiptapToDocx = async (
         },
       ],
     },
-    sections: [{ children }],
+    sections: [
+      {
+        headers: header ? { default: header } : undefined,
+        children,
+      },
+    ],
   });
 
   const blob = await Packer.toBlob(doc);

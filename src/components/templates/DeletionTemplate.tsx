@@ -11,6 +11,7 @@ export const DeletionTemplate = ({ data }: { data: any }) => {
         <img
           src={data?.companyLogo}
           alt="Company Logo"
+          crossOrigin="anonymous"
           className="h-17.5 w-auto object-contain"
         />
       </div>

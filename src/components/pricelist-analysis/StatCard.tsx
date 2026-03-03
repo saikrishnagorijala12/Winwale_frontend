@@ -47,18 +47,18 @@ export const StatCard = ({
     };
     const theme = themes[variant];
     return (
-        <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm h-full hover:shadow-md transition-shadow">
+        <div className="bg-white rounded-2xl border border-slate-200/60 p-5 shadow-sm hover:shadow-lg hover:shadow-slate-200/40 hover:-translate-y-0.5 transition-all duration-300 ring-1 ring-transparent hover:ring-slate-200/50 group">
             <div className="flex items-center gap-4">
                 <div
-                    className={`w-12 h-12 rounded-2xl ${theme.iconBg} flex items-center justify-center ${theme.text}`}
+                    className={`w-12 h-12 rounded-2xl ${theme.iconBg} flex items-center justify-center ${theme.text} shadow-sm group-hover:scale-110 transition-transform duration-300`}
                 >
                     {React.cloneElement(icon as React.ReactElement, { size: 20 } as any)}
                 </div>
                 <div>
-                    <p className="text-2xl font-bold text-slate-900 tabular-nums leading-none">
+                    <p className="text-2xl font-black text-slate-900 tabular-nums leading-none tracking-tight">
                         {value.toLocaleString()}
                     </p>
-                    <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mt-1.5">
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1.5 transition-colors group-hover:text-slate-500">
                         {label}
                     </p>
                 </div>

@@ -89,6 +89,10 @@ export const AnalysisResultsViewer = ({
         }
     }, [actionSummary]);
 
+    const totalModifications = Object.values(actionSummary).reduce(
+        (sum, count) => sum + count,
+        0,
+    );
 
     const isDescChange = activeTab === "DESCRIPTION_CHANGE";
     const isPriceChange =
@@ -108,10 +112,82 @@ export const AnalysisResultsViewer = ({
                     setIsConfirmExportOpen(false);
                 }}
                 title="Export Analysis Results"
-                message="This will download the selected modification categories as an Excel file."
+                message={
+                    <div className="space-y-3 pt-1">
+                        <p className="text-xs text-slate-400 text-left">
+                            Select modification categories to export as Excel.
+                        </p>
+
+                        <div className="space-y-1">
+                            {tabs.map((tab) => {
+                                const hasItems = (actionSummary[tab.id] || 0) > 0;
+                                const isChecked = selectedExportTypes.includes(tab.id);
+
+                                return (
+                                    <label
+                                        key={tab.id}
+                                        className={`
+            flex items-center justify-between
+            px-3 py-2
+            rounded-lg
+            transition-colors
+            ${hasItems ? "cursor-pointer hover:bg-slate-50" : "opacity-40 cursor-not-allowed"}
+            ${isChecked ? "bg-slate-50" : "bg-transparent"}
+          `}
+                                    >
+                                        <div className="flex items-center gap-2">
+                                            <div
+                                                className={`
+                w-8 h-8
+                rounded-md
+                flex items-center justify-center
+                ${isChecked ? `text-${tab.variant}-600` : "text-slate-400"}
+              `}
+                                            >
+                                                <tab.icon size={16} />
+                                            </div>
+
+                                            <div className="flex flex-col text-left">
+                                                <span className="text-sm font-medium text-slate-700">
+                                                    {tab.label}
+                                                </span>
+                                                <span className="text-[10px] text-slate-400">
+                                                    {actionSummary[tab.id] || 0} items
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        <input
+                                            type="checkbox"
+                                            className="
+              w-3.5 h-3.5
+              rounded
+              border-slate-300
+              accent-[#24588fe1]
+              cursor-pointer
+              disabled:cursor-not-allowed
+            "
+                                            checked={isChecked}
+                                            disabled={!hasItems}
+                                            onChange={() => {
+                                                if (!hasItems) return;
+                                                setSelectedExportTypes((prev) =>
+                                                    prev.includes(tab.id)
+                                                        ? prev.filter((id) => id !== tab.id)
+                                                        : [...prev, tab.id],
+                                                );
+                                            }}
+                                        />
+                                    </label>
+                                );
+                            })}
+                        </div>
+                    </div>
+                }
                 confirmText="Yes, Export"
                 cancelText="Cancel"
                 isSubmitting={isExporting}
+                confirmDisabled={selectedExportTypes.length === 0}
                 variant="blue"
             />
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
@@ -130,66 +206,17 @@ export const AnalysisResultsViewer = ({
                 <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between gap-4">
                     <h3 className="text-xl font-bold text-slate-900">Analysis Results</h3>
 
-                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                        <div className="flex flex-wrap gap-3 p-1.5 bg-slate-50 border border-slate-200 rounded-xl">
-                            {tabs.map((tab) => {
-                                const hasItems = (actionSummary[tab.id] || 0) > 0;
-                                const isChecked = selectedExportTypes.includes(tab.id);
-
-                                return (
-                                    <label
-                                        key={tab.id}
-                                        className={`flex items-center gap-2 px-3 py-1.5 rounded-lg transition-all border ${isChecked
-                                            ? `bg-white border-${tab.variant}-200 text-slate-900 shadow-xs`
-                                            : "bg-transparent border-transparent text-slate-400"
-                                            } ${hasItems ? "cursor-pointer hover:text-slate-600" : "opacity-40 cursor-not-allowed"}`}
-                                    >
-                                        <input
-                                            type="checkbox"
-                                            className="sr-only"
-                                            checked={isChecked}
-                                            disabled={!hasItems}
-                                            onChange={() => {
-                                                if (!hasItems) return;
-                                                setSelectedExportTypes((prev) =>
-                                                    prev.includes(tab.id)
-                                                        ? prev.filter((id) => id !== tab.id)
-                                                        : [...prev, tab.id],
-                                                );
-                                            }}
-                                        />
-                                        <div
-                                            className={`w-4 h-4 rounded border flex items-center justify-center transition-all ${isChecked
-                                                ? `bg-${tab.variant}-100/50 border-${tab.variant}-500 text-${tab.variant}-600`
-                                                : "bg-white border-slate-300"
-                                                }`}
-                                        >
-                                            {isChecked && (
-                                                <svg className="w-3 h-3 fill-current" viewBox="0 0 20 20">
-                                                    <path d="M0 11l2-2 5 5L18 3l2 2L7 18z" />
-                                                </svg>
-                                            )}
-                                        </div>
-                                        <span className="text-xs font-bold leading-none select-none">
-                                            {tab.label}
-                                        </span>
-                                    </label>
-                                );
-                            })}
-                        </div>
-
+                    <div className="flex items-center gap-4">
                         <button
                             onClick={() => setIsConfirmExportOpen(true)}
-                            disabled={selectedExportTypes.length === 0 || isExporting}
-                            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-sm transition-all border ${selectedExportTypes.length === 0
-                                ? "bg-slate-50 text-slate-300 border-slate-100 cursor-not-allowed"
-                                : "bg-white text-slate-700 border-slate-200 hover:bg-slate-100 active:scale-95"
-                                }`}
+                            disabled={isExporting || totalModifications === 0}
+                            className="group flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm transition-all border bg-white text-slate-700 border-slate-200 hover:bg-slate-50 hover:border-slate-300 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
                         >
-                            <Download size={16} />
-                            {selectedExportTypes.length === tabs.length
-                                ? "Export All"
-                                : `Export (${selectedExportTypes.length})`}
+                            <Download
+                                size={16}
+                                className="text-slate-400 group-hover:text-slate-600 transition-colors"
+                            />
+                            Export Data
                         </button>
                     </div>
                 </div>

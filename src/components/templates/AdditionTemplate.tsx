@@ -7,7 +7,8 @@ export const AdditionTemplate = ({ data }: { data: any }) => (
       <img
         src={data.companyLogo}
         alt="Company Logo"
-        className="h-[70px] w-auto object-contain"
+        crossOrigin="anonymous"
+        className="h-17.5 w-auto object-contain"
       />
     </div>
 

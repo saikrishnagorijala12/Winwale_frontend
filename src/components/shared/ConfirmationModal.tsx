@@ -15,6 +15,7 @@ interface ConfirmationModalProps {
   confirmText?: string;
   cancelText?: string;
   isSubmitting?: boolean;
+  confirmDisabled?: boolean;
   variant?: "emerald" | "rose" | "amber" | "blue";
 }
 
@@ -29,6 +30,7 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   confirmText = "Confirm",
   cancelText = "Cancel",
   isSubmitting = false,
+  confirmDisabled = false,
   variant = "emerald",
 }) => {
   if (!isOpen) return null;
@@ -58,11 +60,10 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
         <button
           onClick={onClose}
           disabled={isSubmitting}
-          className={`absolute top-6 right-6 transition-colors ${
-            isSubmitting
+          className={`absolute top-6 right-6 transition-colors ${isSubmitting
               ? "text-slate-300 cursor-not-allowed"
               : "text-slate-400 hover:text-slate-600"
-          }`}
+            }`}
         >
           <X className="w-5 h-5" />
         </button>
@@ -91,9 +92,8 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
 
           {warning && (
             <div
-              className={`flex items-start gap-3 border rounded-2xl p-4 mb-6 text-left ${
-                warningColors[warning.type]
-              }`}
+              className={`flex items-start gap-3 border rounded-2xl p-4 mb-6 text-left ${warningColors[warning.type]
+                }`}
             >
               <AlertTriangle
                 className={`w-5 h-5 shrink-0 mt-0.5 ${iconColors[warning.type]}`}
@@ -113,7 +113,7 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
               {cancelText}
             </button>
             <button
-              disabled={isSubmitting}
+              disabled={isSubmitting || confirmDisabled}
               onClick={onConfirm}
               className={`flex-1 px-6 py-3 rounded-xl font-bold text-sm text-white transition-all shadow-sm flex items-center justify-center gap-2 ${bgColors[variant]} disabled:opacity-70`}
             >
