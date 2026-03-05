@@ -256,7 +256,7 @@ export default function UserActivation() {
       setLoading(true);
       const response = await api.get("/users/all");
       const data = response.data;
-      setUsers(Array.isArray(data) ? data : [data]);
+      setUsers(Array.isArray(data?.users) ? data.users : []);
     } catch (error) {
       toast.error("Failed to load users. Please try again.")
     } finally {

@@ -60,7 +60,7 @@ export default function UnifiedAdminDashboard() {
         fetchAnalysisJobs({ page: 1, page_size: 5 }),
       ]);
 
-      setUsersList(Array.isArray(usersRes.data) ? usersRes.data : []);
+      setUsersList(Array.isArray(usersRes.data?.users) ? usersRes.data.users : []);
       setClients(Array.isArray(clientsRes.data) ? clientsRes.data : []);
       setJobs(jobsData.items || []);
     } catch (error) {

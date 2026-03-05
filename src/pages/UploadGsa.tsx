@@ -211,7 +211,6 @@ const UploadGsa: React.FC = () => {
         formData,
         { headers: { "Content-Type": "multipart/form-data" } },
       );
-
       toast.success(
         "Upload received! Your product catalog is being processed in the background."
       );

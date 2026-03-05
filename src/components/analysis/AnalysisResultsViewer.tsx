@@ -320,7 +320,7 @@ export const AnalysisResultsViewer = ({
                                                 {action.manufacturer_part_number || "N/A"}
                                             </td>
                                             <td className="p-3 font-medium text-slate-900">
-                                                {action.product_name || "Unknown Product"}
+                                                {action.product_name || "-"}
                                             </td>
 
                                             {isDescChange && (
