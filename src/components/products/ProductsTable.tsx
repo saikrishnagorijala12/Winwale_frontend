@@ -30,30 +30,30 @@ export default function ProductsTable({
   onPageChange,
 }: ProductsTableProps) {
   return (
-    <div className="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden relative transition-all">
+    <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden relative transition-all">
       <div className="overflow-x-auto">
         <table className="w-full border-collapse">
           <thead>
-            <tr className="bg-slate-50/50 border-b border-slate-200">
-              <th className="text-left px-6 py-5 text-[11px] font-bold text-slate-400 uppercase tracking-widest">
+            <tr className="bg-slate-50 border-b border-slate-200">
+              <th className="text-left px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                 Item Description
               </th>
-              <th className="text-left px-6 py-5 text-[11px] font-bold text-slate-400 uppercase tracking-widest">
+              <th className="text-left px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                 Type
               </th>
-              <th className="text-left px-6 py-5 text-[11px] font-bold text-slate-400 uppercase tracking-widest">
+              <th className="text-left px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                 Client
               </th>
-              <th className="text-left px-6 py-5 text-[11px] font-bold text-slate-400 uppercase tracking-widest">
+              <th className="text-left px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                 Manufacturer
               </th>
-              <th className="text-left px-6 py-5 text-[11px] font-bold text-slate-400 uppercase tracking-widest">
+              <th className="text-left px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                 MFR Part #
               </th>
-              <th className="text-left px-6 py-5 text-[11px] font-bold text-slate-400 uppercase tracking-widest">
+              <th className="text-left px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                 Price
               </th>
-              <th className="text-left px-6 py-5 text-[11px] font-bold text-slate-400 uppercase tracking-widest">
+              <th className="text-left px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                 UOM
               </th>
             </tr>

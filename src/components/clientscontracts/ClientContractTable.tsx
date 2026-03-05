@@ -67,23 +67,23 @@ export const ClientContractTable: React.FC<ClientContractTableProps> = ({
         <table className="w-full text-left border-collapse min-w-225">
           <thead>
             <tr className="bg-slate-50 border-b border-slate-200">
-              <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+              <th className="text-left px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                 Client
               </th>
-              <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+              <th className="text-left px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                 Contract #
               </th>
-              <th className="px-4 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+              <th className="text-left px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                 Status
               </th>
-              <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+              <th className="text-left px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                 Negotiator Contact
               </th>
 
-              <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+              <th className="text-left px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                 Contracting Officer
               </th>
-              <th className="hidden xl:table-cell px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+              <th className="hidden xl:table-cell text-left px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                 Last Modified
               </th>
               <th className="w-16 p-5" />
