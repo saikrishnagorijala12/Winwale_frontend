@@ -11,12 +11,15 @@ export const PASSWORD_RULES = {
   uppercase: { test: (p: string) => /[A-Z]/.test(p), label: "At least 1 uppercase letter" },
   number: { test: (p: string) => /\d/.test(p), label: "At least 1 number" },
   special: { test: (p: string) => /[^A-Za-z0-9]/.test(p), label: "At least 1 special character" },
+  noEdgeSpaces: { test: (p: string) => p === p.trim(), label: "Cannot start or end with spaces" },
 };
 
 export const validatePasswordComplexity = (p: string) => {
   if (!p) return "Password is required";
   const failedRule = Object.values(PASSWORD_RULES).find((rule) => !rule.test(p));
-  if (failedRule) return "Password does not meet requirements";
+  if (failedRule) {
+    return `Password requirement not met: ${failedRule.label}.`;
+  }
   return null;
 };
 

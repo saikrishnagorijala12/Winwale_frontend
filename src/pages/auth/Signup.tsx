@@ -133,7 +133,7 @@ const Signup: React.FC = () => {
         </div>
       )}
 
-      <form onSubmit={handleSignup} className="space-y-6">
+      <form onSubmit={handleSignup} className="space-y-6" noValidate>
         <div>
           <label className="block text-sm font-semibold text-slate-700 mb-2">
             Full name
