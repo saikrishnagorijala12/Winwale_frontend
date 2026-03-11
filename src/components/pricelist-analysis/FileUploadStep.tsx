@@ -123,6 +123,42 @@ export const FileUploadStep = ({
                     </div>
                 )}
 
+                {error && (
+                    <div
+                        className={`p-4 rounded-xl flex items-center gap-2 animate-in fade-in slide-in-from-top-1 ${errorVariant === "warning"
+                            ? "bg-amber-50 text-amber-700 border border-amber-100"
+                            : errorVariant === "info"
+                                ? "bg-blue-50 text-blue-700 border border-blue-100"
+                                : "bg-red-50 text-red-700 border border-red-100"
+                            }`}
+                    >
+                        {errorVariant === "warning" ? (
+                            <AlertTriangle className="w-5 h-5 shrink-0" />
+                        ) : errorVariant === "info" ? (
+                            <Info className="w-5 h-5 shrink-0" />
+                        ) : (
+                            <AlertCircle className="w-5 h-5 shrink-0" />
+                        )}
+                        <span className="text-sm font-medium">{error}</span>
+                    </div>
+                )}
+
+                <div className="flex justify-between">
+                    <button
+                        onClick={onBack}
+                        className="btn-secondary"
+                    >
+                        <ChevronLeft className="w-4 h-4" /> Back
+                    </button>
+                    <button
+                        onClick={onContinue}
+                        disabled={!file || isParsingFile || !previewData}
+                        className="btn-primary"
+                    >
+                        Continue <ChevronRight className="w-4 h-4" />
+                    </button>
+                </div>
+
                 {!isParsingFile && previewData && previewData.length > 0 && (
                     <div className="mt-6 border border-slate-200 rounded-xl overflow-hidden">
                         <div className="bg-slate-50 px-4 py-2 border-b border-slate-200 flex justify-between items-center">
@@ -172,41 +208,6 @@ export const FileUploadStep = ({
                     </div>
                 )}
 
-                {error && (
-                    <div
-                        className={`p-4 rounded-xl flex items-center gap-2 animate-in fade-in slide-in-from-top-1 ${errorVariant === "warning"
-                            ? "bg-amber-50 text-amber-700 border border-amber-100"
-                            : errorVariant === "info"
-                                ? "bg-blue-50 text-blue-700 border border-blue-100"
-                                : "bg-red-50 text-red-700 border border-red-100"
-                            }`}
-                    >
-                        {errorVariant === "warning" ? (
-                            <AlertTriangle className="w-5 h-5 shrink-0" />
-                        ) : errorVariant === "info" ? (
-                            <Info className="w-5 h-5 shrink-0" />
-                        ) : (
-                            <AlertCircle className="w-5 h-5 shrink-0" />
-                        )}
-                        <span className="text-sm font-medium">{error}</span>
-                    </div>
-                )}
-
-                <div className="flex justify-between">
-                    <button
-                        onClick={onBack}
-                        className="btn-secondary"
-                    >
-                        <ChevronLeft className="w-4 h-4" /> Back
-                    </button>
-                    <button
-                        onClick={onContinue}
-                        disabled={!file || isParsingFile || !previewData}
-                        className="btn-primary"
-                    >
-                        Continue <ChevronRight className="w-4 h-4" />
-                    </button>
-                </div>
             </div>
         </div>
     );

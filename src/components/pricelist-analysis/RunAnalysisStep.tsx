@@ -11,6 +11,7 @@ interface RunAnalysisStepProps {
     errorVariant?: "error" | "warning" | "info";
     onBack: () => void;
     onRunAnalysis: () => void;
+    disableRun?: boolean;
 }
 
 export const RunAnalysisStep = ({
@@ -22,6 +23,7 @@ export const RunAnalysisStep = ({
     errorVariant = "error",
     onBack,
     onRunAnalysis,
+    disableRun = false,
 }: RunAnalysisStepProps) => {
     return (
         <div className="group bg-white/80 backdrop-blur-md rounded-3xl border border-slate-200 shadow-2xl shadow-slate-200/60 overflow-hidden">
@@ -123,8 +125,8 @@ export const RunAnalysisStep = ({
                     </button>
                     <button
                         onClick={onRunAnalysis}
-                        disabled={isAnalyzing}
-                        className="btn-primary"
+                        disabled={isAnalyzing || disableRun}
+                        className={`btn-primary ${disableRun ? 'opacity-50 cursor-not-allowed grayscale' : ''}`}
                     >
                         {isAnalyzing ? (
                             <>

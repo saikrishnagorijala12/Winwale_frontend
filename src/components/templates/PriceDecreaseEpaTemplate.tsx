@@ -15,7 +15,7 @@ export const PriceDecreaseEpaTemplate = ({ data }: { data: any }) => (
     <p className="mb-6">{data.submissionDate}</p>
 
     <p className="mb-6">
-      Attn: {data.contractorName} ({data.contractNumber}) <br />
+      Attn: {data.contractorName}<br />
       General Services Administration <br />
       {data.gsaOfficeAddressLine} <br />
       {data.gsaOfficeCityStateZip}

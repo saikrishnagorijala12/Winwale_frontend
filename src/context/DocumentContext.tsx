@@ -51,7 +51,7 @@ const mapJobDetailsToForm = (api: any) => {
 
     fobTerms: other.fob_term,
 
-    coo: contract.origin_country,
+    coo: api.countries_of_origin,
     basicDiscount: discounts.gsa_proposed_discount,
     quantityVolumeDiscount: discounts.q_v_discount,
     otherDiscounts: other.additional_concessions,

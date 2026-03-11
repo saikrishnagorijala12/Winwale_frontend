@@ -287,7 +287,7 @@ export default function AppSidebar() {
         </nav>
 
         {/* Footer  */}
-        <div className="p-4 bg-slate-50/50">
+        <div className="p-4">
           <Link
             to="/settings"
             className="flex items-center gap-3 p-2.5 rounded-xl bg-white border border-slate-200 shadow-sm mb-3"

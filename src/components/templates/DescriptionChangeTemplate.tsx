@@ -12,7 +12,7 @@ export const ProductDescriptiveChangeTemplate = ({ data }: { data: any }) => (
     <p className="mb-4">{data.submissionDate}</p>
 
     <p className="mb-4">
-      Attn: {data.contractorName} ({data.contractNumber}) <br />
+      Attn: {data.contractorName}<br />
       General Services Administration <br />
       {data.gsaOfficeAddressLine} <br />
       {data.gsaOfficeCityStateZip}

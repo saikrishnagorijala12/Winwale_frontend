@@ -11,6 +11,11 @@ import { downloadBlob } from "../utils/downloadUtils";
 import { useAnalysis } from "../context/AnalysisContext";
 import { toast } from "sonner";
 import { processModifications } from "../utils/analysisUtils";
+import {
+  findHeaderRow,
+  validateHeaders,
+  getDisplayColumnName,
+} from "../utils/headerValidationUtils";
 
 import { AnalysisStepper } from "../components/pricelist-analysis/AnalysisStepper";
 import { ClientSelectionStep } from "../components/pricelist-analysis/ClientSelectionStep";
@@ -131,8 +136,56 @@ export default function PriceListAnalysis() {
       const arrayBuffer = await selectedFile.arrayBuffer();
       const data = new Uint8Array(arrayBuffer);
       const workbook = XLSX.read(data, { type: "array" });
-      const sheet = workbook.Sheets[workbook.SheetNames[0]];
-      const jsonData = XLSX.utils.sheet_to_json(sheet, { defval: "" });
+      const sheetName = workbook.SheetNames[0];
+      const sheet = workbook.Sheets[sheetName];
+
+      const rows = XLSX.utils.sheet_to_json(sheet, {
+        header: 1,
+        defval: "",
+      }) as any[][];
+
+      if (rows.length === 0) {
+        setError("The uploaded Excel file contains no data.");
+        setFile(null);
+        setPreviewData(null);
+        setTotalRows(0);
+        return;
+      }
+
+      const headerIdx = findHeaderRow(rows);
+      if (headerIdx === -1) {
+        setError(
+          "Could not detect a valid header row. Please ensure your file contains required columns like 'Part Number', 'Description', and 'Price'.",
+        );
+        setFile(selectedFile);
+        setPreviewData(rows.slice(0, 10));
+        setTotalRows(rows.length);
+        return;
+      }
+
+      const headers = rows[headerIdx].map((h) => String(h || "").trim());
+      const validation = validateHeaders(headers);
+
+      if (!validation.isValid) {
+        const missingNames = validation.missing
+          .map(getDisplayColumnName)
+          .join(", ");
+        setError(`Missing required columns: ${missingNames}`);
+        setFile(selectedFile);
+        setTotalRows(rows.length - headerIdx - 1);
+        const jsonData = XLSX.utils.sheet_to_json(sheet, {
+          range: headerIdx,
+          defval: "",
+        });
+        setPreviewData(jsonData);
+        return;
+      }
+
+      const jsonData = XLSX.utils.sheet_to_json(sheet, {
+        range: headerIdx,
+        defval: "",
+      });
+
       if (jsonData.length === 0) {
         setError("The uploaded Excel file contains no data rows.");
         setFile(null);
@@ -140,16 +193,21 @@ export default function PriceListAnalysis() {
         setTotalRows(0);
         return;
       }
+
       setTotalRows(jsonData.length);
       setPreviewData(jsonData);
+    } catch (err) {
+      console.error("Error processing file:", err);
+      setError("An error occurred while processing the file. Please try again.");
+      setFile(null);
     } finally {
       setIsParsingFile(false);
     }
   };
 
   const handleRunAnalysis = async () => {
-    if (!file || !selectedClient) {
-      setError("Missing file or client selection");
+    if (!file || !selectedClient || (error && errorVariant === "error")) {
+      if (!error) setError("Missing file or client selection");
       return;
     }
 
@@ -258,11 +316,10 @@ export default function PriceListAnalysis() {
             }}
             onContinue={() => {
               setCurrentStep(3);
-              setError(null);
-              setErrorVariant("error");
             }}
             onClearFile={() => {
               setFile(null);
+              setError(null);
               setPreviewData(null);
             }}
           />
@@ -282,6 +339,7 @@ export default function PriceListAnalysis() {
               setError(null);
             }}
             onRunAnalysis={handleRunAnalysis}
+            disableRun={!!error && errorVariant === "error"}
           />
         );
       case 4:

@@ -19,7 +19,7 @@ export const DeletionTemplate = ({ data }: { data: any }) => {
       <p className="mb-6">{data?.submissionDate || "DATE"}</p>
 
       <p className="mb-6">
-        Attn: {data?.contractorName} ({data?.contractNumber}) <br />
+        Attn: {data?.contractorName}<br />
         General Services Administration <br />
         {data?.gsaOfficeAddressLine} <br />
         {data?.gsaOfficeCityStateZip}
