@@ -490,7 +490,7 @@ export const documentConfigs: DocumentConfig[] = [
       {
         id: "requestedIncrease",
         label: "Requested Increase (%)",
-        type: "percentage",
+        type: "text",
         behavior: "manual",
         section: "Request Details",
         validation: [{ type: "required", message: "Required" }],
@@ -506,6 +506,14 @@ export const documentConfigs: DocumentConfig[] = [
       {
         id: "backgroundInfo",
         label: "Background Information",
+        type: "textarea",
+        behavior: "manual",
+        section: "Request Details",
+        validation: [{ type: "required", message: "Required" }],
+      },
+      {
+        id: "increaseJustification",
+        label: "Justification for Increase",
         type: "textarea",
         behavior: "manual",
         section: "Request Details",
@@ -646,7 +654,7 @@ export const documentConfigs: DocumentConfig[] = [
       {
         id: "requestedDecrease",
         label: "Requested Decrease (%)",
-        type: "percentage",
+        type: "text",
         behavior: "manual",
         section: "Request Details",
         validation: [{ type: "required", message: "Required" }],

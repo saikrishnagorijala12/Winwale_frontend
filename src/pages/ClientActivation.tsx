@@ -37,6 +37,7 @@ import {
   normalizeClientFromAPI,
   updateClientFromResponse,
 } from "../utils/clientUtils";
+import { normalizePhoneNumber } from "../utils/phoneUtils";
 
 type TabType = "all" | "pending" | "approved" | "rejected";
 
@@ -152,11 +153,10 @@ const ActionDropdown: React.FC<ActionDropdownProps> = ({
                 isApproved ? onReject() : onApprove();
                 setIsOpen(false);
               }}
-              className={`w-full px-4 py-2 text-left text-sm font-medium flex items-center gap-2 transition-colors ${
-                isApproved
+              className={`w-full px-4 py-2 text-left text-sm font-medium flex items-center gap-2 transition-colors ${isApproved
                   ? "text-red-600 hover:bg-rose-50"
                   : "text-emerald-600 hover:bg-emerald-50"
-              }`}
+                }`}
             >
               {isApproved ? (
                 <>
@@ -200,11 +200,10 @@ const ClientCard: React.FC<ClientCardProps> = ({
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center gap-3 flex-1 min-w-0">
           <div
-            className={`shrink-0 w-12 h-12 rounded-xl border border-slate-200 flex items-center justify-center text-white font-bold text-sm shadow-sm overflow-hidden ${
-              client.company_logo_url
+            className={`shrink-0 w-12 h-12 rounded-xl border border-slate-200 flex items-center justify-center text-white font-bold text-sm shadow-sm overflow-hidden ${client.company_logo_url
                 ? "bg-white"
                 : "bg-linear-to-br from-[#3399cc] to-[#2980b9]"
-            }`}
+              }`}
           >
             {client.company_logo_url ? (
               <img
@@ -413,8 +412,14 @@ const ClientActivation = () => {
     try {
       const { logoFile, logoUrl, ...clientPayload } = editingClient;
 
+      // Normalize phone numbers before submission
+      const normalizedCompanyPhone = normalizePhoneNumber(clientPayload.company_phone_no) || clientPayload.company_phone_no;
+      const normalizedContactPhone = normalizePhoneNumber(clientPayload.contact_officer_phone_no) || clientPayload.contact_officer_phone_no;
+
       const finalPayload = {
         ...clientPayload,
+        company_phone_no: normalizedCompanyPhone,
+        contact_officer_phone_no: normalizedContactPhone,
         company_logo_url: logoUrl?.startsWith("data:")
           ? undefined
           : logoUrl || null,
@@ -658,11 +663,10 @@ const ClientActivation = () => {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as TabType)}
-                className={`px-4 sm:px-6 py-2 sm:py-3 rounded-t-xl font-bold text-xs sm:text-sm transition-all whitespace-nowrap ${
-                  activeTab === tab.id
+                className={`px-4 sm:px-6 py-2 sm:py-3 rounded-t-xl font-bold text-xs sm:text-sm transition-all whitespace-nowrap ${activeTab === tab.id
                     ? `bg-${tab.color}-50 text-${tab.color}-600 border-b-2 border-${tab.color}-600`
                     : "text-slate-500 hover:text-slate-700 hover:bg-slate-50"
-                }`}
+                  }`}
               >
                 {tab.label} ({tab.count})
               </button>
@@ -769,11 +773,10 @@ const ClientActivation = () => {
                     <td className="px-4 py-5">
                       <div className="flex items-center gap-3">
                         <div
-                          className={`shrink-0 w-10 h-10 rounded-xl border border-slate-200 flex items-center justify-center text-white font-bold text-xs shadow-sm overflow-hidden ${
-                            client.company_logo_url
+                          className={`shrink-0 w-10 h-10 rounded-xl border border-slate-200 flex items-center justify-center text-white font-bold text-xs shadow-sm overflow-hidden ${client.company_logo_url
                               ? "bg-white"
                               : "bg-linear-to-br from-[#3399cc] to-[#2980b9]"
-                          }`}
+                            }`}
                         >
                           {client.company_logo_url ? (
                             <img

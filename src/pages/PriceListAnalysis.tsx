@@ -158,7 +158,7 @@ export default function PriceListAnalysis() {
           "Could not detect a valid header row. Please ensure your file contains required columns like 'Part Number', 'Description', and 'Price'.",
         );
         setFile(selectedFile);
-        setPreviewData(rows.slice(0, 10));
+        setPreviewData(null);
         setTotalRows(rows.length);
         return;
       }
@@ -173,11 +173,7 @@ export default function PriceListAnalysis() {
         setError(`Missing required columns: ${missingNames}`);
         setFile(selectedFile);
         setTotalRows(rows.length - headerIdx - 1);
-        const jsonData = XLSX.utils.sheet_to_json(sheet, {
-          range: headerIdx,
-          defval: "",
-        });
-        setPreviewData(jsonData);
+        setPreviewData(null);
         return;
       }
 

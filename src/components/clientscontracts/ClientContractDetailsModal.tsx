@@ -23,6 +23,7 @@ import { Client } from "../../types/client.types";
 import { ClientContractRead } from "../../types/contract.types";
 import StatusBadge from "../shared/StatusBadge";
 import { useClickOutside } from "../../hooks/useClickOutside";
+import { formatPhoneNumber } from "../../utils/phoneUtils";
 
 interface ClientContractDetailsModalProps {
   client: Client | null;
@@ -154,8 +155,8 @@ export const ClientContractDetailsModal: React.FC<
             <div className="relative group">
               <div
                 className={`w-16 h-16 rounded-2xl border border-slate-200 flex items-center justify-center text-white font-bold text-2xl shadow-lg shadow-blue-100 overflow-hidden ${client.logoUrl
-                    ? "bg-slate-50/50"
-                    : "bg-linear-to-br from-[#3399cc] to-[#2980b9]"
+                  ? "bg-slate-50/50"
+                  : "bg-linear-to-br from-[#3399cc] to-[#2980b9]"
                   }`}
               >
                 {client.logoUrl ? (
@@ -224,7 +225,7 @@ export const ClientContractDetailsModal: React.FC<
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div className="space-y-6">
               <Section icon={Building2} title="Company Details">
-                <DetailItem icon={Phone} label="Phone" value={client.phone} />
+                <DetailItem icon={Phone} label="Phone" value={formatPhoneNumber(client.phone)} />
                 <DetailItem
                   icon={Mail}
                   label="Email"
@@ -247,7 +248,7 @@ export const ClientContractDetailsModal: React.FC<
                 <DetailItem
                   icon={Phone}
                   label="Direct Phone"
-                  value={client.contact?.phone}
+                  value={formatPhoneNumber(client.contact?.phone)}
                 />
                 <DetailItem
                   icon={Mail}

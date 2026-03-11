@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Save, Shield } from "lucide-react";
 import { Role } from "@/src/types/roles.types";
 import * as v from "../../utils/validators";
+import { normalizePhoneNumber, formatPhoneNumber } from "../../utils/phoneUtils";
 
 interface ProfileSectionProps {
   user: any;
@@ -28,7 +29,7 @@ export const ProfileSection = ({
   const [name, setName] = useState(user?.name || "");
 
   const [phoneNo, setPhoneNo] = useState(
-    user?.phone_no && user.phone_no !== "NA" ? user.phone_no : "",
+    user?.phone_no && user.phone_no !== "NA" ? formatPhoneNumber(user.phone_no) : "",
   );
   const [nameError, setNameError] = useState("");
   const [formError, setFormError] = useState("");
@@ -71,7 +72,7 @@ export const ProfileSection = ({
 
     await onSave({
       fullName: trimmedName,
-      phone: trimmedPhone === "" ? null : trimmedPhone,
+      phone: trimmedPhone === "" ? null : (normalizePhoneNumber(trimmedPhone) || trimmedPhone),
     });
   };
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {

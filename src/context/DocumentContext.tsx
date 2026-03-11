@@ -27,6 +27,10 @@ const mapJobDetailsToForm = (api: any) => {
   const address = contract.address || {};
   const other = contract.other || {};
   const negotiator = api.negotiator || {};
+  const countryOfOrigin = Array.isArray(api.countries_of_origin)
+    ? api.countries_of_origin.join(", ")
+    : api.countries_of_origin || "";
+  const percentage = api.percentage || "";
 
   return {
     companyName: client.company_name,
@@ -43,18 +47,26 @@ const mapJobDetailsToForm = (api: any) => {
     gsaOfficeCity: address.contract_officer_city,
     gsaOfficeState: address.contract_officer_state,
     gsaOfficeZip: address.contract_officer_zip,
-    gsaOfficeCityStateZip:
-      `${address.contract_officer_city || ""}, ${address.contract_officer_state || ""}, ${address.contract_officer_zip || ""}`.trim(),
+    gsaOfficeCityStateZip: `${address.contract_officer_city || ""}, ${
+      address.contract_officer_state || ""
+    }, ${address.contract_officer_zip || ""}`.trim(),
     negotiatorName: negotiator.name,
     deliveryAroNormal: delivery.normal_delivery_time,
     deliveryAroExpedited: delivery.expedited_delivery_time,
 
     fobTerms: other.fob_term,
 
-    coo: api.countries_of_origin,
+    coo: countryOfOrigin,
     basicDiscount: discounts.gsa_proposed_discount,
     quantityVolumeDiscount: discounts.q_v_discount,
     otherDiscounts: other.additional_concessions,
+    requestedIncrease: percentage?.price_increase
+      ? `${percentage.price_increase.min}% - ${percentage.price_increase.max}%`
+      : "",
+
+    requestedDecrease: percentage?.price_decrease
+      ? `${percentage.price_decrease.min}% - ${percentage.price_decrease.max}%`
+      : "",
 
     energyStarCompliance: (() => {
       const value = other.energy_star_compliance?.toLowerCase();
@@ -75,8 +87,6 @@ const mapJobDetailsToForm = (api: any) => {
     numberOfItemsChanged: modificationSummary.description_changed,
     priceIncreased: modificationSummary.price_increased,
     priceDecreased: modificationSummary.price_decreased,
-    requestedIncrease: modificationSummary.price_increased > 0 ? "" : undefined,
-    requestedDecrease: modificationSummary.price_decreased > 0 ? "" : undefined,
 
     totalSins: api.total_sins,
     ...(() => {
@@ -98,14 +108,17 @@ const mapJobDetailsToForm = (api: any) => {
         sin_deletions: getFormatted("REMOVED_PRODUCT", legacyGroups),
         sin_price_increase: getFormatted("PRICE_INCREASE", legacyGroups),
         sin_price_decrease: getFormatted("PRICE_DECREASE", legacyGroups),
-        sin_description_change: getFormatted("DESCRIPTION_CHANGE", legacyGroups),
+        sin_description_change: getFormatted(
+          "DESCRIPTION_CHANGE",
+          legacyGroups
+        ),
       };
     })(),
   };
 };
 
 const DocumentContext = createContext<DocumentContextType | undefined>(
-  undefined,
+  undefined
 );
 
 export const DocumentProvider: React.FC<{ children: React.ReactNode }> = ({
@@ -117,14 +130,14 @@ export const DocumentProvider: React.FC<{ children: React.ReactNode }> = ({
     string | null
   >(null);
   const [documentConfig, setDocumentConfig] = useState<DocumentConfig | null>(
-    null,
+    null
   );
   const [formData, setFormData] = useState<Record<string, string | number>>({});
   const [validationErrors, setValidationErrors] = useState<ValidationError[]>(
-    [],
+    []
   );
   const [documentHistory, setDocumentHistory] = useState<DocumentMetadata[]>(
-    [],
+    []
   );
   const [analysisSummary, setAnalysisSummary] = useState<any | null>(null);
   const [cachedJobDetails, setCachedJobDetails] = useState<any | null>(null);
@@ -201,7 +214,7 @@ export const DocumentProvider: React.FC<{ children: React.ReactNode }> = ({
         setCurrentStep("select-type");
       }
     },
-    [user, loadedJobId, cachedJobDetails, setCurrentStep],
+    [user, loadedJobId, cachedJobDetails, setCurrentStep]
   );
 
   const updateField = useCallback((fieldId: string, value: string | number) => {
@@ -220,7 +233,7 @@ export const DocumentProvider: React.FC<{ children: React.ReactNode }> = ({
       const fieldLabel = field.label;
 
       const hasRequiredRule = field.validation?.some(
-        (rule) => rule.type === "required",
+        (rule) => rule.type === "required"
       );
 
       if (hasRequiredRule) {
@@ -295,7 +308,7 @@ export const DocumentProvider: React.FC<{ children: React.ReactNode }> = ({
   const generateDocument = useCallback((): DocumentMetadata => {
     const docId = `DOC-${Date.now().toString(36).toUpperCase()}`;
     const versionCount = documentHistory.filter(
-      (d) => d.documentType === selectedDocumentType,
+      (d) => d.documentType === selectedDocumentType
     ).length;
 
     return {

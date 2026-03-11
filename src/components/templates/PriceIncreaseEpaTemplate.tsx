@@ -1,3 +1,5 @@
+import { formatPhoneNumber } from "../../utils/phoneUtils";
+
 export const PriceIncreaseEpaTemplate = ({ data }: { data: any }) => (
   <div
     className="relative text-[14px] leading-[1.6] text-foreground px-12 py-10"
@@ -15,7 +17,8 @@ export const PriceIncreaseEpaTemplate = ({ data }: { data: any }) => (
     <p className="mb-6">{data.submissionDate}</p>
 
     <p className="mb-6">
-      Attn: {data.contractorName}<br />
+      Attn: {data.contractorName}
+      <br />
       General Services Administration <br />
       {data.gsaOfficeAddressLine} <br />
       {data.gsaOfficeCityStateZip}
@@ -40,7 +43,8 @@ export const PriceIncreaseEpaTemplate = ({ data }: { data: any }) => (
       The purpose of this letter is to request your approval of an Economic
       Price Adjustment (EPA) increase based on a Commercial Price List to GSA
       Schedule Contract <strong>{data.contractNumber}</strong> under{" "}
-      <strong>{data.totalSins}</strong> SIN(s) [<strong>{data.sin_price_increase}</strong>]. This request is in accordance
+      <strong>{data.totalSins}</strong> SIN(s) [
+      <strong>{data.sin_price_increase}</strong>]. This request is in accordance
       with EPA Clause GSAM 538.270-4(a)(3). The modification consists of a price
       increase of{" "}
       <strong>{data.requestedIncrease || data.priceIncreasePercent}%</strong>{" "}
@@ -49,14 +53,8 @@ export const PriceIncreaseEpaTemplate = ({ data }: { data: any }) => (
     </p>
 
     <ul className="list-[lower-alpha] ml-10 mb-4 space-y-2">
-      <li>
-        {data.backgroundInfo ||
-          "[Background information regarding your current prices, the applicable wage determination price levels (if applicable), and the increases necessary for your company.]"}
-      </li>
-      <li>
-        {data.justification ||
-          "[Justification for increase. If the EPA requested exceeds the allowable Ceiling Limit, provide specific justification and attach supporting documentation to the modification.] "}
-      </li>
+      <li>{data.backgroundInfo}</li>
+      <li>{data.increaseJustification}</li>
       <li>
         {data.companyName} acknowledges that the proposed price increase will
         not become effective until the Contracting Officer executes the
@@ -85,7 +83,7 @@ export const PriceIncreaseEpaTemplate = ({ data }: { data: any }) => (
     <p className="mb-4">
       If you have any questions regarding this request, please contact{" "}
       <strong>{data.consultantName}</strong> at The Winvale Group at{" "}
-      <strong>{data.consultantPhone}</strong> or{" "}
+      <strong>{formatPhoneNumber(data.consultantPhone)}</strong> or{" "}
       <strong>{data.consultantEmail}</strong>.
     </p>
 

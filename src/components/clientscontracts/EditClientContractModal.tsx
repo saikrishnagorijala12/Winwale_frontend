@@ -24,6 +24,7 @@ import { getInitialFormData } from "../../utils/clientUtils";
 import { contractService } from "../../services/contractService";
 import api from "../../lib/axios";
 import { toast } from "sonner";
+import { normalizePhoneNumber } from "../../utils/phoneUtils";
 
 interface EditClientContractModalProps {
     isOpen: boolean;
@@ -167,8 +168,14 @@ export default function EditClientContractModal({
         try {
             const { logoFile, logoUrl, ...clientPayload } = clientData;
 
+            // Normalize phone numbers before submission
+            const normalizedCompanyPhone = normalizePhoneNumber(clientPayload.company_phone_no) || clientPayload.company_phone_no;
+            const normalizedContactPhone = normalizePhoneNumber(clientPayload.contact_officer_phone_no) || clientPayload.contact_officer_phone_no;
+
             const finalPayload = {
                 ...clientPayload,
+                company_phone_no: normalizedCompanyPhone,
+                contact_officer_phone_no: normalizedContactPhone,
                 company_logo_url: logoUrl?.startsWith("data:") ? undefined : (logoUrl || null)
             };
 

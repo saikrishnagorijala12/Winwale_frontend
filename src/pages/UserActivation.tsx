@@ -25,6 +25,7 @@ import api from "../lib/axios";
 import { Role } from "../types/roles.types";
 import { toast } from "sonner";
 import ConfirmationModal from "../components/shared/ConfirmationModal";
+import { formatPhoneNumber } from "../utils/phoneUtils";
 
 const ROLE_MAP: Record<Role, string> = {
   admin: "Administrator",
@@ -202,7 +203,7 @@ const UserCard: React.FC<UserCardProps> = ({
       <div className="space-y-2.5 mb-4">
         <div className="flex items-center gap-2 text-sm text-slate-600">
           <Phone className="w-4 h-4 text-slate-400 shrink-0" />
-          <span className="truncate">{user.phone_no || "No Phone"}</span>
+          <span className="truncate">{formatPhoneNumber(user.phone_no)}</span>
         </div>
         <div className="flex items-center gap-2 text-sm">
           <Shield className="w-4 h-4 text-slate-400 shrink-0" />
@@ -724,7 +725,7 @@ export default function UserActivation() {
                     </td>
                     <td className="px-4 py-5">
                       <p className="text-sm font-semibold text-slate-600">
-                        {user.phone_no || "No Phone"}
+                        {formatPhoneNumber(user.phone_no)}
                       </p>
                     </td>
                     <td className="px-4 py-5"><StatusBadge status={user.is_deleted ? "rejected" : user.is_active ? "approved" : "pending"} /></td>

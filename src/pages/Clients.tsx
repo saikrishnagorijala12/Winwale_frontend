@@ -11,9 +11,9 @@ import { validateStep1, validateStep2 } from "../utils/clientValidations";
 import {
   normalizeClientFromAPI,
   createClientFromResponse,
-  updateClientFromResponse,
   getInitialFormData,
 } from "../utils/clientUtils";
+import { normalizePhoneNumber } from "../utils/phoneUtils";
 import { ClientHeader } from "../components/clients/ClientHeader";
 import { SearchBar } from "../components/clients/SearchBar";
 import { ClientTable } from "../components/clients/ClientTable";
@@ -118,7 +118,15 @@ export default function ClientsPage() {
     setIsSubmitting(true);
     try {
       const { logoFile, logoUrl, ...clientPayload } = newClient;
-      const res = await api.post("/clients", clientPayload);
+
+      // Normalize phone numbers
+      const finalPayload = {
+        ...clientPayload,
+        company_phone_no: normalizePhoneNumber(clientPayload.company_phone_no) || clientPayload.company_phone_no,
+        contact_officer_phone_no: normalizePhoneNumber(clientPayload.contact_officer_phone_no) || clientPayload.contact_officer_phone_no,
+      };
+
+      const res = await api.post("/clients", finalPayload);
       const clientId = res.data.client_id;
 
       if (logoFile) {
@@ -163,7 +171,15 @@ export default function ClientsPage() {
     setIsSubmitting(true);
     try {
       const { logoFile, logoUrl, ...clientPayload } = editingClient;
-      const res = await api.put(`/clients/${editingClient.id}`, clientPayload);
+
+      // Normalize phone numbers
+      const finalPayload = {
+        ...clientPayload,
+        company_phone_no: normalizePhoneNumber(clientPayload.company_phone_no) || clientPayload.company_phone_no,
+        contact_officer_phone_no: normalizePhoneNumber(clientPayload.contact_officer_phone_no) || clientPayload.contact_officer_phone_no,
+      };
+
+      const res = await api.put(`/clients/${editingClient.id}`, finalPayload);
 
       if (logoFile) {
         const logoFormData = new FormData();

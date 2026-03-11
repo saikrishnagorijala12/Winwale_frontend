@@ -1,3 +1,5 @@
+import { formatPhoneNumber } from "../../utils/phoneUtils";
+
 export const DeletionTemplate = ({ data }: { data: any }) => {
   console.log("DeletionTemplate data:", data);
   console.log("companyLogo value:", data?.companyLogo);
@@ -70,7 +72,7 @@ export const DeletionTemplate = ({ data }: { data: any }) => {
       <p className="mb-4">
         If you have any questions regarding this request, please contact{" "}
         <strong>{data?.consultantName}</strong> of The Winvale Group at{" "}
-        <strong>{data?.consultantPhone}</strong> or{" "}
+        <strong>{formatPhoneNumber(data?.consultantPhone)}</strong> or{" "}
         <strong>{data?.consultantEmail}</strong>.
       </p>
 

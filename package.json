@@ -19,6 +19,7 @@
     "axios": "^1.13.2",
     "docx": "^9.5.1",
     "file-saver": "^2.0.5",
+    "libphonenumber-js": "^1.12.39",
     "lucide-react": "^0.562.0",
     "qrcode": "^1.5.4",
     "react": "^19.2.3",

@@ -1,3 +1,5 @@
+import { formatPhoneNumber } from "../../utils/phoneUtils";
+
 export const ProductDescriptiveChangeTemplate = ({ data }: { data: any }) => (
   <div className="relative text-[13px] leading-[1.6] text-foreground px-8 py-6">
     <div className="absolute top-8 right-10">
@@ -50,7 +52,7 @@ export const ProductDescriptiveChangeTemplate = ({ data }: { data: any }) => (
     <p className="mb-4">
       If you have any questions regarding this request, please contact{" "}
       <strong>{data.consultantName}</strong> at{" "}
-      <strong>{data.consultantPhone}</strong> or{" "}
+      <strong>{formatPhoneNumber(data.consultantPhone)}</strong> or{" "}
       <strong>{data.consultantEmail}</strong>.
     </p>
 

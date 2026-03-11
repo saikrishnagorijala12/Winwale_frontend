@@ -3,6 +3,7 @@ export const NAME_REGEX = /^[A-Za-z]+(?:[ .'-][A-Za-z]+)*$/;
 export const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 export const PHONE_REGEX = /^\+?\d{1,14}$/;
 export const ZIP_REGEX = /^[A-Za-z0-9]{1,7}$/;
+import { validatePhoneNumber } from "./phoneUtils";
 
 
 export const PASSWORD_RULES = {
@@ -57,7 +58,11 @@ export const validateEmail = (value: string | undefined) => {
 export const validatePhone = (value: string | undefined, label: string = "Phone number") => {
   const trimmed = value?.trim() || "";
   if (!trimmed) return `${label} is required`;
-  if (!PHONE_REGEX.test(trimmed)) return `${label} must be up to 14 digits and may start with +`;
+
+  const result = validatePhoneNumber(trimmed);
+  if (!result.isValid) {
+    return result.error || `${label} is invalid`;
+  }
   return null;
 };
 

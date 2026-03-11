@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { Client } from "../../types/client.types";
 import { ContactRow } from "./ContactRow";
+import { formatPhoneNumber } from "../../utils/phoneUtils";
 
 interface ClientDetailsModalProps {
   client: Client | null;
@@ -83,7 +84,7 @@ export const ClientDetailsModal: React.FC<ClientDetailsModalProps> = ({
 
               <div className="bg-slate-50/50 rounded-xl p-5 border border-slate-100 space-y-4">
                 <ContactRow icon={Mail} value={client.email} />
-                <ContactRow icon={Phone} value={client.phone} />
+                <ContactRow icon={Phone} value={formatPhoneNumber(client.phone)} />
                 <ContactRow icon={MapPin} value={client.address} />
               </div>
             </div>
@@ -115,7 +116,7 @@ export const ClientDetailsModal: React.FC<ClientDetailsModalProps> = ({
                     </div>
                     <div className="pt-2 space-y-3 border-t border-blue-100/50">
                       <ContactRow icon={Mail} value={client.contact.email} />
-                      <ContactRow icon={Phone} value={client.contact.phone} />
+                      <ContactRow icon={Phone} value={formatPhoneNumber(client.contact.phone)} />
                     </div>
                   </div>
                 )}

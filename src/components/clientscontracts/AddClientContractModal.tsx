@@ -20,6 +20,7 @@ import { getInitialFormData } from "../../utils/clientUtils";
 import { contractService } from "../../services/contractService";
 import api from "../../lib/axios";
 import { toast } from "sonner";
+import { normalizePhoneNumber } from "../../utils/phoneUtils";
 
 interface AddClientContractModalProps {
   isOpen: boolean;
@@ -133,7 +134,18 @@ export default function AddClientContractModal({
 
     try {
       const { logoFile, logoUrl, ...clientPayload } = clientData;
-      const clientRes = await api.post("/clients", clientPayload);
+
+      // Normalize client phone numbers
+      const normalizedCompanyPhone = normalizePhoneNumber(clientPayload.company_phone_no) || clientPayload.company_phone_no;
+      const normalizedContactPhone = normalizePhoneNumber(clientPayload.contact_officer_phone_no) || clientPayload.contact_officer_phone_no;
+
+      const finalClientPayload = {
+        ...clientPayload,
+        company_phone_no: normalizedCompanyPhone,
+        contact_officer_phone_no: normalizedContactPhone,
+      };
+
+      const clientRes = await api.post("/clients", finalClientPayload);
       const newClientId: number = clientRes.data.client_id;
 
       if (logoFile) {

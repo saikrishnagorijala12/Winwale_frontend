@@ -1,3 +1,5 @@
+import { formatPhoneNumber } from "../../utils/phoneUtils";
+
 export const PriceDecreaseEpaTemplate = ({ data }: { data: any }) => (
   <div
     className="relative text-[14px] leading-[1.6] text-foreground px-12 py-10"
@@ -71,7 +73,7 @@ export const PriceDecreaseEpaTemplate = ({ data }: { data: any }) => (
     <p className="mb-4">
       If you have any questions regarding this request, please contact{" "}
       <strong>{data.consultantName}</strong> at The Winvale Group at{" "}
-      <strong>{data.consultantPhone}</strong> or{" "}
+      <strong>{formatPhoneNumber(data.consultantPhone)}</strong> or{" "}
       <strong>{data.consultantEmail}</strong>.
     </p>
 

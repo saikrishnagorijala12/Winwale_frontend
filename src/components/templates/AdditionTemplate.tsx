@@ -1,3 +1,5 @@
+import { formatPhoneNumber } from "../../utils/phoneUtils";
+
 export const AdditionTemplate = ({ data }: { data: any }) => (
   <div
     className="relative text-[14px] leading-[1.6] text-foreground px-12 py-10"
@@ -15,7 +17,8 @@ export const AdditionTemplate = ({ data }: { data: any }) => (
     <p className="mb-6">{data.submissionDate}</p>
 
     <p className="mb-6">
-      Attn: {data.contractorName}<br />
+      Attn: {data.contractorName}
+      <br />
       General Services Administration <br />
       {data.gsaOfficeAddressLine} <br />
       {data.gsaOfficeCityStateZip}
@@ -42,21 +45,19 @@ export const AdditionTemplate = ({ data }: { data: any }) => (
       <strong>{data.contractNumber}</strong>.{" "}
       <strong>{data.companyName}</strong> would like to add{" "}
       <strong>{data.numberOfProductsAdded}</strong> products under{" "}
-      <strong>{data.totalSins}</strong> SIN(s) [<strong>{data.sin_additions}</strong>]. We would like to add these products
-      because <strong>{data.additionRationale}</strong>.
+      <strong>{data.totalSins}</strong> SIN(s) [
+      <strong>{data.sin_additions}</strong>]. We would like to add these
+      products because <strong>{data.additionRationale}</strong>.
     </p>
 
     <ul className="list-disc ml-6 mb-4 space-y-1">
       <li>
         We certify that these products are TAA Compliant in accordance with
-        52.225-6 TRADE AGREEMENTS CERTIFICATE (MAY 2014). The Country of Origin
-        for the added products is{" "}
-        <strong>
-          {data?.coo && data.coo.trim() !== "" && data.coo !== "undefined"
-            ? data.coo
-            : "—"}
-        </strong>
-        .
+        52.225-6 TRADE AGREEMENTS CERTIFICATE (MAY 2014). The{" "}
+        {data?.coo?.includes(",")
+          ? "Countries of Origin for the added products are"
+          : "Country of Origin for the added products is"}{" "}
+        <strong>{data?.coo}</strong>.
       </li>
       <li>
         GSA Basic Discount: <strong>{data.basicDiscount}</strong> %
@@ -127,7 +128,7 @@ export const AdditionTemplate = ({ data }: { data: any }) => (
     <p className="mb-4">
       If you have any questions regarding this request, please contact{" "}
       <strong>{data.consultantName}</strong> at The Winvale Group at{" "}
-      <strong>{data.consultantPhone}</strong> or{" "}
+      <strong>{formatPhoneNumber(data.consultantPhone)}</strong> or{" "}
       <strong>{data.consultantEmail}</strong>.
     </p>
 
