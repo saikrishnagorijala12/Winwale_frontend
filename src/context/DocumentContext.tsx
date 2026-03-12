@@ -61,11 +61,15 @@ const mapJobDetailsToForm = (api: any) => {
     quantityVolumeDiscount: discounts.q_v_discount,
     otherDiscounts: other.additional_concessions,
     requestedIncrease: percentage?.price_increase
-      ? `${percentage.price_increase.min}% - ${percentage.price_increase.max}%`
+      ? percentage.price_increase.min === percentage.price_increase.max
+        ? `${percentage.price_increase.min}%`
+        : `${percentage.price_increase.min}% - ${percentage.price_increase.max}%`
       : "",
 
     requestedDecrease: percentage?.price_decrease
-      ? `${percentage.price_decrease.min}% - ${percentage.price_decrease.max}%`
+      ? percentage.price_decrease.min === percentage.price_decrease.max
+        ? `${percentage.price_decrease.min}%`
+        : `${percentage.price_decrease.min}% - ${percentage.price_decrease.max}%`
       : "",
 
     energyStarCompliance: (() => {
@@ -110,7 +114,7 @@ const mapJobDetailsToForm = (api: any) => {
         sin_price_decrease: getFormatted("PRICE_DECREASE", legacyGroups),
         sin_description_change: getFormatted(
           "DESCRIPTION_CHANGE",
-          legacyGroups
+          legacyGroups,
         ),
       };
     })(),
@@ -118,7 +122,7 @@ const mapJobDetailsToForm = (api: any) => {
 };
 
 const DocumentContext = createContext<DocumentContextType | undefined>(
-  undefined
+  undefined,
 );
 
 export const DocumentProvider: React.FC<{ children: React.ReactNode }> = ({
@@ -130,14 +134,14 @@ export const DocumentProvider: React.FC<{ children: React.ReactNode }> = ({
     string | null
   >(null);
   const [documentConfig, setDocumentConfig] = useState<DocumentConfig | null>(
-    null
+    null,
   );
   const [formData, setFormData] = useState<Record<string, string | number>>({});
   const [validationErrors, setValidationErrors] = useState<ValidationError[]>(
-    []
+    [],
   );
   const [documentHistory, setDocumentHistory] = useState<DocumentMetadata[]>(
-    []
+    [],
   );
   const [analysisSummary, setAnalysisSummary] = useState<any | null>(null);
   const [cachedJobDetails, setCachedJobDetails] = useState<any | null>(null);
@@ -214,7 +218,7 @@ export const DocumentProvider: React.FC<{ children: React.ReactNode }> = ({
         setCurrentStep("select-type");
       }
     },
-    [user, loadedJobId, cachedJobDetails, setCurrentStep]
+    [user, loadedJobId, cachedJobDetails, setCurrentStep],
   );
 
   const updateField = useCallback((fieldId: string, value: string | number) => {
@@ -233,7 +237,7 @@ export const DocumentProvider: React.FC<{ children: React.ReactNode }> = ({
       const fieldLabel = field.label;
 
       const hasRequiredRule = field.validation?.some(
-        (rule) => rule.type === "required"
+        (rule) => rule.type === "required",
       );
 
       if (hasRequiredRule) {
@@ -308,7 +312,7 @@ export const DocumentProvider: React.FC<{ children: React.ReactNode }> = ({
   const generateDocument = useCallback((): DocumentMetadata => {
     const docId = `DOC-${Date.now().toString(36).toUpperCase()}`;
     const versionCount = documentHistory.filter(
-      (d) => d.documentType === selectedDocumentType
+      (d) => d.documentType === selectedDocumentType,
     ).length;
 
     return {

@@ -47,8 +47,8 @@ export const PriceIncreaseEpaTemplate = ({ data }: { data: any }) => (
       <strong>{data.sin_price_increase}</strong>]. This request is in accordance
       with EPA Clause GSAM 538.270-4(a)(3). The modification consists of a price
       increase of{" "}
-      <strong>{data.requestedIncrease || data.priceIncreasePercent}%</strong>{" "}
-      for <strong>{data.priceIncreased}</strong> item(s) due to{" "}
+      <strong>{data.requestedIncrease || data.priceIncreasePercent}</strong> for{" "}
+      <strong>{data.priceIncreased}</strong> item(s) due to{" "}
       <strong>{data.increaseRationale}</strong>.
     </p>
 

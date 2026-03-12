@@ -17,7 +17,8 @@ export const PriceDecreaseEpaTemplate = ({ data }: { data: any }) => (
     <p className="mb-6">{data.submissionDate}</p>
 
     <p className="mb-6">
-      Attn: {data.contractorName}<br />
+      Attn: {data.contractorName}
+      <br />
       General Services Administration <br />
       {data.gsaOfficeAddressLine} <br />
       {data.gsaOfficeCityStateZip}
@@ -42,11 +43,12 @@ export const PriceDecreaseEpaTemplate = ({ data }: { data: any }) => (
       The purpose of this letter is to request your approval of a price
       reduction modification based on a Commercial Price List to GSA Schedule
       Contract <strong>{data.contractNumber}</strong> under{" "}
-      <strong>{data.totalSins}</strong> SIN(s) [<strong>{data.sin_price_decrease}</strong>]. This request is in accordance
+      <strong>{data.totalSins}</strong> SIN(s) [
+      <strong>{data.sin_price_decrease}</strong>]. This request is in accordance
       with EPA Clause GSAM 538.270-4(a)(3). The modification consists of a price
       decrease of{" "}
-      <strong>{data.requestedDecrease || data.priceDecreasePercent}%</strong>{" "}
-      for <strong>{data.priceDecreased}</strong> item(s) due to{" "}
+      <strong>{data.requestedDecrease || data.priceDecreasePercent}</strong> for{" "}
+      <strong>{data.priceDecreased}</strong> item(s) due to{" "}
       <strong>{data.decreaseRationale}</strong>.
     </p>
 
