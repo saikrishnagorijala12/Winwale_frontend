@@ -38,6 +38,7 @@ import {
   updateClientFromResponse,
 } from "../utils/clientUtils";
 import { normalizePhoneNumber } from "../utils/phoneUtils";
+import { useDebounce } from "../hooks/useDebounce";
 
 type TabType = "all" | "pending" | "approved" | "rejected";
 
@@ -154,8 +155,8 @@ const ActionDropdown: React.FC<ActionDropdownProps> = ({
                 setIsOpen(false);
               }}
               className={`w-full px-4 py-2 text-left text-sm font-medium flex items-center gap-2 transition-colors ${isApproved
-                  ? "text-red-600 hover:bg-rose-50"
-                  : "text-emerald-600 hover:bg-emerald-50"
+                ? "text-red-600 hover:bg-rose-50"
+                : "text-emerald-600 hover:bg-emerald-50"
                 }`}
             >
               {isApproved ? (
@@ -201,8 +202,8 @@ const ClientCard: React.FC<ClientCardProps> = ({
         <div className="flex items-center gap-3 flex-1 min-w-0">
           <div
             className={`shrink-0 w-12 h-12 rounded-xl border border-slate-200 flex items-center justify-center text-white font-bold text-sm shadow-sm overflow-hidden ${client.company_logo_url
-                ? "bg-white"
-                : "bg-linear-to-br from-[#3399cc] to-[#2980b9]"
+              ? "bg-white"
+              : "bg-linear-to-br from-[#3399cc] to-[#2980b9]"
               }`}
           >
             {client.company_logo_url ? (
@@ -285,18 +286,39 @@ const ClientActivation = () => {
   const [editingClient, setEditingClient] = useState<EditingClient | null>(
     null,
   );
+
+  const [statusCounts, setStatusCounts] = useState<Record<string, number>>({
+    all: 0,
+    pending: 0,
+    approved: 0,
+    rejected: 0,
+  });
+  const [totalItems, setTotalItems] = useState(0);
   const [editErrors, setEditErrors] = useState<ClientFormErrors>({});
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [backendError, setBackendError] = useState<string>("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
+  const debouncedSearchQuery = useDebounce(searchQuery, 500);
 
-  const fetchClients = async () => {
+  const fetchClients = async (page: number, query: string, tab: TabType) => {
     try {
       setLoading(true);
-      const response = await api.get("/clients");
-      setClients(Array.isArray(response.data) ? response.data : []);
+      const response = await api.get("/clients", {
+        params: {
+          page,
+          page_size: itemsPerPage,
+          status: tab,
+          search: query || undefined,
+        }
+      });
+      const { clients: fetchedClients, total_count, status_counts } = response.data;
+      setClients(fetchedClients);
+      setTotalItems(total_count);
+      if (status_counts) {
+        setStatusCounts(status_counts);
+      }
     } catch {
       toast.error("Failed to load clients");
     } finally {
@@ -305,12 +327,8 @@ const ClientActivation = () => {
   };
 
   useEffect(() => {
-    fetchClients();
-  }, []);
-
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [activeTab, searchQuery]);
+    fetchClients(currentPage, debouncedSearchQuery, activeTab);
+  }, [currentPage, debouncedSearchQuery, activeTab]);
 
   const handleApiError = (err: any, context: string = "operation") => {
     const errorMessage =
@@ -344,7 +362,7 @@ const ClientActivation = () => {
       toast.success(
         `Client ${action === "approve" ? "approved" : "rejected"} successfully`,
       );
-      await fetchClients();
+      await fetchClients(currentPage, debouncedSearchQuery, activeTab);
       closeConfirmModal();
     } catch (err) {
       handleApiError(err, `${action} client`);
@@ -436,7 +454,7 @@ const ClientActivation = () => {
       }
 
       toast.success("Client updated successfully");
-      await fetchClients();
+      await fetchClients(currentPage, debouncedSearchQuery, activeTab);
       setIsEditModalOpen(false);
     } catch (err: any) {
       handleApiError(err, "update client");
@@ -448,38 +466,6 @@ const ClientActivation = () => {
   const handleRowClick = (client: any) => {
     handleViewClient(client);
   };
-
-  const pendingClients = clients.filter(
-    (c) => !["approved", "rejected"].includes(c.status),
-  );
-  const approvedClients = clients.filter((c) => c.status === "approved");
-  const rejectedClients = clients.filter((c) => c.status === "rejected");
-
-  const getFilteredClients = () => {
-    let list = [];
-    if (activeTab === "pending") list = pendingClients;
-    else if (activeTab === "approved") list = approvedClients;
-    else if (activeTab === "rejected") list = rejectedClients;
-    else list = clients;
-
-    return list.filter(
-      (c) =>
-        c.company_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        c.contact_officer_name
-          ?.toLowerCase()
-          .includes(searchQuery.toLowerCase()),
-    );
-  };
-
-  const filteredClients = getFilteredClients();
-
-  const totalItems = filteredClients.length;
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedClients = filteredClients.slice(
-    startIndex,
-    startIndex + itemsPerPage,
-  );
-  const totalPages = Math.ceil(totalItems / itemsPerPage);
 
   const getTabTitle = () => {
     switch (activeTab) {
@@ -585,25 +571,25 @@ const ClientActivation = () => {
         {[
           {
             label: "Total Clients",
-            count: clients.length,
+            count: statusCounts.all,
             icon: Building2,
             color: "blue",
           },
           {
             label: "Pending Requests",
-            count: pendingClients.length,
+            count: statusCounts.pending,
             icon: Clock,
             color: "orange",
           },
           {
             label: "Approved Clients",
-            count: approvedClients.length,
+            count: statusCounts.approved,
             icon: CheckCircle2,
             color: "emerald",
           },
           {
             label: "Rejected",
-            count: rejectedClients.length,
+            count: statusCounts.rejected,
             icon: XCircle,
             color: "rose",
           },
@@ -638,25 +624,25 @@ const ClientActivation = () => {
               {
                 id: "all",
                 label: "All Clients",
-                count: clients.length,
+                count: statusCounts.all,
                 color: "blue",
               },
               {
                 id: "pending",
                 label: "Pending",
-                count: pendingClients.length,
+                count: statusCounts.pending,
                 color: "orange",
               },
               {
                 id: "approved",
                 label: "Approved",
-                count: approvedClients.length,
+                count: statusCounts.approved,
                 color: "emerald",
               },
               {
                 id: "rejected",
                 label: "Rejected",
-                count: rejectedClients.length,
+                count: statusCounts.rejected,
                 color: "rose",
               },
             ].map((tab) => (
@@ -664,8 +650,8 @@ const ClientActivation = () => {
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as TabType)}
                 className={`px-4 sm:px-6 py-2 sm:py-3 rounded-t-xl font-bold text-xs sm:text-sm transition-all whitespace-nowrap ${activeTab === tab.id
-                    ? `bg-${tab.color}-50 text-${tab.color}-600 border-b-2 border-${tab.color}-600`
-                    : "text-slate-500 hover:text-slate-700 hover:bg-slate-50"
+                  ? `bg-${tab.color}-50 text-${tab.color}-600 border-b-2 border-${tab.color}-600`
+                  : "text-slate-500 hover:text-slate-700 hover:bg-slate-50"
                   }`}
               >
                 {tab.label} ({tab.count})
@@ -700,12 +686,12 @@ const ClientActivation = () => {
                 Loading clients...
               </p>
             </div>
-          ) : paginatedClients.length === 0 ? (
+          ) : clients.length === 0 ? (
             <div className="py-16 text-center text-slate-400 text-sm">
               No clients found.
             </div>
           ) : (
-            paginatedClients.map((client) => (
+            clients.map((client) => (
               <ClientCard
                 key={client.client_id}
                 client={client}
@@ -754,7 +740,7 @@ const ClientActivation = () => {
                     </div>
                   </td>
                 </tr>
-              ) : paginatedClients.length === 0 ? (
+              ) : clients.length === 0 ? (
                 <tr>
                   <td
                     colSpan={6}
@@ -764,7 +750,7 @@ const ClientActivation = () => {
                   </td>
                 </tr>
               ) : (
-                paginatedClients.map((client) => (
+                clients.map((client) => (
                   <tr
                     key={client.client_id}
                     onClick={() => handleRowClick(client)}
@@ -774,8 +760,8 @@ const ClientActivation = () => {
                       <div className="flex items-center gap-3">
                         <div
                           className={`shrink-0 w-10 h-10 rounded-xl border border-slate-200 flex items-center justify-center text-white font-bold text-xs shadow-sm overflow-hidden ${client.company_logo_url
-                              ? "bg-white"
-                              : "bg-linear-to-br from-[#3399cc] to-[#2980b9]"
+                            ? "bg-white"
+                            : "bg-linear-to-br from-[#3399cc] to-[#2980b9]"
                             }`}
                         >
                           {client.company_logo_url ? (

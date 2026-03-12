@@ -11,7 +11,7 @@ export const normalizeClientFromAPI = (c: any): Client => {
   return {
     id: c.client_id,
     name: c.company_name,
-    contract: c.contract_number || "—",
+    contract: c.contract?.contract_number || c.contract_number || "—",
     status: normalizeStatus(c.status) as ClientStatus,
     lastModification:
       (c.updated_time || c.created_time)?.split("T")[0] ?? "—",
@@ -41,6 +41,7 @@ export const normalizeClientFromAPI = (c: any): Client => {
       .filter(Boolean)
       .join(", "),
     logoUrl: c.company_logo_url,
+    contractDetails: c.contract,
   };
 };
 

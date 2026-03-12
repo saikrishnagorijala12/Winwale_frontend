@@ -1,7 +1,15 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { resetPassword, confirmResetPassword } from "aws-amplify/auth";
-import { Mail, Lock, Loader2, ArrowRight, ArrowLeft, X, CheckCircle2 } from "lucide-react";
+import {
+  Mail,
+  Lock,
+  Loader2,
+  ArrowRight,
+  ArrowLeft,
+  X,
+  CheckCircle2,
+} from "lucide-react";
 import AuthLayout from "../../components/auth/AuthLayout";
 import { PASSWORD_RULES as passwordRules } from "@/src/utils/validators";
 import { validateEmail } from "@/src/utils/validators";
@@ -63,7 +71,9 @@ const ForgotPassword: React.FC = () => {
     } catch (err: any) {
       console.log("Reset request handled:", err?.name || "Success");
     } finally {
-      setSuccess("If an account exists for this email, a recovery code has been sent.");
+      setSuccess(
+        "If an account exists for this email, a recovery code has been sent.",
+      );
       setStep("confirm");
       setLoading(false);
     }
@@ -100,9 +110,7 @@ const ForgotPassword: React.FC = () => {
     <AuthLayout title={title} subtitle={subtitle}>
       {error && (
         <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 text-sm flex items-center justify-between">
-          <div className="flex-1">
-            {error}
-          </div>
+          <div className="flex-1">{error}</div>
           <button
             onClick={() => setError(null)}
             className="ml-3 text-red-500 hover:text-red-700 transition-colors p-1 rounded-md hover:bg-red-100"
@@ -162,11 +170,16 @@ const ForgotPassword: React.FC = () => {
             className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-[#3498db] hover:bg-[#2980b9] text-white font-semibold rounded-xl shadow-lg shadow-blue-500/30 transition-all active:scale-[0.98] disabled:opacity-70"
           >
             {loading ? (
-              <Loader2 className="h-5 w-5 animate-spin" />
+              <>
+                <Loader2 className="h-5 w-5 animate-spin" />
+                Sending...
+              </>
             ) : (
-              "Send Code"
+              <>
+                Send Code
+                <ArrowRight className="h-5 w-5" />
+              </>
             )}
-            {!loading && <ArrowRight className="h-5 w-5" />}
           </button>
         </form>
       ) : (
@@ -222,10 +235,11 @@ const ForgotPassword: React.FC = () => {
             )}
 
             <div
-              className={`overflow-hidden transition-all duration-300 ${passwordFocused && newPassword.length > 0 && hasFailedRules
-                ? "max-h-40 opacity-100"
-                : "max-h-0 opacity-0"
-                }`}
+              className={`overflow-hidden transition-all duration-300 ${
+                passwordFocused && newPassword.length > 0 && hasFailedRules
+                  ? "max-h-40 opacity-100"
+                  : "max-h-0 opacity-0"
+              }`}
             >
               <ul className="mt-3 space-y-1 text-sm">
                 {Object.entries(passwordRules).map(([key, rule]) => {
@@ -233,14 +247,16 @@ const ForgotPassword: React.FC = () => {
                   return (
                     <li
                       key={key}
-                      className={`flex items-center gap-2 ${passed ? "text-green-600" : "text-slate-400"
-                        }`}
+                      className={`flex items-center gap-2 ${
+                        passed ? "text-green-600" : "text-slate-400"
+                      }`}
                     >
                       <span
-                        className={`inline-flex h-4 w-4 items-center justify-center rounded-full border text-xs ${passed
-                          ? "border-green-600 bg-green-600 text-white"
-                          : "border-slate-300"
-                          }`}
+                        className={`inline-flex h-4 w-4 items-center justify-center rounded-full border text-xs ${
+                          passed
+                            ? "border-green-600 bg-green-600 text-white"
+                            : "border-slate-300"
+                        }`}
                       >
                         {passed ? "✓" : ""}
                       </span>
@@ -258,11 +274,16 @@ const ForgotPassword: React.FC = () => {
             className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-[#3498db] hover:bg-[#2980b9] text-white font-semibold rounded-xl shadow-lg shadow-blue-500/30 transition-all active:scale-[0.98] disabled:opacity-70"
           >
             {loading ? (
-              <Loader2 className="h-5 w-5 animate-spin" />
+              <>
+                <Loader2 className="h-5 w-5 animate-spin" />
+                Updating...
+              </>
             ) : (
-              "Update Password"
+              <>
+                Update Password
+                <ArrowRight className="h-5 w-5" />
+              </>
             )}
-            {!loading && <ArrowRight className="h-5 w-5" />}
           </button>
         </form>
       )}

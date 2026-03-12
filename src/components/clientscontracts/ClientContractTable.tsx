@@ -8,7 +8,7 @@ import { ClientContractRead } from "../../types/contract.types";
 
 interface ClientContractTableProps {
   clients: Client[];
-  contracts: ClientContractRead[];
+  contracts?: ClientContractRead[];
   loading: boolean;
   openClientId: number | null;
   onRowClick: (client: Client) => void;
@@ -58,8 +58,8 @@ export const ClientContractTable: React.FC<ClientContractTableProps> = ({
   const totalPages = Math.ceil(totalClients / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
 
-  const getContract = (clientId: number) =>
-    contracts.find((c) => c.client_id === clientId) ?? null;
+  const getContract = (client: Client) =>
+    client.contractDetails ?? null;
 
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
@@ -109,7 +109,7 @@ export const ClientContractTable: React.FC<ClientContractTableProps> = ({
               </tr>
             ) : (
               clients.map((client) => {
-                const contract = getContract(client.id);
+                const contract = getContract(client);
                 return (
                   <tr
                     key={client.id}
@@ -120,8 +120,8 @@ export const ClientContractTable: React.FC<ClientContractTableProps> = ({
                       <div className="flex items-center gap-3">
                         <div
                           className={`shrink-0 w-9 h-9 rounded-xl border border-slate-200 flex items-center justify-center text-white font-bold text-xs shadow-sm overflow-hidden ${client.logoUrl
-                              ? "bg-white"
-                              : "bg-linear-to-br from-[#3399cc] to-[#2980b9]"
+                            ? "bg-white"
+                            : "bg-linear-to-br from-[#3399cc] to-[#2980b9]"
                             }`}
                         >
                           {client.logoUrl ? (
@@ -242,7 +242,7 @@ export const ClientContractTable: React.FC<ClientContractTableProps> = ({
           <EmptyState />
         ) : (
           clients.map((client) => {
-            const contract = getContract(client.id);
+            const contract = getContract(client);
             return (
               <div
                 key={client.id}
@@ -253,8 +253,8 @@ export const ClientContractTable: React.FC<ClientContractTableProps> = ({
                   <div className="flex items-center gap-3">
                     <div
                       className={`w-12 h-12 rounded-2xl bg-linear-to-br flex items-center justify-center text-white font-bold text-lg shadow-blue-100 shadow-lg overflow-hidden${client.logoUrl
-                          ? "bg-white"
-                          : "bg-linear-to-br from-[#3399cc] to-[#2980b9]"
+                        ? "bg-white"
+                        : "bg-linear-to-br from-[#3399cc] to-[#2980b9]"
                         }`}
                     >
                       {client.logoUrl ? (

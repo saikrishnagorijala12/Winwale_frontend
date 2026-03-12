@@ -23,7 +23,6 @@ type FormErrors = {
   confirmPassword?: string;
 };
 
-
 const PasswordChecklist: React.FC<{ password: string }> = ({ password }) => {
   return (
     <ul className="mt-3 space-y-1 text-sm">
@@ -33,14 +32,16 @@ const PasswordChecklist: React.FC<{ password: string }> = ({ password }) => {
         return (
           <li
             key={key}
-            className={`flex items-center gap-2 ${passed ? "text-green-600" : "text-slate-400"
-              }`}
+            className={`flex items-center gap-2 ${
+              passed ? "text-green-600" : "text-slate-400"
+            }`}
           >
             <span
-              className={`inline-flex h-4 w-4 items-center justify-center rounded-full border text-xs ${passed
-                ? "border-green-600 bg-green-600 text-white"
-                : "border-slate-300"
-                }`}
+              className={`inline-flex h-4 w-4 items-center justify-center rounded-full border text-xs ${
+                passed
+                  ? "border-green-600 bg-green-600 text-white"
+                  : "border-slate-300"
+              }`}
             >
               {passed ? "✓" : ""}
             </span>
@@ -99,9 +100,12 @@ const Signup: React.FC = () => {
         },
       });
 
-      navigate(`/verify-email?email=${encodeURIComponent(formData.email.trim())}`, {
-        state: { password: formData.password }
-      });
+      navigate(
+        `/verify-email?email=${encodeURIComponent(formData.email.trim())}`,
+        {
+          state: { password: formData.password },
+        },
+      );
     } catch (err: any) {
       if (err.name === "UsernameExistsException") {
         setError("An account with this email already exists. Try signing in.");
@@ -120,9 +124,7 @@ const Signup: React.FC = () => {
     <AuthLayout title={title} subtitle={subtitle}>
       {error && (
         <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 text-sm flex items-center justify-between">
-          <div className="flex-1">
-            {error}
-          </div>
+          <div className="flex-1">{error}</div>
           <button
             onClick={() => setError(null)}
             className="ml-3 text-red-500 hover:text-red-700 transition-colors p-1 rounded-md hover:bg-red-100"
@@ -220,12 +222,11 @@ const Signup: React.FC = () => {
           </div>
 
           <div
-            className={`overflow-hidden transition-all duration-300 ease-in-out ${passwordFocused &&
-              hasFailedRules &&
-              formData.password.length > 0
-              ? "max-h-40 opacity-100"
-              : "max-h-0 opacity-0"
-              }`}
+            className={`overflow-hidden transition-all duration-300 ease-in-out ${
+              passwordFocused && hasFailedRules && formData.password.length > 0
+                ? "max-h-40 opacity-100"
+                : "max-h-0 opacity-0"
+            }`}
           >
             <PasswordChecklist password={formData.password} />
           </div>
@@ -266,7 +267,14 @@ const Signup: React.FC = () => {
           disabled={loading}
           className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-[#3498db] hover:bg-[#2980b9] text-white font-semibold rounded-xl disabled:opacity-70 transition-all active:scale-[0.98]"
         >
-          {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : "Sign up"}
+          {loading ? (
+            <>
+              <Loader2 className="h-5 w-5 animate-spin" />
+              Signing up...
+            </>
+          ) : (
+            "Sign up"
+          )}
         </button>
       </form>
 

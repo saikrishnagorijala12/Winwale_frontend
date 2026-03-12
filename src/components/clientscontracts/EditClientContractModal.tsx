@@ -82,7 +82,7 @@ export default function EditClientContractModal({
                 logoFile: null,
             });
 
-            if (contract) {
+            if (contract && typeof contract === "object") {
                 setContractData({ ...contract });
             } else {
                 setContractData({

@@ -26,6 +26,7 @@ import { Role } from "../types/roles.types";
 import { toast } from "sonner";
 import ConfirmationModal from "../components/shared/ConfirmationModal";
 import { formatPhoneNumber } from "../utils/phoneUtils";
+import { useDebounce } from "../hooks/useDebounce";
 
 const ROLE_MAP: Record<Role, string> = {
   admin: "Administrator",
@@ -33,7 +34,6 @@ const ROLE_MAP: Record<Role, string> = {
 };
 
 type TabType = "all" | "pending" | "approved" | "rejected";
-
 
 interface ActionDropdownProps {
   user: any;
@@ -228,14 +228,22 @@ const UserCard: React.FC<UserCardProps> = ({
       </div>
 
       <div className="flex items-center justify-between pt-3 border-t border-slate-100">
-        <StatusBadge status={user.is_deleted ? "rejected" : user.is_active ? "approved" : "pending"} />
+        <StatusBadge
+          status={
+            user.is_deleted
+              ? "rejected"
+              : user.is_active
+                ? "approved"
+                : "pending"
+          }
+        />
       </div>
     </div>
   );
 };
 
 export default function UserActivation() {
-  const [users, setUsers] = useState([]);
+  const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [isActionLoading, setIsActionLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -249,33 +257,45 @@ export default function UserActivation() {
     isOpen: false,
     user: null,
   });
+
+  const [statusCounts, setStatusCounts] = useState<Record<string, number>>({
+    all: 0,
+    pending: 0,
+    approved: 0,
+    rejected: 0,
+  });
+  const [totalItems, setTotalItems] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
+  const debouncedSearchQuery = useDebounce(searchQuery, 500);
 
-  const fetchUsers = async () => {
+  const fetchUsers = async (page: number, query: string, tab: TabType) => {
     try {
       setLoading(true);
-      const response = await api.get("/users/all");
-      const data = response.data;
-      setUsers(Array.isArray(data?.users) ? data.users : []);
+      const response = await api.get("/users/all", {
+        params: {
+          page,
+          page_size: itemsPerPage,
+          status: tab,
+          search: query || undefined,
+        },
+      });
+      const { users: fetchedUsers, total_count, status_counts } = response.data;
+      setUsers(fetchedUsers);
+      setTotalItems(total_count);
+      if (status_counts) {
+        setStatusCounts(status_counts);
+      }
     } catch (error) {
-      toast.error("Failed to load users. Please try again.")
+      toast.error("Failed to load users. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchUsers();
-  }, []);
-
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [activeTab, searchQuery]);
-
-  const pendingUsers = users.filter((u) => !u.is_active && !u.is_deleted);
-  const approvedUsers = users.filter((u) => u.is_active && !u.is_deleted);
-  const rejectedUsers = users.filter((u) => u.is_deleted);
+    fetchUsers(currentPage, debouncedSearchQuery, activeTab);
+  }, [currentPage, debouncedSearchQuery, activeTab]);
 
   const openConfirmModal = (user, action: "approve" | "reject") => {
     setConfirmModal({
@@ -350,7 +370,7 @@ export default function UserActivation() {
     try {
       setIsActionLoading(true);
       await api.put(`/users/change_role/${roleChangeModal.user.user_id}`);
-      await fetchUsers();
+      await fetchUsers(currentPage, debouncedSearchQuery, activeTab);
 
       toast.success("User role changed successfully");
       closeRoleChangeModal();
@@ -361,42 +381,6 @@ export default function UserActivation() {
       setIsActionLoading(false);
     }
   };
-
-  const getFilteredUsers = () => {
-    let userList = [];
-    switch (activeTab) {
-      case "all":
-        userList = users;
-        break;
-      case "pending":
-        userList = pendingUsers;
-        break;
-      case "approved":
-        userList = approvedUsers;
-        break;
-      case "rejected":
-        userList = rejectedUsers;
-        break;
-      default:
-        userList = users;
-    }
-
-    return userList.filter(
-      (user) =>
-        user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        user.email.toLowerCase().includes(searchQuery.toLowerCase()),
-    );
-  };
-
-  const filteredUsers = getFilteredUsers();
-
-  const totalItems = filteredUsers.length;
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedUsers = filteredUsers.slice(
-    startIndex,
-    startIndex + itemsPerPage,
-  );
-  const totalPages = Math.ceil(totalItems / itemsPerPage);
 
   const getRoleStyle = (roleId) => {
     const role = ROLE_MAP[roleId] || "default";
@@ -446,9 +430,6 @@ export default function UserActivation() {
     }
   };
 
-
-
-
   return (
     <div className="min-h-screen bg-linear-to-br from-slate-50 via-blue-50/30 to-slate-100 p-4 sm:p-6 lg:p-10 space-y-6 sm:space-y-8 lg:space-y-10">
       <ConfirmationModal
@@ -459,7 +440,10 @@ export default function UserActivation() {
         message={
           <>
             Are you sure you want to {confirmModal.action}{" "}
-            <span className="font-bold text-slate-700">{confirmModal.user?.name}</span>?
+            <span className="font-bold text-slate-700">
+              {confirmModal.user?.name}
+            </span>
+            ?
           </>
         }
         details={[
@@ -469,9 +453,10 @@ export default function UserActivation() {
         warning={
           confirmModal.action === "reject"
             ? {
-              message: "This action will reject the user's account. They won't be able to access the system.",
-              type: "rose",
-            }
+                message:
+                  "This action will reject the user's account. They won't be able to access the system.",
+                type: "rose",
+              }
             : undefined
         }
         variant={confirmModal.action === "approve" ? "emerald" : "rose"}
@@ -487,18 +472,28 @@ export default function UserActivation() {
         message={
           <>
             Are you sure you want to change the role of{" "}
-            <span className="font-bold text-slate-700">{roleChangeModal.user?.name}</span>?
+            <span className="font-bold text-slate-700">
+              {roleChangeModal.user?.name}
+            </span>
+            ?
           </>
         }
         details={[
-          { label: "Current Role", value: ROLE_MAP[roleChangeModal.user?.role] || "User" },
+          {
+            label: "Current Role",
+            value: ROLE_MAP[roleChangeModal.user?.role] || "User",
+          },
           {
             label: "New Role",
-            value: roleChangeModal.user?.role === "admin" ? "Consultant" : "Administrator",
+            value:
+              roleChangeModal.user?.role === "admin"
+                ? "Consultant"
+                : "Administrator",
           },
         ]}
         warning={{
-          message: "This will change the user's permissions and access level in the system.",
+          message:
+            "This will change the user's permissions and access level in the system.",
           type: "amber",
         }}
         variant="blue"
@@ -519,25 +514,25 @@ export default function UserActivation() {
         {[
           {
             label: "Total Users",
-            count: users.length,
+            count: statusCounts.all,
             icon: Users,
             color: "blue",
           },
           {
             label: "Pending Approvals",
-            count: pendingUsers.length,
+            count: statusCounts.pending,
             icon: Clock,
             color: "orange",
           },
           {
             label: "Approved",
-            count: approvedUsers.length,
+            count: statusCounts.approved,
             icon: CheckCircle2,
             color: "emerald",
           },
           {
             label: "Rejected",
-            count: rejectedUsers.length,
+            count: statusCounts.rejected,
             icon: XCircle,
             color: "rose",
           },
@@ -572,35 +567,36 @@ export default function UserActivation() {
               {
                 id: "all",
                 label: "All Users",
-                count: users.length,
+                count: statusCounts.all,
                 color: "blue",
               },
               {
                 id: "pending",
                 label: "Pending",
-                count: pendingUsers.length,
+                count: statusCounts.pending,
                 color: "orange",
               },
               {
                 id: "approved",
                 label: "Approved",
-                count: approvedUsers.length,
+                count: statusCounts.approved,
                 color: "emerald",
               },
               {
                 id: "rejected",
                 label: "Rejected",
-                count: rejectedUsers.length,
+                count: statusCounts.rejected,
                 color: "rose",
               },
             ].map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as TabType)}
-                className={`px-4 sm:px-6 py-2 sm:py-3 rounded-t-xl font-bold text-xs sm:text-sm transition-all whitespace-nowrap ${activeTab === tab.id
-                  ? `bg-${tab.color}-50 text-${tab.color}-600 border-b-2 border-${tab.color}-600`
-                  : "text-slate-500 hover:text-slate-700 hover:bg-slate-50"
-                  }`}
+                className={`px-4 sm:px-6 py-2 sm:py-3 rounded-t-xl font-bold text-xs sm:text-sm transition-all whitespace-nowrap ${
+                  activeTab === tab.id
+                    ? `bg-${tab.color}-50 text-${tab.color}-600 border-b-2 border-${tab.color}-600`
+                    : "text-slate-500 hover:text-slate-700 hover:bg-slate-50"
+                }`}
               >
                 {tab.label} ({tab.count})
               </button>
@@ -632,14 +628,16 @@ export default function UserActivation() {
           {loading ? (
             <div className="py-16 flex flex-col items-center justify-center gap-3">
               <Loader2 className="w-8 h-8 animate-spin text-[#24578f]" />
-              <p className="text-sm text-slate-500 font-medium">Loading users...</p>
+              <p className="text-sm text-slate-500 font-medium">
+                Loading users...
+              </p>
             </div>
-          ) : paginatedUsers.length === 0 ? (
+          ) : users.length === 0 ? (
             <div className="py-16 text-center text-slate-400 text-sm">
               No users found.
             </div>
           ) : (
-            paginatedUsers.map((user) => (
+            users.map((user) => (
               <UserCard
                 key={user.user_id}
                 user={user}
@@ -686,14 +684,17 @@ export default function UserActivation() {
                     </div>
                   </td>
                 </tr>
-              ) : paginatedUsers.length === 0 ? (
+              ) : users.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-20 text-center text-slate-400">
+                  <td
+                    colSpan={6}
+                    className="px-6 py-20 text-center text-slate-400"
+                  >
                     No users found.
                   </td>
                 </tr>
               ) : (
-                paginatedUsers.map((user) => (
+                users.map((user) => (
                   <tr
                     key={user.user_id}
                     className="group hover:bg-slate-50/30 transition-colors"
@@ -724,19 +725,38 @@ export default function UserActivation() {
                       </span>
                     </td>
                     <td className="px-4 py-5">
-                      <p className="text-sm font-semibold text-slate-600">
-                        {formatPhoneNumber(user.phone_no)}
-                      </p>
+                      {user.phone_no ? (
+                        <p className="text-sm font-semibold text-slate-600">
+                          {formatPhoneNumber(user.phone_no)}
+                        </p>
+                      ) : (
+                        <span className="text-sm text-slate-400 font-medium italic">
+                          Not provided
+                        </span>
+                      )}
                     </td>
-                    <td className="px-4 py-5"><StatusBadge status={user.is_deleted ? "rejected" : user.is_active ? "approved" : "pending"} /></td>
+                    <td className="px-4 py-5">
+                      <StatusBadge
+                        status={
+                          user.is_deleted
+                            ? "rejected"
+                            : user.is_active
+                              ? "approved"
+                              : "pending"
+                        }
+                      />
+                    </td>
                     <td className="px-4 py-5">
                       <div className="flex items-center gap-2 text-sm text-slate-400 font-medium">
                         <Calendar className="w-4 h-4" />
-                        {new Date(user.created_time).toLocaleDateString("en-US", {
-                          month: "short",
-                          day: "2-digit",
-                          year: "numeric",
-                        })}
+                        {new Date(user.created_time).toLocaleDateString(
+                          "en-US",
+                          {
+                            month: "short",
+                            day: "2-digit",
+                            year: "numeric",
+                          },
+                        )}
                       </div>
                     </td>
                     <td className="px-4 py-5">

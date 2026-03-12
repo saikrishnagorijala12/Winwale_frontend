@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import { Plus } from "lucide-react";
 import { toast } from "sonner";
 import api from "../lib/axios";
@@ -14,6 +14,7 @@ import { ClientContractTable } from "../components/clientscontracts/ClientContra
 import ConfirmationModal from "../components/shared/ConfirmationModal";
 import AddClientContractModal from "../components/clientscontracts/AddClientContractModal";
 import EditClientContractModal from "../components/clientscontracts/EditClientContractModal";
+import { useDebounce } from "../hooks/useDebounce";
 
 export default function ClientsAndContractsPage() {
     const [clients, setClients] = useState<Client[]>([]);
@@ -22,7 +23,6 @@ export default function ClientsAndContractsPage() {
     const [filterStatus, setFilterStatus] = useState("all");
     const [openClientId, setOpenClientId] = useState<number | null>(null);
 
-    const [contracts, setContracts] = useState<ClientContractRead[]>([]);
 
     const [detailsClient, setDetailsClient] = useState<Client | null>(null);
     const [showAddModal, setShowAddModal] = useState(false);
@@ -34,42 +34,40 @@ export default function ClientsAndContractsPage() {
     const [contractToDelete, setContractToDelete] = useState<number | null>(null);
     const [deletingContract, setDeletingContract] = useState(false);
 
+    const [totalItems, setTotalItems] = useState(0);
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 10;
+    const debouncedSearchQuery = useDebounce(searchQuery, 500);
 
-    const fetchClients = async () => {
+    const fetchClientsAndContracts = async (page: number, query: string, status: string) => {
         try {
             setClientLoading(true);
-            const res = await api.get("/clients");
-            setClients(res.data.map(normalizeClientFromAPI));
+            const res = await api.get("/clients", {
+                params: {
+                    page,
+                    page_size: itemsPerPage,
+                    status: status === "all" ? undefined : status,
+                    search: query || undefined,
+                }
+            });
+            const { clients: fetchedClients, total_count } = res.data;
+            setClients(fetchedClients.map(normalizeClientFromAPI));
+            setTotalItems(total_count);
         } catch {
-            toast.error("Failed to load clients");
+            toast.error("Failed to load data");
         } finally {
             setClientLoading(false);
         }
     };
 
-    const fetchContracts = async () => {
-        try {
-            const data = await contractService.getAllContracts();
-            setContracts(data.filter((c) => !c.is_deleted));
-        } catch {
-            toast.error("Failed to load contracts");
-        }
-    };
-
     const refreshData = () => {
-        fetchClients();
-        fetchContracts();
+        fetchClientsAndContracts(currentPage, debouncedSearchQuery, filterStatus);
     };
 
     useEffect(() => {
-        refreshData();
-    }, []);
+        fetchClientsAndContracts(currentPage, debouncedSearchQuery, filterStatus);
+    }, [currentPage, debouncedSearchQuery, filterStatus]);
 
-    useEffect(() => {
-        setCurrentPage(1);
-    }, [searchQuery, filterStatus]);
 
     useEffect(() => {
         if (detailsClient) {
@@ -78,29 +76,10 @@ export default function ClientsAndContractsPage() {
         }
     }, [clients]);
 
-    const getContractForClient = (clientId: number) =>
-        contracts.find((c) => c.client_id === clientId) ?? null;
-
-    const filteredClients = useMemo(() => {
-        const q = searchQuery.toLowerCase();
-        return clients.filter((c) => {
-            const contract = getContractForClient(c.id);
-            const matchSearch =
-                c.name.toLowerCase().includes(q) ||
-                (c.contact?.name || "").toLowerCase().includes(q) ||
-                c.email.toLowerCase().includes(q) ||
-                (contract?.contract_number || "").toLowerCase().includes(q) ||
-                (contract?.fob_term || "").toLowerCase().includes(q);
-            const matchFilter = filterStatus === "all" || c.status === filterStatus;
-            return matchSearch && matchFilter;
-        });
-    }, [clients, contracts, searchQuery, filterStatus]);
-
-    const totalClients = filteredClients.length;
-    const paginatedClients = filteredClients.slice(
-        (currentPage - 1) * itemsPerPage,
-        currentPage * itemsPerPage,
-    );
+    const getContractForClient = (clientId: number) => {
+        const client = clients.find(c => c.id === clientId);
+        return client?.contractDetails ?? null;
+    };
 
     const openEditModal = (client: Client) => {
         setClientToEdit(client);
@@ -112,7 +91,7 @@ export default function ClientsAndContractsPage() {
         setDeletingContract(true);
         try {
             await contractService.deleteContract(contractToDelete);
-            setContracts((prev) => prev.filter((c) => c.client_id !== contractToDelete));
+            await refreshData();
             toast.success("Contract deleted");
         } catch (err: any) {
             toast.error(err.message || "Failed to delete contract");
@@ -151,8 +130,8 @@ export default function ClientsAndContractsPage() {
             />
 
             <ClientContractTable
-                clients={paginatedClients}
-                contracts={contracts}
+                clients={clients}
+                contracts={[]}
                 loading={clientLoading}
                 openClientId={openClientId}
                 onRowClick={setDetailsClient}
@@ -160,7 +139,7 @@ export default function ClientsAndContractsPage() {
                 onView={setDetailsClient}
                 onEdit={openEditModal}
                 currentPage={currentPage}
-                totalClients={totalClients}
+                totalClients={totalItems}
                 itemsPerPage={itemsPerPage}
                 onPageChange={setCurrentPage}
             />
@@ -205,7 +184,7 @@ export default function ClientsAndContractsPage() {
                     <>
                         Are you sure you want to delete contract{" "}
                         <span className="font-bold text-slate-700">
-                            {contracts.find((c) => c.client_id === contractToDelete)?.contract_number}
+                            {getContractForClient(contractToDelete)?.contract_number}
                         </span>
                         ?
                     </>

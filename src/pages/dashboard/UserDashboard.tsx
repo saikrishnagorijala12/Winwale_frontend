@@ -36,6 +36,7 @@ export default function Dashboard() {
   const { user } = useAuth();
 
   const [clients, setClients] = useState<Client[]>([]);
+  const [clientStats, setClientStats] = useState({ all: 0, pending: 0, approved: 0, rejected: 0 });
   const [jobs, setJobs] = useState<AnalysisJobResponse[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -71,7 +72,8 @@ export default function Dashboard() {
           productService.getAllProducts({ page: 1, page_size: 1 }),
         ]);
 
-      setClients(clientsRes.data);
+      setClients(clientsRes.data?.clients || []);
+      setClientStats(clientsRes.data?.status_counts || { all: 0, pending: 0, approved: 0, rejected: 0 });
       setJobs(jobsData.items || []);
       setTotalApproved(approvedData.total || 0);
       setTotalPending(pendingData.total || 0);
@@ -84,7 +86,7 @@ export default function Dashboard() {
   };
 
   const calculateStats = () => {
-    const totalClients = clients.length;
+    const totalClients = clientStats.all;
     const completedJobs = totalApproved;
     const pendingJobs = totalPending;
 
@@ -116,12 +118,7 @@ export default function Dashboard() {
     },
   ];
 
-  const recentAnalyses = jobs
-    .sort(
-      (a, b) =>
-        new Date(b.created_time).getTime() - new Date(a.created_time).getTime(),
-    )
-    .slice(0, 5)
+  const recentAnalyses = (jobs || [])
     .map((job) => ({
       id: job.job_id,
       client: job.client,
@@ -174,51 +171,51 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 animate-slide-up">
         {loading
           ? Array(4)
-              .fill(0)
-              .map((_, i) => (
-                <div
-                  key={i}
-                  className="bg-white p-6 rounded-2xl h-32 flex flex-col justify-between"
-                >
-                  <div className="flex justify-between">
-                    <Skeleton className="h-3 w-20" />
-                    <Skeleton className="h-10 w-10 rounded-xl" />
-                  </div>
-                  <Skeleton className="h-8 w-12" />
-                </div>
-              ))
-          : stats.map((stat) => (
+            .fill(0)
+            .map((_, i) => (
               <div
-                key={stat.label}
-                className="bg-white p-6 flex flex-col justify-between rounded-2xl transition-all hover:shadow-lg "
+                key={i}
+                className="bg-white p-6 rounded-2xl h-32 flex flex-col justify-between"
               >
-                <div className="flex justify-between items-start">
-                  <span
-                    className="text-[11px] font-black uppercase tracking-widest"
-                    style={{ color: colors.muted }}
-                  >
-                    {stat.label}
-                  </span>
-                  <div
-                    className="p-2.5 rounded-xl"
-                    style={{ backgroundColor: colors.secondaryBg }}
-                  >
-                    <stat.icon
-                      className="w-5 h-5 text-[#24548f]"
-                      strokeWidth={2.5}
-                    />
-                  </div>
+                <div className="flex justify-between">
+                  <Skeleton className="h-3 w-20" />
+                  <Skeleton className="h-10 w-10 rounded-xl" />
                 </div>
-                <div>
-                  <div
-                    className="text-3xl font-black tracking-tighter mb-1"
-                    style={{ color: colors.fg }}
-                  >
-                    {stat.value}
-                  </div>
+                <Skeleton className="h-8 w-12" />
+              </div>
+            ))
+          : stats.map((stat) => (
+            <div
+              key={stat.label}
+              className="bg-white p-6 flex flex-col justify-between rounded-2xl transition-all hover:shadow-lg "
+            >
+              <div className="flex justify-between items-start">
+                <span
+                  className="text-[11px] font-black uppercase tracking-widest"
+                  style={{ color: colors.muted }}
+                >
+                  {stat.label}
+                </span>
+                <div
+                  className="p-2.5 rounded-xl"
+                  style={{ backgroundColor: colors.secondaryBg }}
+                >
+                  <stat.icon
+                    className="w-5 h-5 text-[#24548f]"
+                    strokeWidth={2.5}
+                  />
                 </div>
               </div>
-            ))}
+              <div>
+                <div
+                  className="text-3xl font-black tracking-tighter mb-1"
+                  style={{ color: colors.fg }}
+                >
+                  {stat.value}
+                </div>
+              </div>
+            </div>
+          ))}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
@@ -474,7 +471,7 @@ export default function Dashboard() {
                       className="text-sm font-black"
                       style={{ color: colors.fg }}
                     >
-                      {clients.filter((c) => c.status === item.key).length}
+                      {clientStats[item.key as keyof typeof clientStats]}
                     </span>
                   )}
                 </div>

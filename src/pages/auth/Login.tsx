@@ -92,7 +92,7 @@ const Login: React.FC = () => {
         }
         setError(
           refreshErr.response?.data?.message ||
-          "Login successful, but profile could not be loaded.",
+            "Login successful, but profile could not be loaded.",
         );
       }
     } catch (err: any) {
@@ -225,7 +225,14 @@ const Login: React.FC = () => {
           disabled={loading}
           className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-[#3498db] hover:bg-[#2980b9] text-white font-semibold rounded-xl shadow-lg shadow-blue-500/30 transition-all active:scale-[0.98] disabled:opacity-70"
         >
-          {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : "Sign in"}
+          {loading ? (
+            <>
+              <Loader2 className="h-5 w-5 animate-spin" />
+              Signing in...
+            </>
+          ) : (
+            "Sign in"
+          )}
         </button>
       </form>
 

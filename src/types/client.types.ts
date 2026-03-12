@@ -41,6 +41,7 @@ export interface Client {
   phone: string;
   address: string;
   logoUrl?: string;
+  contractDetails?: any;
 }
 
 export interface ClientFormData {
