@@ -42,9 +42,8 @@ export const CompanyFormStep: React.FC<CompanyFormStepProps> = ({
     }
   };
 
-  const inputClass = (field: keyof ClientFormErrors) =>
-    `w-full mt-2 px-4 py-3 rounded-xl border-2 transition-colors focus:outline-none border-slate-200 focus:border-[#38A1DB]"
-    }`;
+  const inputClass =
+  "w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 transition-colors focus:outline-none focus:border-[#38A1DB]";
 
   return (
     <div className="grid md:grid-cols-2 gap-5">
@@ -120,7 +119,7 @@ export const CompanyFormStep: React.FC<CompanyFormStepProps> = ({
         </label>
         <input
           type="text"
-          className={inputClass("company_name")}
+          className={inputClass}
           value={formData.company_name}
           onChange={(e) => {
             onChange("company_name", e.target.value);
@@ -140,7 +139,7 @@ export const CompanyFormStep: React.FC<CompanyFormStepProps> = ({
         </label>
         <input
           type="email"
-          className={inputClass("company_email")}
+          className={inputClass}
           value={formData.company_email}
           onChange={(e) => {
             onChange("company_email", e.target.value);
@@ -160,7 +159,7 @@ export const CompanyFormStep: React.FC<CompanyFormStepProps> = ({
         </label>
         <input
           type="tel"
-          className={inputClass("company_phone_no")}
+          className={inputClass}
           value={formData.company_phone_no}
           onChange={(e) => {
             onChange("company_phone_no", e.target.value);
@@ -180,7 +179,7 @@ export const CompanyFormStep: React.FC<CompanyFormStepProps> = ({
         </label>
         <input
           type="text"
-          className={inputClass("company_address")}
+          className={inputClass}
           value={formData.company_address}
           onChange={(e) => {
             onChange("company_address", e.target.value);
@@ -201,7 +200,7 @@ export const CompanyFormStep: React.FC<CompanyFormStepProps> = ({
           </label>
           <input
             type="text"
-            className={inputClass("company_city")}
+            className={inputClass}
             value={formData.company_city}
             onChange={(e) => {onChange("company_city", e.target.value);
             onClearError("company_city");}}
@@ -218,7 +217,7 @@ export const CompanyFormStep: React.FC<CompanyFormStepProps> = ({
           </label>
           <input
             type="text"
-            className={inputClass("company_state")}
+            className={inputClass}
             value={formData.company_state}
             onChange={(e) => {onChange("company_state", e.target.value);
             onClearError("company_state");}}
@@ -235,7 +234,7 @@ export const CompanyFormStep: React.FC<CompanyFormStepProps> = ({
           </label>
           <input
             type="text"
-            className={inputClass("company_zip")}
+            className={inputClass}
             value={formData.company_zip}
             onChange={(e) => {onChange("company_zip", e.target.value);
             onClearError("company_zip");}}

@@ -48,6 +48,9 @@ export const validateStep2 = (contract: ClientContractCreate): { isValid: boolea
   const qvErr = v.validateMaxLength(contract.q_v_discount, 50, "Quantity/Volume Discount");
   if (qvErr) errors.q_v_discount = qvErr;
 
+  const epaErr = v.validateMaxLength(contract.epa_method_mechanism, 255, "EPA Method / Mechanism");
+  if (epaErr) errors.epa_method_mechanism = epaErr;
+
   const concessionsErr = v.validateMaxLength(contract.additional_concessions, 50, "Additional Concessions");
   if (concessionsErr) errors.additional_concessions = concessionsErr;
 

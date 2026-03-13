@@ -12,7 +12,7 @@ export const validateStep1 = (
 ): boolean => {
   const newErrors: ClientFormErrors = {};
 
-  const companyNameErr = v.validateName(clientData.company_name, true);
+  const companyNameErr = v.validateName(clientData.company_name, true, 51);
   if (companyNameErr) newErrors.company_name = companyNameErr;
 
   const emailErr = v.validateEmail(clientData.company_email);
@@ -21,13 +21,13 @@ export const validateStep1 = (
   const phoneErr = v.validatePhone(clientData.company_phone_no, "Company Phone");
   if (phoneErr) newErrors.company_phone_no = phoneErr;
 
-  const addrErr = v.validateRequired(clientData.company_address, "Company Address") || v.validateMaxLength(clientData.company_address, 50,"Address");
+  const addrErr = v.validateRequired(clientData.company_address, "Company Address") || v.validateMaxLength(clientData.company_address, 50, "Address");
   if (addrErr) newErrors.company_address = addrErr;
 
-  const cityErr = v.validateRequired(clientData.company_city, "City") || v.validateMaxLength(clientData.company_city, 50,"City");
+  const cityErr = v.validateRequired(clientData.company_city, "City") || v.validateMaxLength(clientData.company_city, 50, "City");
   if (cityErr) newErrors.company_city = cityErr;
 
-  const stateErr = v.validateRequired(clientData.company_state, "State") || v.validateMaxLength(clientData.company_state, 50,"State");
+  const stateErr = v.validateRequired(clientData.company_state, "State") || v.validateMaxLength(clientData.company_state, 50, "State");
   if (stateErr) newErrors.company_state = stateErr;
 
   const zipRequired = v.validateRequired(clientData.company_zip, "ZIP");
@@ -46,18 +46,19 @@ export const validateStep2 = (
   clientData.negotiators.forEach((negotiator, index) => {
     const negErrors: Partial<Record<keyof Negotiator, string>> = {};
 
-    const nameErr = v.validateName(negotiator.name, true);
+    const nameErr = v.validateName(negotiator.name, false, 50);
     if (nameErr) negErrors.name = nameErr;
 
-    const emailErr = v.validateEmail(negotiator.email || "");
-    if (emailErr) {
-      negErrors.email = emailErr === "Email is required" ? "Email address is required" : emailErr;
-    }
+    const titleErr = v.validateRequiredMaxLength(negotiator.title, 50, "Title");
+    if (titleErr) negErrors.title = titleErr;
+
+    const emailErr = v.validateOptionalEmail(negotiator.email || "", 100);
+    if (emailErr) negErrors.email = emailErr;
 
     const phoneErr = v.validatePhone(negotiator.phone_no || "", "Phone number");
     if (phoneErr) negErrors.phone_no = phoneErr;
 
-    const addrLen = v.validateMaxLength(negotiator.address || "", 50, "Address");
+    const addrLen = v.validateMaxLength(negotiator.address || "", 100, "Address");
     if (addrLen) negErrors.address = addrLen;
 
     const cityLen = v.validateMaxLength(negotiator.city || "", 50, "City");

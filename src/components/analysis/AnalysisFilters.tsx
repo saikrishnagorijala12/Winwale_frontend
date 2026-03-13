@@ -1,5 +1,11 @@
 import React from "react";
-import { Search, Filter, CheckCircle2, ChevronDown, Loader2 } from "lucide-react";
+import {
+  Search,
+  Filter,
+  CheckCircle2,
+  ChevronDown,
+  Loader2,
+} from "lucide-react";
 import { StatusFilter } from "../../types/analysis.types";
 import { Client } from "../../types/pricelist.types";
 import { ClientDropdown } from "../shared/ClientDropdown";
@@ -88,7 +94,9 @@ export default function AnalysisFilters({
             {isLoading ? (
               <div className="flex items-center gap-2 p-3 bg-slate-50 border border-slate-200 rounded-xl">
                 <Loader2 className="w-4 h-4 animate-spin text-[#24578f]" />
-                <span className="text-slate-500 text-xs font-medium">Fetching...</span>
+                <span className="text-slate-500 text-xs font-medium">
+                  Fetching...
+                </span>
               </div>
             ) : (
               <ClientDropdown

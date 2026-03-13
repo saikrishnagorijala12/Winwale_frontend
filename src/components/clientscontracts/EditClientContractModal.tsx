@@ -108,6 +108,7 @@ export default function EditClientContractModal({
           fob_term: "Origin",
           energy_star_compliance: "Yes",
           is_deleted: false,
+          is_tdr: false,
         });
       }
       setStep(1);
@@ -177,7 +178,6 @@ export default function EditClientContractModal({
     try {
       const { logoFile, logoUrl, ...clientPayload } = clientData;
 
-      // Normalize phone numbers before submission
       const normalizedCompanyPhone =
         normalizePhoneNumber(clientPayload.company_phone_no) ||
         clientPayload.company_phone_no;
@@ -212,6 +212,7 @@ export default function EditClientContractModal({
         normal_delivery_time: Number(contractData.normal_delivery_time) || 0,
         expedited_delivery_time:
           Number(contractData.expedited_delivery_time) || 0,
+        is_tdr: contractData.is_tdr,
       };
 
       if (contract) {

@@ -51,6 +51,7 @@ const initialContract: Omit<ClientContractCreate, "client_id"> = {
   fob_term: "Origin",
   energy_star_compliance: "Yes",
   is_deleted: false,
+  is_tdr: false,
 };
 
 export default function AddClientContractModal({
@@ -135,7 +136,6 @@ export default function AddClientContractModal({
     try {
       const { logoFile, logoUrl, ...clientPayload } = clientData;
 
-      // Normalize client phone numbers
       const normalizedCompanyPhone = normalizePhoneNumber(clientPayload.company_phone_no) || clientPayload.company_phone_no;
       
       const normalizedNegotiators = clientPayload.negotiators.map(n => ({
@@ -167,6 +167,7 @@ export default function AddClientContractModal({
         normal_delivery_time: Number(contractData.normal_delivery_time) || 0,
         expedited_delivery_time:
           Number(contractData.expedited_delivery_time) || 0,
+        is_tdr: contractData.is_tdr,
       };
       await contractService.createContract(newClientId, contractPayload);
 

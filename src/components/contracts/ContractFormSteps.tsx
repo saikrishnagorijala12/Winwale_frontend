@@ -5,7 +5,7 @@ import {
   FormErrors,
 } from "../../types/contract.types";
 import { useClickOutside } from "../../hooks/useClickOutside";
-import { AlertCircle, X } from "lucide-react";
+import { AlertCircle, ChevronDown, Truck, X } from "lucide-react";
 
 interface Step1Props {
   contract: ClientContractCreate;
@@ -19,6 +19,15 @@ interface Step1Props {
   errors: FormErrors;
   hideClientField?: boolean;
 }
+
+const inputClass =
+  "w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 transition-colors outline-none focus:border-[#38A1DB]";
+
+const selectClass =
+  "w-full mt-2 px-4 py-3 pr-10 rounded-xl border-2 border-slate-200 transition-colors outline-none bg-white appearance-none focus:border-[#38A1DB]";
+
+const textareaClass =
+  "w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 transition-colors outline-none resize-none focus:border-[#38A1DB]";
 
 export function Step1({
   contract,
@@ -55,8 +64,7 @@ export function Step1({
         </label>
         <input
           type="text"
-          className={`w-full mt-2 px-4 py-3 rounded-xl border-2 transition-colors outline-none border-slate-200 "
-            }`}
+          className={inputClass}
           value={contract.contract_number}
           onChange={(e) => {
             onChange({ ...contract, contract_number: e.target.value });
@@ -80,8 +88,9 @@ export function Step1({
             <input
               type="text"
               placeholder="Search by Client ID or Company Name"
-              className={`w-full mt-2 px-4 py-3 pr-10 rounded-xl border-2 transition-colors outline-none border-slate-200 "
-                } ${isClientSelected ? "bg-slate-50 cursor-not-allowed" : ""}`}
+              className={`${inputClass} pr-10 ${
+                isClientSelected ? "bg-slate-50 cursor-not-allowed" : ""
+              }`}
               value={clientSearch}
               readOnly={isClientSelected}
               onFocus={() => {
@@ -156,8 +165,7 @@ export function Step1({
         </label>
         <input
           type="text"
-          className={`w-full mt-2 px-4 py-3 rounded-xl border-2 transition-colors outline-none border-slate-200 "
-            }`}
+          className={inputClass}
           value={contract.contract_officer_name || ""}
           onChange={(e) => {
             onChange({ ...contract, contract_officer_name: e.target.value });
@@ -177,8 +185,7 @@ export function Step1({
         </label>
         <input
           type="text"
-          className={`w-full mt-2 px-4 py-3 rounded-xl border-2 transition-colors outline-none border-slate-200 "
-            }`}
+          className={inputClass}
           value={contract.contract_officer_address || ""}
           onChange={(e) => {
             onChange({ ...contract, contract_officer_address: e.target.value });
@@ -198,8 +205,7 @@ export function Step1({
         </label>
         <input
           type="text"
-          className={`w-full mt-2 px-4 py-3 rounded-xl border-2 transition-colors outline-none border-slate-200 "
-            }`}
+          className={inputClass}
           value={contract.contract_officer_city || ""}
           onChange={(e) => {
             onChange({ ...contract, contract_officer_city: e.target.value });
@@ -218,8 +224,7 @@ export function Step1({
           <label className="text-sm font-bold text-slate-700">State</label>
           <input
             type="text"
-            className={`w-full mt-2 px-4 py-3 rounded-xl border-2 transition-colors outline-none border-slate-200 "
-              }`}
+            className={inputClass}
             value={contract.contract_officer_state || ""}
             onChange={(e) =>
               onChange({ ...contract, contract_officer_state: e.target.value })
@@ -235,8 +240,7 @@ export function Step1({
           <label className="text-sm font-bold text-slate-700">ZIP</label>
           <input
             type="text"
-            className={`w-full mt-2 px-4 py-3 rounded-xl border-2 transition-colors outline-none border-slate-200 "
-              }`}
+            className={inputClass}
             value={contract.contract_officer_zip || ""}
             onChange={(e) =>
               onChange({ ...contract, contract_officer_zip: e.target.value })
@@ -270,83 +274,94 @@ export function Step2({
     <div className="grid md:grid-cols-2 gap-6">
       <div>
         <label className="text-sm font-bold text-slate-700">FOB Term</label>
-        <select
-          className={`w-full mt-2 px-4 py-3 rounded-xl border-2 transition-colors outline-none bg-white border-slate-200 "
-            }`}
-          value={contract.fob_term || "Origin"}
-          onChange={(e) => onChange({ ...contract, fob_term: e.target.value })}
-        >
-          <option value="Origin">Origin</option>
-          <option value="Destination">Destination</option>
-          <option value="No Delivery">No Delivery</option>
-        </select>
-        {errors.fob_term && (
-          <div className="mt-1 text-xs text-red-600">
-            <span>{errors.fob_term}</span>
-          </div>
-        )}
+        <div className="relative">
+          <select
+            className={`${selectClass} pr-10`}
+            value={contract.fob_term || "Origin"}
+            onChange={(e) =>
+              onChange({ ...contract, fob_term: e.target.value })
+            }
+          >
+            <option value="Origin">Origin</option>
+            <option value="Destination">Destination</option>
+            <option value="No Delivery">No Delivery</option>
+          </select>
+
+          <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/4 w-4 h-4 text-slate-400 pointer-events-none" />
+        </div>
       </div>
 
       <div>
         <label className="text-sm font-bold text-slate-700">
           Energy Star Compliance
         </label>
-        <select
-          className={`w-full mt-2 px-4 py-3 rounded-xl border-2 transition-colors outline-none bg-white border-slate-200 "
-            }`}
-          value={contract.energy_star_compliance || "Yes"}
-          onChange={(e) => {
-            onChange({ ...contract, energy_star_compliance: e.target.value });
-            onClearError?.("energy_star_compliance");
-          }}
-        >
-          <option value="Yes">Yes</option>
-          <option value="No">No</option>
-          <option value="N/A">N/A</option>
-        </select>
-        {errors.energy_star_compliance && (
-          <div className="mt-1 text-xs text-red-600">
-            <span>{errors.energy_star_compliance}</span>
-          </div>
-        )}
+        <div className="relative">
+          <select
+            className={selectClass}
+            value={contract.energy_star_compliance || "Yes"}
+            onChange={(e) => {
+              onChange({ ...contract, energy_star_compliance: e.target.value });
+              onClearError?.("energy_star_compliance");
+            }}
+          >
+            <option value="Yes">Yes</option>
+            <option value="No">No</option>
+            <option value="N/A">N/A</option>
+          </select>
+          {errors.energy_star_compliance && (
+            <div className="mt-1 text-xs text-red-600">
+              <span>{errors.energy_star_compliance}</span>
+            </div>
+          )}
+          <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/4 w-4 h-4 text-slate-400 pointer-events-none" />
+        </div>
       </div>
       <div>
         <label className="text-sm font-bold text-slate-700">
-          Quantity/Volume Discounts
+          Includes Hazardous Materials?
         </label>
-        <input
-          className={`w-full mt-2 px-4 py-3 rounded-xl border-2 transition-colors outline-none resize-none border-slate-200 "
-            }`}
-          value={contract.q_v_discount || ""}
-          onChange={(e) => {
-            onChange({ ...contract, q_v_discount: e.target.value });
-            onClearError?.("q_v_discount");
-          }}
-        />
-        {errors.q_v_discount && (
-          <div className="mt-1 text-xs text-red-600">
-            <span>{errors.q_v_discount}</span>
-          </div>
-        )}
+        <div className="relative">
+          <select
+            className={selectClass}
+            value={contract.is_hazardous ? "Yes" : "No"}
+            onChange={(e) => {
+              onChange({ ...contract, is_hazardous: e.target.value === "Yes" });
+              onClearError?.("is_hazardous");
+            }}
+          >
+            <option value="No">No</option>
+            <option value="Yes">Yes</option>
+          </select>
+          {errors.is_hazardous && (
+            <div className="mt-1 text-xs text-red-600">
+              <span>{errors.is_hazardous}</span>
+            </div>
+          )}
+          <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/4 w-4 h-4 text-slate-400 pointer-events-none" />
+        </div>
       </div>
+
       <div>
-        <label className="text-sm font-bold text-slate-700">Includes Hazardous Materials?</label>
+        <label className="text-sm font-bold text-slate-700">TDR Status</label>
+        <div className="relative">
         <select
-          className={`w-full mt-2 px-4 py-3 rounded-xl border-2 transition-colors focus:outline-none bg-white border-slate-200 focus:border-[#38A1DB]`}
-          value={contract.is_hazardous ? "Yes" : "No"}
+          className={selectClass}
+          value={contract.is_tdr ? "TDR" : "Non-TDR"}
           onChange={(e) => {
-            onChange({ ...contract, is_hazardous: e.target.value === "Yes" });
-            onClearError?.("is_hazardous");
+            onChange({ ...contract, is_tdr: e.target.value === "TDR" });
+            onClearError?.("is_tdr");
           }}
         >
-          <option value="No">No</option>
-          <option value="Yes">Yes</option>
+          <option value="Non-TDR">Non-TDR</option>
+          <option value="TDR">TDR</option>
         </select>
-        {errors.is_hazardous && (
+        {errors.is_tdr && (
           <div className="mt-1 text-xs text-red-600">
-            <span>{errors.is_hazardous}</span>
+            <span>{errors.is_tdr}</span>
           </div>
         )}
+        <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/4 w-4 h-4 text-slate-400 pointer-events-none" />
+        </div>
       </div>
       <div>
         <label className="text-sm font-bold text-slate-700">
@@ -354,8 +369,7 @@ export function Step2({
         </label>
         <input
           type="number"
-          className={`w-full mt-2 px-4 py-3 rounded-xl border-2 transition-colors outline-none border-slate-200 "
-            }`}
+          className={inputClass}
           value={contract.normal_delivery_time || 30}
           onChange={(e) => {
             onChange({
@@ -377,8 +391,7 @@ export function Step2({
         </label>
         <input
           type="number"
-          className={`w-full mt-2 px-4 py-3 rounded-xl border-2 transition-colors outline-none border-slate-200 "
-            }`}
+          className={inputClass}
           value={contract.expedited_delivery_time || 10}
           onChange={(e) => {
             onChange({
@@ -394,12 +407,13 @@ export function Step2({
           </div>
         )}
       </div>
-
       <div className="md:col-span-2">
-        <label className="text-sm font-bold text-slate-700">EPA Method / Mechanism</label>
+        <label className="text-sm font-bold text-slate-700">
+          EPA Method / Mechanism
+        </label>
         <input
           type="text"
-          className={`w-full mt-2 px-4 py-3 rounded-xl border-2 transition-colors focus:outline-none border-slate-200 focus:border-[#38A1DB]`}
+          className={inputClass}
           value={contract.epa_method_mechanism || ""}
           onChange={(e) => {
             onChange({ ...contract, epa_method_mechanism: e.target.value });
@@ -414,12 +428,30 @@ export function Step2({
       </div>
       <div className="md:col-span-2">
         <label className="text-sm font-bold text-slate-700">
+          Quantity/Volume Discounts
+        </label>
+        <textarea
+          rows={2}
+          className={textareaClass}
+          value={contract.q_v_discount || ""}
+          onChange={(e) => {
+            onChange({ ...contract, q_v_discount: e.target.value });
+            onClearError?.("q_v_discount");
+          }}
+        />
+        {errors.q_v_discount && (
+          <div className="mt-1 text-xs text-red-600">
+            <span>{errors.q_v_discount}</span>
+          </div>
+        )}
+      </div>
+      <div className="md:col-span-2">
+        <label className="text-sm font-bold text-slate-700">
           Additional Concessions
         </label>
         <textarea
           rows={2}
-          className={`w-full mt-2 px-4 py-3 rounded-xl border-2 transition-colors outline-none resize-none border-slate-200 "
-            }`}
+          className={textareaClass}
           value={contract.additional_concessions || ""}
           onChange={(e) => {
             onChange({ ...contract, additional_concessions: e.target.value });

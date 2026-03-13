@@ -15,6 +15,7 @@ export interface ClientContractBase {
   energy_star_compliance?: string;
   epa_method_mechanism?: string;
   is_hazardous?: boolean;
+  is_tdr?: boolean;
 }
 
 export interface ClientContractRead extends ClientContractBase {

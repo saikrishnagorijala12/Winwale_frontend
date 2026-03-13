@@ -18,6 +18,7 @@ import {
   Loader2,
   ShieldCheck,
   ShieldAlert,
+  XCircle,
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
@@ -42,18 +43,21 @@ const DetailItem = ({
   label,
   value,
   className = "",
+  iconClassName = "text-slate-400",
 }: {
   icon: any;
   label: string;
   value: string | number | null | undefined;
   className?: string;
+  iconClassName?: string;
 }) => (
   <div className={`flex flex-col gap-1 ${className}`}>
     <span className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">
       {label}
     </span>
+
     <div className="flex items-center gap-2">
-      <Icon className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+      <Icon className={`w-3.5 h-3.5 shrink-0 ${iconClassName}`} />
       <span className="text-sm font-medium text-slate-700 truncate">
         {value || "—"}
       </span>
@@ -407,33 +411,33 @@ export const ClientContractDetailsModal: React.FC<
                       label="EPA Method / Mechanism"
                       value={contract.epa_method_mechanism}
                     />
-                    <div className="flex flex-col gap-1">
-                      <span className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">
-                        Hazardous Materials
-                      </span>
-                      <div className="flex items-center gap-2 mt-0.5">
-                        {contract.is_hazardous ? (
-                          <>
-                            <ShieldAlert className="w-3.5 h-3.5 text-red-500" />
-                            <span className="text-red-600 font-bold text-xs">
-                              Includes Hazardous
-                            </span>
-                          </>
-                        ) : (
-                          <>
-                            <ShieldCheck className="w-3.5 h-3.5 text-green-500" />
-                            <span className="text-green-600 font-bold text-xs">
-                              Non-Hazardous
-                            </span>
-                          </>
-                        )}
-                      </div>
-                    </div>
+                    <DetailItem
+                      icon={contract.is_hazardous ? ShieldAlert : ShieldCheck}
+                      label="Hazardous Materials"
+                      value={
+                        contract.is_hazardous
+                          ? "Includes Hazardous"
+                          : "Non-Hazardous"
+                      }
+                      iconClassName={
+                        contract.is_hazardous
+                          ? "text-red-500"
+                          : "text-green-500"
+                      }
+                    />
+
+                    <DetailItem
+                      icon={contract.is_tdr ? ShieldCheck : XCircle}
+                      label="TDR Status"
+                      value={contract.is_tdr ? "TDR Contract" : "Non-TDR"}
+                      iconClassName={
+                        contract.is_tdr ? "text-blue-500" : "text-slate-400"
+                      }
+                    />
                     <DetailItem
                       icon={FileText}
                       label="Concessions"
                       value={contract.additional_concessions}
-                      className="sm:col-span-2"
                     />
                   </Section>
                 </>

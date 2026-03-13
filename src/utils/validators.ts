@@ -48,11 +48,18 @@ export const validateMaxLength = (value: string | undefined, max: number, label:
   return null;
 };
 
-export const validateEmail = (value: string | undefined) => {
+export const validateEmail = (value: string | undefined, max = 50) => {
   const trimmed = value?.trim() || "";
   if (!trimmed) return "Email is required";
   if (!EMAIL_REGEX.test(trimmed)) return "Please enter a valid email address";
-  return validateMaxLength(trimmed, 50, "Email");
+  return validateMaxLength(trimmed, max, "Email");
+};
+
+export const validateOptionalEmail = (value: string | undefined, max = 50) => {
+  const trimmed = value?.trim() || "";
+  if (!trimmed) return null;
+  if (!EMAIL_REGEX.test(trimmed)) return "Please enter a valid email address";
+  return validateMaxLength(trimmed, max, "Email");
 };
 
 export const validatePhone = (value: string | undefined, label: string = "Phone number") => {
@@ -74,7 +81,7 @@ export const validateZip = (value: string | undefined) => {
   return null;
 };
 
-export const validateName = (value: string | undefined, isCompany = false) => {
+export const validateName = (value: string | undefined, isCompany = false, max = 30) => {
   const trimmed = value?.trim() || "";
   const label = isCompany ? "Company name" : "Name";
   const regex = isCompany ? COMPANY_NAME_REGEX : NAME_REGEX;
@@ -85,16 +92,22 @@ export const validateName = (value: string | undefined, isCompany = false) => {
       ? "Company name can contain letters, numbers, spaces, and . , ' & ( ) - only"
       : "Name can contain letters, spaces, and . ' - only";
   }
-  return validateMaxLength(trimmed, 30, "Name");
+  return validateMaxLength(trimmed, max, label);
 };
 
-export const validateOptionalName = (value: string | undefined, fieldLabel: string = "Name") => {
+export const validateOptionalName = (value: string | undefined, fieldLabel: string = "Name", max = 30) => {
   const trimmed = value?.trim() || "";
   if (!trimmed) return null;
   if (!NAME_REGEX.test(trimmed)) {
     return `${fieldLabel} can contain letters, spaces, and . ' - only`;
   }
-  return validateMaxLength(trimmed, 30, "Name");
+  return validateMaxLength(trimmed, max, fieldLabel);
+};
+
+export const validateRequiredMaxLength = (value: string | undefined, max: number, label: string) => {
+  const requiredErr = validateRequired(value, label);
+  if (requiredErr) return requiredErr;
+  return validateMaxLength(value, max, label);
 };
 
 export const validateRange = (value: number, min: number, max: number, label: string) => {

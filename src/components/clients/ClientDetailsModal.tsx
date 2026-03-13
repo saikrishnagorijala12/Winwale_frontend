@@ -13,6 +13,7 @@ import {
   ShieldAlert,
   ChevronLeft,
   ChevronRight,
+  XCircle,
 } from "lucide-react";
 import { Client } from "../../types/client.types";
 import { ContactRow } from "./ContactRow";
@@ -241,34 +242,53 @@ export const ClientDetailsModal: React.FC<ClientDetailsModalProps> = ({
                   </div>
                 </div>
 
-                <div className="bg-slate-50 border border-slate-100 rounded-2xl p-6 space-y-4 shadow-sm">
-                  <div>
-                    <p className="text-[11px] uppercase font-bold text-[#38A1DB] tracking-wider">
-                      EPA Method
-                    </p>
-                    <p className="text-slate-700 mt-1">
-                      {client.contractDetails.epa_method_mechanism || "—"}
-                    </p>
-                  </div>
+                  <div className="bg-slate-50 border border-slate-100 rounded-2xl p-6 space-y-4 shadow-sm">
+                    <div>
+                      <p className="text-[11px] uppercase font-bold text-[#38A1DB] tracking-wider">
+                        EPA Method
+                      </p>
+                      <p className="text-slate-700 mt-1">
+                        {client.contractDetails.epa_method_mechanism || "—"}
+                      </p>
+                    </div>
 
-                  <div className="flex items-center gap-2 mt-2">
-                    {client.contractDetails.is_hazardous ? (
-                      <>
-                        <ShieldAlert className="w-4 h-4 text-red-500" />
-                        <span className="text-red-600 font-semibold text-sm">
-                          Hazardous
-                        </span>
-                      </>
-                    ) : (
-                      <>
-                        <ShieldCheck className="w-4 h-4 text-green-500" />
-                        <span className="text-green-600 font-semibold text-sm">
-                          Non-Hazardous
-                        </span>
-                      </>
-                    )}
+                    <div className="flex flex-col gap-2 pt-2 border-t border-slate-200">
+                      <div className="flex items-center gap-2">
+                        {client.contractDetails.is_hazardous ? (
+                          <>
+                            <ShieldAlert className="w-4 h-4 text-red-500" />
+                            <span className="text-red-600 font-semibold text-sm">
+                              Hazardous
+                            </span>
+                          </>
+                        ) : (
+                          <>
+                            <ShieldCheck className="w-4 h-4 text-green-500" />
+                            <span className="text-green-600 font-semibold text-sm">
+                              Non-Hazardous
+                            </span>
+                          </>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {client.contractDetails.is_tdr ? (
+                          <>
+                            <ShieldCheck className="w-4 h-4 text-blue-500" />
+                            <span className="text-blue-600 font-semibold text-sm">
+                              TDR Contract
+                            </span>
+                          </>
+                        ) : (
+                          <>
+                            <XCircle className="w-4 h-4 text-slate-400" />
+                            <span className="text-slate-400 font-semibold text-sm">
+                              Non-TDR
+                            </span>
+                          </>
+                        )}
+                      </div>
+                    </div>
                   </div>
-                </div>
 
                 <div className="bg-slate-50 border border-slate-100 rounded-2xl p-6 space-y-4 shadow-sm">
                   <div>
