@@ -77,7 +77,7 @@ export const ClientContractTable: React.FC<ClientContractTableProps> = ({
                 Status
               </th>
               <th className="text-left px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                Negotiator Contact
+                Negotiators
               </th>
 
               <th className="text-left px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
@@ -166,17 +166,22 @@ export const ClientContractTable: React.FC<ClientContractTableProps> = ({
                     </td>
 
                     <td className="px-6 py-4">
-                      {!client.contact ? (
+                      {(!client.negotiators || client.negotiators.length === 0) ? (
                         <span className="text-[10px] italic font-medium text-gray-400 uppercase">
                           Not Assigned
                         </span>
                       ) : (
                         <div className="flex flex-col max-w-37.5">
                           <span className="text-sm font-semibold text-slate-900 truncate">
-                            {client.contact.name}
+                            {client.negotiators[0].name}
+                            {client.negotiators.length > 1 && (
+                              <span className="ml-1.5 inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-[#38A1DB] border border-blue-100">
+                                +{client.negotiators.length - 1}
+                              </span>
+                            )}
                           </span>
                           <span className="text-xs text-slate-500 truncate">
-                            {client.contact.email}
+                            {client.negotiators[0].email}
                           </span>
                         </div>
                       )}
@@ -305,10 +310,11 @@ export const ClientContractTable: React.FC<ClientContractTableProps> = ({
                 <div className="grid grid-cols-2 gap-3 bg-slate-50 rounded-xl p-4 border border-slate-100">
                   <div>
                     <p className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">
-                      Contact
+                      Negotiators
                     </p>
                     <p className="text-sm font-semibold text-slate-800 truncate">
-                      {client.contact?.name || "—"}
+                      {client.negotiators?.[0]?.name || "—"}
+                      {client.negotiators && client.negotiators.length > 1 && ` (+${client.negotiators.length - 1})`}
                     </p>
                   </div>
                   <div>

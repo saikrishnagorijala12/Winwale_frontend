@@ -154,10 +154,11 @@ const ActionDropdown: React.FC<ActionDropdownProps> = ({
                 isApproved ? onReject() : onApprove();
                 setIsOpen(false);
               }}
-              className={`w-full px-4 py-2 text-left text-sm font-medium flex items-center gap-2 transition-colors ${isApproved
-                ? "text-red-600 hover:bg-rose-50"
-                : "text-emerald-600 hover:bg-emerald-50"
-                }`}
+              className={`w-full px-4 py-2 text-left text-sm font-medium flex items-center gap-2 transition-colors ${
+                isApproved
+                  ? "text-red-600 hover:bg-rose-50"
+                  : "text-emerald-600 hover:bg-emerald-50"
+              }`}
             >
               {isApproved ? (
                 <>
@@ -201,10 +202,11 @@ const ClientCard: React.FC<ClientCardProps> = ({
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center gap-3 flex-1 min-w-0">
           <div
-            className={`shrink-0 w-12 h-12 rounded-xl border border-slate-200 flex items-center justify-center text-white font-bold text-sm shadow-sm overflow-hidden ${client.company_logo_url
-              ? "bg-white"
-              : "bg-linear-to-br from-[#3399cc] to-[#2980b9]"
-              }`}
+            className={`shrink-0 w-12 h-12 rounded-xl border border-slate-200 flex items-center justify-center text-white font-bold text-sm shadow-sm overflow-hidden ${
+              client.company_logo_url
+                ? "bg-white"
+                : "bg-linear-to-br from-[#3399cc] to-[#2980b9]"
+            }`}
           >
             {client.company_logo_url ? (
               <img
@@ -240,7 +242,10 @@ const ClientCard: React.FC<ClientCardProps> = ({
         <div className="flex items-center gap-2 text-sm text-slate-600">
           <User className="w-4 h-4 text-slate-400 shrink-0" />
           <span className="truncate">
-            {client.contact_officer_name || "N/A"}
+            {client.negotiators?.[0]?.name || "N/A"}
+            {client.negotiators &&
+              client.negotiators.length > 1 &&
+              ` (+${client.negotiators.length - 1})`}
           </span>
         </div>
         <div className="flex items-center gap-2 text-sm text-slate-600">
@@ -311,9 +316,13 @@ const ClientActivation = () => {
           page_size: itemsPerPage,
           status: tab,
           search: query || undefined,
-        }
+        },
       });
-      const { clients: fetchedClients, total_count, status_counts } = response.data;
+      const {
+        clients: fetchedClients,
+        total_count,
+        status_counts,
+      } = response.data;
       setClients(fetchedClients);
       setTotalItems(total_count);
       if (status_counts) {
@@ -376,22 +385,26 @@ const ClientActivation = () => {
   };
 
   const handleEditClient = (client: Client) => {
+    const addrParts = client.address.split(", ");
     setEditingClient({
       id: client.id,
       company_name: client.name,
       company_email: client.email,
       company_phone_no: client.phone,
-      company_address: client.address.split(", ")[0] || "",
-      company_city: client.address.split(", ")[1] || "",
-      company_state: client.address.split(", ")[2] || "",
-      company_zip: client.address.split(", ")[3] || "",
-      contact_officer_name: client.contact?.name || "",
-      contact_officer_email: client.contact?.email || "",
-      contact_officer_phone_no: client.contact?.phone || "",
-      contact_officer_address: client.contact?.address?.split(", ")[0] || "",
-      contact_officer_city: client.contact?.address?.split(", ")[1] || "",
-      contact_officer_state: client.contact?.address?.split(", ")[2] || "",
-      contact_officer_zip: client.contact?.address?.split(", ")[3] || "",
+      company_address: addrParts[0] || "",
+      company_city: addrParts[1] || "",
+      company_state: addrParts[2] || "",
+      company_zip: addrParts[3] || "",
+      negotiators: client.negotiators.map((neg) => ({
+        name: neg.name || "",
+        title: neg.title || "",
+        email: neg.email || "",
+        phone_no: neg.phone_no || "",
+        address: neg.address || "",
+        city: neg.city || "",
+        state: neg.state || "",
+        zip: neg.zip || "",
+      })),
       status: client.status,
       logoUrl: client.logoUrl || "",
       logoFile: null,
@@ -430,14 +443,15 @@ const ClientActivation = () => {
     try {
       const { logoFile, logoUrl, ...clientPayload } = editingClient;
 
-      // Normalize phone numbers before submission
-      const normalizedCompanyPhone = normalizePhoneNumber(clientPayload.company_phone_no) || clientPayload.company_phone_no;
-      const normalizedContactPhone = normalizePhoneNumber(clientPayload.contact_officer_phone_no) || clientPayload.contact_officer_phone_no;
-
       const finalPayload = {
         ...clientPayload,
-        company_phone_no: normalizedCompanyPhone,
-        contact_officer_phone_no: normalizedContactPhone,
+        company_phone_no:
+          normalizePhoneNumber(clientPayload.company_phone_no) ||
+          clientPayload.company_phone_no,
+        negotiators: clientPayload.negotiators.map((neg) => ({
+          ...neg,
+          phone_no: normalizePhoneNumber(neg.phone_no || "") || neg.phone_no,
+        })),
         company_logo_url: logoUrl?.startsWith("data:")
           ? undefined
           : logoUrl || null,
@@ -649,10 +663,11 @@ const ClientActivation = () => {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as TabType)}
-                className={`px-4 sm:px-6 py-2 sm:py-3 rounded-t-xl font-bold text-xs sm:text-sm transition-all whitespace-nowrap ${activeTab === tab.id
-                  ? `bg-${tab.color}-50 text-${tab.color}-600 border-b-2 border-${tab.color}-600`
-                  : "text-slate-500 hover:text-slate-700 hover:bg-slate-50"
-                  }`}
+                className={`px-4 sm:px-6 py-2 sm:py-3 rounded-t-xl font-bold text-xs sm:text-sm transition-all whitespace-nowrap ${
+                  activeTab === tab.id
+                    ? `bg-${tab.color}-50 text-${tab.color}-600 border-b-2 border-${tab.color}-600`
+                    : "text-slate-500 hover:text-slate-700 hover:bg-slate-50"
+                }`}
               >
                 {tab.label} ({tab.count})
               </button>
@@ -712,7 +727,7 @@ const ClientActivation = () => {
                   Company
                 </th>
                 <th className="text-left px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-widerral Information">
-                  Contact Officer
+                  Negotiators
                 </th>
                 <th className="text-left px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-widerral Information">
                   Location
@@ -759,10 +774,11 @@ const ClientActivation = () => {
                     <td className="px-4 py-5">
                       <div className="flex items-center gap-3">
                         <div
-                          className={`shrink-0 w-10 h-10 rounded-xl border border-slate-200 flex items-center justify-center text-white font-bold text-xs shadow-sm overflow-hidden ${client.company_logo_url
-                            ? "bg-white"
-                            : "bg-linear-to-br from-[#3399cc] to-[#2980b9]"
-                            }`}
+                          className={`shrink-0 w-10 h-10 rounded-xl border border-slate-200 flex items-center justify-center text-white font-bold text-xs shadow-sm overflow-hidden ${
+                            client.company_logo_url
+                              ? "bg-white"
+                              : "bg-linear-to-br from-[#3399cc] to-[#2980b9]"
+                          }`}
                         >
                           {client.company_logo_url ? (
                             <img
@@ -784,10 +800,26 @@ const ClientActivation = () => {
                         </div>
                       </div>
                     </td>
-                    <td className="px-4 py-5">
-                      <p className="text-sm font-semibold text-slate-700">
-                        {client.contact_officer_name || "N/A"}
-                      </p>
+                    <td className="px-6 py-4">
+                      {(!client.negotiators || client.negotiators.length === 0) ? (
+                        <span className="text-[10px] italic font-medium text-gray-400 uppercase">
+                          Not Assigned
+                        </span>
+                      ) : (
+                        <div className="flex flex-col max-w-37.5">
+                          <span className="text-sm font-semibold text-slate-900 truncate">
+                            {client.negotiators[0].name}
+                            {client.negotiators.length > 1 && (
+                              <span className="ml-1.5 inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-[#38A1DB] border border-blue-100">
+                                +{client.negotiators.length - 1}
+                              </span>
+                            )}
+                          </span>
+                          <span className="text-xs text-slate-500 truncate">
+                            {client.negotiators[0].email}
+                          </span>
+                        </div>
+                      )}
                     </td>
                     <td className="px-4 py-5">
                       <div className="text-sm text-slate-600 flex items-center gap-1">

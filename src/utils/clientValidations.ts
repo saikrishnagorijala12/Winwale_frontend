@@ -2,6 +2,7 @@ import {
   ClientFormData,
   ClientFormErrors,
   EditingClient,
+  Negotiator,
 } from "../types/client.types";
 import * as v from "./validators";
 
@@ -39,34 +40,42 @@ export const validateStep1 = (
 
 export const validateStep2 = (
   clientData: ClientFormData | EditingClient,
-): { isValid: boolean; errors: Record<string, string> } => {
-  const errors: Record<string, string> = {};
+): { isValid: boolean; errors: ClientFormErrors } => {
+  const errors: ClientFormErrors = { negotiators: {} };
 
-  const nameErr = v.validateName(clientData.contact_officer_name, false);
-  if (nameErr) errors.contact_officer_name = nameErr;
+  clientData.negotiators.forEach((negotiator, index) => {
+    const negErrors: Partial<Record<keyof Negotiator, string>> = {};
 
-  const emailErr = v.validateEmail(clientData.contact_officer_email);
-  if (emailErr) {
-    errors.contact_officer_email = emailErr === "Email is required" ? "Email address is required" : emailErr;
-  }
+    const nameErr = v.validateName(negotiator.name, true);
+    if (nameErr) negErrors.name = nameErr;
 
-  const phoneErr = v.validatePhone(clientData.contact_officer_phone_no, "Phone number");
-  if (phoneErr) errors.contact_officer_phone_no = phoneErr;
+    const emailErr = v.validateEmail(negotiator.email || "");
+    if (emailErr) {
+      negErrors.email = emailErr === "Email is required" ? "Email address is required" : emailErr;
+    }
 
-  const addrLen = v.validateMaxLength(clientData.contact_officer_address, 50,"Address");
-  if (addrLen) errors.contact_officer_address = addrLen;
+    const phoneErr = v.validatePhone(negotiator.phone_no || "", "Phone number");
+    if (phoneErr) negErrors.phone_no = phoneErr;
 
-  const cityLen = v.validateMaxLength(clientData.contact_officer_city, 50,"City");
-  if (cityLen) errors.contact_officer_city = cityLen;
+    const addrLen = v.validateMaxLength(negotiator.address || "", 50, "Address");
+    if (addrLen) negErrors.address = addrLen;
 
-  const stateLen = v.validateMaxLength(clientData.contact_officer_state, 50,"State");
-  if (stateLen) errors.contact_officer_state = stateLen;
+    const cityLen = v.validateMaxLength(negotiator.city || "", 50, "City");
+    if (cityLen) negErrors.city = cityLen;
 
-  const zipErr = v.validateZip(clientData.contact_officer_zip);
-  if (zipErr) errors.contact_officer_zip = zipErr;
+    const stateLen = v.validateMaxLength(negotiator.state || "", 50, "State");
+    if (stateLen) negErrors.state = stateLen;
+
+    const zipErr = v.validateZip(negotiator.zip || "");
+    if (zipErr) negErrors.zip = zipErr;
+
+    if (Object.keys(negErrors).length > 0) {
+      errors.negotiators![index] = negErrors;
+    }
+  });
 
   return {
-    isValid: Object.keys(errors).length === 0,
+    isValid: Object.keys(errors.negotiators!).length === 0,
     errors,
   };
 };

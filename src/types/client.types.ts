@@ -6,14 +6,19 @@ export type ClientFormErrors = Partial<{
   company_city: string;
   company_state: string;
   company_zip: string;
-  contact_officer_name: string;
-  contact_officer_email: string;
-  contact_officer_phone_no: string;
-  contact_officer_address: string;
-  contact_officer_city: string;
-  contact_officer_state: string;
-  contact_officer_zip: string;
+  negotiators: { [index: number]: Partial<Record<keyof Negotiator, string>> };
 }>;
+
+export interface Negotiator {
+  name: string;
+  title: string;
+  email: string | null;
+  phone_no: string | null;
+  address: string | null;
+  city: string | null;
+  state: string | null;
+  zip: string | null;
+}
 
 export interface ClientContact {
   name: string | null;
@@ -36,7 +41,7 @@ export interface Client {
   contract: string;
   status: ClientStatus;
   lastModification: string | null;
-  contact: ClientContact | null;
+  negotiators: Negotiator[];
   email: string;
   phone: string;
   address: string;
@@ -52,13 +57,7 @@ export interface ClientFormData {
   company_city: string;
   company_state: string;
   company_zip: string;
-  contact_officer_name: string;
-  contact_officer_email: string;
-  contact_officer_phone_no: string;
-  contact_officer_address: string;
-  contact_officer_city: string;
-  contact_officer_state: string;
-  contact_officer_zip: string;
+  negotiators: Negotiator[];
   status: ClientStatus;
   logoUrl?: string;
   logoFile?: File | null;

@@ -13,6 +13,8 @@ export interface ClientContractBase {
   expedited_delivery_time?: number;
   fob_term?: string;
   energy_star_compliance?: string;
+  epa_method_mechanism?: string;
+  is_hazardous?: boolean;
 }
 
 export interface ClientContractRead extends ClientContractBase {

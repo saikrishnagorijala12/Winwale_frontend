@@ -137,12 +137,16 @@ export default function AddClientContractModal({
 
       // Normalize client phone numbers
       const normalizedCompanyPhone = normalizePhoneNumber(clientPayload.company_phone_no) || clientPayload.company_phone_no;
-      const normalizedContactPhone = normalizePhoneNumber(clientPayload.contact_officer_phone_no) || clientPayload.contact_officer_phone_no;
+      
+      const normalizedNegotiators = clientPayload.negotiators.map(n => ({
+        ...n,
+        phone_no: normalizePhoneNumber(n.phone_no || "") || n.phone_no
+      }));
 
       const finalClientPayload = {
         ...clientPayload,
         company_phone_no: normalizedCompanyPhone,
-        contact_officer_phone_no: normalizedContactPhone,
+        negotiators: normalizedNegotiators,
       };
 
       const clientRes = await api.post("/clients", finalClientPayload);

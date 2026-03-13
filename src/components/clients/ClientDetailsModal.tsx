@@ -8,6 +8,11 @@ import {
   MapPin,
   Globe,
   Edit,
+  FileText,
+  ShieldCheck,
+  ShieldAlert,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { Client } from "../../types/client.types";
 import { ContactRow } from "./ContactRow";
@@ -24,6 +29,7 @@ export const ClientDetailsModal: React.FC<ClientDetailsModalProps> = ({
   onClose,
   onEdit,
 }) => {
+  const [currentNegIndex, setCurrentNegIndex] = React.useState(0);
   if (!client) return null;
 
   const handleEdit = () => {
@@ -32,25 +38,26 @@ export const ClientDetailsModal: React.FC<ClientDetailsModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-slate-900/40  z-50 flex items-center justify-center p-4 h-full">
+    <div className="fixed inset-0 bg-slate-900/50 m-auto z-50 flex items-center justify-center p-6">
       <div className="absolute inset-0" onClick={onClose} />
 
-      <div className="relative bg-white rounded-2xl shadow-xl max-w-4xl w-full max-h-[90vh] flex flex-col overflow-hidden">
-        <div className="relative bg-linear-to-br p-8">
+      <div className="relative bg-white rounded-3xl shadow-2xl max-w-5xl w-full max-h-[92vh] flex flex-col overflow-hidden border border-slate-100">
+        {/* Header */}
+        <div className="relative px-10 py-8 border-b border-slate-100 bg-slate-50/50">
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 p-3 rounded-full hover:bg-white/20 text-slate-700 transition-colors"
+            className="absolute top-6 right-6 p-2 hover:bg-slate-100 rounded-full transition-colors text-slate-400"
           >
             <X className="w-5 h-5" />
           </button>
 
           <div className="flex items-center gap-6">
-            <div className="w-20 h-20 rounded-2xl bg-[#38A1DB] shadow-lg flex items-center justify-center text-white font-black text-2xl border-4 border-white/20 overflow-hidden">
+            <div className="w-20 h-20 rounded-2xl bg-[#38A1DB] flex items-center justify-center text-white font-black text-2xl shadow-md overflow-hidden">
               {client.logoUrl ? (
                 <img
                   src={client.logoUrl}
                   alt={client.name}
-                  className="w-full h-full object-contain p-1 bg-white"
+                  className="w-full h-full object-contain bg-white p-1"
                 />
               ) : (
                 client.name
@@ -61,81 +68,240 @@ export const ClientDetailsModal: React.FC<ClientDetailsModalProps> = ({
                   .toUpperCase()
               )}
             </div>
+
             <div>
-              <p className="text-blue-400 text-sm font-medium uppercase tracking-widest mb-1">
+              <p className="text-[11px] tracking-widest uppercase text-[#38A1DB] font-semibold mb-1">
                 Client Profile
               </p>
-              <h2 className="text-3xl uppercase font-bold text-slate-700 tracking-tight">
+              <h2 className="text-3xl font-extrabold text-slate-800 tracking-tight">
                 {client.name}
               </h2>
             </div>
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-8">
-          <div className="grid md:grid-cols-2 gap-8">
-            <div className="space-y-6">
-              <div className="flex items-center gap-2 pb-2 border-b border-slate-100">
+        {/* Content */}
+        <div className="flex-1 overflow-y-auto px-10 py-8 space-y-10">
+          {/* Top Section */}
+          <div className="grid md:grid-cols-2 gap-8 items-start">
+            {/* Company */}
+            <div className="space-y-5">
+              <div className="flex items-center gap-2">
                 <Building2 className="w-5 h-5 text-[#38A1DB]" />
-                <h3 className="font-bold text-slate-800 uppercase text-sm tracking-wider">
+                <h3 className="font-bold text-sm uppercase tracking-wider text-slate-700">
                   Company Details
                 </h3>
               </div>
 
-              <div className="bg-slate-50/50 rounded-xl p-5 border border-slate-100 space-y-4">
+              <div className="bg-slate-50 rounded-2xl border border-slate-100 p-6 space-y-4 shadow-sm">
                 <ContactRow icon={Mail} value={client.email} />
-                <ContactRow icon={Phone} value={formatPhoneNumber(client.phone)} />
+                <ContactRow
+                  icon={Phone}
+                  value={formatPhoneNumber(client.phone)}
+                />
                 <ContactRow icon={MapPin} value={client.address} />
               </div>
             </div>
 
-            <div className="space-y-6">
-              <div className="flex items-center gap-2 pb-2 border-b border-slate-100">
-                <User className="w-5 h-5 text-[#38A1DB]" />
-                <h3 className="font-bold text-slate-800 uppercase text-sm tracking-wider">
-                  Primary Contact
-                </h3>
-              </div>
+            {/* Negotiators */}
+            <div className="space-y-5">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <User className="w-5 h-5 text-[#38A1DB]" />
+                  <h3 className="font-bold text-sm uppercase tracking-wider text-slate-700">
+                    Negotiators
+                  </h3>
+                </div>
 
-              <div className="bg-blue-50/30 rounded-xl p-5 border border-blue-100/50">
-                {!client.contact ? (
-                  <div className="text-center py-6">
-                    <p className="text-slate-400 italic text-sm">
-                      No primary contact assigned
-                    </p>
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    <div>
-                      <span className="text-[10px] font-bold text-[#38A1DB] uppercase tracking-tighter">
-                        Full Name
-                      </span>
-                      <p className="text-slate-900 font-bold text-lg leading-none mt-1">
-                        {client.contact.name || "—"}
-                      </p>
-                    </div>
-                    <div className="pt-2 space-y-3 border-t border-blue-100/50">
-                      <ContactRow icon={Mail} value={client.contact.email} />
-                      <ContactRow icon={Phone} value={formatPhoneNumber(client.contact.phone)} />
-                    </div>
-                  </div>
+                {client.negotiators?.length > 1 && (
+                  <span className="text-[11px] font-bold bg-slate-100 text-[#38A1DB] px-3 py-1 rounded-full">
+                    {currentNegIndex + 1} / {client.negotiators.length}
+                  </span>
                 )}
               </div>
+
+              {!client.negotiators || client.negotiators.length === 0 ? (
+                <div className="bg-slate-50 border border-slate-100 rounded-2xl p-8 flex flex-col items-center justify-center gap-2 min-h-45">
+                  <User className="w-6 h-6 text-slate-300" />
+                  <p className="text-slate-400 italic text-sm">
+                    No negotiators assigned
+                  </p>
+                </div>
+              ) : (
+                <div className="relative bg-slate-50 border border-slate-100 rounded-2xl p-6 shadow-sm">
+                  {/* Switch Buttons */}
+                  {client.negotiators.length > 1 && (
+                    <div className="absolute top-5 right-5 flex gap-2">
+                      <button
+                        onClick={() =>
+                          setCurrentNegIndex((prev) =>
+                            prev > 0 ? prev - 1 : client.negotiators.length - 1,
+                          )
+                        }
+                        className="p-2 rounded-lg border border-slate-200 text-slate-400 hover:text-[#38A1DB] hover:bg-white transition"
+                      >
+                        <ChevronLeft className="w-4 h-4" />
+                      </button>
+
+                      <button
+                        onClick={() =>
+                          setCurrentNegIndex((prev) =>
+                            prev < client.negotiators.length - 1 ? prev + 1 : 0,
+                          )
+                        }
+                        className="p-2 rounded-lg border border-slate-200 text-slate-400 hover:text-[#38A1DB] hover:bg-white transition"
+                      >
+                        <ChevronRight className="w-4 h-4" />
+                      </button>
+                    </div>
+                  )}
+
+                  <div className="space-y-5">
+                    <div>
+                      <p className="text-[11px] uppercase font-bold text-[#38A1DB] tracking-wider">
+                        {client.negotiators[currentNegIndex].title ||
+                          "Negotiator"}
+                      </p>
+
+                      <p className="text-xl font-bold text-slate-900 mt-1">
+                        {client.negotiators[currentNegIndex].name || "—"}
+                      </p>
+                    </div>
+
+                    <div className="border-t border-slate-200 pt-4 space-y-3">
+                      {client.negotiators[currentNegIndex].email && (
+                        <ContactRow
+                          icon={Mail}
+                          value={client.negotiators[currentNegIndex].email}
+                        />
+                      )}
+
+                      {client.negotiators[currentNegIndex].phone_no && (
+                        <ContactRow
+                          icon={Phone}
+                          value={formatPhoneNumber(
+                            client.negotiators[currentNegIndex].phone_no,
+                          )}
+                        />
+                      )}
+
+                      <ContactRow
+                        icon={MapPin}
+                        value={[
+                          client.negotiators[currentNegIndex].address,
+                          client.negotiators[currentNegIndex].city,
+                          client.negotiators[currentNegIndex].state,
+                          client.negotiators[currentNegIndex].zip,
+                        ]
+                          .filter(Boolean)
+                          .join(", ")}
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
+          </div>
+
+          {/* Contract Section */}
+          <div className="space-y-6">
+            <div className="flex items-center gap-2">
+              <FileText className="w-5 h-5 text-[#38A1DB]" />
+              <h3 className="font-bold text-sm uppercase tracking-wider text-slate-700">
+                Contract Information
+              </h3>
+            </div>
+
+            {!client.contractDetails ? (
+              <div className="bg-slate-50 border border-slate-100 rounded-2xl p-10 text-center">
+                <p className="text-slate-400 italic text-sm">
+                  No active contract found for this client
+                </p>
+              </div>
+            ) : (
+              <div className="grid md:grid-cols-3 gap-6">
+                {/* Card */}
+                <div className="bg-slate-50 border border-slate-100 rounded-2xl p-6 space-y-4 shadow-sm">
+                  <div>
+                    <p className="text-[11px] uppercase font-bold text-[#38A1DB] tracking-wider">
+                      Contract Number
+                    </p>
+                    <p className="text-lg font-bold text-slate-900 mt-1">
+                      {client.contractDetails.contract_number || "—"}
+                    </p>
+                  </div>
+
+                  <div>
+                    <p className="text-[11px] uppercase font-bold text-[#38A1DB] tracking-wider">
+                      Origin Country
+                    </p>
+                    <p className="text-slate-700 mt-1">
+                      {client.contractDetails.origin_country || "—"}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="bg-slate-50 border border-slate-100 rounded-2xl p-6 space-y-4 shadow-sm">
+                  <div>
+                    <p className="text-[11px] uppercase font-bold text-[#38A1DB] tracking-wider">
+                      EPA Method
+                    </p>
+                    <p className="text-slate-700 mt-1">
+                      {client.contractDetails.epa_method_mechanism || "—"}
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-2 mt-2">
+                    {client.contractDetails.is_hazardous ? (
+                      <>
+                        <ShieldAlert className="w-4 h-4 text-red-500" />
+                        <span className="text-red-600 font-semibold text-sm">
+                          Hazardous
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        <ShieldCheck className="w-4 h-4 text-green-500" />
+                        <span className="text-green-600 font-semibold text-sm">
+                          Non-Hazardous
+                        </span>
+                      </>
+                    )}
+                  </div>
+                </div>
+
+                <div className="bg-slate-50 border border-slate-100 rounded-2xl p-6 space-y-4 shadow-sm">
+                  <div>
+                    <p className="text-[11px] uppercase font-bold text-[#38A1DB] tracking-wider">
+                      Delivery Time
+                    </p>
+                    <p className="text-slate-700 mt-1">
+                      {client.contractDetails.normal_delivery_time || 0} /{" "}
+                      {client.contractDetails.expedited_delivery_time || 0} Days
+                    </p>
+                  </div>
+
+                  <div>
+                    <p className="text-[11px] uppercase font-bold text-[#38A1DB] tracking-wider">
+                      GSA Discount
+                    </p>
+                    <p className="text-slate-700 mt-1">
+                      {client.contractDetails.gsa_proposed_discount || 0}%
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
-        <div className="sticky bottom-0 bg-slate-50 p-6 rounded-b-3xl flex justify-between border-t border-slate-100">
-          <button
-            onClick={onClose}
-            className="px-6 py-3 rounded-2xl font-bold text-slate-500 hover:text-slate-700 hover:bg-slate-100 transition-all active:scale-95"
-          >
+        {/* Footer */}
+        <div className="flex justify-between items-center px-8 py-5 border-t border-slate-100 bg-slate-50">
+          <button onClick={onClose} className="btn-secondary">
             Close
           </button>
-          <button
-            onClick={handleEdit}
-            className="flex items-center gap-2 px-6 py-3 rounded-2xl bg-linear-to-br from-[#38A1DB] to-[#2D8BBF] text-white font-bold shadow-lg hover:shadow-xl transition-all active:scale-95"
-          >
+
+          <button onClick={handleEdit} className="btn-primary">
             <Edit className="w-4 h-4" />
             Edit Client
           </button>

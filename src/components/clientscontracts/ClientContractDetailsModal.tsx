@@ -16,6 +16,10 @@ import {
   Map,
   Upload,
   Loader2,
+  ShieldCheck,
+  ShieldAlert,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { toast } from "sonner";
 import api from "../../lib/axios";
@@ -92,6 +96,7 @@ export const ClientContractDetailsModal: React.FC<
   ClientContractDetailsModalProps
 > = ({ client, contract, onClose, onEdit, onSuccess }) => {
   const [isUploading, setIsUploading] = React.useState(false);
+  const [currentNegIndex, setCurrentNegIndex] = React.useState(0);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
   const modalRef = React.useRef<HTMLDivElement>(null);
 
@@ -150,14 +155,15 @@ export const ClientContractDetailsModal: React.FC<
         ref={modalRef}
         className="bg-white rounded-2xl shadow-2xl max-w-5xl w-full max-h-[92vh] overflow-hidden flex flex-col animate-in fade-in zoom-in duration-200"
       >
-        <div className="p-6 md:p-8 border-b border-slate-100 flex items-start justify-between">
+        <div className="p-6 bg-slate-50/50 md:p-8 border-b border-slate-100 flex items-start justify-between">
           <div className="flex items-center gap-6">
             <div className="relative group">
               <div
-                className={`w-16 h-16 rounded-2xl border border-slate-200 flex items-center justify-center text-white font-bold text-2xl shadow-lg shadow-blue-100 overflow-hidden ${client.logoUrl
-                  ? "bg-slate-50/50"
-                  : "bg-linear-to-br from-[#3399cc] to-[#2980b9]"
-                  }`}
+                className={`w-16 h-16 rounded-2xl border border-slate-200 flex items-center justify-center text-white font-bold text-2xl shadow-lg shadow-blue-100 overflow-hidden ${
+                  client.logoUrl
+                    ? "bg-slate-50/50"
+                    : "bg-linear-to-br from-[#3399cc] to-[#2980b9]"
+                }`}
               >
                 {client.logoUrl ? (
                   <img
@@ -225,7 +231,11 @@ export const ClientContractDetailsModal: React.FC<
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div className="space-y-6">
               <Section icon={Building2} title="Company Details">
-                <DetailItem icon={Phone} label="Phone" value={formatPhoneNumber(client.phone)} />
+                <DetailItem
+                  icon={Phone}
+                  label="Phone"
+                  value={formatPhoneNumber(client.phone)}
+                />
                 <DetailItem
                   icon={Mail}
                   label="Email"
@@ -239,29 +249,113 @@ export const ClientContractDetailsModal: React.FC<
                 />
               </Section>
 
-              <Section icon={User} title="Primary Contact" badge="Negotiator">
-                <DetailItem
-                  icon={User}
-                  label="Full Name"
-                  value={client.contact?.name}
-                />
-                <DetailItem
-                  icon={Phone}
-                  label="Direct Phone"
-                  value={formatPhoneNumber(client.contact?.phone)}
-                />
-                <DetailItem
-                  icon={Mail}
-                  label="Direct Email"
-                  value={client.contact?.email}
-                  className="sm:col-span-2"
-                />
-                <DetailItem
-                  icon={MapPin}
-                  label="Direct Address"
-                  value={client.contact?.address}
-                  className="sm:col-span-2"
-                />
+              <Section
+                icon={User}
+                title="Negotiators"
+                badge={
+                  client.negotiators && client.negotiators.length > 0
+                    ? `${currentNegIndex + 1} of ${client.negotiators.length}`
+                    : undefined
+                }
+              >
+                <div className="flex flex-col gap-4 sm:col-span-2">
+                  {!client.negotiators || client.negotiators.length === 0 ? (
+                    <div className="flex items-center justify-center min-h-40 text-center">
+                      <p className="text-sm italic text-slate-400">
+                        No negotiators assigned
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm relative group overflow-hidden">
+                        {client.negotiators.length > 1 && (
+                          <div className="absolute top-4 right-4 flex gap-1 z-10">
+                            <button
+                              onClick={() =>
+                                setCurrentNegIndex((prev) =>
+                                  prev > 0
+                                    ? prev - 1
+                                    : client.negotiators.length - 1,
+                                )
+                              }
+                              className="p-1.5 rounded-lg border border-slate-100 bg-white text-slate-400 hover:text-[#38A1DB] hover:border-blue-100 transition-all active:scale-90"
+                            >
+                              <ChevronLeft className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() =>
+                                setCurrentNegIndex((prev) =>
+                                  prev < client.negotiators.length - 1
+                                    ? prev + 1
+                                    : 0,
+                                )
+                              }
+                              className="p-1.5 rounded-lg border border-slate-100 bg-white text-slate-400 hover:text-[#38A1DB] hover:border-blue-100 transition-all active:scale-90"
+                            >
+                              <ChevronRight className="w-4 h-4" />
+                            </button>
+                          </div>
+                        )}
+
+                        <div className="space-y-3">
+                          <div>
+                            <span className="text-[10px] font-bold text-[#38A1DB] uppercase tracking-tighter">
+                              {client.negotiators[currentNegIndex].title ||
+                                "Negotiator"}
+                            </span>
+                            <p className="text-slate-900 font-bold text-base mt-0.5 pr-16">
+                              {client.negotiators[currentNegIndex].name || "—"}
+                            </p>
+                          </div>
+
+                          <div className="pt-2 grid grid-cols-1 sm:grid-cols-2 gap-3 border-t border-slate-100">
+                            <DetailItem
+                              icon={Mail}
+                              label="Email"
+                              value={client.negotiators[currentNegIndex].email}
+                            />
+                            <DetailItem
+                              icon={Phone}
+                              label="Phone"
+                              value={formatPhoneNumber(
+                                client.negotiators[currentNegIndex].phone_no,
+                              )}
+                            />
+                            <DetailItem
+                              icon={MapPin}
+                              label="Address"
+                              value={[
+                                client.negotiators[currentNegIndex].address,
+                                client.negotiators[currentNegIndex].city,
+                                client.negotiators[currentNegIndex].state,
+                                client.negotiators[currentNegIndex].zip,
+                              ]
+                                .filter(Boolean)
+                                .join(", ")}
+                              className="sm:col-span-2"
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      {client.negotiators.length > 1 && (
+                        <div className="flex items-center justify-center gap-1.5 pt-1">
+                          {client.negotiators.map((_, i) => (
+                            <button
+                              key={i}
+                              onClick={() => setCurrentNegIndex(i)}
+                              className={`w-1.5 h-1.5 rounded-full transition-all ${
+                                i === currentNegIndex
+                                  ? "bg-[#38A1DB] w-4"
+                                  : "bg-slate-200 hover:bg-slate-300"
+                              }`}
+                            />
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
               </Section>
             </div>
 
@@ -301,13 +395,40 @@ export const ClientContractDetailsModal: React.FC<
                     <DetailItem
                       icon={Calendar}
                       label="Normal Delivery"
-                      value={`${contract.normal_delivery_time} Days`}
+                      value={`${contract.normal_delivery_time || 0} Days`}
                     />
                     <DetailItem
                       icon={Zap}
                       label="Expedited"
-                      value={`${contract.expedited_delivery_time} Days`}
+                      value={`${contract.expedited_delivery_time || 0} Days`}
                     />
+                    <DetailItem
+                      icon={FileText}
+                      label="EPA Method / Mechanism"
+                      value={contract.epa_method_mechanism}
+                    />
+                    <div className="flex flex-col gap-1">
+                      <span className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">
+                        Hazardous Materials
+                      </span>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        {contract.is_hazardous ? (
+                          <>
+                            <ShieldAlert className="w-3.5 h-3.5 text-red-500" />
+                            <span className="text-red-600 font-bold text-xs">
+                              Includes Hazardous
+                            </span>
+                          </>
+                        ) : (
+                          <>
+                            <ShieldCheck className="w-3.5 h-3.5 text-green-500" />
+                            <span className="text-green-600 font-bold text-xs">
+                              Non-Hazardous
+                            </span>
+                          </>
+                        )}
+                      </div>
+                    </div>
                     <DetailItem
                       icon={FileText}
                       label="Concessions"

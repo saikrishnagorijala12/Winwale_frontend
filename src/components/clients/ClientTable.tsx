@@ -75,7 +75,10 @@ export const ClientTable: React.FC<ClientTableProps> = ({
                 Status
               </th>
               <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                Contact
+                Negotiators
+              </th>
+              <th className="hidden lg:table-cell px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                Contract #
               </th>
               <th className="hidden lg:table-cell px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                 Company Email
@@ -131,20 +134,30 @@ export const ClientTable: React.FC<ClientTableProps> = ({
                   </td>
                   <td className="px-4 py-4"><StatusBadge status={client.status} /></td>
                   <td className="px-6 py-4">
-                    {!client.contact ? (
+                    {(!client.negotiators || client.negotiators.length === 0) ? (
                       <span className="text-[10px] italic font-medium text-gray-400 uppercase">
                         Not Assigned
                       </span>
                     ) : (
-                      <div className="flex flex-col max-w-37.5">
+                      <div className="flex flex-col">
                         <span className="text-sm font-semibold text-slate-900 truncate">
-                          {client.contact.name}
+                          {client.negotiators[0].name}
+                          {client.negotiators.length > 1 && (
+                            <span className="ml-1.5 inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-[#38A1DB] border border-blue-100">
+                              +{client.negotiators.length - 1}
+                            </span>
+                          )}
                         </span>
                         <span className="hidden lg:block text-xs text-slate-500 truncate">
-                          {client.contact.email}
+                          {client.negotiators[0].title}
                         </span>
                       </div>
                     )}
+                  </td>
+                  <td className="hidden lg:table-cell px-6 py-4">
+                    <span className="text-sm font-medium text-slate-700">
+                      {client.contract || "—"}
+                    </span>
                   </td>
                   <td className="hidden lg:table-cell px-6 py-4 text-sm font-medium text-slate-600 truncate max-w-45">
                     {client.email}
@@ -251,10 +264,11 @@ export const ClientTable: React.FC<ClientTableProps> = ({
               <div className="grid grid-cols-2 gap-4 bg-slate-50 rounded-xl p-4 border border-slate-100">
                 <div>
                   <p className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">
-                    Contact
+                    Negotiators
                   </p>
                   <p className="text-sm font-semibold text-slate-800 truncate">
-                    {client.contact?.name || "—"}
+                    {client.negotiators?.[0]?.name || "—"}
+                    {client.negotiators && client.negotiators.length > 1 && ` (+${client.negotiators.length - 1})`}
                   </p>
                 </div>
                 <div>
@@ -263,6 +277,14 @@ export const ClientTable: React.FC<ClientTableProps> = ({
                   </p>
                   <p className="text-sm font-semibold text-slate-800">
                     {formatDate(client.lastModification)}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">
+                    Contract
+                  </p>
+                  <p className="text-sm font-semibold text-slate-800 truncate">
+                    {client.contract || "—"}
                   </p>
                 </div>
                 <div className="col-span-2">

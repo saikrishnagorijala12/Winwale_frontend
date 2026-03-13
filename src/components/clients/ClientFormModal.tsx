@@ -30,7 +30,7 @@ interface ClientFormModalProps {
   onClearErrorMessage?: () => void;
 }
 
-const STEPS = ["Company Info", "Primary Contact"];
+const STEPS = ["Company Info", "Negotiators"];
 
 export const ClientFormModal: React.FC<ClientFormModalProps> = ({
   isOpen,

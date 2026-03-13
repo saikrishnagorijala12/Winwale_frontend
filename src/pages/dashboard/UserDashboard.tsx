@@ -102,7 +102,7 @@ export default function Dashboard() {
       icon: Building2,
     },
     {
-      label: "Analyses Completed",
+      label: "Analyses Approved",
       value: stats_data.completedJobs.toString(),
       icon: FileSearch,
     },

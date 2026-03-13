@@ -46,9 +46,9 @@ export default function ClientsPage() {
   const filteredClients = clients.filter((client) => {
     const matchesSearch =
       client.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (client.contact?.name || "")
-        .toLowerCase()
-        .includes(searchQuery.toLowerCase());
+      client.negotiators.some((neg) =>
+        neg.name.toLowerCase().includes(searchQuery.toLowerCase()),
+      );
 
     const matchesFilter =
       filterStatus === "all" || client.status === filterStatus;
@@ -119,11 +119,16 @@ export default function ClientsPage() {
     try {
       const { logoFile, logoUrl, ...clientPayload } = newClient;
 
-      // Normalize phone numbers
+      // Normalize phone numbers for company and all negotiators
       const finalPayload = {
         ...clientPayload,
-        company_phone_no: normalizePhoneNumber(clientPayload.company_phone_no) || clientPayload.company_phone_no,
-        contact_officer_phone_no: normalizePhoneNumber(clientPayload.contact_officer_phone_no) || clientPayload.contact_officer_phone_no,
+        company_phone_no:
+          normalizePhoneNumber(clientPayload.company_phone_no) ||
+          clientPayload.company_phone_no,
+        negotiators: clientPayload.negotiators.map((neg) => ({
+          ...neg,
+          phone_no: normalizePhoneNumber(neg.phone_no || "") || neg.phone_no,
+        })),
       };
 
       const res = await api.post("/clients", finalPayload);
@@ -172,11 +177,16 @@ export default function ClientsPage() {
     try {
       const { logoFile, logoUrl, ...clientPayload } = editingClient;
 
-      // Normalize phone numbers
+      // Normalize phone numbers for company and all negotiators
       const finalPayload = {
         ...clientPayload,
-        company_phone_no: normalizePhoneNumber(clientPayload.company_phone_no) || clientPayload.company_phone_no,
-        contact_officer_phone_no: normalizePhoneNumber(clientPayload.contact_officer_phone_no) || clientPayload.contact_officer_phone_no,
+        company_phone_no:
+          normalizePhoneNumber(clientPayload.company_phone_no) ||
+          clientPayload.company_phone_no,
+        negotiators: clientPayload.negotiators.map((neg) => ({
+          ...neg,
+          phone_no: normalizePhoneNumber(neg.phone_no || "") || neg.phone_no,
+        })),
       };
 
       const res = await api.put(`/clients/${editingClient.id}`, finalPayload);
@@ -214,22 +224,26 @@ export default function ClientsPage() {
   };
 
   const openEditDialog = (client: Client) => {
+    const addrParts = client.address.split(", ");
     setEditingClient({
       id: client.id,
       company_name: client.name,
       company_email: client.email,
       company_phone_no: client.phone,
-      company_address: client.address.split(", ")[0] || "",
-      company_city: client.address.split(", ")[1] || "",
-      company_state: client.address.split(", ")[2] || "",
-      company_zip: client.address.split(", ")[3] || "",
-      contact_officer_name: client.contact?.name || "",
-      contact_officer_email: client.contact?.email || "",
-      contact_officer_phone_no: client.contact?.phone || "",
-      contact_officer_address: client.contact?.address?.split(", ")[0] || "",
-      contact_officer_city: client.contact?.address?.split(", ")[1] || "",
-      contact_officer_state: client.contact?.address?.split(", ")[2] || "",
-      contact_officer_zip: client.contact?.address?.split(", ")[3] || "",
+      company_address: addrParts[0] || "",
+      company_city: addrParts[1] || "",
+      company_state: addrParts[2] || "",
+      company_zip: addrParts[3] || "",
+      negotiators: client.negotiators.map((neg) => ({
+        name: neg.name || "",
+        title: neg.title || "",
+        email: neg.email || "",
+        phone_no: neg.phone_no || "",
+        address: neg.address || "",
+        city: neg.city || "",
+        state: neg.state || "",
+        zip: neg.zip || "",
+      })),
       status: client.status,
       logoUrl: client.logoUrl || "",
       logoFile: null,
@@ -256,7 +270,11 @@ export default function ClientsPage() {
     try {
       setLoading(true);
       const res = await api.get("/clients");
-      const normalized = res.data.map(normalizeClientFromAPI);
+      // The API returns { clients: [...], total_count: ..., status_counts: ... }
+      const fetchedClients = Array.isArray(res.data)
+        ? res.data
+        : res.data.clients || [];
+      const normalized = fetchedClients.map(normalizeClientFromAPI);
       setClients(normalized);
     } catch {
       toast.error("Failed to load clients");

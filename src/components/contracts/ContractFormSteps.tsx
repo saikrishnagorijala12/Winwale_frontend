@@ -312,6 +312,44 @@ export function Step2({
       </div>
       <div>
         <label className="text-sm font-bold text-slate-700">
+          Quantity/Volume Discounts
+        </label>
+        <input
+          className={`w-full mt-2 px-4 py-3 rounded-xl border-2 transition-colors outline-none resize-none border-slate-200 "
+            }`}
+          value={contract.q_v_discount || ""}
+          onChange={(e) => {
+            onChange({ ...contract, q_v_discount: e.target.value });
+            onClearError?.("q_v_discount");
+          }}
+        />
+        {errors.q_v_discount && (
+          <div className="mt-1 text-xs text-red-600">
+            <span>{errors.q_v_discount}</span>
+          </div>
+        )}
+      </div>
+      <div>
+        <label className="text-sm font-bold text-slate-700">Includes Hazardous Materials?</label>
+        <select
+          className={`w-full mt-2 px-4 py-3 rounded-xl border-2 transition-colors focus:outline-none bg-white border-slate-200 focus:border-[#38A1DB]`}
+          value={contract.is_hazardous ? "Yes" : "No"}
+          onChange={(e) => {
+            onChange({ ...contract, is_hazardous: e.target.value === "Yes" });
+            onClearError?.("is_hazardous");
+          }}
+        >
+          <option value="No">No</option>
+          <option value="Yes">Yes</option>
+        </select>
+        {errors.is_hazardous && (
+          <div className="mt-1 text-xs text-red-600">
+            <span>{errors.is_hazardous}</span>
+          </div>
+        )}
+      </div>
+      <div>
+        <label className="text-sm font-bold text-slate-700">
           Normal Delivery (Days)
         </label>
         <input
@@ -356,22 +394,21 @@ export function Step2({
           </div>
         )}
       </div>
+
       <div className="md:col-span-2">
-        <label className="text-sm font-bold text-slate-700">
-          Quantity/Volume Discounts
-        </label>
+        <label className="text-sm font-bold text-slate-700">EPA Method / Mechanism</label>
         <input
-          className={`w-full mt-2 px-4 py-3 rounded-xl border-2 transition-colors outline-none resize-none border-slate-200 "
-            }`}
-          value={contract.q_v_discount || ""}
+          type="text"
+          className={`w-full mt-2 px-4 py-3 rounded-xl border-2 transition-colors focus:outline-none border-slate-200 focus:border-[#38A1DB]`}
+          value={contract.epa_method_mechanism || ""}
           onChange={(e) => {
-            onChange({ ...contract, q_v_discount: e.target.value });
-            onClearError?.("q_v_discount");
+            onChange({ ...contract, epa_method_mechanism: e.target.value });
+            onClearError?.("epa_method_mechanism");
           }}
         />
-        {errors.q_v_discount && (
+        {errors.epa_method_mechanism && (
           <div className="mt-1 text-xs text-red-600">
-            <span>{errors.q_v_discount}</span>
+            <span>{errors.epa_method_mechanism}</span>
           </div>
         )}
       </div>

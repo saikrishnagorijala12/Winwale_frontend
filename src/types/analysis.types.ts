@@ -35,6 +35,7 @@ export interface AnalysisJobResponse {
   user: string;
   status: "pending" | "approved" | "rejected";
   action_summary: Record<string, number>;
+  cpl_file_url?: string | null;
   created_time: string;
   updated_time: string;
 }
