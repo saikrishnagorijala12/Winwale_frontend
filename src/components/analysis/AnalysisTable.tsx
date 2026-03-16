@@ -14,7 +14,6 @@ import ModificationsSummary from "./ModificationsSummary";
 import AnalysisActionsMenu from "./AnalysisActionsMenu";
 import Pagination from "../shared/Pagination";
 import { useAnalysis } from "../../context/AnalysisContext";
-import { normalizeStatus } from "../../utils/statusUtils";
 import StatusBadge from "../shared/StatusBadge";
 import { formatDateTime } from "../../utils/analysisUtils";
 import {
@@ -142,8 +141,8 @@ export default function AnalysisTable({
                         <div className="flex items-center gap-3">
                           <div
                             className={`shrink-0 w-9 h-9 rounded-xl border border-slate-200 flex items-center justify-center text-white font-bold text-xs shadow-sm overflow-hidden ${item.client_logo_url
-                                ? "bg-white"
-                                : "bg-linear-to-br from-[#3399cc] to-[#2980b9]"
+                              ? "bg-white"
+                              : "bg-linear-to-br from-[#3399cc] to-[#2980b9]"
                               }`}
                           >
                             {item.client_logo_url ? (
@@ -325,8 +324,8 @@ export default function AnalysisTable({
                   <div className="flex items-center gap-3 mb-3">
                     <div
                       className={`shrink-0 w-10 h-10 rounded-xl border border-slate-200 flex items-center justify-center text-white font-bold text-sm shadow-sm overflow-hidden ${item.client_logo_url
-                          ? "bg-white"
-                          : "bg-linear-to-br from-[#3399cc] to-[#2980b9]"
+                        ? "bg-white"
+                        : "bg-linear-to-br from-[#3399cc] to-[#2980b9]"
                         }`}
                     >
                       {item.client_logo_url ? (

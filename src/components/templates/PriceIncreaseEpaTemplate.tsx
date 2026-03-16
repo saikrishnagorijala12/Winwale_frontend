@@ -64,14 +64,16 @@ export const PriceIncreaseEpaTemplate = ({ data }: { data: any }) => (
         All prices offered to GSA include the current Industrial Funding Fee
         (IFF).
       </li>
-      <li>
-        {data.cspStatement ||
-          "For non-TDR only: Statement that Commercial Sales Practices (CSP) Information in accordance with GSAR 552.238-81 PRICE REDUCTIONS (see most current Solicitation for clause/deviation effective date) previously submitted with the initial award (or contract modification) or CSP-1 has not changed, if applicable. If CSP has changed, provide updated CSP-1 in eMod."}
-      </li>
-      <li>
-        {data.confirmStatement ||
-          "This request conforms to the agreed upon EPA method."}
-      </li>
+      {data.is_tdr !== "yes" && (
+        <li>
+          Commercial Sales Practices (CSP) Information in accordance with GSAR
+          552.238-81 PRICE REDUCTIONS (see most current Solicitation for
+          clause/deviation effective date) previously submitted with the initial
+          award (or contract modification) or CSP-1 has not changed, if
+          applicable. If CSP has changed, provide updated CSP-1 in eMod.
+        </li>
+      )}
+      <li>This request conforms to the agreed upon EPA method.</li>
     </ul>
 
     <p className="mb-4">

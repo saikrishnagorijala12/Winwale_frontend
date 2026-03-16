@@ -32,6 +32,7 @@ export default function DocumentFormRenderer() {
     validateForm,
     setCurrentStep,
     validationErrors,
+    availableNegotiators,
   } = useDocument();
   const navigate = useNavigate();
 
@@ -209,6 +210,43 @@ export default function DocumentFormRenderer() {
                       {field.options?.map((option) => (
                         <option key={option.value} value={option.value}>
                           {option.label}
+                        </option>
+                      ))}
+                    </select>
+                    <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                      <ChevronRight className="w-4 h-4 text-gray-400 rotate-90" />
+                    </div>
+                  </div>
+                ) : field.id === "negotiatorName" ? (
+                  <div className="relative">
+                    <select
+                      value={formData[field.id] || ""}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        updateField("negotiatorName", val);
+                        const selected = availableNegotiators.find(
+                          (n) => n.name === val
+                        );
+                        if (selected) {
+                          updateField("negotiatorTitle", selected.title);
+                        }
+                      }}
+                      disabled={isReadOnly}
+                      className={`${isReadOnly ? disabledInputStyles : inputStyles} appearance-none pr-8`}
+                      style={{
+                        borderColor: colors.border,
+                        backgroundColor: isReadOnly
+                          ? colors.secondaryBg
+                          : "white",
+                      }}
+                    >
+                      {availableNegotiators.length === 0 && (
+                         <option value="" disabled>No negotiators available</option>
+                      )}
+                      
+                      {availableNegotiators.map((n) => (
+                        <option key={n.name} value={n.name}>
+                          {n.name} - {n.title}
                         </option>
                       ))}
                     </select>

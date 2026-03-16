@@ -110,13 +110,22 @@ export const AdditionTemplate = ({ data }: { data: any }) => (
         The items being added are not identical/substantially similar to
         previously deleted items that had a lower Schedule price.
       </li>
-      <li>No hazardous materials will be delivered under this contract.</li>
-      <li>Place of Performance per FAR 52.215-6 (see current Solicitation).</li>
       <li>
-        If applicable : State whether EPA method and mechanism are the same as
-        currently awarded product(s) and/or SIN(s) or propose EPA method and
-        mechanism
+        {data.is_hazardous === "yes"
+          ? "Hazardous materials will be delivered under this contract."
+          : "No hazardous materials will be delivered under this contract."}
       </li>
+      <li>
+        Place of Performance per FAR 52.215-6:{" "}
+        <strong>
+          {data.gsaOfficeAddressLine}, {data.gsaOfficeCityStateZip}
+        </strong>
+      </li>
+      {data.epa_method_mechanism && (
+        <li>
+          EPA method and mechanism: {data.epa_method_mechanism}
+        </li>
+      )}
     </ul>
 
     <p className="mb-4">

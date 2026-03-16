@@ -136,6 +136,7 @@ export interface DocumentContextType {
   resetWorkflow: () => void;
   generateDocument: () => DocumentMetadata;
   analysisSummary: any | null;
+  availableNegotiators: { name: string; title: string }[];
 }
 
 export interface Step {

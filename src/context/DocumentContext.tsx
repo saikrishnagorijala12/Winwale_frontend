@@ -26,11 +26,14 @@ const mapJobDetailsToForm = (api: any) => {
   const delivery = contract.delivery || {};
   const address = contract.address || {};
   const other = contract.other || {};
-  const negotiator = api.negotiator || {};
+  const negotiators = api.negotiators || [];
+  const defaultNegotiator = negotiators.length > 0 ? negotiators[0] : {};
   const countryOfOrigin = Array.isArray(api.countries_of_origin)
     ? api.countries_of_origin.join(", ")
     : api.countries_of_origin || "";
-  const percentage = api.percentage || "";
+  const percentage = api.percentage || {};
+  const isTdr = other.is_tdr ? "yes" : "no";
+  const isHazardous = other.is_hazardous ? "yes" : "no";
 
   return {
     companyName: client.company_name,
@@ -50,11 +53,15 @@ const mapJobDetailsToForm = (api: any) => {
     gsaOfficeCityStateZip: `${address.contract_officer_city || ""}, ${
       address.contract_officer_state || ""
     }, ${address.contract_officer_zip || ""}`.trim(),
-    negotiatorName: negotiator.name,
+    negotiatorName: defaultNegotiator.name || "",
+    negotiatorTitle: defaultNegotiator.title || "",
     deliveryAroNormal: delivery.normal_delivery_time,
     deliveryAroExpedited: delivery.expedited_delivery_time,
 
     fobTerms: other.fob_term,
+    epa_method_mechanism: other.epa_method_mechanism,
+    is_tdr: isTdr,
+    is_hazardous: isHazardous,
 
     coo: countryOfOrigin,
     basicDiscount: discounts.gsa_proposed_discount,
@@ -146,6 +153,9 @@ export const DocumentProvider: React.FC<{ children: React.ReactNode }> = ({
   const [analysisSummary, setAnalysisSummary] = useState<any | null>(null);
   const [cachedJobDetails, setCachedJobDetails] = useState<any | null>(null);
   const [loadedJobId, setLoadedJobId] = useState<number | null>(null);
+  const [availableNegotiators, setAvailableNegotiators] = useState<
+    { name: string; title: string }[]
+  >([]);
 
   const loadDocumentConfig = useCallback(
     async (typeId: string, jobId?: number) => {
@@ -174,6 +184,7 @@ export const DocumentProvider: React.FC<{ children: React.ReactNode }> = ({
         if (jobDetails) {
           mappedData = mapJobDetailsToForm(jobDetails);
           setAnalysisSummary(jobDetails.modification_summary);
+          setAvailableNegotiators(jobDetails.negotiators || []);
         }
 
         if (user) {
@@ -206,6 +217,10 @@ export const DocumentProvider: React.FC<{ children: React.ReactNode }> = ({
 
           if (mappedData.companyLogo) {
             merged.companyLogo = mappedData.companyLogo;
+          }
+
+          if (mappedData.negotiatorTitle) {
+            merged.negotiatorTitle = mappedData.negotiatorTitle;
           }
 
           return merged;
@@ -349,6 +364,7 @@ export const DocumentProvider: React.FC<{ children: React.ReactNode }> = ({
         resetWorkflow,
         generateDocument,
         analysisSummary,
+        availableNegotiators,
       }}
     >
       {children}
