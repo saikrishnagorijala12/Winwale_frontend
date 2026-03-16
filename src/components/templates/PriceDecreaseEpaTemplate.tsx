@@ -92,5 +92,18 @@ export const PriceDecreaseEpaTemplate = ({ data }: { data: any }) => (
         {data.companyName || "COMPANY NAME"}
       </p>
     </div>
+
+    <div className="mt-8">
+      <p className="mb-2">
+        <strong>Attachments:</strong>
+      </p>
+      <div className="ml-6 space-y-1">
+        <p>☐ Modification Cover Letter signed by Authorized Negotiator or Corporate Official</p>
+        <p>☐ Current dated commercial price list, commercial catalog, or other standard market pricing</p>
+        <p>☐ Updated Product File (PF), Services Plus File (SPF), or Price Proposal Template (PPT) (as applicable)</p>
+        <p>☐ Supporting Price Documentation, if applicable</p>
+        <p>☒ Other documentation, if applicable</p>
+      </div>
+    </div>
   </div>
 );
