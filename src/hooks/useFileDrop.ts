@@ -8,7 +8,7 @@ const VALID_EXCEL_MIME_TYPES = new Set([
 const VALID_EXCEL_EXTENSIONS = /\.(xlsx|xls)$/i;
 
 export interface UseFileDropOptions {
-    onFileDrop: (file: File) => void;
+    onFileDrop: (files: File[]) => void;
     onInvalidFile?: (reason: string) => void;
 }
 
@@ -53,17 +53,25 @@ export function useFileDrop({
             e.stopPropagation();
             setIsDragging(false);
 
-            const file = e.dataTransfer.files?.[0];
-            if (!file) return;
+            const files = Array.from(e.dataTransfer.files);
+            if (!files.length) return;
 
-            if (!isValidExcelFile(file)) {
+            const validFiles = files.filter(isValidExcelFile);
+
+            if (validFiles.length === 0) {
                 onInvalidFile?.(
-                    "Invalid file type. Please drop an Excel (.xlsx or .xls) file."
+                    "Invalid file type. Please drop Excel (.xlsx or .xls) files."
                 );
                 return;
             }
 
-            onFileDrop(file);
+            if (validFiles.length < files.length) {
+                onInvalidFile?.(
+                    "Some files were ignored. Please drop only Excel (.xlsx or .xls) files."
+                );
+            }
+
+            onFileDrop(validFiles);
         },
         [onFileDrop, onInvalidFile]
     );

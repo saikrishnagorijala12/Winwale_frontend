@@ -47,14 +47,14 @@ export default function PriceListAnalysis() {
     "error" | "warning" | "info"
   >("error");
 
-  const [file, setFile] = useState<File | null>(null);
-  const [uploadedFileName, setUploadedFileName] = useState<string>("");
+  const [files, setFiles] = useState<File[]>([]);
   const [uploadResult, setUploadResult] = useState<any>(null);
   const [jobDetails, setJobDetails] = useState<any>(null);
   const [previewData, setPreviewData] = useState<any[] | null>(null);
-  const [totalRows, setTotalRows] = useState<number>(0);
   const [isFetchingJob, setIsFetchingJob] = useState(false);
   const [isParsingFile, setIsParsingFile] = useState(false);
+  const [fileWarnings, setFileWarnings] = useState<Record<string, string>>({});
+  const [previewIndex, setPreviewIndex] = useState<number | null>(null);
 
   useEffect(() => {
     fetchClients();
@@ -111,98 +111,204 @@ export default function PriceListAnalysis() {
       return;
     }
     const target = e.target as HTMLInputElement;
-    const selectedFile = target.files?.[0] ?? null;
-    if (!selectedFile) return;
-    await processFile(selectedFile);
+    const selectedFiles = Array.from(target.files ?? []);
+    if (selectedFiles.length === 0) return;
+    await processFiles(selectedFiles);
+    // Reset input value so the same file can be selected again if removed
+    target.value = '';
   };
 
-  const handleFileDrop = async (droppedFile: File) => {
-    await processFile(droppedFile);
+  const handleFileDrop = async (droppedFiles: File[]) => {
+    await processFiles(droppedFiles);
   };
 
-  const processFile = async (selectedFile: File) => {
-    if (!selectedFile.name.match(/\.(xlsx|xls)$/i)) {
-      setError("Invalid format. Please select an Excel (.xlsx or .xls) file");
-      return;
-    }
-    setFile(selectedFile);
-    setUploadedFileName(selectedFile.name);
-    setError(null);
-    setErrorVariant("error");
-    setPreviewData(null);
+  const generatePreview = async (file: File) => {
     setIsParsingFile(true);
-
+    setPreviewData(null);
     try {
-      const arrayBuffer = await selectedFile.arrayBuffer();
+      const arrayBuffer = await file.arrayBuffer();
       const data = new Uint8Array(arrayBuffer);
       const workbook = XLSX.read(data, { type: "array" });
-      const sheetName = workbook.SheetNames[0];
-      const sheet = workbook.Sheets[sheetName];
-
-      const rows = XLSX.utils.sheet_to_json(sheet, {
-        header: 1,
-        defval: "",
-      }) as any[][];
-
-      if (rows.length === 0) {
-        setError("The uploaded Excel file contains no data.");
-        setFile(null);
-        setPreviewData(null);
-        setTotalRows(0);
-        return;
-      }
-
+      const sheet = workbook.Sheets[workbook.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "" }) as any[][];
       const headerIdx = findHeaderRow(rows);
-      if (headerIdx === -1) {
-        setError(
-          "Could not detect a valid header row. Please ensure your file contains required columns like 'Part Number', 'Description', and 'Price'.",
-        );
-        setFile(selectedFile);
-        setPreviewData(null);
-        setTotalRows(rows.length);
-        return;
+      if (headerIdx !== -1) {
+        const previewRows = rows.slice(headerIdx, headerIdx + 11);
+        const cols = previewRows[0];
+        const jsonData = previewRows.slice(1).map((row) => {
+          const obj: any = {};
+          cols.forEach((col: any, idx: number) => {
+            obj[col] = row[idx] !== undefined ? row[idx] : "";
+          });
+          return obj;
+        });
+        if (jsonData.length > 0) setPreviewData(jsonData);
       }
-
-      const headers = rows[headerIdx].map((h) => String(h || "").trim());
-      const validation = validateHeaders(headers);
-
-      if (!validation.isValid) {
-        const missingNames = validation.missing
-          .map(getDisplayColumnName)
-          .join(", ");
-        setError(`Missing required columns: ${missingNames}`);
-        setFile(selectedFile);
-        setTotalRows(rows.length - headerIdx - 1);
-        setPreviewData(null);
-        return;
-      }
-
-      const jsonData = XLSX.utils.sheet_to_json(sheet, {
-        range: headerIdx,
-        defval: "",
-      });
-
-      if (jsonData.length === 0) {
-        setError("The uploaded Excel file contains no data rows.");
-        setFile(null);
-        setPreviewData(null);
-        setTotalRows(0);
-        return;
-      }
-
-      setTotalRows(jsonData.length);
-      setPreviewData(jsonData);
     } catch (err) {
-      console.error("Error processing file:", err);
-      setError("An error occurred while processing the file. Please try again.");
-      setFile(null);
+      console.error("Error generating preview:", err);
     } finally {
       setIsParsingFile(false);
     }
   };
 
+  const processFiles = async (newFiles: File[]) => {
+    setError(null);
+    setErrorVariant("error");
+    setIsParsingFile(true);
+
+    try {
+      const excelFiles = newFiles.filter(f => f.name.match(/\.(xlsx|xls)$/i));
+      if (excelFiles.length < newFiles.length) {
+        toast.warning("Some files were ignored. Only Excel files are allowed.");
+      }
+      if (excelFiles.length === 0) {
+        return;
+      }
+
+      // Deduplicate
+      const uniqueFiles = excelFiles.filter(newFile =>
+        !files.some(existing => existing.name === newFile.name && existing.size === newFile.size)
+      );
+      if (uniqueFiles.length < excelFiles.length) {
+        toast.info("Duplicate files were ignored.");
+      }
+      if (uniqueFiles.length === 0) {
+        return;
+      }
+
+      // Validate headers for every file
+      const validFiles: File[] = [];
+      const newFileWarnings: Record<string, string> = { ...fileWarnings };
+      let firstValidPreviewFile: File | null = null;
+
+      for (const file of uniqueFiles) {
+        try {
+          const arrayBuffer = await file.arrayBuffer();
+          const data = new Uint8Array(arrayBuffer);
+          const workbook = XLSX.read(data, { type: "array" });
+          const sheetName = workbook.SheetNames[0];
+          const sheet = workbook.Sheets[sheetName];
+
+          const rows = XLSX.utils.sheet_to_json(sheet, {
+            header: 1,
+            defval: "",
+          }) as any[][];
+
+          if (rows.length === 0) {
+            newFileWarnings[`${file.name}-${file.size}`] = "File is empty";
+            validFiles.push(file);
+            continue;
+          }
+
+          const headerIdx = findHeaderRow(rows);
+          if (headerIdx === -1) {
+            newFileWarnings[`${file.name}-${file.size}`] = "Could not detect a valid header row";
+            validFiles.push(file);
+            continue;
+          }
+
+          const headers = rows[headerIdx].map((h) => String(h || "").trim());
+          const validation = validateHeaders(headers);
+          if (!validation.isValid) {
+            const missingNames = validation.missing.map(getDisplayColumnName).join(", ");
+            newFileWarnings[`${file.name}-${file.size}`] = `Missing columns: ${missingNames}`;
+            validFiles.push(file);
+            continue;
+          }
+
+          // File is valid — if it was previously warned, clear it
+          delete newFileWarnings[`${file.name}-${file.size}`];
+
+          validFiles.push(file);
+        } catch {
+          newFileWarnings[`${file.name}-${file.size}`] = "Failed to read file";
+          validFiles.push(file);
+        }
+      }
+
+      // Add valid files to state
+      if (validFiles.length > 0) {
+        setFiles(prev => {
+          const updatedFiles = [...prev, ...validFiles];
+          // If no preview yet, preview the first valid file from the new set
+          if (previewIndex === null) {
+            const firstValidIdx = updatedFiles.findIndex(f => !newFileWarnings[`${f.name}-${f.size}`]);
+            if (firstValidIdx !== -1) {
+              setPreviewIndex(firstValidIdx);
+              generatePreview(updatedFiles[firstValidIdx]);
+            }
+          }
+          return updatedFiles;
+        });
+        setFileWarnings(newFileWarnings);
+      }
+
+      // Update grouped error message based on all current warnings
+      setFileWarnings(newFileWarnings);
+    } catch (err) {
+      console.error("Error processing files:", err);
+      setError("An error occurred while processing the files. Please try again.");
+    } finally {
+      setIsParsingFile(false);
+    }
+  };
+
+  const handleRemoveFile = async (index: number) => {
+    const removedFile = files[index];
+    const newFiles = files.filter((_, i) => i !== index);
+    setFiles(newFiles);
+
+    // Update warnings
+    const newFileWarnings = { ...fileWarnings };
+    delete newFileWarnings[`${removedFile.name}-${removedFile.size}`];
+    setFileWarnings(newFileWarnings);
+
+    if (newFiles.length === 0) {
+      setPreviewData(null);
+      setPreviewIndex(null);
+      return;
+    }
+
+    // If the previewed file was removed, or if we need a new preview
+    if (previewIndex === index) {
+      setPreviewData(null);
+      // Try to find the next valid file to preview
+      const nextValidIdx = newFiles.findIndex(f => !newFileWarnings[`${f.name}-${f.size}`]);
+      if (nextValidIdx !== -1) {
+        setPreviewIndex(nextValidIdx);
+        generatePreview(newFiles[nextValidIdx]);
+      } else {
+        setPreviewIndex(null);
+      }
+    } else if (previewIndex !== null && previewIndex > index) {
+      // Shift index if removed file was before current preview
+      setPreviewIndex(previewIndex - 1);
+    }
+  };
+
+  const handlePreviewFile = (index: number) => {
+    const file = files[index];
+    const warning = fileWarnings[`${file.name}-${file.size}`];
+    if (warning) {
+      toast.error(`Cannot preview file with errors: ${warning}`);
+      return;
+    }
+    setPreviewIndex(index);
+    generatePreview(file);
+  };
+
+
+  const handleClearAllFiles = () => {
+    setFiles([]);
+    setPreviewData(null);
+    setError(null);
+    setFileWarnings({});
+    setPreviewIndex(null);
+  };
+
   const handleRunAnalysis = async () => {
-    if (!file || !selectedClient || (error && errorVariant === "error")) {
+    const hasWarnings = Object.keys(fileWarnings).length > 0;
+    if (files.length === 0 || !selectedClient || (error && errorVariant === "error") || hasWarnings) {
       if (!error) setError("Missing file or client selection");
       return;
     }
@@ -212,7 +318,7 @@ export default function PriceListAnalysis() {
     setErrorVariant("error");
 
     const formData = new FormData();
-    formData.append("file", file);
+    files.forEach((f) => formData.append("files", f));
 
     try {
       const response = await api.post(`/cpl/${selectedClient}`, formData, {
@@ -233,14 +339,12 @@ export default function PriceListAnalysis() {
   const handleReset = () => {
     setCurrentStep(1);
     setSelectedClient(null);
-    setFile(null);
-    setUploadedFileName("");
+    setFiles([]);
     setUploadResult(null);
     setSelectedJobId(null);
     setJobDetails(null);
 
     setPreviewData(null);
-    setTotalRows(0);
     setError(null);
     setErrorVariant("error");
     setActiveTab("NEW_PRODUCT");
@@ -294,10 +398,10 @@ export default function PriceListAnalysis() {
       case 2:
         return (
           <FileUploadStep
-            file={file}
-            uploadedFileName={uploadedFileName}
+            files={files}
+            fileWarnings={fileWarnings}
             previewData={previewData}
-            totalRows={totalRows}
+            previewIndex={previewIndex}
             isParsingFile={isParsingFile}
             error={error}
             errorVariant={errorVariant}
@@ -306,36 +410,36 @@ export default function PriceListAnalysis() {
             onInvalidFile={(reason) => setError(reason)}
             onBack={() => {
               setCurrentStep(1);
-              setFile(null);
+              setFiles([]);
               setPreviewData(null);
               setError(null);
+              setFileWarnings({});
+              setPreviewIndex(null);
             }}
             onContinue={() => {
               setCurrentStep(3);
             }}
-            onClearFile={() => {
-              setFile(null);
-              setError(null);
-              setPreviewData(null);
-            }}
+            onRemoveFile={handleRemoveFile}
+            onClearAllFiles={handleClearAllFiles}
+            onPreviewFile={handlePreviewFile}
           />
         );
       case 3:
         return (
           <RunAnalysisStep
             activeClient={activeClient}
-            uploadedFileName={uploadedFileName}
-            totalRows={totalRows}
+            uploadedFileName={files.length > 0 ? `${files.length} files selected` : ""}
+            totalRows={files.length} // Temporary: passing file count instead of total rows as RunAnalysisStep might expect totalRows string
             isAnalyzing={isAnalyzing}
             error={error}
             errorVariant={errorVariant}
             onBack={() => {
               setCurrentStep(2);
               setUploadResult(null);
-              setError(null);
+              // Do not clear errors here as they might still be valid for step 2
             }}
             onRunAnalysis={handleRunAnalysis}
-            disableRun={!!error && errorVariant === "error"}
+            disableRun={(!!error && errorVariant === "error") || Object.keys(fileWarnings).length > 0}
           />
         );
       case 4:

@@ -9,10 +9,11 @@ export type FieldType =
   | "percentage"
   | "currency"
   | "textarea"
-  | "select";
-
+  | "select"
+  | "checkbox-group";
+ 
 export type FieldBehavior = "readonly" | "editable" | "manual";
-
+ 
 export interface ValidationRule {
   type:
   | "required"
@@ -27,14 +28,14 @@ export interface ValidationRule {
   value?: string | number;
   message: string;
 }
-
+ 
 export interface DocumentTypeCardProps {
   config: DocumentConfig;
   isSelected: boolean;
   onSelect: () => void;
   count?: number;
 }
-
+ 
 export interface DocumentField {
   id: string;
   label: string;
@@ -47,7 +48,7 @@ export interface DocumentField {
   defaultValue?: string | number;
   width?: string;
 }
-
+ 
 export interface DocumentConfig {
   id: string;
   name: string;
@@ -55,16 +56,16 @@ export interface DocumentConfig {
   icon: string;
   fields: DocumentField[];
 }
-
+ 
 export interface DocumentMetadata {
   id: string;
   documentType: string;
   version: string;
   generatedBy: string;
   generatedAt: string;
-  data: Record<string, string | number>;
+  data: Record<string, string | number | string[]>;
 }
-
+ 
 export type WorkflowStep =
   | "select-type"
   | "load-config"
@@ -72,80 +73,80 @@ export type WorkflowStep =
   | "validation"
   | "preview"
   | "generate";
-
+ 
 export type DocumentTemplateType =
   | "addition"
   | "deletion"
   | "price-increase"
   | "price-decrease"
   | "description-change";
-
+ 
 export const resolveTemplateType = (documentId: string) => {
   switch (documentId) {
     case "addition":
     case "add-product":
     case "add-product-modification":
       return "addition";
-
+ 
     case "deletion":
     case "delete-product":
       return "deletion";
-
+ 
     case "price-increase":
       return "price-increase";
-
+ 
     case "price-decrease":
       return "price-decrease";
-
+ 
     case "description-change":
       return "description-change";
-
+ 
     default:
       console.error("No template mapped for documentId:", documentId);
       return null;
   }
 };
-
+ 
 export interface ValidationError {
   fieldId: string;
   message: string;
 }
-
+ 
 export interface DocumentContextType {
   currentStep: WorkflowStep;
   setCurrentStep: (step: WorkflowStep) => void;
-
+ 
   selectedDocumentType: string | null;
   setSelectedDocumentType: (type: string | null) => void;
   documentConfig: DocumentConfig | null;
-
-  formData: Record<string, string | number>;
+ 
+  formData: Record<string, string | number | string[]>;
   setFormData: React.Dispatch<
-    React.SetStateAction<Record<string, string | number>>
+    React.SetStateAction<Record<string, string | number | string[]>>
   >;
-  updateField: (fieldId: string, value: string | number) => void;
-
+  updateField: (fieldId: string, value: string | number | string[]) => void;
+ 
   validationErrors: ValidationError[];
   setValidationErrors: (errors: ValidationError[]) => void;
   validateForm: () => boolean;
-
+ 
   documentHistory: DocumentMetadata[];
   addToHistory: (doc: DocumentMetadata) => void;
-
+ 
   loadDocumentConfig: (typeId: string, jobId?: number) => Promise<void>;
   resetWorkflow: () => void;
   generateDocument: () => DocumentMetadata;
   analysisSummary: any | null;
   availableNegotiators: { name: string; title: string }[];
 }
-
+ 
 export interface Step {
   id: WorkflowStep;
   label: string;
   description: string;
 }
-
-
+ 
+ 
 export interface DocumentTemplate {
   id: string;
   name: string;

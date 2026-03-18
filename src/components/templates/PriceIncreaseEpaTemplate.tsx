@@ -105,12 +105,48 @@ export const PriceIncreaseEpaTemplate = ({ data }: { data: any }) => (
       <p className="mb-2">
         <strong>Attachments:</strong>
       </p>
-      <div className="ml-6 space-y-1">
-        <p>☐ Modification Cover Letter signed by Authorized Negotiator or Corporate Official</p>
-        <p>☐ Current dated commercial price list, commercial catalog, or other standard market pricing</p>
-        <p>☐ Updated Product File (PF), Services Plus File (SPF), or Price Proposal Template (PPT) (as applicable)</p>
-        <p>☐ Supporting Price Documentation, if applicable</p>
-        <p>☒ Other documentation, if applicable</p>
+      <div className="space-y-1 text-black font-serif">
+        <p>
+          {data.attachments?.includes("cover_letter")
+            ? "\u2612\uFE0E"
+            : "\u2610\uFE0E"}{" "}
+          Modification Cover Letter signed by Authorized Negotiator or Corporate
+          Official
+        </p>
+        <p>
+          {data.attachments?.includes("price_list")
+            ? "\u2612\uFE0E"
+            : "\u2610\uFE0E"}{" "}
+          Current dated commercial price list, commercial catalog, or other
+          standard market pricing
+        </p>
+        <p>
+          {data.attachments?.includes("product_file")
+            ? "\u2612\uFE0E"
+            : "\u2610\uFE0E"}{" "}
+          Updated Product File (PF), Services Plus File (SPF), or{" "}
+          <a
+            href="https://www.gsa.gov/sell-to-government/step-1-learn-about-government-contracting/how-to-access-contract-opportunities/help-with-mas-contracts-to-sell-to-government/requirements-after-getting-a-mas-contract"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-600 underline"
+          >
+            Price Proposal Template (PPT)
+          </a>{" "}
+          (as applicable)
+        </p>
+        <p>
+          {data.attachments?.includes("supporting_docs")
+            ? "\u2612\uFE0E"
+            : "\u2610\uFE0E"}{" "}
+          Supporting Price Documentation, if applicable
+        </p>
+        <p>
+          {data.attachments?.includes("other")
+            ? "\u2612\uFE0E"
+            : "\u2610\uFE0E"}{" "}
+          Other documentation, if applicable
+        </p>
       </div>
     </div>
   </div>

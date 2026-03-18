@@ -237,6 +237,38 @@ export const documentConfigs: DocumentConfig[] = [
         behavior: "readonly",
         section: "Logistics & Compliance",
       },
+      {
+        id: "attachments",
+        label: "Attachments",
+        type: "checkbox-group",
+        behavior: "manual",
+        section: "Attachments",
+        options: [
+          {
+            value: "cover_letter",
+            label:
+              "Modification Cover Letter signed by Authorized Negotiator or Corporate Official",
+          },
+          {
+            value: "price_list",
+            label:
+              "Current dated commercial price list, commercial catalog, or other standard market pricing",
+          },
+          {
+            value: "product_file",
+            label:
+              "Updated Product File (PF), Services Plus File (SPF), or Price Proposal Template (PPT)",
+          },
+          {
+            value: "supporting_docs",
+            label: "Supporting Price Documentation, if applicable",
+          },
+          {
+            value: "other",
+            label: "Other documentation, if applicable",
+          },
+        ],
+      },
     ],
   },
 
@@ -398,6 +430,38 @@ export const documentConfigs: DocumentConfig[] = [
         type: "text",
         behavior: "readonly",
         section: "Logistics & Compliance",
+      },
+      {
+        id: "attachments",
+        label: "Attachments",
+        type: "checkbox-group",
+        behavior: "manual",
+        section: "Attachments",
+        options: [
+          {
+            value: "cover_letter",
+            label:
+              "Modification Cover Letter signed by Authorized Negotiator or Corporate Official",
+          },
+          {
+            value: "price_list",
+            label:
+              "Current dated commercial price list, commercial catalog, or other standard market pricing",
+          },
+          {
+            value: "product_file",
+            label:
+              "Updated Product File (PF), Services Plus File (SPF), or Price Proposal Template (PPT)",
+          },
+          {
+            value: "supporting_docs",
+            label: "Supporting Price Documentation, if applicable",
+          },
+          {
+            value: "other",
+            label: "Other documentation, if applicable",
+          },
+        ],
       },
     ],
   },
@@ -585,6 +649,38 @@ export const documentConfigs: DocumentConfig[] = [
         behavior: "readonly",
         section: "Logistics & Compliance",
       },
+      {
+        id: "attachments",
+        label: "Attachments",
+        type: "checkbox-group",
+        behavior: "manual",
+        section: "Attachments",
+        options: [
+          {
+            value: "cover_letter",
+            label:
+              "Modification Cover Letter signed by Authorized Negotiator or Corporate Official",
+          },
+          {
+            value: "price_list",
+            label:
+              "Current dated commercial price list, commercial catalog, or other standard market pricing",
+          },
+          {
+            value: "product_file",
+            label:
+              "Updated Product File (PF), Services Plus File (SPF), or Price Proposal Template (PPT)",
+          },
+          {
+            value: "supporting_docs",
+            label: "Supporting Price Documentation, if applicable",
+          },
+          {
+            value: "other",
+            label: "Other documentation, if applicable",
+          },
+        ],
+      },
     ],
   },
 
@@ -755,6 +851,38 @@ export const documentConfigs: DocumentConfig[] = [
         behavior: "readonly",
         section: "Logistics & Compliance",
       },
+      {
+        id: "attachments",
+        label: "Attachments",
+        type: "checkbox-group",
+        behavior: "manual",
+        section: "Attachments",
+        options: [
+          {
+            value: "cover_letter",
+            label:
+              "Modification Cover Letter signed by Authorized Negotiator or Corporate Official",
+          },
+          {
+            value: "price_list",
+            label:
+              "Current dated commercial price list, commercial catalog, or other standard market pricing",
+          },
+          {
+            value: "product_file",
+            label:
+              "Updated Product File (PF), Services Plus File (SPF), or Price Proposal Template (PPT)",
+          },
+          {
+            value: "supporting_docs",
+            label: "Supporting Price Documentation, if applicable",
+          },
+          {
+            value: "other",
+            label: "Other documentation, if applicable",
+          },
+        ],
+      },
     ],
   },
 
@@ -923,6 +1051,38 @@ export const documentConfigs: DocumentConfig[] = [
         type: "text",
         behavior: "readonly",
         section: "Logistics & Compliance",
+      },
+      {
+        id: "attachments",
+        label: "Attachments",
+        type: "checkbox-group",
+        behavior: "manual",
+        section: "Attachments",
+        options: [
+          {
+            value: "cover_letter",
+            label:
+              "Modification Cover Letter signed by Authorized Negotiator or Corporate Official",
+          },
+          {
+            value: "price_list",
+            label:
+              "Current dated commercial price list, commercial catalog, or other standard market pricing",
+          },
+          {
+            value: "product_file",
+            label:
+              "Updated Product File (PF), Services Plus File (SPF), or Price Proposal Template (PPT)",
+          },
+          {
+            value: "supporting_docs",
+            label: "Supporting Price Documentation, if applicable",
+          },
+          {
+            value: "other",
+            label: "Other documentation, if applicable",
+          },
+        ],
       },
     ],
   },

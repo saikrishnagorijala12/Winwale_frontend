@@ -52,7 +52,7 @@ export const validateStep2 = (
     const titleErr = v.validateRequiredMaxLength(negotiator.title, 50, "Title");
     if (titleErr) negErrors.title = titleErr;
 
-    const emailErr = v.validateOptionalEmail(negotiator.email || "", 100);
+    const emailErr = v.validateEmail(negotiator.email, 100);
     if (emailErr) negErrors.email = emailErr;
 
     const phoneErr = v.validatePhone(negotiator.phone_no || "", "Phone number");

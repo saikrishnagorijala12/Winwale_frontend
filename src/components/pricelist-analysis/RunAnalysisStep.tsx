@@ -86,7 +86,7 @@ export const RunAnalysisStep = ({
                         </div>
                         <div>
                             <p className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">
-                                Total Rows
+                                Files
                             </p>
                             <p className="text-sm font-semibold text-slate-700">
                                 {totalRows.toLocaleString()}

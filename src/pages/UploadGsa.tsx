@@ -94,7 +94,11 @@ const UploadGsa: React.FC = () => {
 
   const { isDragging, handleDragOver, handleDragLeave, handleDrop } =
     useFileDrop({
-      onFileDrop: processFile,
+      onFileDrop: (files) => {
+        if (files.length > 0) {
+          processFile(files[0]);
+        }
+      },
       onInvalidFile: (reason) => setError(reason),
     });
 
@@ -118,6 +122,7 @@ const UploadGsa: React.FC = () => {
       const rows = XLSX.utils.sheet_to_json<any[]>(sheet, {
         header: 1,
         defval: "",
+        range: { s: { r: 0, c: 0 }, e: { r: 100, c: 50 } },
       });
 
       if (rows.length === 0) {
@@ -166,8 +171,16 @@ const UploadGsa: React.FC = () => {
         return;
       }
 
-      const jsonData = XLSX.utils.sheet_to_json<PreviewRow>(sheet);
-      setPreviewData(jsonData.slice(0, 10));
+      const headers = rows[headerRowIndex] as any[];
+      const jsonData = dataRows.slice(0, 10).map((row) => {
+        const obj: PreviewRow = {};
+        headers.forEach((header, index) => {
+          const key = String(header || `Column ${index + 1}`).trim();
+          obj[key] = row[index] !== undefined ? row[index] : "";
+        });
+        return obj;
+      });
+      setPreviewData(jsonData);
     } catch (err) {
       console.error("Preview failed:", err);
       setError("Failed to process the Excel file. Please try again.");
