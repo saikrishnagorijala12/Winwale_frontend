@@ -39,7 +39,6 @@ export const HEADER_ALIASES: Record<string, string[]> = {
 
 export const REQUIRED_COLS = [
     "part_number",
-    "product_description",
     "commercial_list_price_(gv)",
 ];
 
@@ -66,7 +65,6 @@ const getAliasSet = (): Set<string> => {
 const ALIAS_SET = getAliasSet();
 
 export const findHeaderRow = (data: any[][]): number => {
-    // Check up to 30 rows for headers
     const maxRows = Math.min(30, data.length);
 
     for (let i = 0; i < maxRows; i++) {
@@ -76,7 +74,7 @@ export const findHeaderRow = (data: any[][]): number => {
         const normalizedRow = row.map((cell) => normalizeHeader(String(cell)));
         const matches = normalizedRow.filter((val) => ALIAS_SET.has(val));
 
-        if (matches.length >= 3) {
+        if (matches.length >= 2) {
             return i;
         }
     }

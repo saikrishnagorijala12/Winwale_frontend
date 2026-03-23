@@ -114,7 +114,6 @@ export default function PriceListAnalysis() {
     const selectedFiles = Array.from(target.files ?? []);
     if (selectedFiles.length === 0) return;
     await processFiles(selectedFiles);
-    // Reset input value so the same file can be selected again if removed
     target.value = '';
   };
 
@@ -131,17 +130,23 @@ export default function PriceListAnalysis() {
       const workbook = XLSX.read(data, { type: "array" });
       const sheet = workbook.Sheets[workbook.SheetNames[0]];
       const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "" }) as any[][];
-      const headerIdx = findHeaderRow(rows);
-      if (headerIdx !== -1) {
-        const previewRows = rows.slice(headerIdx, headerIdx + 11);
-        const cols = previewRows[0];
+      let headerIdx = findHeaderRow(rows);
+      const actualHeaderIdx = headerIdx === -1 ? 0 : headerIdx;
+
+      if (rows.length > actualHeaderIdx) {
+        const previewRows = rows.slice(actualHeaderIdx, actualHeaderIdx + 11);
+        const headers = (previewRows[0] || []).map((h: any, i: number) =>
+          String(h || "").trim() || `Column ${i + 1}`
+        );
+
         const jsonData = previewRows.slice(1).map((row) => {
           const obj: any = {};
-          cols.forEach((col: any, idx: number) => {
-            obj[col] = row[idx] !== undefined ? row[idx] : "";
+          headers.forEach((h: string, idx: number) => {
+            obj[h] = row[idx] !== undefined ? row[idx] : "";
           });
           return obj;
         });
+
         if (jsonData.length > 0) setPreviewData(jsonData);
       }
     } catch (err) {
@@ -165,7 +170,6 @@ export default function PriceListAnalysis() {
         return;
       }
 
-      // Deduplicate
       const uniqueFiles = excelFiles.filter(newFile =>
         !files.some(existing => existing.name === newFile.name && existing.size === newFile.size)
       );
@@ -176,7 +180,6 @@ export default function PriceListAnalysis() {
         return;
       }
 
-      // Validate headers for every file
       const validFiles: File[] = [];
       const newFileWarnings: Record<string, string> = { ...fileWarnings };
       let firstValidPreviewFile: File | null = null;
@@ -216,7 +219,6 @@ export default function PriceListAnalysis() {
             continue;
           }
 
-          // File is valid — if it was previously warned, clear it
           delete newFileWarnings[`${file.name}-${file.size}`];
 
           validFiles.push(file);
@@ -226,24 +228,22 @@ export default function PriceListAnalysis() {
         }
       }
 
-      // Add valid files to state
       if (validFiles.length > 0) {
         setFiles(prev => {
           const updatedFiles = [...prev, ...validFiles];
-          // If no preview yet, preview the first valid file from the new set
           if (previewIndex === null) {
-            const firstValidIdx = updatedFiles.findIndex(f => !newFileWarnings[`${f.name}-${f.size}`]);
-            if (firstValidIdx !== -1) {
-              setPreviewIndex(firstValidIdx);
-              generatePreview(updatedFiles[firstValidIdx]);
-            }
+            let idx = updatedFiles.findIndex(
+              (f) => !newFileWarnings[`${f.name}-${f.size}`],
+            );
+            if (idx === -1) idx = 0;
+            setPreviewIndex(idx);
+            generatePreview(updatedFiles[idx]);
           }
           return updatedFiles;
         });
         setFileWarnings(newFileWarnings);
       }
 
-      // Update grouped error message based on all current warnings
       setFileWarnings(newFileWarnings);
     } catch (err) {
       console.error("Error processing files:", err);
@@ -258,7 +258,6 @@ export default function PriceListAnalysis() {
     const newFiles = files.filter((_, i) => i !== index);
     setFiles(newFiles);
 
-    // Update warnings
     const newFileWarnings = { ...fileWarnings };
     delete newFileWarnings[`${removedFile.name}-${removedFile.size}`];
     setFileWarnings(newFileWarnings);
@@ -269,30 +268,21 @@ export default function PriceListAnalysis() {
       return;
     }
 
-    // If the previewed file was removed, or if we need a new preview
     if (previewIndex === index) {
       setPreviewData(null);
-      // Try to find the next valid file to preview
-      const nextValidIdx = newFiles.findIndex(f => !newFileWarnings[`${f.name}-${f.size}`]);
-      if (nextValidIdx !== -1) {
-        setPreviewIndex(nextValidIdx);
-        generatePreview(newFiles[nextValidIdx]);
-      } else {
-        setPreviewIndex(null);
-      }
+      let nextIdx = newFiles.findIndex(
+        (f) => !newFileWarnings[`${f.name}-${f.size}`],
+      );
+      if (nextIdx === -1) nextIdx = 0;
+      setPreviewIndex(nextIdx);
+      generatePreview(newFiles[nextIdx]);
     } else if (previewIndex !== null && previewIndex > index) {
-      // Shift index if removed file was before current preview
       setPreviewIndex(previewIndex - 1);
     }
   };
 
   const handlePreviewFile = (index: number) => {
     const file = files[index];
-    const warning = fileWarnings[`${file.name}-${file.size}`];
-    if (warning) {
-      toast.error(`Cannot preview file with errors: ${warning}`);
-      return;
-    }
     setPreviewIndex(index);
     generatePreview(file);
   };
@@ -429,14 +419,13 @@ export default function PriceListAnalysis() {
           <RunAnalysisStep
             activeClient={activeClient}
             uploadedFileName={files.length > 0 ? `${files.length} files selected` : ""}
-            totalRows={files.length} // Temporary: passing file count instead of total rows as RunAnalysisStep might expect totalRows string
+            totalRows={files.length}
             isAnalyzing={isAnalyzing}
             error={error}
             errorVariant={errorVariant}
             onBack={() => {
               setCurrentStep(2);
               setUploadResult(null);
-              // Do not clear errors here as they might still be valid for step 2
             }}
             onRunAnalysis={handleRunAnalysis}
             disableRun={(!!error && errorVariant === "error") || Object.keys(fileWarnings).length > 0}

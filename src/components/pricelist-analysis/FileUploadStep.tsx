@@ -13,7 +13,6 @@ import {
     Loader2,
 } from "lucide-react";
 
-// Add custom scrollbar style
 const scrollbarStyles = `
   .custom-scrollbar::-webkit-scrollbar {
     width: 4px;
@@ -99,50 +98,50 @@ export const FileUploadStep = ({
                         onChange={onFileChange}
                     />
 
-                {/* Top Row: Full-width Upload Zone */}
-                <div
-                    className={`border-2 border-dashed rounded-xl p-12 text-center transition-all cursor-pointer ${files.length > 0
-                        ? Object.keys(fileWarnings).length > 0
-                            ? "border-amber-400 bg-amber-50/30"
-                            : "border-emerald-500 bg-emerald-50"
-                        : isDragging
-                            ? "border-[#3399cc] bg-cyan-50/70 scale-[1.01]"
-                            : "border-slate-300 hover:border-[#3399cc] hover:bg-cyan-50/50"
-                        }`}
-                    onClick={onFileChange}
-                    onDragOver={handleDragOver}
-                    onDragLeave={handleDragLeave}
-                    onDrop={handleDrop}
-                >
-                    {files.length > 0 ? (
-                        <div className="space-y-4">
-                            <div className={`w-16 h-16 mx-auto rounded-xl flex items-center justify-center ${Object.keys(fileWarnings).length > 0 ? "bg-amber-100" : "bg-emerald-100"}`}>
-                                {Object.keys(fileWarnings).length > 0 ? (
-                                    <AlertTriangle className="w-8 h-8 text-amber-600" />
-                                ) : (
-                                    <Check className="w-8 h-8 text-emerald-600" />
-                                )}
+                    {/* Top Row: Full-width Upload Zone */}
+                    <div
+                        className={`border-2 border-dashed rounded-xl p-12 text-center transition-all cursor-pointer ${files.length > 0
+                            ? Object.keys(fileWarnings).length > 0
+                                ? "border-amber-400 bg-amber-50/30"
+                                : "border-emerald-500 bg-emerald-50"
+                            : isDragging
+                                ? "border-[#3399cc] bg-cyan-50/70 scale-[1.01]"
+                                : "border-slate-300 hover:border-[#3399cc] hover:bg-cyan-50/50"
+                            }`}
+                        onClick={onFileChange}
+                        onDragOver={handleDragOver}
+                        onDragLeave={handleDragLeave}
+                        onDrop={handleDrop}
+                    >
+                        {files.length > 0 ? (
+                            <div className="space-y-4">
+                                <div className={`w-16 h-16 mx-auto rounded-xl flex items-center justify-center ${Object.keys(fileWarnings).length > 0 ? "bg-amber-100" : "bg-emerald-100"}`}>
+                                    {Object.keys(fileWarnings).length > 0 ? (
+                                        <AlertTriangle className="w-8 h-8 text-amber-600" />
+                                    ) : (
+                                        <Check className="w-8 h-8 text-emerald-600" />
+                                    )}
+                                </div>
+                                <div>
+                                    <p className="font-medium text-slate-900">{files.length} file{files.length > 1 ? "s" : ""} selected</p>
+                                    <p className="text-sm text-slate-500">Click or drag & drop to add more files</p>
+                                </div>
                             </div>
-                            <div>
-                                <p className="font-medium text-slate-900">{files.length} file{files.length > 1 ? "s" : ""} selected</p>
-                                <p className="text-sm text-slate-500">Click or drag & drop to add more files</p>
+                        ) : (
+                            <div className="space-y-3">
+                                <div className={`w-16 h-16 bg-white rounded-2xl shadow-sm flex items-center justify-center mx-auto transition-transform ${isDragging ? "scale-110" : ""
+                                    }`}>
+                                    <Upload className={`w-8 h-8 ${isDragging ? "text-[#2b82ad]" : "text-[#3399cc]"}`} />
+                                </div>
+                                <div>
+                                    <p className="font-bold text-slate-900">
+                                        {isDragging ? "Drop your files here" : "Drag & drop or click to browse"}
+                                    </p>
+                                    <p className="text-sm text-slate-500">Excel (.xlsx or .xls) files only</p>
+                                </div>
                             </div>
-                        </div>
-                    ) : (
-                        <div className="space-y-3">
-                            <div className={`w-16 h-16 bg-white rounded-2xl shadow-sm flex items-center justify-center mx-auto transition-transform ${isDragging ? "scale-110" : ""
-                                }`}>
-                                <Upload className={`w-8 h-8 ${isDragging ? "text-[#2b82ad]" : "text-[#3399cc]"}`} />
-                            </div>
-                            <div>
-                                <p className="font-bold text-slate-900">
-                                    {isDragging ? "Drop your files here" : "Drag & drop or click to browse"}
-                                </p>
-                                <p className="text-sm text-slate-500">Excel (.xlsx or .xls) files only</p>
-                            </div>
-                        </div>
-                    )}
-                </div>
+                        )}
+                    </div>
 
                     {/* Bottom Row: Two-column grid for File List and Preview */}
                     {files.length > 0 && (
@@ -160,37 +159,54 @@ export const FileUploadStep = ({
                                         const warning = fileWarnings[`${f.name}-${f.size}`];
                                         const isActive = previewIndex === i;
                                         return (
-                                            <li key={i} className={`group relative flex justify-between items-center border p-3 rounded-xl transition-all cursor-pointer ${warning
-                                                ? "border-amber-200 bg-amber-50/40"
-                                                : isActive
-                                                    ? "border-[#3399cc] bg-white shadow-md shadow-cyan-100/50 ring-1 ring-[#3399cc]/20 z-10"
+                                            <li key={i} className={`group relative flex justify-between items-center border p-3.5 rounded-2xl transition-all cursor-pointer ${isActive
+                                                ? warning
+                                                    ? "border-amber-400 bg-amber-50/50 z-10"
+                                                    : "border-[#3399cc] bg-cyan-50/30 z-10"
+                                                : warning
+                                                    ? "border-amber-200 bg-amber-50/20 hover:border-amber-400/40"
                                                     : "border-slate-200 bg-white hover:border-[#3399cc]/40 hover:bg-cyan-50/10"
                                                 }`}
                                                 onClick={() => onPreviewFile(i)}
                                             >
-                                                <div className="flex items-center gap-3 overflow-hidden">
-                                                    <div className={`p-2 rounded-lg ${warning ? "bg-amber-100/50" : isActive ? "bg-cyan-50" : "bg-slate-50"}`}>
+                                                <div className="flex items-center gap-3.5 overflow-hidden">
+                                                    <div className={`p-2.5 rounded-xl transition-colors ${warning
+                                                        ? isActive ? "bg-amber-100" : "bg-amber-100/50"
+                                                        : isActive ? "bg-[#3399cc] text-white" : "bg-slate-50 group-hover:bg-cyan-50"
+                                                        }`}>
                                                         {warning ? (
-                                                            <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0" />
+                                                            <AlertTriangle className={`w-4 h-4 shrink-0 ${isActive ? "text-amber-700" : "text-amber-500"}`} />
                                                         ) : (
-                                                            <FileSpreadsheet className={`w-4 h-4 shrink-0 ${isActive ? "text-[#3399cc]" : "text-emerald-500"}`} />
+                                                            <FileSpreadsheet className={`w-4 h-4 shrink-0 ${isActive ? "text-white" : "text-emerald-500 group-hover:text-[#3399cc]"}`} />
                                                         )}
                                                     </div>
                                                     <div className="flex flex-col min-w-0">
-                                                        <span className={`text-xs truncate font-semibold ${isActive ? "text-slate-900" : "text-slate-600"}`}>{f.name}</span>
-                                                        {warning ? (
-                                                            <span className="text-[9px] text-amber-600 font-bold truncate mt-0.5">{warning}</span>
-                                                        ) : (
-                                                            <span className="text-[9px] text-slate-400 font-medium mt-0.5">
-                                                                {isActive ? "Currently viewing" : `${(f.size / 1024).toFixed(1)} KB`}
+                                                        <span className={`text-xs truncate font-bold ${isActive ? "text-slate-900" : "text-slate-600"}`}>
+                                                            {f.name}
+                                                        </span>
+                                                        <div className="flex items-center gap-2 mt-0.5">
+                                                            {isActive && (
+                                                                <span className={`text-[8px] px-1.5 py-0.5 rounded-full font-bold uppercase tracking-wider ${warning ? "bg-amber-100 text-amber-700" : "bg-cyan-100 text-[#3399cc]"
+                                                                    }`}>
+                                                                    Viewing
+                                                                </span>
+                                                            )}
+                                                            <span className={`text-[9px] font-bold truncate ${warning
+                                                                ? isActive ? "text-amber-700" : "text-amber-600"
+                                                                : isActive ? "text-[#3399cc]" : "text-slate-400"
+                                                                }`}>
+                                                                {warning || `${(f.size / 1024).toFixed(1)} KB`}
                                                             </span>
-                                                        )}
+                                                        </div>
                                                     </div>
                                                 </div>
                                                 <button onClick={(e) => {
                                                     e.stopPropagation();
                                                     onRemoveFile(i);
-                                                }} className="opacity-0 group-hover:opacity-100 text-slate-400 hover:text-red-500 p-1.5 transition-all">
+                                                }} className={`transition-all p-1.5 rounded-lg ${isActive
+                                                    ? "text-slate-400 hover:text-red-500 hover:bg-red-50"
+                                                    : "opacity-0 group-hover:opacity-100 text-slate-400 hover:text-red-500 hover:bg-red-50"
+                                                    }`}>
                                                     <X className="w-3.5 h-3.5" />
                                                 </button>
                                             </li>
@@ -288,21 +304,21 @@ export const FileUploadStep = ({
                     )}
 
                     {/* Bottom Row: Actions */}
-                <div className="flex justify-between items-center pt-4 mt-2">
-                    <button
-                        onClick={onBack}
-                        className="btn-secondary"
-                    >
-                        <ChevronLeft className="w-4 h-4" /> Back
-                    </button>
-                    <button
-                        onClick={onContinue}
-                        disabled={files.length === 0 || isParsingFile || !previewData || Object.keys(fileWarnings).length > 0}
-                        className="btn-primary"
-                    >
-                        Continue <ChevronRight className="w-4 h-4" />
-                    </button>
-                </div>
+                    <div className="flex justify-between items-center pt-4 mt-2">
+                        <button
+                            onClick={onBack}
+                            className="btn-secondary"
+                        >
+                            <ChevronLeft className="w-4 h-4" /> Back
+                        </button>
+                        <button
+                            onClick={onContinue}
+                            disabled={files.length === 0 || isParsingFile || !previewData || Object.keys(fileWarnings).length > 0}
+                            className="btn-primary"
+                        >
+                            Continue <ChevronRight className="w-4 h-4" />
+                        </button>
+                    </div>
                 </div>
             </div>
         </>

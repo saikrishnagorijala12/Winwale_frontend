@@ -14,7 +14,6 @@ import {
 } from "../services/analysisService";
 import { AnalysisJob } from "../types/analysis.types";
 import { AnalysisResultsViewer } from "../components/analysis/AnalysisResultsViewer";
-import StatusBadge from "../components/shared/StatusBadge";
 import { toast } from "sonner";
 import { downloadBlob } from "../utils/downloadUtils";
 import { processModifications } from "../utils/analysisUtils";
@@ -69,14 +68,6 @@ export default function AnalysisDetails() {
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
   };
-
-  // if (isFetchingJob && !job) {
-  //   return (
-  //     <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-  //       <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#24548F]"></div>
-  //     </div>
-  //   );
-  // }
 
   if (!isFetchingJob && !job) {
     return (

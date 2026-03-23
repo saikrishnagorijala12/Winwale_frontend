@@ -35,7 +35,7 @@ const formatDate = (value?: string | null) => {
 const EmptyState = () => (
   <div className="py-20 flex flex-col items-center justify-center text-center px-4">
     <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center mb-4 border border-slate-100">
-      <Inbox className="w-8 h-8 text-slate-300" />
+      <FileText className="w-8 h-8 text-slate-300" />
     </div>
     <h3 className="text-base font-bold text-slate-500">No client profiles found</h3>
   </div>

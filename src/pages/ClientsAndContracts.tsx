@@ -3,7 +3,6 @@ import { Plus } from "lucide-react";
 import { toast } from "sonner";
 import api from "../lib/axios";
 import { Client } from "../types/client.types";
-import { ClientContractRead } from "../types/contract.types";
 import {
     normalizeClientFromAPI,
 } from "../utils/clientUtils";

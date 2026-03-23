@@ -13,11 +13,8 @@ import {
   MoreVertical,
   Check,
   X,
-  Mail,
-  Phone,
   User,
-  ChevronRight,
-  ChevronLeft,
+  File,
 } from "lucide-react";
 import StatusBadge from "../components/shared/StatusBadge";
 import Pagination from "../components/shared/Pagination";
@@ -28,14 +25,12 @@ import { ClientDetailsModal } from "../components/clients/ClientDetailsModal";
 import { ClientFormModal } from "../components/clients/ClientFormModal";
 import {
   Client,
-  ClientFormData,
   ClientFormErrors,
   EditingClient,
 } from "../types/client.types";
 import { validateStep1, validateStep2 } from "../utils/clientValidations";
 import {
   normalizeClientFromAPI,
-  updateClientFromResponse,
 } from "../utils/clientUtils";
 import { normalizePhoneNumber } from "../utils/phoneUtils";
 import { useDebounce } from "../hooks/useDebounce";
@@ -757,12 +752,16 @@ const ClientActivation = () => {
                 </tr>
               ) : clients.length === 0 ? (
                 <tr>
-                  <td
-                    colSpan={6}
-                    className="px-6 py-20 text-center text-slate-400"
-                  >
-                    No clients found.
-                  </td>
+                  <td colSpan={7} className="px-6 py-20">
+                  <div className="flex flex-col items-center justify-center text-center">
+                    <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center mb-4 border border-slate-100">
+                      <File className="w-8 h-8 text-slate-300" />
+                    </div>
+                    <h3 className="text-base font-bold text-slate-500">
+                        No clients found
+                    </h3>
+                  </div>
+                </td>
                 </tr>
               ) : (
                 clients.map((client) => (

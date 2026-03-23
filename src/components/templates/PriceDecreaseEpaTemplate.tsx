@@ -45,8 +45,8 @@ export const PriceDecreaseEpaTemplate = ({ data }: { data: any }) => (
       Contract <strong>{data.contractNumber}</strong> under{" "}
       <strong>{data.totalSins}</strong> SIN(s) [
       <strong>{data.sin_price_decrease}</strong>]. This request is in accordance
-      with EPA Clause GSAM 538.270-4(a)(3). The modification consists of a price
-      decrease of{" "}
+      with GSAR 552.238-120 and the provisions under GSAM 538.270-4(a)(3). The
+      modification consists of a price decrease of{" "}
       <strong>{data.requestedDecrease || data.priceDecreasePercent}</strong> for{" "}
       <strong>{data.priceDecreased}</strong> item(s) due to{" "}
       <strong>{data.decreaseRationale}</strong>.
@@ -62,8 +62,10 @@ export const PriceDecreaseEpaTemplate = ({ data }: { data: any }) => (
 
       {data.is_tdr !== "yes" && (
         <li>
-
-          Commercial Sales Practices (CSP) information previously submitted in accordance with GSAR 552.238-81 Price Reductions remains accurate and unchanged. If CSP information has changed, an updated CSP-1 has been provided within eMod.
+          Commercial Sales Practices (CSP) information previously submitted in
+          accordance with GSAR 552.238-81 Price Reductions remains accurate and
+          unchanged. If CSP information has changed, an updated CSP-1 has been
+          provided within eMod.
         </li>
       )}
     </ul>

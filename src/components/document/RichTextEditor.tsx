@@ -138,6 +138,37 @@ export const RichTextEditor = ({
           "prose prose-slate max-w-none focus:outline-none min-h-[700px] p-16 text-slate-800 leading-normal tiptap-editor",
         style: "font-family: 'Times New Roman', serif; font-size: 11pt;",
       },
+      handleClick: (view, pos, event) => {
+        if (!editable) return false;
+
+        const { state } = view;
+        // Check at pos and pos - 2 to handle clicking on edges
+        const checkChars = (p: number) => {
+          if (p < 0 || p > state.doc.content.size - 2) return null;
+          return state.doc.textBetween(p, p + 2);
+        };
+
+        let char = checkChars(pos);
+        let targetPos = pos;
+
+        if (char !== "\u2612\uFE0E" && char !== "\u2610\uFE0E") {
+          char = checkChars(pos - 2);
+          targetPos = pos - 2;
+        }
+
+        if (char === "\u2612\uFE0E") {
+          view.dispatch(
+            state.tr.insertText("\u2610\uFE0E", targetPos, targetPos + 2),
+          );
+          return true;
+        } else if (char === "\u2610\uFE0E") {
+          view.dispatch(
+            state.tr.insertText("\u2612\uFE0E", targetPos, targetPos + 2),
+          );
+          return true;
+        }
+        return false;
+      },
     },
   });
 

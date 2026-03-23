@@ -10,7 +10,6 @@ import {
 import { validateStep1, validateStep2 } from "../utils/clientValidations";
 import {
   normalizeClientFromAPI,
-  createClientFromResponse,
   getInitialFormData,
 } from "../utils/clientUtils";
 import { normalizePhoneNumber } from "../utils/phoneUtils";
@@ -119,7 +118,6 @@ export default function ClientsPage() {
     try {
       const { logoFile, logoUrl, ...clientPayload } = newClient;
 
-      // Normalize phone numbers for company and all negotiators
       const finalPayload = {
         ...clientPayload,
         company_phone_no:
@@ -177,7 +175,6 @@ export default function ClientsPage() {
     try {
       const { logoFile, logoUrl, ...clientPayload } = editingClient;
 
-      // Normalize phone numbers for company and all negotiators
       const finalPayload = {
         ...clientPayload,
         company_phone_no:
@@ -270,7 +267,6 @@ export default function ClientsPage() {
     try {
       setLoading(true);
       const res = await api.get("/clients");
-      // The API returns { clients: [...], total_count: ..., status_counts: ... }
       const fetchedClients = Array.isArray(res.data)
         ? res.data
         : res.data.clients || [];

@@ -17,7 +17,7 @@ export const StatCard = ({
 
   useEffect(() => {
     let start = 0;
-    const duration = 800; // animation speed
+    const duration = 800;
     const increment = value / (duration / 16);
 
     const timer = setInterval(() => {

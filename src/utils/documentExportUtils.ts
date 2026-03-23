@@ -6,6 +6,7 @@ import {
   AlignmentType,
   ImageRun,
   Header,
+  CheckBox,
 } from "docx";
 import { saveAs } from "file-saver";
 
@@ -36,7 +37,6 @@ export const convertTiptapToDocx = async (
 
       const buffer = await response.arrayBuffer();
 
-      // Create a temporary image to read natural size
       const blob = new Blob([buffer]);
       const imageBitmap = await createImageBitmap(blob);
 
@@ -81,24 +81,38 @@ export const convertTiptapToDocx = async (
   const processNode = (node: any) => {
     if (node.type === "paragraph") {
       const textRuns = (node.content || [])
-        .map((child: any) => {
+        .flatMap((child: any) => {
           if (child.type === "text") {
-            return new TextRun({
-              text: child.text,
-              bold: child.marks?.some((m: any) => m.type === "bold"),
-              italics: child.marks?.some((m: any) => m.type === "italic"),
-              underline: child.marks?.some((m: any) => m.type === "underline")
-                ? {}
-                : undefined,
-              font: "Times New Roman",
-              size: 24,
-            });
+            const parts = child.text.split(/(\u2612\uFE0E|\u2610\uFE0E)/);
+            return parts
+              .map((part: string) => {
+                if (part === "\u2612\uFE0E") {
+                  return new CheckBox({ checked: true });
+                }
+                if (part === "\u2610\uFE0E") {
+                  return new CheckBox({ checked: false });
+                }
+                if (!part) return null;
+
+                return new TextRun({
+                  text: part,
+                  bold: child.marks?.some((m: any) => m.type === "bold"),
+                  italics: child.marks?.some((m: any) => m.type === "italic"),
+                  underline: child.marks?.some(
+                    (m: any) => m.type === "underline",
+                  )
+                    ? {}
+                    : undefined,
+                  font: "Times New Roman",
+                  size: 24,
+                });
+              })
+              .filter(Boolean);
           } else if (child.type === "hardBreak") {
-            return new TextRun({ break: 1 });
+            return [new TextRun({ break: 1 })];
           }
-          return null;
-        })
-        .filter(Boolean);
+          return [];
+        });
 
       children.push(
         new Paragraph({
@@ -112,28 +126,42 @@ export const convertTiptapToDocx = async (
           listItem.content?.forEach((paragraphNode: any) => {
             if (paragraphNode.type === "paragraph") {
               const textRuns = (paragraphNode.content || [])
-                .map((child: any) => {
+                .flatMap((child: any) => {
                   if (child.type === "text") {
-                    return new TextRun({
-                      text: child.text,
-                      bold: child.marks?.some((m: any) => m.type === "bold"),
-                      italics: child.marks?.some(
-                        (m: any) => m.type === "italic",
-                      ),
-                      underline: child.marks?.some(
-                        (m: any) => m.type === "underline",
-                      )
-                        ? {}
-                        : undefined,
-                      font: "Times New Roman",
-                      size: 24,
-                    });
+                    const parts = child.text.split(
+                      /(\u2612\uFE0E|\u2610\uFE0E)/,
+                    );
+                    return parts
+                      .map((part: string) => {
+                        if (part === "\u2612\uFE0E") {
+                          return new CheckBox({ checked: true });
+                        }
+                        if (part === "\u2610\uFE0E") {
+                          return new CheckBox({ checked: false });
+                        }
+                        if (!part) return null;
+
+                        return new TextRun({
+                          text: part,
+                          bold: child.marks?.some((m: any) => m.type === "bold"),
+                          italics: child.marks?.some(
+                            (m: any) => m.type === "italic",
+                          ),
+                          underline: child.marks?.some(
+                            (m: any) => m.type === "underline",
+                          )
+                            ? {}
+                            : undefined,
+                          font: "Times New Roman",
+                          size: 24,
+                        });
+                      })
+                      .filter(Boolean);
                   } else if (child.type === "hardBreak") {
-                    return new TextRun({ break: 1 });
+                    return [new TextRun({ break: 1 })];
                   }
-                  return null;
-                })
-                .filter(Boolean);
+                  return [];
+                });
 
               children.push(
                 new Paragraph({

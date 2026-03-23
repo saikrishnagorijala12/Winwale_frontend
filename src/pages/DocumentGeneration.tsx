@@ -2,7 +2,6 @@ import { useDocument } from "@/src/context/DocumentContext";
 import { DocumentTypeCard } from "../components/document/DocumentTypeSelector";
 import DocumentFormRenderer from "../components/document/DocumentFormRenderer";
 import { DocumentPreview } from "../components/document/DocumentPreview";
-import { Loader2 } from "lucide-react";
 import { documentConfigs } from "../types/documentConfigs";
 import { useSearchParams } from "react-router-dom";
 import { useEffect } from "react";

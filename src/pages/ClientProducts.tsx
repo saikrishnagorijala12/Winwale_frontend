@@ -5,7 +5,6 @@ import {
   Search,
   ChevronLeft,
   ChevronRight,
-  ArrowLeft,
   X,
   ExternalLink,
   Inbox,

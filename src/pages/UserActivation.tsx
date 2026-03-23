@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef, JSX } from "react";
 import {
   UserCheck,
   UserX,
-  Mail,
   Calendar,
   Shield,
   Search,
@@ -11,13 +10,10 @@ import {
   Clock,
   Loader2,
   Users,
-  AlertTriangle,
   MoreVertical,
   RefreshCw,
-  User,
   Phone,
-  ChevronRight,
-  ChevronLeft,
+  User2,
 } from "lucide-react";
 import StatusBadge from "../components/shared/StatusBadge";
 import Pagination from "../components/shared/Pagination";
@@ -686,12 +682,16 @@ export default function UserActivation() {
                 </tr>
               ) : users.length === 0 ? (
                 <tr>
-                  <td
-                    colSpan={6}
-                    className="px-6 py-20 text-center text-slate-400"
-                  >
-                    No users found.
-                  </td>
+                  <td colSpan={7} className="px-6 py-20">
+                  <div className="flex flex-col items-center justify-center text-center">
+                    <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center mb-4 border border-slate-100">
+                      <User2 className="w-8 h-8 text-slate-300" />
+                    </div>
+                    <h3 className="text-base font-bold text-slate-500">
+                        No users found
+                    </h3>
+                  </div>
+                </td>
                 </tr>
               ) : (
                 users.map((user) => (

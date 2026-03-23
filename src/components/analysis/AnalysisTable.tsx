@@ -9,6 +9,7 @@ import {
   Clock,
   MoreVertical,
   Eye,
+  FileSearchCorner,
 } from "lucide-react";
 import ModificationsSummary from "./ModificationsSummary";
 import AnalysisActionsMenu from "./AnalysisActionsMenu";
@@ -108,11 +109,15 @@ export default function AnalysisTable({
                 </tr>
               ) : analysisHistory.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="p-12 text-center">
-                    <FileText className="w-12 h-12 mx-auto text-slate-300 mb-4" />
-                    <p className="font-bold text-slate-500 mb-2">
-                      No analyses found
-                    </p>
+                  <td colSpan={7} className="px-6 py-20">
+                    <div className="flex flex-col items-center justify-center text-center">
+                      <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center mb-4 border border-slate-100">
+                        <FileSearchCorner className="w-8 h-8 text-slate-300" />
+                      </div>
+                      <h3 className="text-base font-bold text-slate-500">
+                        No analyses found
+                      </h3>
+                    </div>
                   </td>
                 </tr>
               ) : (
@@ -140,10 +145,11 @@ export default function AnalysisTable({
                       <td className="p-4">
                         <div className="flex items-center gap-3">
                           <div
-                            className={`shrink-0 w-9 h-9 rounded-xl border border-slate-200 flex items-center justify-center text-white font-bold text-xs shadow-sm overflow-hidden ${item.client_logo_url
-                              ? "bg-white"
-                              : "bg-linear-to-br from-[#3399cc] to-[#2980b9]"
-                              }`}
+                            className={`shrink-0 w-9 h-9 rounded-xl border border-slate-200 flex items-center justify-center text-white font-bold text-xs shadow-sm overflow-hidden ${
+                              item.client_logo_url
+                                ? "bg-white"
+                                : "bg-linear-to-br from-[#3399cc] to-[#2980b9]"
+                            }`}
                           >
                             {item.client_logo_url ? (
                               <img
@@ -323,10 +329,11 @@ export default function AnalysisTable({
                   {/* Client Info */}
                   <div className="flex items-center gap-3 mb-3">
                     <div
-                      className={`shrink-0 w-10 h-10 rounded-xl border border-slate-200 flex items-center justify-center text-white font-bold text-sm shadow-sm overflow-hidden ${item.client_logo_url
-                        ? "bg-white"
-                        : "bg-linear-to-br from-[#3399cc] to-[#2980b9]"
-                        }`}
+                      className={`shrink-0 w-10 h-10 rounded-xl border border-slate-200 flex items-center justify-center text-white font-bold text-sm shadow-sm overflow-hidden ${
+                        item.client_logo_url
+                          ? "bg-white"
+                          : "bg-linear-to-br from-[#3399cc] to-[#2980b9]"
+                      }`}
                     >
                       {item.client_logo_url ? (
                         <img

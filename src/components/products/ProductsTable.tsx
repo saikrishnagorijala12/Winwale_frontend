@@ -1,5 +1,5 @@
 import React from "react";
-import { Loader2, Inbox } from "lucide-react";
+import { Loader2, Inbox, Package } from "lucide-react";
 import { Product, Client } from "../../types/product.types";
 import ProductTableRow from "./ProductTableRow";
 import Pagination from "../shared/Pagination";
@@ -83,7 +83,7 @@ export default function ProductsTable({
                 <td colSpan={7} className="px-6 py-20">
                   <div className="flex flex-col items-center justify-center text-center">
                     <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center mb-4 border border-slate-100">
-                      <Inbox className="w-8 h-8 text-slate-300" />
+                      <Package className="w-8 h-8 text-slate-300" />
                     </div>
                     <h3 className="text-base font-bold text-slate-500">
                       {selectedClient

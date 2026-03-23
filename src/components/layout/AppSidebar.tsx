@@ -52,18 +52,6 @@ export const navSections = [
   {
     label: "Workspace",
     items: [
-      // {
-      //   to: "/clients",
-      //   icon: Building2,
-      //   label: "Clients",
-      //   roles: [ROLES.ADMIN, ROLES.USER],
-      // },
-      // {
-      //   to: "/contracts",
-      //   icon: FileText,
-      //   label: "Contracts",
-      //   roles: [ROLES.ADMIN, ROLES.USER],
-      // },
       {
         to: "/client-profiles",
         icon: FileText,
