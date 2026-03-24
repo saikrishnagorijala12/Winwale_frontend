@@ -1,6 +1,8 @@
 import React from "react";
 import { Product } from "../../types/product.types";
 import { formatCurrency } from "../../utils/productUtils";
+import { Tooltip } from "../shared/Tooltip";
+
 
 interface ProductTableRowProps {
   product: Product;
@@ -17,14 +19,20 @@ export default function ProductTableRow({
       onClick={onClick}
     >
       <td className="px-6 py-4">
-        <div className="text-sm font-bold text-slate-800 group-hover:text-[#3399cc] transition-colors">
-          {product.item_name}
+        <div className="flex flex-col items-start">
+          <Tooltip content={product.item_name} position="top">
+            <div className="text-sm font-bold text-slate-800 group-hover:text-[#3399cc] transition-colors truncate max-w-[200px]">
+              {product.item_name}
+            </div>
+          </Tooltip>
+          {product.item_description && (
+            <Tooltip content={product.item_description} position="top">
+              <div className="text-xs text-slate-500 mt-1 truncate max-w-62.5 font-medium">
+                {product.item_description}
+              </div>
+            </Tooltip>
+          )}
         </div>
-        {product.item_description && (
-          <div className="text-xs text-slate-500 mt-1 truncate max-w-62.5 font-medium">
-            {product.item_description}
-          </div>
-        )}
       </td>
       <td className="px-6 py-4">
         <span
@@ -33,11 +41,15 @@ export default function ProductTableRow({
           {product.item_type === "A" ? "Accessory" : "Base"}
         </span>
       </td>
-      <td className="px-6 py-4 text-sm text-slate-600 font-semibold">
-        {product.client_name}
+      <td className="px-6 py-4 text-sm text-slate-600 font-semibold truncate max-w-[150px]">
+        <Tooltip content={product.client_name} position="top">
+          {product.client_name}
+        </Tooltip>
       </td>
-      <td className="px-6 py-4 text-sm text-slate-600">
-        {product.manufacturer}
+      <td className="px-6 py-4 text-sm text-slate-600 truncate max-w-[150px]">
+        <Tooltip content={product.manufacturer || ""} disabled={!product.manufacturer} position="top">
+          {product.manufacturer || "—"}
+        </Tooltip>
       </td>
       <td className="px-6 py-4 text-sm font-mono text-slate-600 font-medium">
         {product.manufacturer_part_number}

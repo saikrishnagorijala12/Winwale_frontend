@@ -23,6 +23,7 @@ import { toast } from "sonner";
 import ConfirmationModal from "../components/shared/ConfirmationModal";
 import { formatPhoneNumber } from "../utils/phoneUtils";
 import { useDebounce } from "../hooks/useDebounce";
+import { Tooltip } from "../components/shared/Tooltip";
 
 const ROLE_MAP: Record<Role, string> = {
   admin: "Administrator",
@@ -77,6 +78,7 @@ const ActionDropdown: React.FC<ActionDropdownProps> = ({
           setIsOpen(!isOpen);
         }}
         className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
+        aria-label="Toggle user actions dropdown"
       >
         <MoreVertical className="w-5 h-5 text-slate-600" />
       </button>
@@ -179,11 +181,15 @@ const UserCard: React.FC<UserCardProps> = ({
           <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center text-blue-500 font-bold text-sm uppercase shrink-0">
             {user.name.charAt(0)}
           </div>
-          <div className="flex-1 min-w-0">
-            <h3 className="font-bold text-slate-800 text-base truncate">
-              {user.name}
-            </h3>
-            <p className="text-xs text-slate-400 truncate">{user.email}</p>
+          <div className="flex-1 min-w-0 flex flex-col items-start">
+            <Tooltip content={user.name} position="top">
+              <h3 className="font-bold text-slate-800 text-base truncate">
+                {user.name}
+              </h3>
+            </Tooltip>
+            <Tooltip content={user.email} position="top">
+              <p className="text-xs text-slate-400 truncate">{user.email}</p>
+            </Tooltip>
           </div>
         </div>
         <div onClick={(e) => e.stopPropagation()}>
@@ -426,6 +432,22 @@ export default function UserActivation() {
     }
   };
 
+  const getEmptyStateTitle = () => {
+    switch (activeTab) {
+      case "pending":
+        return "No pending requests";
+      case "approved":
+        return "No approved users";
+      case "rejected":
+        return "No rejected users";
+      case "all":
+      default:
+        return "No users found";
+    }
+  };
+
+  const title = getEmptyStateTitle();
+
   return (
     <div className="min-h-screen bg-linear-to-br from-slate-50 via-blue-50/30 to-slate-100 p-4 sm:p-6 lg:p-10 space-y-6 sm:space-y-8 lg:space-y-10">
       <ConfirmationModal
@@ -616,6 +638,7 @@ export default function UserActivation() {
               className="w-full pl-11 pr-4 py-3 bg-white border border-slate-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
+              aria-label="Search users by name or email"
             />
           </div>
         </div>
@@ -629,8 +652,11 @@ export default function UserActivation() {
               </p>
             </div>
           ) : users.length === 0 ? (
-            <div className="py-16 text-center text-slate-400 text-sm">
-              No users found.
+            <div className="py-16 flex flex-col items-center justify-center text-center">
+              <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center mb-4 border border-slate-100">
+                <User2 className="w-8 h-8 text-slate-300" />
+              </div>
+              <h3 className="text-base font-bold text-slate-500">{title}</h3>
             </div>
           ) : (
             users.map((user) => (
@@ -676,22 +702,24 @@ export default function UserActivation() {
                   <td colSpan={6} className="px-6 py-20 text-center">
                     <div className="flex flex-col items-center justify-center gap-3">
                       <Loader2 className="w-8 h-8 animate-spin text-[#24578f]" />
-                      <p className="text-slate-400 text-sm">Loading users...</p>
+                      <p className="text-sm text-slate-500 font-medium">
+                        Loading users...
+                      </p>
                     </div>
                   </td>
                 </tr>
               ) : users.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="px-6 py-20">
-                  <div className="flex flex-col items-center justify-center text-center">
-                    <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center mb-4 border border-slate-100">
-                      <User2 className="w-8 h-8 text-slate-300" />
+                    <div className="flex flex-col items-center justify-center text-center">
+                      <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center mb-4 border border-slate-100">
+                        <User2 className="w-8 h-8 text-slate-300" />
+                      </div>
+                      <h3 className="text-base font-bold text-slate-500">
+                        {title}
+                      </h3>
                     </div>
-                    <h3 className="text-base font-bold text-slate-500">
-                        No users found
-                    </h3>
-                  </div>
-                </td>
+                  </td>
                 </tr>
               ) : (
                 users.map((user) => (
@@ -704,13 +732,17 @@ export default function UserActivation() {
                         <div className="w-10 h-10 bg-blue-50 rounded-full flex items-center justify-center text-blue-500 font-bold text-xs uppercase">
                           {user.name.charAt(0)}
                         </div>
-                        <div>
-                          <p className="font-bold text-sm text-slate-800">
-                            {user.name}
-                          </p>
-                          <p className="text-xs text-slate-400 flex items-center gap-1">
-                            {user.email}
-                          </p>
+                        <div className="flex flex-col items-start">
+                          <Tooltip content={user.name} position="top">
+                            <p className="font-bold text-sm text-slate-800 truncate max-w-37.5">
+                              {user.name}
+                            </p>
+                          </Tooltip>
+                          <Tooltip content={user.email} position="top">
+                            <p className="text-xs text-slate-400 flex items-center gap-1 truncate max-w-37.5">
+                              {user.email}
+                            </p>
+                          </Tooltip>
                         </div>
                       </div>
                     </td>
@@ -730,7 +762,7 @@ export default function UserActivation() {
                           {formatPhoneNumber(user.phone_no)}
                         </p>
                       ) : (
-                        <span className="text-sm text-slate-400 font-medium italic">
+                        <span className="text-[10px] italic font-medium text-gray-400 uppercase">
                           Not provided
                         </span>
                       )}

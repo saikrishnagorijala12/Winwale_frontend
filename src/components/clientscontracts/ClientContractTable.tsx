@@ -3,6 +3,8 @@ import { Loader2, MoreVertical, Inbox, Calendar, FileText } from "lucide-react";
 import { ClientActionsMenu } from "./ActionsMenu";
 import StatusBadge from "../shared/StatusBadge";
 import Pagination from "../shared/Pagination";
+import { Tooltip } from "../shared/Tooltip";
+
 import { Client } from "../../types/client.types";
 import { ClientContractRead } from "../../types/contract.types";
 
@@ -135,13 +137,17 @@ export const ClientContractTable: React.FC<ClientContractTableProps> = ({
                           )}
                         </div>
 
-                        <div className="min-w-0">
-                          <p className="font-semibold text-slate-900 uppercase group-hover:text-[#38A1DB] transition-colors truncate max-w-40">
-                            {client.name}
-                          </p>
-                          <p className="text-xs text-slate-400 truncate max-w-40">
-                            {client.email}
-                          </p>
+                        <div className="min-w-0 flex flex-col items-start">
+                          <Tooltip content={client.name} position="top">
+                            <p className="font-semibold text-slate-900 uppercase group-hover:text-[#38A1DB] transition-colors truncate max-w-40">
+                              {client.name}
+                            </p>
+                          </Tooltip>
+                          <Tooltip content={client.email || ""} disabled={!client.email} position="top">
+                            <p className="text-xs text-slate-400 truncate max-w-40">
+                              {client.email}
+                            </p>
+                          </Tooltip>
                         </div>
                       </div>
                     </td>
@@ -150,7 +156,7 @@ export const ClientContractTable: React.FC<ClientContractTableProps> = ({
                       {contract ? (
                         <div className="flex items-center gap-2">
                           <FileText className="w-4 h-4 text-blue-400 shrink-0" />
-                          <span className="text-sm font-semibold text-slate-800 truncate max-w-30">
+                          <span className="text-sm font-semibold text-slate-800 truncate max-w-30 block">
                             {contract.contract_number}
                           </span>
                         </div>
@@ -171,27 +177,33 @@ export const ClientContractTable: React.FC<ClientContractTableProps> = ({
                           Not Assigned
                         </span>
                       ) : (
-                        <div className="flex flex-col max-w-37.5">
-                          <span className="text-sm font-semibold text-slate-900 truncate">
-                            {client.negotiators[0].name}
-                            {client.negotiators.length > 1 && (
-                              <span className="ml-1.5 inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-[#38A1DB] border border-blue-100">
-                                +{client.negotiators.length - 1}
-                              </span>
-                            )}
-                          </span>
-                          <span className="text-xs text-slate-500 truncate">
-                            {client.negotiators[0].email}
-                          </span>
+                        <div className="flex flex-col max-w-37.5 items-start">
+                          <Tooltip content={client.negotiators[0].name} position="top">
+                            <span className="text-sm font-semibold text-slate-900 truncate block">
+                              {client.negotiators[0].name}
+                              {client.negotiators.length > 1 && (
+                                <span className="ml-1.5 inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-[#38A1DB] border border-blue-100">
+                                  +{client.negotiators.length - 1}
+                                </span>
+                              )}
+                            </span>
+                          </Tooltip>
+                          <Tooltip content={client.negotiators[0].email || ""} disabled={!client.negotiators[0].email} position="top">
+                            <span className="text-xs text-slate-500 truncate block">
+                              {client.negotiators[0].email}
+                            </span>
+                          </Tooltip>
                         </div>
                       )}
                     </td>
 
                     <td className="px-6 py-4">
                       {contract ? (
-                        <span className="text-sm font-medium text-slate-700">
-                          {contract.contract_officer_name || "—"}
-                        </span>
+                        <Tooltip content={contract.contract_officer_name || ""} disabled={!contract.contract_officer_name} position="top">
+                          <span className="text-sm font-medium text-slate-700 truncate block max-w-[150px]">
+                            {contract.contract_officer_name || "—"}
+                          </span>
+                        </Tooltip>
                       ) : (
                         <span className="text-slate-300">—</span>
                       )}

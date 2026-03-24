@@ -20,6 +20,7 @@ import api from "@/src/lib/axios";
 import StatusBadge from "../../components/shared/StatusBadge";
 import { fetchAnalysisJobs } from "../../services/analysisService";
 import { AnalysisJobResponse } from "../../types/analysis.types";
+import { Tooltip } from "../../components/shared/Tooltip";
 
 const Skeleton = ({ className }) => (
   <div className={`animate-pulse bg-slate-200 rounded-md ${className}`} />
@@ -283,19 +284,23 @@ export default function UnifiedAdminDashboard() {
                         style={{ color: colors.primary }}
                       />
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <h4
-                        className="font-bold truncate"
-                        style={{ color: colors.fg }}
-                      >
-                        {item.client}
-                      </h4>
-                      <p
-                        className="text-xs font-bold"
-                        style={{ color: colors.muted }}
-                      >
-                        {item.contract}
-                      </p>
+                    <div className="flex-1 min-w-0 flex flex-col items-start">
+                      <Tooltip content={item.client} position="top">
+                        <h4
+                          className="font-bold truncate"
+                          style={{ color: colors.fg }}
+                        >
+                          {item.client}
+                        </h4>
+                      </Tooltip>
+                      <Tooltip content={item.contract} position="top">
+                        <p
+                          className="text-xs font-bold truncate"
+                          style={{ color: colors.muted }}
+                        >
+                          {item.contract}
+                        </p>
+                      </Tooltip>
                     </div>
                     <div className="hidden sm:flex items-center gap-6 px-4">
                       <div className="text-center">
@@ -512,6 +517,7 @@ export default function UnifiedAdminDashboard() {
                       <button
                         onClick={() => navigate("/user-activation")}
                         className="p-1.5 hover:bg-blue-50 rounded-lg transition-colors text-[#24548f]"
+                        aria-label={`View details for ${item.name}`}
                       >
                         <ChevronRight className="w-4 h-4" />
                       </button>
@@ -551,6 +557,7 @@ export default function UnifiedAdminDashboard() {
                       <button
                         onClick={() => navigate("/client-activation")}
                         className="p-1.5 hover:bg-emerald-50 rounded-lg transition-colors text-emerald-600"
+                        aria-label={`View details for ${item.company_name}`}
                       >
                         <ChevronRight className="w-4 h-4" />
                       </button>

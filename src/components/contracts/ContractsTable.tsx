@@ -11,6 +11,8 @@ import {
 } from "lucide-react";
 import { ClientContractRead } from "../../types/contract.types";
 import Pagination from "../shared/Pagination";
+import { Tooltip } from "../shared/Tooltip";
+
 
 interface ContractTableProps {
   contracts: ClientContractRead[];
@@ -97,37 +99,45 @@ export default function ContractTable({
                   className="group hover:bg-blue-50/30 cursor-pointer transition-all duration-200"
                 >
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="font-bold text-slate-800 text-sm group-hover:text-[#38A1DB] transition-colors">
-                      {contract.contract_number}
-                    </span>
+                    <Tooltip content={contract.contract_number} position="top">
+                      <span className="font-bold text-slate-800 text-sm group-hover:text-[#38A1DB] transition-colors truncate block max-w-[150px]">
+                        {contract.contract_number}
+                      </span>
+                    </Tooltip>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center gap-4">
                       <div className="w-10 h-10 shrink-0 rounded-xl bg-linear-to-br from-[#38A1DB] to-[#2D8BBF] flex items-center justify-center text-white text-xs font-bold shadow-sm">
                         {contract.client.slice(0, 2).toLocaleUpperCase()}
                       </div>
-                      <div className="flex flex-col">
-                        <span className="font-bold text-slate-800 text-sm transition-colors">
-                          {contract.client}
-                        </span>
+                      <div className="flex flex-col items-start">
+                        <Tooltip content={contract.client} position="top">
+                          <span className="font-bold text-slate-800 text-sm transition-colors truncate block max-w-[150px]">
+                            {contract.client}
+                          </span>
+                        </Tooltip>
                       </div>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-slate-600 font-medium">
-                      {contract.contract_officer_name || (
-                        <span className="text-slate-300">—</span>
-                      )}
-                    </div>
+                    <Tooltip content={contract.contract_officer_name || ""} disabled={!contract.contract_officer_name} position="top">
+                      <div className="text-sm text-slate-600 font-medium truncate max-w-[150px]">
+                        {contract.contract_officer_name || (
+                          <span className="text-slate-300">—</span>
+                        )}
+                      </div>
+                    </Tooltip>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center gap-1.5 text-slate-500">
                       <MapPin className="w-3.5 h-3.5 text-slate-400" />
-                      <span className="text-sm truncate max-w-37.5">
-                        {contract.contract_officer_city
-                          ? `${contract.contract_officer_city}, ${contract.contract_officer_state}`
-                          : "Not set"}
-                      </span>
+                      <Tooltip content={contract.contract_officer_city ? `${contract.contract_officer_city}, ${contract.contract_officer_state}` : ""} disabled={!contract.contract_officer_city} position="top">
+                        <span className="text-sm truncate max-w-37.5">
+                          {contract.contract_officer_city
+                            ? `${contract.contract_officer_city}, ${contract.contract_officer_state}`
+                            : "Not set"}
+                        </span>
+                      </Tooltip>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">

@@ -18,21 +18,31 @@ export const validateStep1 = (
   const emailErr = v.validateEmail(clientData.company_email);
   if (emailErr) newErrors.company_email = emailErr;
 
-  const phoneErr = v.validatePhone(clientData.company_phone_no, "Company Phone");
+  const phoneErr = v.validatePhone(
+    clientData.company_phone_no,
+    "Company Phone",
+  );
   if (phoneErr) newErrors.company_phone_no = phoneErr;
 
-  const addrErr = v.validateRequired(clientData.company_address, "Company Address") || v.validateMaxLength(clientData.company_address, 50, "Address");
+  const addrErr =
+    v.validateRequired(clientData.company_address, "Company Address") ||
+    v.validateMaxLength(clientData.company_address, 50, "Address");
   if (addrErr) newErrors.company_address = addrErr;
 
-  const cityErr = v.validateRequired(clientData.company_city, "City") || v.validateMaxLength(clientData.company_city, 50, "City");
+  const cityErr =
+    v.validateRequired(clientData.company_city, "City") ||
+    v.validateMaxLength(clientData.company_city, 50, "City");
   if (cityErr) newErrors.company_city = cityErr;
 
-  const stateErr = v.validateRequired(clientData.company_state, "State") || v.validateMaxLength(clientData.company_state, 50, "State");
+  const stateErr =
+    v.validateRequired(clientData.company_state, "State") ||
+    v.validateMaxLength(clientData.company_state, 50, "State");
   if (stateErr) newErrors.company_state = stateErr;
 
   const zipRequired = v.validateRequired(clientData.company_zip, "ZIP");
   const zipFormat = v.validateZip(clientData.company_zip);
-  if (zipRequired || zipFormat) newErrors.company_zip = zipRequired || zipFormat || "";
+  if (zipRequired || zipFormat)
+    newErrors.company_zip = zipRequired || zipFormat || "";
 
   setErrors(newErrors);
   return Object.keys(newErrors).length === 0;
@@ -58,7 +68,11 @@ export const validateStep2 = (
     const phoneErr = v.validatePhone(negotiator.phone_no || "", "Phone number");
     if (phoneErr) negErrors.phone_no = phoneErr;
 
-    const addrLen = v.validateMaxLength(negotiator.address || "", 100, "Address");
+    const addrLen = v.validateMaxLength(
+      negotiator.address || "",
+      100,
+      "Address",
+    );
     if (addrLen) negErrors.address = addrLen;
 
     const cityLen = v.validateMaxLength(negotiator.city || "", 50, "City");

@@ -2,6 +2,8 @@ import React from "react";
 import { X, ExternalLink, ChevronRight, Check } from "lucide-react";
 import { Product } from "../../types/product.types";
 import { formatCurrency } from "../../utils/productUtils";
+import { Tooltip } from "../shared/Tooltip";
+
 
 interface ProductDrawerProps {
   product: Product;
@@ -36,16 +38,19 @@ export default function ProductDrawer({
             <h2 className="text-xl font-bold text-slate-900 leading-tight">
               {product.item_name}
             </h2>
-            <p className="text-xs text-slate-500 mt-1 font-medium italic">
-              {product.item_description}
-            </p>
+            <Tooltip content={product.item_description || ""} disabled={!product.item_description} position="top">
+              <p className="text-xs text-slate-500 mt-1 font-medium italic truncate max-w-[300px]">
+                {product.item_description}
+              </p>
+            </Tooltip>
           </div>
-          <button
-            onClick={onClose}
-            className="p-2 hover:bg-slate-100 rounded-full transition-colors text-slate-400 hover:text-slate-900"
-          >
-            <X size={24} />
-          </button>
+            <button
+              onClick={onClose}
+              className="p-2 hover:bg-slate-100 rounded-full transition-colors text-slate-400 hover:text-slate-900"
+              aria-label="Close Product Drawer"
+            >
+              <X size={24} />
+            </button>
         </div>
 
         <div className="flex-1 overflow-y-auto p-8 space-y-10 scrollbar-thin">

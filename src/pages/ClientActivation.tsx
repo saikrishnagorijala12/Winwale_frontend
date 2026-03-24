@@ -23,17 +23,12 @@ import api from "../lib/axios";
 import ConfirmationModal from "../components/shared/ConfirmationModal";
 import { ClientDetailsModal } from "../components/clients/ClientDetailsModal";
 import { ClientFormModal } from "../components/clients/ClientFormModal";
-import {
-  Client,
-  ClientFormErrors,
-  EditingClient,
-} from "../types/client.types";
+import { Client, ClientFormErrors, EditingClient } from "../types/client.types";
 import { validateStep1, validateStep2 } from "../utils/clientValidations";
-import {
-  normalizeClientFromAPI,
-} from "../utils/clientUtils";
+import { normalizeClientFromAPI } from "../utils/clientUtils";
 import { normalizePhoneNumber } from "../utils/phoneUtils";
 import { useDebounce } from "../hooks/useDebounce";
+import { Tooltip } from "../components/shared/Tooltip";
 
 type TabType = "all" | "pending" | "approved" | "rejected";
 
@@ -85,6 +80,7 @@ const ActionDropdown: React.FC<ActionDropdownProps> = ({
           setIsOpen(!isOpen);
         }}
         className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
+        aria-label="Toggle client actions dropdown"
       >
         <MoreVertical className="w-5 h-5 text-slate-600" />
       </button>
@@ -213,13 +209,17 @@ const ClientCard: React.FC<ClientCardProps> = ({
               client.company_name.substring(0, 2).toUpperCase()
             )}
           </div>
-          <div className="flex-1 min-w-0">
-            <h3 className="font-bold text-slate-800 text-base truncate">
-              {client.company_name}
-            </h3>
-            <p className="text-xs text-slate-400 truncate">
-              {client.company_email}
-            </p>
+          <div className="flex-1 min-w-0 flex flex-col items-start">
+            <Tooltip content={client.company_name} position="top">
+              <h3 className="font-bold text-slate-800 text-base truncate">
+                {client.company_name}
+              </h3>
+            </Tooltip>
+            <Tooltip content={client.company_email} position="top">
+              <p className="text-xs text-slate-400 truncate">
+                {client.company_email}
+              </p>
+            </Tooltip>
           </div>
         </div>
         <div onClick={(e) => e.stopPropagation()}>
@@ -506,6 +506,21 @@ const ClientActivation = () => {
     }
   };
 
+  const getEmptyStateTitle = () => {
+    switch (activeTab) {
+      case "pending":
+        return "No pending client requests";
+      case "approved":
+        return "No approved clients";
+      case "rejected":
+        return "No rejected clients";
+      case "all":
+      default:
+        return "No clients found";
+    }
+  };
+  const title = getEmptyStateTitle();
+
   return (
     <div className="min-h-screen bg-linear-to-br from-slate-50 via-blue-50/30 to-slate-100 p-4 sm:p-6 lg:p-10 space-y-6 sm:space-y-8 lg:space-y-10">
       <ConfirmationModal
@@ -684,6 +699,7 @@ const ClientActivation = () => {
               className="w-full pl-11 pr-4 py-3 bg-white border border-slate-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20  transition-all"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
+              aria-label="Search clients by company or contact"
             />
           </div>
         </div>
@@ -697,8 +713,11 @@ const ClientActivation = () => {
               </p>
             </div>
           ) : clients.length === 0 ? (
-            <div className="py-16 text-center text-slate-400 text-sm">
-              No clients found.
+            <div className="py-16 flex flex-col items-center justify-center text-center">
+              <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center mb-4 border border-slate-100">
+                <File className="w-8 h-8 text-slate-300" />
+              </div>
+              <h3 className="text-base font-bold text-slate-500">{title}</h3>
             </div>
           ) : (
             clients.map((client) => (
@@ -744,7 +763,7 @@ const ClientActivation = () => {
                   <td colSpan={6} className="px-6 py-20 text-center">
                     <div className="flex flex-col items-center justify-center gap-3">
                       <Loader2 className="w-8 h-8 animate-spin text-[#24578f]" />
-                      <p className="text-slate-400 text-sm">
+                      <p className="text-sm text-slate-500 font-medium">
                         Loading clients...
                       </p>
                     </div>
@@ -753,15 +772,15 @@ const ClientActivation = () => {
               ) : clients.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="px-6 py-20">
-                  <div className="flex flex-col items-center justify-center text-center">
-                    <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center mb-4 border border-slate-100">
-                      <File className="w-8 h-8 text-slate-300" />
+                    <div className="flex flex-col items-center justify-center text-center">
+                      <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center mb-4 border border-slate-100">
+                        <File className="w-8 h-8 text-slate-300" />
+                      </div>
+                      <h3 className="text-base font-bold text-slate-500">
+                        {title}
+                      </h3>
                     </div>
-                    <h3 className="text-base font-bold text-slate-500">
-                        No clients found
-                    </h3>
-                  </div>
-                </td>
+                  </td>
                 </tr>
               ) : (
                 clients.map((client) => (
@@ -789,18 +808,23 @@ const ClientActivation = () => {
                             client.company_name.substring(0, 2).toUpperCase()
                           )}
                         </div>
-                        <div>
-                          <p className="font-bold text-sm text-slate-800">
-                            {client.company_name}
-                          </p>
-                          <p className="text-xs text-slate-400">
-                            {client.company_email}
-                          </p>
+                        <div className="flex flex-col items-start">
+                          <Tooltip content={client.company_name} position="top">
+                            <p className="font-bold text-sm text-slate-800 truncate max-w-50">
+                              {client.company_name}
+                            </p>
+                          </Tooltip>
+                          <Tooltip content={client.company_email} position="top">
+                            <p className="text-xs text-slate-400 flex items-center gap-1 truncate max-w-50">
+                              {client.company_email}
+                            </p>
+                          </Tooltip>
                         </div>
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      {(!client.negotiators || client.negotiators.length === 0) ? (
+                      {!client.negotiators ||
+                      client.negotiators.length === 0 ? (
                         <span className="text-[10px] italic font-medium text-gray-400 uppercase">
                           Not Assigned
                         </span>

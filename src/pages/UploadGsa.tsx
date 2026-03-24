@@ -393,8 +393,10 @@ const UploadGsa: React.FC = () => {
                       onClick={() => {
                         setFile(null);
                         setPreviewData(null);
+                        setError(null);
                       }}
                       className="p-2 hover:bg-white rounded-full text-slate-400 hover:text-red-500 transition-all"
+                      aria-label="Remove selected file"
                     >
                       <X size={20} />
                     </button>

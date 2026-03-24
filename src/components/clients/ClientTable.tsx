@@ -11,6 +11,8 @@ import { Client } from "../../types/client.types";
 import { ClientActionsMenu } from "./ClientActionsMenu";
 import StatusBadge from "../shared/StatusBadge";
 import Pagination from "../shared/Pagination";
+import { Tooltip } from "../shared/Tooltip";
+
 
 interface ClientTableProps {
   clients: Client[];
@@ -127,9 +129,13 @@ export const ClientTable: React.FC<ClientTableProps> = ({
                           client.name.substring(0, 2).toUpperCase()
                         )}
                       </div>
-                      <span className="font-semibold text-slate-900 group-hover:text-[#38A1DB] transition-colors  max-w-50">
-                        {client.name}
-                      </span>
+                      <div className="flex flex-col items-start min-w-0">
+                        <Tooltip content={client.name} position="top">
+                          <span className="font-semibold text-slate-900 group-hover:text-[#38A1DB] transition-colors truncate max-w-50 block">
+                            {client.name}
+                          </span>
+                        </Tooltip>
+                      </div>
                     </div>
                   </td>
                   <td className="px-4 py-4"><StatusBadge status={client.status} /></td>
@@ -139,18 +145,22 @@ export const ClientTable: React.FC<ClientTableProps> = ({
                         Not Assigned
                       </span>
                     ) : (
-                      <div className="flex flex-col">
-                        <span className="text-sm font-semibold text-slate-900 truncate">
-                          {client.negotiators[0].name}
-                          {client.negotiators.length > 1 && (
-                            <span className="ml-1.5 inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-[#38A1DB] border border-blue-100">
-                              +{client.negotiators.length - 1}
-                            </span>
-                          )}
-                        </span>
-                        <span className="hidden lg:block text-xs text-slate-500 truncate">
-                          {client.negotiators[0].title}
-                        </span>
+                      <div className="flex flex-col items-start">
+                        <Tooltip content={client.negotiators[0].name} position="top">
+                          <span className="text-sm font-semibold text-slate-900 truncate block max-w-[150px]">
+                            {client.negotiators[0].name}
+                            {client.negotiators.length > 1 && (
+                              <span className="ml-1.5 inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-[#38A1DB] border border-blue-100">
+                                +{client.negotiators.length - 1}
+                              </span>
+                            )}
+                          </span>
+                        </Tooltip>
+                        <Tooltip content={client.negotiators[0].title || ""} disabled={!client.negotiators[0].title} position="top">
+                          <span className="hidden lg:block text-xs text-slate-500 truncate max-w-[150px]">
+                            {client.negotiators[0].title}
+                          </span>
+                        </Tooltip>
                       </div>
                     )}
                   </td>
@@ -160,7 +170,9 @@ export const ClientTable: React.FC<ClientTableProps> = ({
                     </span>
                   </td>
                   <td className="hidden lg:table-cell px-6 py-4 text-sm font-medium text-slate-600 truncate max-w-45">
-                    {client.email}
+                    <Tooltip content={client.email || ""} disabled={!client.email} position="top">
+                      {client.email}
+                    </Tooltip>
                   </td>
                   <td className="hidden xl:table-cell px-6 py-4 text-sm text-slate-500">
                     <div className="flex items-center gap-1.5 text-slate-500">

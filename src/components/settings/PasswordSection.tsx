@@ -117,7 +117,7 @@ export const PasswordSection = ({
             <h3 className="text-xl font-bold text-slate-900">
               Update Password
             </h3>
-            <button onClick={resetForm}>
+            <button onClick={resetForm} aria-label="Close form">
               <X className="w-5 h-5 text-slate-400" />
             </button>
           </div>
@@ -140,6 +140,7 @@ export const PasswordSection = ({
                 type="button"
                 onClick={() => setShowCurrent((v) => !v)}
                 className="absolute inset-y-0 right-3 flex items-center text-slate-400"
+                aria-label={showCurrent ? "Hide password" : "Show password"}
               >
                 {showCurrent ? <EyeOff size={16} /> : <Eye size={16} />}
               </button>
@@ -169,6 +170,7 @@ export const PasswordSection = ({
                 type="button"
                 onClick={() => setShowNew((v) => !v)}
                 className="absolute inset-y-0 right-3 flex items-center text-slate-400"
+                aria-label={showNew ? "Hide password" : "Show password"}
               >
                 {showNew ? <EyeOff size={16} /> : <Eye size={16} />}
               </button>
@@ -227,6 +229,7 @@ export const PasswordSection = ({
                 type="button"
                 onClick={() => setShowConfirm((v) => !v)}
                 className="absolute inset-y-0 right-3 flex items-center text-slate-400"
+                aria-label={showConfirm ? "Hide password" : "Show password"}
               >
                 {showConfirm ? <EyeOff size={16} /> : <Eye size={16} />}
               </button>

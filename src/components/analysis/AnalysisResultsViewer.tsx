@@ -14,6 +14,8 @@ import { ModificationAction } from "../../types/analysis.types";
 import { StatCard } from "../pricelist-analysis/StatCard";
 import ConfirmationModal from "../shared/ConfirmationModal";
 import Pagination from "../shared/Pagination";
+import { Tooltip } from "../shared/Tooltip";
+
 
 const tabs = [
     {
@@ -207,17 +209,18 @@ export const AnalysisResultsViewer = ({
                     <h3 className="text-xl font-bold text-slate-900">Analysis Results</h3>
 
                     <div className="flex items-center gap-4">
-                        <button
-                            onClick={() => setIsConfirmExportOpen(true)}
-                            disabled={isExporting || totalModifications === 0}
-                            className="group flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm transition-all border bg-white text-slate-700 border-slate-200 hover:bg-slate-50 hover:border-slate-300 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
-                        >
-                            <Download
-                                size={16}
-                                className="text-slate-400 group-hover:text-slate-600 transition-colors"
-                            />
-                            Export Data
-                        </button>
+                            <button
+                                onClick={() => setIsConfirmExportOpen(true)}
+                                disabled={isExporting || totalModifications === 0}
+                                className="group flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm transition-all border bg-white text-slate-700 border-slate-200 hover:bg-slate-50 hover:border-slate-300 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+                                aria-label="Export Analysis Results"
+                            >
+                                <Download
+                                    size={16}
+                                    className="text-slate-400 group-hover:text-slate-600 transition-colors"
+                                />
+                                Export Data
+                            </button>
                     </div>
                 </div>
 
@@ -319,17 +322,23 @@ export const AnalysisResultsViewer = ({
                                             <td className="p-3 font-mono text-xs text-slate-500">
                                                 {action.manufacturer_part_number || "N/A"}
                                             </td>
-                                            <td className="p-3 font-medium text-slate-900">
-                                                {action.product_name || "-"}
+                                             <td className="p-3 font-medium text-slate-900 truncate max-w-[200px]">
+                                                <Tooltip content={action.product_name || ""} disabled={!action.product_name} position="top">
+                                                    {action.product_name || "-"}
+                                                </Tooltip>
                                             </td>
 
                                             {isDescChange && (
                                                 <>
                                                     <td className="p-3 text-xs text-slate-400 truncate max-w-60">
-                                                        {action.old_description || "-"}
+                                                        <Tooltip content={action.old_description || ""} disabled={!action.old_description} position="top">
+                                                            {action.old_description || "-"}
+                                                        </Tooltip>
                                                     </td>
-                                                    <td className="p-3 text-xs text-slate-700">
-                                                        {action.new_description || "-"}
+                                                    <td className="p-3 text-xs text-slate-700 truncate max-w-60">
+                                                        <Tooltip content={action.new_description || ""} disabled={!action.new_description} position="top">
+                                                            {action.new_description || "-"}
+                                                        </Tooltip>
                                                     </td>
                                                 </>
                                             )}
@@ -352,9 +361,11 @@ export const AnalysisResultsViewer = ({
                                             {isAddOrDelete && (
                                                 <>
                                                     <td className="p-3 text-xs text-slate-700 truncate max-w-60">
-                                                        {action.new_description ||
-                                                            action.old_description ||
-                                                            "-"}
+                                                        <Tooltip content={action.new_description || action.old_description || ""} disabled={!(action.new_description || action.old_description)} position="top">
+                                                            {action.new_description ||
+                                                                action.old_description ||
+                                                                "-"}
+                                                        </Tooltip>
                                                     </td>
                                                     <td className="p-3 text-right font-bold text-slate-900 tabular-nums">
                                                         {(action.new_price ?? action.old_price)

@@ -22,6 +22,8 @@ import {
   SortConfig,
   StatusFilter,
 } from "../../types/analysis.types";
+import { Tooltip } from "../shared/Tooltip";
+
 
 interface AnalysisTableProps {
   analysisHistory: AnalysisJob[];
@@ -164,13 +166,17 @@ export default function AnalysisTable({
                             )}
                           </div>
 
-                          <div className="leading-tight">
-                            <span className="block text-sm uppercase font-semibold text-slate-800">
-                              {item.client || "—"}
-                            </span>
-                            <span className="text-[12px] font-medium text-slate-500">
-                              {item.contract_number || "No Contract"}
-                            </span>
+                          <div className="leading-tight overflow-hidden flex flex-col items-start">
+                            <Tooltip content={item.client || ""} disabled={!item.client} position="top">
+                              <span className="block text-sm uppercase font-semibold text-slate-800 truncate max-w-[150px]">
+                                {item.client || "—"}
+                              </span>
+                            </Tooltip>
+                            <Tooltip content={item.contract_number || ""} disabled={!item.contract_number} position="top">
+                              <span className="text-[12px] font-medium text-slate-500 truncate block max-w-[150px]">
+                                {item.contract_number || "No Contract"}
+                              </span>
+                            </Tooltip>
                           </div>
                         </div>
                       </td>
@@ -197,7 +203,7 @@ export default function AnalysisTable({
                           </div>
                         </div>
                       </td>
-                      <td className="p-4">
+                      <td className="p-4 truncate max-w-[150px]">
                         <span className="px-2 text-slate-500 text-sm transition-colors">
                           {item.user}
                         </span>

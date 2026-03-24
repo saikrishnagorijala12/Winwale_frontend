@@ -5,7 +5,7 @@ import {
   FormErrors,
 } from "../../types/contract.types";
 import { useClickOutside } from "../../hooks/useClickOutside";
-import { AlertCircle, ChevronDown, Truck, X } from "lucide-react";
+import { ChevronDown, X } from "lucide-react";
 
 interface Step1Props {
   contract: ClientContractCreate;
@@ -161,7 +161,7 @@ export function Step1({
 
       <div>
         <label className="text-sm font-bold text-slate-700">
-          Contract Officer Name
+          Contract Officer Name <span className="text-red-500">*</span>
         </label>
         <input
           type="text"
@@ -181,7 +181,7 @@ export function Step1({
 
       <div>
         <label className="text-sm font-bold text-slate-700">
-          GSA Office Address
+          GSA Office Address <span className="text-red-500">*</span>
         </label>
         <input
           type="text"
@@ -201,7 +201,7 @@ export function Step1({
 
       <div>
         <label className="text-sm font-bold text-slate-700">
-          GSA Office City
+          GSA Office City <span className="text-red-500">*</span>
         </label>
         <input
           type="text"
@@ -221,7 +221,9 @@ export function Step1({
 
       <div className="grid grid-cols-2 gap-2">
         <div>
-          <label className="text-sm font-bold text-slate-700">State</label>
+          <label className="text-sm font-bold text-slate-700">
+            State <span className="text-red-500">*</span>
+          </label>
           <input
             type="text"
             className={inputClass}
@@ -237,7 +239,9 @@ export function Step1({
           )}
         </div>
         <div>
-          <label className="text-sm font-bold text-slate-700">ZIP</label>
+          <label className="text-sm font-bold text-slate-700">
+            ZIP <span className="text-red-500">*</span>
+          </label>
           <input
             type="text"
             className={inputClass}
@@ -273,7 +277,7 @@ export function Step2({
   return (
     <div className="grid md:grid-cols-2 gap-6">
       <div>
-        <label className="text-sm font-bold text-slate-700">FOB Term</label>
+        <label className="text-sm font-bold text-slate-700">FOB Term <span className="text-red-500">*</span></label>
         <div className="relative">
           <select
             className={`${selectClass} pr-10`}
@@ -293,7 +297,7 @@ export function Step2({
 
       <div>
         <label className="text-sm font-bold text-slate-700">
-          Energy Star Compliance
+          Energy Star Compliance <span className="text-red-500">*</span>
         </label>
         <div className="relative">
           <select
@@ -318,7 +322,7 @@ export function Step2({
       </div>
       <div>
         <label className="text-sm font-bold text-slate-700">
-          Includes Hazardous Materials?
+          Includes Hazardous Materials? <span className="text-red-500">*</span>
         </label>
         <div className="relative">
           <select
@@ -342,30 +346,30 @@ export function Step2({
       </div>
 
       <div>
-        <label className="text-sm font-bold text-slate-700">TDR Status</label>
+        <label className="text-sm font-bold text-slate-700">TDR Status <span className="text-red-500">*</span></label>
         <div className="relative">
-        <select
-          className={selectClass}
-          value={contract.is_tdr ? "TDR" : "Non-TDR"}
-          onChange={(e) => {
-            onChange({ ...contract, is_tdr: e.target.value === "TDR" });
-            onClearError?.("is_tdr");
-          }}
-        >
-          <option value="Non-TDR">Non-TDR</option>
-          <option value="TDR">TDR</option>
-        </select>
-        {errors.is_tdr && (
-          <div className="mt-1 text-xs text-red-600">
-            <span>{errors.is_tdr}</span>
-          </div>
-        )}
-        <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/4 w-4 h-4 text-slate-400 pointer-events-none" />
+          <select
+            className={selectClass}
+            value={contract.is_tdr ? "TDR" : "Non-TDR"}
+            onChange={(e) => {
+              onChange({ ...contract, is_tdr: e.target.value === "TDR" });
+              onClearError?.("is_tdr");
+            }}
+          >
+            <option value="Non-TDR">Non-TDR</option>
+            <option value="TDR">TDR</option>
+          </select>
+          {errors.is_tdr && (
+            <div className="mt-1 text-xs text-red-600">
+              <span>{errors.is_tdr}</span>
+            </div>
+          )}
+          <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/4 w-4 h-4 text-slate-400 pointer-events-none" />
         </div>
       </div>
       <div>
         <label className="text-sm font-bold text-slate-700">
-          Normal Delivery (Days)
+          Normal Delivery (Days) <span className="text-red-500">*</span>
         </label>
         <input
           type="number"
@@ -387,7 +391,7 @@ export function Step2({
       </div>
       <div>
         <label className="text-sm font-bold text-slate-700">
-          Expedited Delivery (Days)
+          Expedited Delivery (Days) <span className="text-red-500">*</span>
         </label>
         <input
           type="number"
@@ -409,7 +413,7 @@ export function Step2({
       </div>
       <div className="md:col-span-2">
         <label className="text-sm font-bold text-slate-700">
-          EPA Method / Mechanism
+          EPA Method / Mechanism <span className="text-red-500">*</span>
         </label>
         <input
           type="text"
@@ -428,7 +432,7 @@ export function Step2({
       </div>
       <div className="md:col-span-2">
         <label className="text-sm font-bold text-slate-700">
-          Quantity/Volume Discounts
+          Quantity/Volume Discounts <span className="text-red-500">*</span>
         </label>
         <textarea
           rows={2}
@@ -447,7 +451,7 @@ export function Step2({
       </div>
       <div className="md:col-span-2">
         <label className="text-sm font-bold text-slate-700">
-          Additional Concessions
+          Additional Concessions <span className="text-red-500">*</span>
         </label>
         <textarea
           rows={2}

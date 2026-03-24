@@ -29,6 +29,8 @@ import { ClientContractRead } from "../../types/contract.types";
 import StatusBadge from "../shared/StatusBadge";
 import { useClickOutside } from "../../hooks/useClickOutside";
 import { formatPhoneNumber } from "../../utils/phoneUtils";
+import { Tooltip } from "../shared/Tooltip";
+
 
 interface ClientContractDetailsModalProps {
   client: Client | null;
@@ -56,7 +58,7 @@ const DetailItem = ({
       {label}
     </span>
 
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-2 overflow-hidden">
       <Icon className={`w-3.5 h-3.5 shrink-0 ${iconClassName}`} />
       <span className="text-sm font-medium text-slate-700 truncate">
         {value || "—"}
@@ -179,18 +181,24 @@ export const ClientContractDetailsModal: React.FC<
                   client.name.substring(0, 2).toUpperCase()
                 )}
               </div>
-              <button
-                onClick={() => fileInputRef.current?.click()}
-                disabled={isUploading}
-                className="absolute -bottom-1 -right-1 p-1.5 bg-white rounded-lg shadow-md border border-slate-100 text-slate-600 hover:text-[#38A1DB] transition-all active:scale-95 disabled:opacity-50"
-                title="Upload Logo"
+              <Tooltip
+                content="Upload Logo"
+                position="top"
+                wrapperClassName="absolute -bottom-1 -right-1 inline-flex items-center justify-center"
               >
-                {isUploading ? (
-                  <Loader2 className="w-3 h-3 animate-spin" />
-                ) : (
-                  <Upload className="w-3 h-3" />
-                )}
-              </button>
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={isUploading}
+                  className="p-1.5 bg-white rounded-lg shadow-md border border-slate-100 text-slate-600 hover:text-[#38A1DB] transition-all active:scale-95 disabled:opacity-50"
+                  aria-label="Upload Client Logo"
+                >
+                  {isUploading ? (
+                    <Loader2 className="w-3 h-3 animate-spin" />
+                  ) : (
+                    <Upload className="w-3 h-3" />
+                  )}
+                </button>
+              </Tooltip>
               <input
                 type="file"
                 ref={fileInputRef}
@@ -223,12 +231,13 @@ export const ClientContractDetailsModal: React.FC<
               </div>
             </div>
           </div>
-          <button
-            onClick={onClose}
-            className="p-2 hover:bg-slate-100 rounded-full transition-colors text-slate-400"
-          >
-            <X className="w-6 h-6" />
-          </button>
+            <button
+              onClick={onClose}
+              className="p-2 hover:bg-slate-100 rounded-full transition-colors text-slate-400"
+              aria-label="Close Modal"
+            >
+              <X className="w-6 h-6" />
+            </button>
         </div>
 
         <div className="flex-1 overflow-y-auto p-6 md:p-8">
@@ -274,30 +283,36 @@ export const ClientContractDetailsModal: React.FC<
                       <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm relative group overflow-hidden">
                         {client.negotiators.length > 1 && (
                           <div className="absolute top-4 right-4 flex gap-1 z-10">
-                            <button
-                              onClick={() =>
-                                setCurrentNegIndex((prev) =>
-                                  prev > 0
-                                    ? prev - 1
-                                    : client.negotiators.length - 1,
-                                )
-                              }
-                              className="p-1.5 rounded-lg border border-slate-100 bg-white text-slate-400 hover:text-[#38A1DB] hover:border-blue-100 transition-all active:scale-90"
-                            >
-                              <ChevronLeft className="w-4 h-4" />
-                            </button>
-                            <button
-                              onClick={() =>
-                                setCurrentNegIndex((prev) =>
-                                  prev < client.negotiators.length - 1
-                                    ? prev + 1
-                                    : 0,
-                                )
-                              }
-                              className="p-1.5 rounded-lg border border-slate-100 bg-white text-slate-400 hover:text-[#38A1DB] hover:border-blue-100 transition-all active:scale-90"
-                            >
-                              <ChevronRight className="w-4 h-4" />
-                            </button>
+                            <Tooltip content="Previous Negotiator" position="top">
+                              <button
+                                onClick={() =>
+                                  setCurrentNegIndex((prev) =>
+                                    prev > 0
+                                      ? prev - 1
+                                      : client.negotiators!.length - 1,
+                                  )
+                                }
+                                className="p-1.5 rounded-lg border border-slate-100 bg-white text-slate-400 hover:text-[#38A1DB] hover:border-blue-100 transition-all active:scale-90"
+                                aria-label="Previous Negotiator"
+                              >
+                                <ChevronLeft className="w-4 h-4" />
+                              </button>
+                            </Tooltip>
+                            <Tooltip content="Next Negotiator" position="top">
+                              <button
+                                onClick={() =>
+                                  setCurrentNegIndex((prev) =>
+                                    prev < client.negotiators!.length - 1
+                                      ? prev + 1
+                                      : 0,
+                                  )
+                                }
+                                className="p-1.5 rounded-lg border border-slate-100 bg-white text-slate-400 hover:text-[#38A1DB] hover:border-blue-100 transition-all active:scale-90"
+                                aria-label="Next Negotiator"
+                              >
+                                <ChevronRight className="w-4 h-4" />
+                              </button>
+                            </Tooltip>
                           </div>
                         )}
 
@@ -471,16 +486,19 @@ export const ClientContractDetailsModal: React.FC<
             >
               Close
             </button>
-            <button
-              onClick={() => {
-                onEdit(client);
-                onClose();
-              }}
-              className="btn-primary"
-            >
-              <Edit2 className="w-4 h-4" />
-              Edit details
-            </button>
+            <Tooltip content="Edit Client Details" position="top">
+              <button
+                onClick={() => {
+                  onEdit(client);
+                  onClose();
+                }}
+                className="btn-primary"
+                aria-label="Edit Client Details"
+              >
+                <Edit2 className="w-4 h-4" />
+                Edit details
+              </button>
+            </Tooltip>
           </div>
         </div>
       </div>

@@ -43,7 +43,7 @@ export const CompanyFormStep: React.FC<CompanyFormStepProps> = ({
   };
 
   const inputClass =
-  "w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 transition-colors focus:outline-none focus:border-[#38A1DB]";
+    "w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200 transition-colors focus:outline-none focus:border-[#38A1DB]";
 
   return (
     <div className="grid md:grid-cols-2 gap-5">
@@ -127,9 +127,7 @@ export const CompanyFormStep: React.FC<CompanyFormStepProps> = ({
           }}
         />
         {errors.company_name && (
-          <p className="mt-1 text-xs text-red-600 ">
-            {errors.company_name}
-          </p>
+          <p className="mt-1 text-xs text-red-600 ">{errors.company_name}</p>
         )}
       </div>
 
@@ -147,9 +145,7 @@ export const CompanyFormStep: React.FC<CompanyFormStepProps> = ({
           }}
         />
         {errors.company_email && (
-          <p className="mt-1 text-xs text-red-600 ">
-            {errors.company_email}
-          </p>
+          <p className="mt-1 text-xs text-red-600 ">{errors.company_email}</p>
         )}
       </div>
 
@@ -187,62 +183,60 @@ export const CompanyFormStep: React.FC<CompanyFormStepProps> = ({
           }}
         />
         {errors.company_address && (
-          <p className="mt-1 text-xs text-red-600 ">
-            {errors.company_address}
-          </p>
+          <p className="mt-1 text-xs text-red-600 ">{errors.company_address}</p>
         )}
       </div>
 
       <div className="grid grid-cols-3 md:col-span-2 gap-4">
         <div className="col-span-1">
           <label className="text-sm font-bold text-slate-700">
-            City<span className="text-red-500">*</span>
+            City <span className="text-red-500">*</span>
           </label>
           <input
             type="text"
             className={inputClass}
             value={formData.company_city}
-            onChange={(e) => {onChange("company_city", e.target.value);
-            onClearError("company_city");}}
+            onChange={(e) => {
+              onChange("company_city", e.target.value);
+              onClearError("company_city");
+            }}
           />
           {errors.company_city && (
-            <p className="mt-1 text-xs text-red-600 ">
-              {errors.company_city}
-            </p>
+            <p className="mt-1 text-xs text-red-600 ">{errors.company_city}</p>
           )}
         </div>
         <div className="col-span-1">
           <label className="text-sm font-bold text-slate-700">
-            State<span className="text-red-500">*</span>
+            State <span className="text-red-500">*</span>
           </label>
           <input
             type="text"
             className={inputClass}
             value={formData.company_state}
-            onChange={(e) => {onChange("company_state", e.target.value);
-            onClearError("company_state");}}
+            onChange={(e) => {
+              onChange("company_state", e.target.value);
+              onClearError("company_state");
+            }}
           />
           {errors.company_state && (
-            <p className="mt-1 text-xs text-red-600 ">
-              {errors.company_state}
-            </p>
+            <p className="mt-1 text-xs text-red-600 ">{errors.company_state}</p>
           )}
         </div>
         <div className="col-span-1">
           <label className="text-sm font-bold text-slate-700">
-            ZIP<span className="text-red-500">*</span>
+            ZIP <span className="text-red-500">*</span>
           </label>
           <input
             type="text"
             className={inputClass}
             value={formData.company_zip}
-            onChange={(e) => {onChange("company_zip", e.target.value);
-            onClearError("company_zip");}}
+            onChange={(e) => {
+              onChange("company_zip", e.target.value);
+              onClearError("company_zip");
+            }}
           />
           {errors.company_zip && (
-            <p className="mt-1 text-xs text-red-600 ">
-              {errors.company_zip}
-            </p>
+            <p className="mt-1 text-xs text-red-600 ">{errors.company_zip}</p>
           )}
         </div>
       </div>

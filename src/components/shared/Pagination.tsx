@@ -1,5 +1,7 @@
 import React from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Tooltip } from "./Tooltip";
+
 
 interface PaginationProps {
   currentPage: number;
@@ -69,14 +71,14 @@ export default function Pagination({
 
       {totalPages > 1 && (
         <div className="flex items-center gap-1.5">
-          <button
-            disabled={currentPage === 1}
-            onClick={() => onPageChange(currentPage - 1)}
-            className="p-2 rounded-lg border border-slate-200 text-slate-400 hover:bg-slate-50 hover:text-slate-600 disabled:opacity-30 disabled:hover:bg-transparent transition-all mr-2"
-            aria-label="Previous page"
-          >
-            <ChevronLeft size={18} />
-          </button>
+            <button
+              disabled={currentPage === 1}
+              onClick={() => onPageChange(currentPage - 1)}
+              className="p-2 rounded-lg border border-slate-200 text-slate-400 hover:bg-slate-50 hover:text-slate-600 disabled:opacity-30 disabled:hover:bg-transparent transition-all mr-2"
+              aria-label="Previous page"
+            >
+              <ChevronLeft size={18} />
+            </button>
 
           <div className="flex items-center gap-1">
             {getPageNumbers().map((pageNum, idx) => (
@@ -102,14 +104,14 @@ export default function Pagination({
             ))}
           </div>
 
-          <button
-            disabled={currentPage === totalPages}
-            onClick={() => onPageChange(currentPage + 1)}
-            className="p-2 rounded-lg border border-slate-200 text-slate-400 hover:bg-slate-50 hover:text-slate-600 disabled:opacity-30 disabled:hover:bg-transparent transition-all ml-2"
-            aria-label="Next page"
-          >
-            <ChevronRight size={18} />
-          </button>
+            <button
+              disabled={currentPage === totalPages}
+              onClick={() => onPageChange(currentPage + 1)}
+              className="p-2 rounded-lg border border-slate-200 text-slate-400 hover:bg-slate-50 hover:text-slate-600 disabled:opacity-30 disabled:hover:bg-transparent transition-all ml-2"
+              aria-label="Next page"
+            >
+              <ChevronRight size={18} />
+            </button>
         </div>
       )}
     </div>
