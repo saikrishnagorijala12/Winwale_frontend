@@ -78,7 +78,7 @@ export default function AnalysisDetails() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50/50 p-6 lg:p-10 space-y-8">
+    <div className="min-h-screen bg-slate-50/50 p-4 sm:p-6 lg:p-10 space-y-8">
       {/* Header Section */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
         <div className="space-y-1">

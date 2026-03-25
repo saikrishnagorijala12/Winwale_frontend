@@ -116,6 +116,13 @@ export default function AppSidebar() {
     System: true,
   });
 
+  const expandAllSections = () => {
+    const allExpanded = Object.fromEntries(
+      navSections.map((section) => [section.label, true]),
+    );
+    setExpandedSections(allExpanded);
+  };
+
   const navigate = useNavigate();
   const isAdmin = user?.role === ROLES.ADMIN;
 
@@ -274,7 +281,10 @@ export default function AppSidebar() {
               wrapperClassName="hidden md:inline-flex items-center justify-center"
             >
               <button
-                onClick={() => setIsCollapsed(true)}
+                onClick={() => {
+                  setIsCollapsed(true);
+                  expandAllSections();
+                }}
                 className="p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-200/50 rounded-lg transition-all cursor-e-resize"
                 aria-label="Collapse Sidebar"
               >
@@ -375,12 +385,16 @@ export default function AppSidebar() {
 
         {/* Footer  */}
         <div
-          className={`p-4 ${isCollapsed ? "flex flex-col items-center gap-4" : ""}`}
+          className={`p-4 flex flex-col gap-3 ${isCollapsed ? "items-center" : ""}`}
         >
-          <Tooltip content="Settings" position="right" disabled={!isCollapsed}>
+          <Tooltip content={`${user?.name || "User"} • ${ROLE_MAP[user?.role as Role] || "Guest"}`} position="right" disabled={!isCollapsed}>
             <Link
               to="/settings"
-              className={`flex items-center ${isCollapsed ? "justify-center w-10 h-10 p-0" : "gap-3 p-2.5"} rounded-xl bg-white border border-slate-200 shadow-sm transition-all hover:shadow-md hover:border-slate-300`}
+              className={`flex items-center ${
+                isCollapsed
+                  ? "justify-center w-10 h-10 p-0"
+                  : "gap-3 p-2.5 bg-white border border-slate-200 shadow-sm hover:shadow-md hover:border-slate-300"
+              } rounded-xl transition-all`}
             >
               <div className="w-10 h-10 rounded-full bg-linear-to-br from-[#c3d7e7] to-[#a3c1da] flex items-center justify-center shrink-0 shadow-inner">
                 <span className="text-sm font-bold text-[#1e293b]">

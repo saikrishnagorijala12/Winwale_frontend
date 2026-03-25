@@ -168,12 +168,12 @@ export default function AnalysisTable({
 
                           <div className="leading-tight overflow-hidden flex flex-col items-start">
                             <Tooltip content={item.client || ""} disabled={!item.client} position="top">
-                              <span className="block text-sm uppercase font-semibold text-slate-800 truncate max-w-[150px]">
+                              <span className="block text-sm uppercase font-semibold text-slate-800 truncate max-w-37.5">
                                 {item.client || "—"}
                               </span>
                             </Tooltip>
                             <Tooltip content={item.contract_number || ""} disabled={!item.contract_number} position="top">
-                              <span className="text-[12px] font-medium text-slate-500 truncate block max-w-[150px]">
+                              <span className="text-[12px] font-medium text-slate-500 truncate block max-w-37.5">
                                 {item.contract_number || "No Contract"}
                               </span>
                             </Tooltip>
@@ -203,7 +203,7 @@ export default function AnalysisTable({
                           </div>
                         </div>
                       </td>
-                      <td className="p-4 truncate max-w-[150px]">
+                      <td className="p-4 truncate max-w-37.5">
                         <span className="px-2 text-slate-500 text-sm transition-colors">
                           {item.user}
                         </span>

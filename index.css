@@ -7,7 +7,7 @@
 /* Component styles */
 @layer components {
   .btn-primary {
-    @apply flex items-center justify-center gap-2
+    @apply inline-flex items-center justify-center gap-2
       px-6 py-2.5
       bg-[#3399cc]
       hover:bg-[#2980b9]
@@ -24,7 +24,7 @@
     @apply opacity-70 cursor-not-allowed;
   }
   .btn-secondary {
-    @apply flex items-center justify-center gap-2
+    @apply inline-flex items-center justify-center gap-2
       px-6 py-2.5
       bg-white
       border border-slate-200

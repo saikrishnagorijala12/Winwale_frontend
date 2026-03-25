@@ -147,7 +147,7 @@ export const FileUploadStep = ({
                     {files.length > 0 && (
                         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
                             {/* File List Column */}
-                            <div className="lg:col-span-4 space-y-3 bg-slate-50/50 rounded-2xl p-4 border border-slate-100 h-fit">
+                            <div className="lg:col-span-4 space-y-3 bg-slate-50/50 rounded-2xl p-3 sm:p-4 border border-slate-100 h-fit">
                                 <div className="flex justify-between items-center px-1">
                                     <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Selected Files</span>
                                     <button onClick={onClearAllFiles} className="text-red-500 hover:text-red-700 text-[10px] font-bold flex items-center gap-1 transition-colors">
@@ -232,9 +232,9 @@ export const FileUploadStep = ({
                                                     Data Preview • {files[previewIndex ?? 0]?.name}
                                                 </span>
                                             </div>
-                                            <span className="text-[10px] text-slate-400 font-medium">Showing first 10 rows</span>
+                                            <span className="text-[10px] text-slate-400 font-medium whitespace-nowrap">Showing first 10 rows</span>
                                         </div>
-                                        <div className="overflow-auto custom-scrollbar max-h-100">
+                                        <div className="overflow-x-auto custom-scrollbar max-h-100">
                                             <table className="w-full text-[11px] text-left border-collapse">
                                                 <thead className="sticky top-0 z-20">
                                                     <tr className="bg-slate-100/80 backdrop-blur-sm border-b border-slate-200">

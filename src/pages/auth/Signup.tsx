@@ -152,7 +152,7 @@ const Signup: React.FC = () => {
                 setFormData({ ...formData, fullName: e.target.value });
                 setError(null);
               }}
-              className="block w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 outline-none"
+              className="block w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-[#3498db] outline-none"
               placeholder="Your Name"
             />
           </div>
@@ -177,7 +177,7 @@ const Signup: React.FC = () => {
                 setFormData({ ...formData, email: e.target.value });
                 setError(null);
               }}
-              className="block w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 outline-none"
+              className="block w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-[#3498db] outline-none"
               placeholder="name@winvale.com"
             />
           </div>
@@ -204,7 +204,7 @@ const Signup: React.FC = () => {
               }}
               onFocus={() => setPasswordFocused(true)}
               onBlur={() => setPasswordFocused(false)}
-              className="block w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 outline-none"
+              className="block w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-[#3498db] outline-none"
               placeholder="Min. 8 characters"
             />
 
@@ -251,7 +251,7 @@ const Signup: React.FC = () => {
                 setFormData({ ...formData, confirmPassword: e.target.value });
                 setError(null);
               }}
-              className="block w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 outline-none"
+              className="block w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-[#3498db] outline-none"
               placeholder="Re-enter password"
             />
           </div>

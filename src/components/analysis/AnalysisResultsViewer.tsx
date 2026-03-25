@@ -205,10 +205,10 @@ export const AnalysisResultsViewer = ({
             </div>
 
             <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
-                <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between gap-4">
-                    <h3 className="text-xl font-bold text-slate-900">Analysis Results</h3>
+                <div className="px-4 sm:px-6 py-4 sm:py-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <h3 className="text-lg sm:text-xl font-bold text-slate-900 text-center sm:text-left">Analysis Results</h3>
 
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center justify-center sm:justify-end gap-4 font-normal">
                             <button
                                 onClick={() => setIsConfirmExportOpen(true)}
                                 disabled={isExporting || totalModifications === 0}
@@ -224,13 +224,13 @@ export const AnalysisResultsViewer = ({
                     </div>
                 </div>
 
-                <div className="px-6 pt-4">
-                    <div className="bg-slate-100/80 p-1 rounded-2xl flex items-center w-full ">
+                <div className="px-4 sm:px-6 pt-4">
+                    <div className="bg-slate-100/80 p-1 rounded-2xl flex items-center w-full overflow-x-auto custom-scrollbar no-scrollbar">
                         {tabs.map((tab) => (
                             <button
                                 key={tab.id}
                                 onClick={() => onTabChange(tab.id)}
-                                className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold transition-all
+                                className={`flex-1 min-w-[120px] sm:min-w-0 flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all
                        ${activeTab === tab.id
                                         ? "bg-white text-slate-900 shadow-sm"
                                         : "text-slate-500 hover:text-slate-700"
@@ -248,9 +248,9 @@ export const AnalysisResultsViewer = ({
                     </div>
                 </div>
 
-                <div className="p-6">
-                    <div className="border border-slate-100 rounded-xl overflow-hidden">
-                        <table className="w-full text-sm table-fixed">
+                <div className="p-4 sm:p-6">
+                    <div className="border border-slate-100 rounded-xl overflow-x-auto custom-scrollbar">
+                        <table className="w-full text-sm min-w-[800px] lg:table-fixed">
                             <thead className="bg-slate-50/50">
                                 <tr>
                                     <th className="text-left p-3 font-bold text-slate-700">

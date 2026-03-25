@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Link, useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { resetPassword, confirmResetPassword } from "aws-amplify/auth";
 import {
   Mail,
@@ -22,9 +22,19 @@ interface FormErrors {
 
 const ForgotPassword: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const [searchParams] = useSearchParams();
+
+  const prefilledEmail =
+    (location.state as { email?: string } | null)?.email ||
+    searchParams.get("email") ||
+    "";
+  const resetRequired = !!(
+    location.state as { passwordResetRequired?: boolean } | null
+  )?.passwordResetRequired;
 
   const [step, setStep] = useState<"request" | "confirm">("request");
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(prefilledEmail);
   const [otp, setOtp] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [passwordFocused, setPasswordFocused] = useState(false);
@@ -36,6 +46,15 @@ const ForgotPassword: React.FC = () => {
   const hasFailedRules = Object.values(passwordRules).some(
     (rule) => !rule.test(newPassword),
   );
+
+
+  useEffect(() => {
+    if (!resetRequired) return;
+
+    setSuccess(
+      "Your password must be reset before you can sign in. Request a recovery code to continue.",
+    );
+  }, [resetRequired]);
 
   const validateRequest = () => {
     const newErrors: FormErrors = {};
@@ -155,7 +174,7 @@ const ForgotPassword: React.FC = () => {
                   setErrors((p) => ({ ...p, email: undefined }));
                   setError(null);
                 }}
-                className="block w-full pl-11 pr-4 py-3 rounded-xl outline-none transition-all bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-blue-500/20"
+                className="block w-full pl-11 pr-4 py-3 rounded-xl outline-none transition-all bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-blue-500/20 focus:border-[#3498db]"
                 placeholder="name@winvale.com"
               />
             </div>
@@ -198,7 +217,7 @@ const ForgotPassword: React.FC = () => {
                 setError(null);
               }}
               className="block w-full text-center text-2xl tracking-[0.5em] font-mono py-4 rounded-xl outline-none transition-all
-              bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-blue-500/20"
+              bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-blue-500/20 focus:border-[#3498db]"
               placeholder="000000"
             />
             {errors.otp && (
@@ -225,7 +244,7 @@ const ForgotPassword: React.FC = () => {
                 onFocus={() => setPasswordFocused(true)}
                 onBlur={() => setPasswordFocused(false)}
                 className="block w-full pl-11 pr-4 py-3 rounded-xl outline-none transition-all
-                  bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-blue-500/20"
+                  bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-blue-500/20 focus:border-[#3498db]"
                 placeholder="Min. 8 characters"
               />
             </div>

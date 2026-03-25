@@ -41,6 +41,7 @@ export default function AnalysisFilters({
   onClearFilters,
   isLoading = false,
 }: AnalysisFiltersProps) {
+  const todayStr = new Date().toISOString().split("T")[0];
   const selectedClientId =
     clientFilter === "All"
       ? 0
@@ -70,8 +71,8 @@ export default function AnalysisFilters({
         </button>
       </div>
 
-      <div className="p-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="p-4 sm:p-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="space-y-1">
             <label className="text-[11px] font-black uppercase tracking-widest text-slate-400">
               Search
@@ -137,28 +138,31 @@ export default function AnalysisFilters({
             <label className="text-[11px] font-black uppercase tracking-widest text-slate-400">
               Date Range
             </label>
-
+ 
             <div className="flex flex-col gap-2 2xl:flex-row">
               <div className="relative flex-1">
                 <input
                   type="date"
                   value={dateFrom ? dateFrom.toISOString().split("T")[0] : ""}
+                  max={dateTo ? dateTo.toISOString().split("T")[0] : todayStr}
                   onChange={(e) =>
                     setDateFrom(
-                      e.target.value ? new Date(e.target.value) : undefined,
+                      e.target.value ? new Date(e.target.value) : undefined
                     )
                   }
                   className="w-full text-slate-500 px-4 pr-3 py-3 rounded-xl border border-slate-200 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-blue-500/20  outline-none transition-all text-sm font-medium"
                 />
               </div>
-
+ 
               <div className="relative flex-1">
                 <input
                   type="date"
                   value={dateTo ? dateTo.toISOString().split("T")[0] : ""}
+                  min={dateFrom ? dateFrom.toISOString().split("T")[0] : ""}
+                  max={todayStr}
                   onChange={(e) =>
                     setDateTo(
-                      e.target.value ? new Date(e.target.value) : undefined,
+                      e.target.value ? new Date(e.target.value) : undefined
                     )
                   }
                   className="w-full text-slate-500 px-4 pr-3 py-3 rounded-xl border border-slate-200 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-blue-500/20  outline-none transition-all text-sm font-medium"

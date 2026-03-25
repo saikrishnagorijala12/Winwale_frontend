@@ -39,8 +39,8 @@ export const RunAnalysisStep = ({
                 </p>
             </div>
 
-            <div className="p-6 space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full mb-10">
+            <div className="p-4 sm:p-6 space-y-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full mb-10">
                     <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 flex items-center gap-4">
                         <div className="p-3 bg-white rounded-xl shadow-sm">
                             <Building2 className="w-5 h-5 text-[#3399cc]" />

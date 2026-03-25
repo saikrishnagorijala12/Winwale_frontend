@@ -167,7 +167,7 @@ export default function AnalysisHistory() {
   };
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-slate-50 via-blue-50/30 to-slate-100 p-4 md:p-6 lg:p-10 space-y-6 lg:space-y-10">
+    <div className="min-h-screen bg-linear-to-br from-slate-50 via-blue-50/30 to-slate-100 p-3 sm:p-6 lg:p-10 space-y-6 lg:space-y-10">
       <ConfirmationModal
         isOpen={confirmModal.isOpen}
         onClose={() => setConfirmModal({ ...confirmModal, isOpen: false })}

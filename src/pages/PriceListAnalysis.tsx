@@ -488,7 +488,7 @@ export default function PriceListAnalysis() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50/50 p-6 lg:p-10 space-y-10">
+    <div className="min-h-screen bg-slate-50/50 p-4 sm:p-6 lg:p-10 space-y-8 lg:space-y-10">
       <div className="space-y-1">
         <h1 className="text-3xl font-bold tracking-tight text-slate-900">
           Price List Analysis

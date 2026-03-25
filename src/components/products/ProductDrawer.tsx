@@ -39,7 +39,7 @@ export default function ProductDrawer({
               {product.item_name}
             </h2>
             <Tooltip content={product.item_description || ""} disabled={!product.item_description} position="top">
-              <p className="text-xs text-slate-500 mt-1 font-medium italic truncate max-w-[300px]">
+              <p className="text-xs text-slate-500 mt-1 font-medium italic truncate max-w-75">
                 {product.item_description}
               </p>
             </Tooltip>

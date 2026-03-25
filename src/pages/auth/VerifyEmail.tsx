@@ -144,7 +144,7 @@ const VerifyEmail: React.FC = () => {
                         type="text"
                         required
                         maxLength={6}
-                        className="block w-full text-center text-3xl tracking-[0.5em] font-mono py-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 outline-none"
+                        className="block w-full text-center text-3xl tracking-[0.5em] font-mono py-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-[#3498db] outline-none"
                         placeholder="000000"
                         value={otp}
                         onChange={(e) => {

@@ -24,6 +24,15 @@ const Login: React.FC = () => {
 
   const isAuthProcessed = useRef(false);
 
+  const routeToPasswordReset = () => {
+    navigate(`/forgot-password?email=${encodeURIComponent(email.trim())}`, {
+      state: {
+        email: email.trim(),
+        passwordResetRequired: true,
+      },
+    });
+  };
+
   const validate = (): boolean => {
     const newErrors: FormErrors = {};
 
@@ -61,6 +70,11 @@ const Login: React.FC = () => {
         navigate(`/verify-email?email=${encodeURIComponent(email.trim())}`, {
           state: { password },
         });
+        return;
+      }
+
+      if (nextStep.signInStep === "RESET_PASSWORD") {
+        routeToPasswordReset();
         return;
       }
 
@@ -102,6 +116,11 @@ const Login: React.FC = () => {
         });
         return;
       }
+
+      if (err.name === "PasswordResetRequiredException") {
+        routeToPasswordReset();
+        return;
+      }
       if (err?.message?.includes("There is already a signed in user")) {
         await signOut();
         const { nextStep: retryStep } = await signIn({
@@ -112,6 +131,10 @@ const Login: React.FC = () => {
           navigate(`/verify-email?email=${encodeURIComponent(email.trim())}`, {
             state: { password },
           });
+          return;
+        }
+        if (retryStep.signInStep === "RESET_PASSWORD") {
+          routeToPasswordReset();
           return;
         }
         isAuthProcessed.current = true;
@@ -166,7 +189,7 @@ const Login: React.FC = () => {
                 setErrors((prev) => ({ ...prev, email: undefined }));
                 setError(null);
               }}
-              className="block w-full pl-11 pr-4 py-3 rounded-xl outline-none transition-all bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-blue-500/20"
+              className="block w-full pl-11 pr-4 py-3 rounded-xl outline-none transition-all bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-blue-500/20 focus:border-[#3498db]"
               placeholder="name@winvale.com"
             />
           </div>
@@ -191,7 +214,7 @@ const Login: React.FC = () => {
                 setErrors((prev) => ({ ...prev, password: undefined }));
                 setError(null);
               }}
-              className="block w-full pl-11 pr-11 py-3 rounded-xl outline-none transition-all bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-blue-500/20"
+              className="block w-full pl-11 pr-11 py-3 rounded-xl outline-none transition-all bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-blue-500/20 focus:border-[#3498db]"
               placeholder="••••••••"
             />
             <button

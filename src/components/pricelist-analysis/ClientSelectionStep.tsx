@@ -43,7 +43,7 @@ export const ClientSelectionStep = ({
         <p className="text-sm text-slate-500">Choose the client for analysis</p>
       </div>
 
-      <div className="p-8 space-y-8 relative">
+      <div className="p-5 sm:p-8 space-y-8 relative">
         {isLoading ? (
           <div className="flex items-center gap-3 p-4 bg-slate-50 border border-slate-200 rounded-2xl">
             <Loader2 className="w-5 h-5 animate-spin text-[#24578f]" />
