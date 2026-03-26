@@ -7,6 +7,7 @@ import {
   ImageRun,
   Header,
   CheckBox,
+  ExternalHyperlink,
 } from "docx";
 import { saveAs } from "file-saver";
 
@@ -78,41 +79,55 @@ export const convertTiptapToDocx = async (
     }
   }
 
+  const createParagraphChildren = (content: any[] = []) =>
+    content.flatMap((child: any) => {
+      if (child.type === "text") {
+        const parts = child.text.split(/(\u2612\uFE0E|\u2610\uFE0E)/);
+        const linkMark = child.marks?.find((mark: any) => mark.type === "link");
+
+        return parts
+          .map((part: string) => {
+            if (part === "\u2612\uFE0E") {
+              return new CheckBox({ checked: true });
+            }
+            if (part === "\u2610\uFE0E") {
+              return new CheckBox({ checked: false });
+            }
+            if (!part) return null;
+
+            const textRun = new TextRun({
+              text: part,
+              bold: child.marks?.some((m: any) => m.type === "bold"),
+              italics: child.marks?.some((m: any) => m.type === "italic"),
+              underline: linkMark?.attrs?.href
+                ? {}
+                : child.marks?.some((m: any) => m.type === "underline")
+                  ? {}
+                  : undefined,
+              color: linkMark?.attrs?.href ? "0563C1" : undefined,
+              font: "Times New Roman",
+              size: 24,
+            });
+
+            if (linkMark?.attrs?.href) {
+              return new ExternalHyperlink({
+                children: [textRun],
+                link: linkMark.attrs.href,
+              });
+            }
+
+            return textRun;
+          })
+          .filter(Boolean);
+      } else if (child.type === "hardBreak") {
+        return [new TextRun({ break: 1 })];
+      }
+      return [];
+    });
+
   const processNode = (node: any) => {
     if (node.type === "paragraph") {
-      const textRuns = (node.content || [])
-        .flatMap((child: any) => {
-          if (child.type === "text") {
-            const parts = child.text.split(/(\u2612\uFE0E|\u2610\uFE0E)/);
-            return parts
-              .map((part: string) => {
-                if (part === "\u2612\uFE0E") {
-                  return new CheckBox({ checked: true });
-                }
-                if (part === "\u2610\uFE0E") {
-                  return new CheckBox({ checked: false });
-                }
-                if (!part) return null;
-
-                return new TextRun({
-                  text: part,
-                  bold: child.marks?.some((m: any) => m.type === "bold"),
-                  italics: child.marks?.some((m: any) => m.type === "italic"),
-                  underline: child.marks?.some(
-                    (m: any) => m.type === "underline",
-                  )
-                    ? {}
-                    : undefined,
-                  font: "Times New Roman",
-                  size: 24,
-                });
-              })
-              .filter(Boolean);
-          } else if (child.type === "hardBreak") {
-            return [new TextRun({ break: 1 })];
-          }
-          return [];
-        });
+      const textRuns = createParagraphChildren(node.content || []);
 
       children.push(
         new Paragraph({
@@ -125,43 +140,9 @@ export const convertTiptapToDocx = async (
         if (listItem.type === "listItem") {
           listItem.content?.forEach((paragraphNode: any) => {
             if (paragraphNode.type === "paragraph") {
-              const textRuns = (paragraphNode.content || [])
-                .flatMap((child: any) => {
-                  if (child.type === "text") {
-                    const parts = child.text.split(
-                      /(\u2612\uFE0E|\u2610\uFE0E)/,
-                    );
-                    return parts
-                      .map((part: string) => {
-                        if (part === "\u2612\uFE0E") {
-                          return new CheckBox({ checked: true });
-                        }
-                        if (part === "\u2610\uFE0E") {
-                          return new CheckBox({ checked: false });
-                        }
-                        if (!part) return null;
-
-                        return new TextRun({
-                          text: part,
-                          bold: child.marks?.some((m: any) => m.type === "bold"),
-                          italics: child.marks?.some(
-                            (m: any) => m.type === "italic",
-                          ),
-                          underline: child.marks?.some(
-                            (m: any) => m.type === "underline",
-                          )
-                            ? {}
-                            : undefined,
-                          font: "Times New Roman",
-                          size: 24,
-                        });
-                      })
-                      .filter(Boolean);
-                  } else if (child.type === "hardBreak") {
-                    return [new TextRun({ break: 1 })];
-                  }
-                  return [];
-                });
+              const textRuns = createParagraphChildren(
+                paragraphNode.content || [],
+              );
 
               children.push(
                 new Paragraph({
