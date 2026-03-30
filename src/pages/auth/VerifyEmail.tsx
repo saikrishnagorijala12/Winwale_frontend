@@ -79,6 +79,8 @@ const VerifyEmail: React.FC = () => {
             ) {
                 setError("This account is already verified. Please sign in.");
                 setTimeout(() => navigate("/login"), 2000);
+            } else if (err.name === "LimitExceededException") {
+                setError("Too many verification attempts. Please try again later.");
             } else {
                 setError(err.message || "Verification failed. Please check the code and try again.");
             }
@@ -96,7 +98,11 @@ const VerifyEmail: React.FC = () => {
             await resendSignUpCode({ username: email.trim() });
             setSuccess("A new verification code has been sent to your email.");
         } catch (err: any) {
-            setError(err.message || "Failed to resend code. Please try again later.");
+            if (err.name === "LimitExceededException") {
+                setError("Too many attempts to send verification code. Please try again later.");
+            } else {
+                setError(err.message || "Failed to resend code. Please try again later.");
+            }
         } finally {
             setResending(false);
         }

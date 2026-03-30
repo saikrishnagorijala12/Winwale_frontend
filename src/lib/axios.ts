@@ -31,11 +31,16 @@ const deepTrim = (data: any): any => {
 };
 
 api.interceptors.request.use(async (config) => {
-  const session = await fetchAuthSession();
-  const idToken = session.tokens?.idToken?.toString();
+  try {
+    const session = await fetchAuthSession();
+    const idToken = session.tokens?.idToken?.toString();
 
-  if (idToken) {
-    config.headers.Authorization = `Bearer ${idToken}`;
+    if (idToken) {
+      config.headers.Authorization = `Bearer ${idToken}`;
+    }
+  } catch (error) {
+    console.error("Auth session fetch failed:", error);
+    window.dispatchEvent(new CustomEvent("custom:unauthorized"));
   }
 
   if (
@@ -59,6 +64,10 @@ api.interceptors.response.use(
     }
 
     const status = error.response.status;
+
+    if (status === 401) {
+      window.dispatchEvent(new CustomEvent("custom:unauthorized"));
+    }
 
     const message =
       error.response.data?.detail ||

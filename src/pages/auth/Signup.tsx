@@ -109,6 +109,8 @@ const Signup: React.FC = () => {
     } catch (err: any) {
       if (err.name === "UsernameExistsException") {
         setError("An account with this email already exists. Try signing in.");
+      } else if (err.name === "NotAuthorizedException" || err.message?.includes("attempts exceeded")) {
+        setError("Too many signup attempts. Please try again later.");
       } else {
         setError(err.message || "Signup failed");
       }

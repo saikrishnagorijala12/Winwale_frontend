@@ -121,6 +121,11 @@ const Login: React.FC = () => {
         routeToPasswordReset();
         return;
       }
+      if (err.name === "NotAuthorizedException" || err.message?.includes("Password attempts exceeded")) {
+        setError("Password attempts exceeded. Please try again later.");
+        return;
+      }
+
       if (err?.message?.includes("There is already a signed in user")) {
         await signOut();
         const { nextStep: retryStep } = await signIn({

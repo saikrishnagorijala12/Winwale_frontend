@@ -73,6 +73,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     bootstrapAuth();
   }, []);
 
+  useEffect(() => {
+    const handleUnauthorized = async () => {
+      console.warn("Unauthorized access detected, logging out...");
+      await logout();
+    };
+
+    window.addEventListener("custom:unauthorized", handleUnauthorized);
+    return () => {
+      window.removeEventListener("custom:unauthorized", handleUnauthorized);
+    };
+  }, []);
+
   const logout = async () => {
     try {
       await signOut();
