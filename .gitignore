@@ -15,5 +15,3 @@ src/pages/DownloadHistory.tsx
 
 # src/types/document.types.ts
 # src/types/documentConfigs.ts
-
-dist/
