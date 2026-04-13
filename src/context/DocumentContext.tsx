@@ -32,7 +32,7 @@ const mapJobDetailsToForm = (api: any) => {
     ? api.countries_of_origin.join(", ")
     : api.countries_of_origin || "";
   const percentage = api.percentage || {};
-  const isTdr = other.is_tdr ? "yes" : "no";
+  const isTdr = "yes";
   const isHazardous = other.is_hazardous ? "yes" : "no";
 
   return {

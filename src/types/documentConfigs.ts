@@ -219,23 +219,27 @@ export const documentConfigs: DocumentConfig[] = [
           { value: "no", label: "No" },
         ],
       },
+
       {
-        id: "is_tdr",
-        label: "TDR Status",
+        id: "epa_method_mechanism",
+        label: "EPA Method/Mechanism",
         type: "select",
         behavior: "readonly",
         section: "Logistics & Compliance",
         options: [
-          { value: "yes", label: "Yes" },
-          { value: "no", label: "No" },
+          {
+            value: "GSAM 538.270-4(a)(1), Based on fixed escalation rates",
+            label: "GSAM 538.270-4(a)(1), Based on fixed escalation rates",
+          },
+          {
+            value: "GSAM 538.270-4(a)(2), Based on a market index or other basis",
+            label: "GSAM 538.270-4(a)(2), Based on a market index or other basis",
+          },
+          {
+            value: "GSAM 538.270-4(a)(3), Based on established pricing",
+            label: "GSAM 538.270-4(a)(3), Based on established pricing",
+          },
         ],
-      },
-      {
-        id: "epa_method_mechanism",
-        label: "EPA Method/Mechanism",
-        type: "text",
-        behavior: "readonly",
-        section: "Logistics & Compliance",
       },
       {
         id: "attachments",
@@ -413,23 +417,27 @@ export const documentConfigs: DocumentConfig[] = [
           { value: "no", label: "No" },
         ],
       },
+
       {
-        id: "is_tdr",
-        label: "TDR Status",
+        id: "epa_method_mechanism",
+        label: "EPA Method/Mechanism",
         type: "select",
         behavior: "readonly",
         section: "Logistics & Compliance",
         options: [
-          { value: "yes", label: "Yes" },
-          { value: "no", label: "No" },
+          {
+            value: "GSAM 538.270-4(a)(1), Based on fixed escalation rates",
+            label: "GSAM 538.270-4(a)(1), Based on fixed escalation rates",
+          },
+          {
+            value: "GSAM 538.270-4(a)(2), Based on a market index or other basis",
+            label: "GSAM 538.270-4(a)(2), Based on a market index or other basis",
+          },
+          {
+            value: "GSAM 538.270-4(a)(3), Based on established pricing",
+            label: "GSAM 538.270-4(a)(3), Based on established pricing",
+          },
         ],
-      },
-      {
-        id: "epa_method_mechanism",
-        label: "EPA Method/Mechanism",
-        type: "text",
-        behavior: "readonly",
-        section: "Logistics & Compliance",
       },
       {
         id: "attachments",
@@ -631,23 +639,27 @@ export const documentConfigs: DocumentConfig[] = [
           { value: "no", label: "No" },
         ],
       },
+
       {
-        id: "is_tdr",
-        label: "TDR Status",
+        id: "epa_method_mechanism",
+        label: "EPA Method/Mechanism",
         type: "select",
         behavior: "readonly",
         section: "Logistics & Compliance",
         options: [
-          { value: "yes", label: "Yes" },
-          { value: "no", label: "No" },
+          {
+            value: "GSAM 538.270-4(a)(1), Based on fixed escalation rates",
+            label: "GSAM 538.270-4(a)(1), Based on fixed escalation rates",
+          },
+          {
+            value: "GSAM 538.270-4(a)(2), Based on a market index or other basis",
+            label: "GSAM 538.270-4(a)(2), Based on a market index or other basis",
+          },
+          {
+            value: "GSAM 538.270-4(a)(3), Based on established pricing",
+            label: "GSAM 538.270-4(a)(3), Based on established pricing",
+          },
         ],
-      },
-      {
-        id: "epa_method_mechanism",
-        label: "EPA Method/Mechanism",
-        type: "text",
-        behavior: "readonly",
-        section: "Logistics & Compliance",
       },
       {
         id: "attachments",
@@ -833,23 +845,27 @@ export const documentConfigs: DocumentConfig[] = [
           { value: "no", label: "No" },
         ],
       },
+
       {
-        id: "is_tdr",
-        label: "TDR Status",
+        id: "epa_method_mechanism",
+        label: "EPA Method/Mechanism",
         type: "select",
         behavior: "readonly",
         section: "Logistics & Compliance",
         options: [
-          { value: "yes", label: "Yes" },
-          { value: "no", label: "No" },
+          {
+            value: "GSAM 538.270-4(a)(1), Based on fixed escalation rates",
+            label: "GSAM 538.270-4(a)(1), Based on fixed escalation rates",
+          },
+          {
+            value: "GSAM 538.270-4(a)(2), Based on a market index or other basis",
+            label: "GSAM 538.270-4(a)(2), Based on a market index or other basis",
+          },
+          {
+            value: "GSAM 538.270-4(a)(3), Based on established pricing",
+            label: "GSAM 538.270-4(a)(3), Based on established pricing",
+          },
         ],
-      },
-      {
-        id: "epa_method_mechanism",
-        label: "EPA Method/Mechanism",
-        type: "text",
-        behavior: "readonly",
-        section: "Logistics & Compliance",
       },
       {
         id: "attachments",
@@ -1034,23 +1050,27 @@ export const documentConfigs: DocumentConfig[] = [
           { value: "no", label: "No" },
         ],
       },
+
       {
-        id: "is_tdr",
-        label: "TDR Status",
+        id: "epa_method_mechanism",
+        label: "EPA Method/Mechanism",
         type: "select",
         behavior: "readonly",
         section: "Logistics & Compliance",
         options: [
-          { value: "yes", label: "Yes" },
-          { value: "no", label: "No" },
+          {
+            value: "GSAM 538.270-4(a)(1), Based on fixed escalation rates",
+            label: "GSAM 538.270-4(a)(1), Based on fixed escalation rates",
+          },
+          {
+            value: "GSAM 538.270-4(a)(2), Based on a market index or other basis",
+            label: "GSAM 538.270-4(a)(2), Based on a market index or other basis",
+          },
+          {
+            value: "GSAM 538.270-4(a)(3), Based on established pricing",
+            label: "GSAM 538.270-4(a)(3), Based on established pricing",
+          },
         ],
-      },
-      {
-        id: "epa_method_mechanism",
-        label: "EPA Method/Mechanism",
-        type: "text",
-        behavior: "readonly",
-        section: "Logistics & Compliance",
       },
       {
         id: "attachments",

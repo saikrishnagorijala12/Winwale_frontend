@@ -108,7 +108,7 @@ export default function EditClientContractModal({
           fob_term: "Origin",
           energy_star_compliance: "Yes",
           is_deleted: false,
-          is_tdr: false,
+
         });
       }
       setStep(1);
@@ -210,9 +210,8 @@ export default function EditClientContractModal({
         ...contractData,
         gsa_proposed_discount: Number(contractData.gsa_proposed_discount) || 0,
         normal_delivery_time: Number(contractData.normal_delivery_time) || 0,
-        expedited_delivery_time:
-          Number(contractData.expedited_delivery_time) || 0,
-        is_tdr: contractData.is_tdr,
+        expedited_delivery_time: contractData.expedited_delivery_time,
+
       };
 
       if (contract) {

@@ -441,14 +441,7 @@ export const ClientContractDetailsModal: React.FC<
                       }
                     />
 
-                    <DetailItem
-                      icon={contract.is_tdr ? ShieldCheck : XCircle}
-                      label="TDR Status"
-                      value={contract.is_tdr ? "TDR Contract" : "Non-TDR"}
-                      iconClassName={
-                        contract.is_tdr ? "text-blue-500" : "text-slate-400"
-                      }
-                    />
+
                     <DetailItem
                       icon={FileText}
                       label="Concessions"

@@ -85,8 +85,7 @@ export const validateStep2 = (
   if (normalDeliveryErr) errors.normal_delivery_time = normalDeliveryErr;
 
   const expeditedDeliveryErr =
-    v.validateRequired(contract.expedited_delivery_time, "Expedited Delivery Time") ||
-    v.validatePositiveInteger(contract.expedited_delivery_time, "Expedited delivery time");
+    v.validateRequired(contract.expedited_delivery_time, "Expedited Delivery Time");
   if (expeditedDeliveryErr) errors.expedited_delivery_time = expeditedDeliveryErr;
 
   const fobErr = v.validateRequired(contract.fob_term, "FOB Term");

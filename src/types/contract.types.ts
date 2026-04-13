@@ -10,7 +10,7 @@ export interface ClientContractBase {
   q_v_discount?: string;
   additional_concessions?: string;
   normal_delivery_time?: number;
-  expedited_delivery_time?: number;
+  expedited_delivery_time?: string;
   fob_term?: string;
   energy_star_compliance?: string;
   epa_method_mechanism?: string;

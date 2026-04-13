@@ -60,14 +60,7 @@ export const PriceDecreaseEpaTemplate = ({ data }: { data: any }) => (
 
       <li>All prices offered to GSA include the current IFF.</li>
 
-      {data.is_tdr !== "yes" && (
-        <li>
-          Commercial Sales Practices (CSP) information previously submitted in
-          accordance with GSAR 552.238-81 Price Reductions remains accurate and
-          unchanged. If CSP information has changed, an updated CSP-1 has been
-          provided within eMod.
-        </li>
-      )}
+
     </ul>
 
     <p className="mb-4">

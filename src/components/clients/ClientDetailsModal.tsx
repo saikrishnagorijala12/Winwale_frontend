@@ -270,23 +270,7 @@ export const ClientDetailsModal: React.FC<ClientDetailsModalProps> = ({
                           </>
                         )}
                       </div>
-                      <div className="flex items-center gap-2">
-                        {client.contractDetails.is_tdr ? (
-                          <>
-                            <ShieldCheck className="w-4 h-4 text-blue-500" />
-                            <span className="text-blue-600 font-semibold text-sm">
-                              TDR Contract
-                            </span>
-                          </>
-                        ) : (
-                          <>
-                            <XCircle className="w-4 h-4 text-slate-400" />
-                            <span className="text-slate-400 font-semibold text-sm">
-                              Non-TDR
-                            </span>
-                          </>
-                        )}
-                      </div>
+
                     </div>
                   </div>
 

@@ -51,7 +51,7 @@ const initialContract: Omit<ClientContractCreate, "client_id"> = {
   fob_term: "Origin",
   energy_star_compliance: "Yes",
   is_deleted: false,
-  is_tdr: false,
+
 };
 
 export default function AddClientContractModal({
@@ -165,9 +165,8 @@ export default function AddClientContractModal({
         client_id: newClientId,
         gsa_proposed_discount: Number(contractData.gsa_proposed_discount) || 0,
         normal_delivery_time: Number(contractData.normal_delivery_time) || 0,
-        expedited_delivery_time:
-          Number(contractData.expedited_delivery_time) || 0,
-        is_tdr: contractData.is_tdr,
+        expedited_delivery_time: contractData.expedited_delivery_time,
+
       };
       await contractService.createContract(newClientId, contractPayload);
 

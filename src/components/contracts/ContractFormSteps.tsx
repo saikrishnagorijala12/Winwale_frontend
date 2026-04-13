@@ -320,6 +320,38 @@ export function Step2({
           <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/4 w-4 h-4 text-slate-400 pointer-events-none" />
         </div>
       </div>
+      <div >
+        <label className="text-sm font-bold text-slate-700">
+          EPA Method / Mechanism <span className="text-red-500">*</span>
+        </label>
+        <div className="relative">
+          <select
+            className={selectClass}
+            value={contract.epa_method_mechanism || ""}
+            onChange={(e) => {
+              onChange({ ...contract, epa_method_mechanism: e.target.value });
+              onClearError?.("epa_method_mechanism");
+            }}
+          >
+            <option value="" disabled>Select EPA Provision</option>
+            <option value="GSAM 538.270-4(a)(1), Based on fixed escalation rates">
+              GSAM 538.270-4(a)(1), Based on fixed escalation rates
+            </option>
+            <option value="GSAM 538.270-4(a)(2), Based on a market index or other basis">
+              GSAM 538.270-4(a)(2), Based on a market index or other basis
+            </option>
+            <option value="GSAM 538.270-4(a)(3), Based on established pricing">
+              GSAM 538.270-4(a)(3), Based on established pricing
+            </option>
+          </select>
+          <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/4 w-4 h-4 text-slate-400 pointer-events-none" />
+        </div>
+        {errors.epa_method_mechanism && (
+          <div className="mt-1.5 text-xs text-red-600">
+            <span>{errors.epa_method_mechanism}</span>
+          </div>
+        )}
+      </div>
       <div>
         <label className="text-sm font-bold text-slate-700">
           Includes Hazardous Materials? <span className="text-red-500">*</span>
@@ -339,29 +371,6 @@ export function Step2({
           {errors.is_hazardous && (
             <div className="mt-1 text-xs text-red-600">
               <span>{errors.is_hazardous}</span>
-            </div>
-          )}
-          <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/4 w-4 h-4 text-slate-400 pointer-events-none" />
-        </div>
-      </div>
-
-      <div>
-        <label className="text-sm font-bold text-slate-700">TDR Status <span className="text-red-500">*</span></label>
-        <div className="relative">
-          <select
-            className={selectClass}
-            value={contract.is_tdr ? "TDR" : "Non-TDR"}
-            onChange={(e) => {
-              onChange({ ...contract, is_tdr: e.target.value === "TDR" });
-              onClearError?.("is_tdr");
-            }}
-          >
-            <option value="Non-TDR">Non-TDR</option>
-            <option value="TDR">TDR</option>
-          </select>
-          {errors.is_tdr && (
-            <div className="mt-1 text-xs text-red-600">
-              <span>{errors.is_tdr}</span>
             </div>
           )}
           <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/4 w-4 h-4 text-slate-400 pointer-events-none" />
@@ -394,39 +403,17 @@ export function Step2({
           Expedited Delivery (Days) <span className="text-red-500">*</span>
         </label>
         <input
-          type="number"
-          className={inputClass}
-          value={contract.expedited_delivery_time || 10}
-          onChange={(e) => {
-            onChange({
-              ...contract,
-              expedited_delivery_time: parseInt(e.target.value) || 0,
-            });
-            onClearError?.("expedited_delivery_time");
-          }}
-        />
-        {errors.expedited_delivery_time && (
-          <div className="mt-1 text-xs text-red-600">
-            <span>{errors.expedited_delivery_time}</span>
-          </div>
-        )}
-      </div>
-      <div className="md:col-span-2">
-        <label className="text-sm font-bold text-slate-700">
-          EPA Method / Mechanism <span className="text-red-500">*</span>
-        </label>
-        <input
           type="text"
           className={inputClass}
-          value={contract.epa_method_mechanism || ""}
+          value={contract.expedited_delivery_time || ""}
           onChange={(e) => {
-            onChange({ ...contract, epa_method_mechanism: e.target.value });
-            onClearError?.("epa_method_mechanism");
+            onChange({ ...contract, expedited_delivery_time: e.target.value });
+            onClearError?.("expedited_delivery_time");
           }}
-        />
-        {errors.epa_method_mechanism && (
+          placeholder="e.g. 10 or Contact Contractor"
+        />{errors.expedited_delivery_time && (
           <div className="mt-1 text-xs text-red-600">
-            <span>{errors.epa_method_mechanism}</span>
+            <span>{errors.expedited_delivery_time}</span>
           </div>
         )}
       </div>
