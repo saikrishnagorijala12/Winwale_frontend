@@ -30,7 +30,7 @@ const initialForm: ClientContractCreate = {
   q_v_discount: "",
   additional_concessions: "",
   normal_delivery_time: 30,
-  expedited_delivery_time: 10,
+  expedited_delivery_time: "10",
   fob_term: "Origin",
   energy_star_compliance: "Yes",
   is_deleted: false,
@@ -106,7 +106,7 @@ export default function AddContractModal({
         origin_country: payload.origin_country || "USA",
         gsa_proposed_discount: Number(payload.gsa_proposed_discount) || 0,
         normal_delivery_time: Number(payload.normal_delivery_time) || 0,
-        expedited_delivery_time: Number(payload.expedited_delivery_time) || 0,
+        expedited_delivery_time: payload.expedited_delivery_time,
       };
 
       await contractService.createContract(client_id!, formattedPayload);

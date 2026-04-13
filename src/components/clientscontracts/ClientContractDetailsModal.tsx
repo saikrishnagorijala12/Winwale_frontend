@@ -165,11 +165,10 @@ export const ClientContractDetailsModal: React.FC<
           <div className="flex items-center gap-6">
             <div className="relative group">
               <div
-                className={`w-16 h-16 rounded-2xl border border-slate-200 flex items-center justify-center text-white font-bold text-2xl shadow-lg shadow-blue-100 overflow-hidden ${
-                  client.logoUrl
-                    ? "bg-slate-50/50"
-                    : "bg-linear-to-br from-[#3399cc] to-[#2980b9]"
-                }`}
+                className={`w-16 h-16 rounded-2xl border border-slate-200 flex items-center justify-center text-white font-bold text-2xl shadow-lg shadow-blue-100 overflow-hidden ${client.logoUrl
+                  ? "bg-slate-50/50"
+                  : "bg-linear-to-br from-[#3399cc] to-[#2980b9]"
+                  }`}
               >
                 {client.logoUrl ? (
                   <img
@@ -231,13 +230,13 @@ export const ClientContractDetailsModal: React.FC<
               </div>
             </div>
           </div>
-            <button
-              onClick={onClose}
-              className="p-2 hover:bg-slate-100 rounded-full transition-colors text-slate-400"
-              aria-label="Close Modal"
-            >
-              <X className="w-6 h-6" />
-            </button>
+          <button
+            onClick={onClose}
+            className="p-2 hover:bg-slate-100 rounded-full transition-colors text-slate-400"
+            aria-label="Close Modal"
+          >
+            <X className="w-6 h-6" />
+          </button>
         </div>
 
         <div className="flex-1 overflow-y-auto p-6 md:p-8">
@@ -363,11 +362,10 @@ export const ClientContractDetailsModal: React.FC<
                             <button
                               key={i}
                               onClick={() => setCurrentNegIndex(i)}
-                              className={`w-1.5 h-1.5 rounded-full transition-all ${
-                                i === currentNegIndex
-                                  ? "bg-[#38A1DB] w-4"
-                                  : "bg-slate-200 hover:bg-slate-300"
-                              }`}
+                              className={`w-1.5 h-1.5 rounded-full transition-all ${i === currentNegIndex
+                                ? "bg-[#38A1DB] w-4"
+                                : "bg-slate-200 hover:bg-slate-300"
+                                }`}
                             />
                           ))}
                         </div>
@@ -419,7 +417,7 @@ export const ClientContractDetailsModal: React.FC<
                     <DetailItem
                       icon={Zap}
                       label="Expedited"
-                      value={`${contract.expedited_delivery_time || 0} Days`}
+                      value={`${contract.expedited_delivery_time || 0} `}
                     />
                     <DetailItem
                       icon={FileText}

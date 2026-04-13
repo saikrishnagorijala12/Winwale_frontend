@@ -104,7 +104,7 @@ export default function EditClientContractModal({
           q_v_discount: "",
           additional_concessions: "",
           normal_delivery_time: 30,
-          expedited_delivery_time: 10,
+          expedited_delivery_time: "10",
           fob_term: "Origin",
           energy_star_compliance: "Yes",
           is_deleted: false,

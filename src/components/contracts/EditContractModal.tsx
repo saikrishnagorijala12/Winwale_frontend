@@ -31,7 +31,7 @@ const initialForm: ClientContractUpdate = {
   q_v_discount: "",
   additional_concessions: "",
   normal_delivery_time: 30,
-  expedited_delivery_time: 10,
+  expedited_delivery_time: "10",
   fob_term: "Origin",
   energy_star_compliance: "Yes",
 };
@@ -62,7 +62,7 @@ export default function EditContractModal({
         q_v_discount: initialContract.q_v_discount || "",
         additional_concessions: initialContract.additional_concessions || "",
         normal_delivery_time: initialContract.normal_delivery_time || 30,
-        expedited_delivery_time: initialContract.expedited_delivery_time || 10,
+        expedited_delivery_time: initialContract.expedited_delivery_time ? String(initialContract.expedited_delivery_time) : "10",
         fob_term: initialContract.fob_term || "Origin",
         energy_star_compliance: initialContract.energy_star_compliance || "Yes",
       });
@@ -114,7 +114,7 @@ export default function EditContractModal({
         origin_country: formData.origin_country || "USA",
         gsa_proposed_discount: Number(formData.gsa_proposed_discount) || 0,
         normal_delivery_time: Number(formData.normal_delivery_time) || 0,
-        expedited_delivery_time: Number(formData.expedited_delivery_time) || 0,
+        expedited_delivery_time: formData.expedited_delivery_time,
       };
 
       await contractService.updateContract(initialContract.client_id, payload);
@@ -423,13 +423,13 @@ export default function EditContractModal({
                     Expedited Delivery (Days)
                   </label>
                   <input
-                    type="number"
+                    type="text"
                     className="w-full mt-2 px-4 py-3 rounded-xl border-2 border-slate-200  outline-none"
                     value={formData.expedited_delivery_time}
                     onChange={(e) =>
                       setFormData({
                         ...formData,
-                        expedited_delivery_time: parseInt(e.target.value) || 0,
+                        expedited_delivery_time: e.target.value,
                       })
                     }
                   />
