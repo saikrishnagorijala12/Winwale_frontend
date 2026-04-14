@@ -14,6 +14,22 @@ export default defineConfig(({  }) => {
         alias: {
           '@': path.resolve(__dirname, '.'),
         }
+      },
+      build: {
+        target: 'esnext',
+        minify: 'esbuild',
+        chunkSizeWarningLimit: 1000,
+        rollupOptions: {
+          maxParallelFileOps: 3,
+          output: {
+            manualChunks: {
+              'vendor-amplify': ['aws-amplify'],
+              'vendor-utils': ['xlsx', 'docx', 'file-saver', 'qrcode'],
+              'vendor-ui': ['lucide-react', 'react', 'react-dom', 'react-router-dom', 'sonner'],
+              'vendor-editor': ['@tiptap/react', '@tiptap/starter-kit', '@tiptap/extension-image', '@tiptap/extension-link', '@tiptap/extension-underline'],
+            }
+          }
+        }
       }
     };
 });

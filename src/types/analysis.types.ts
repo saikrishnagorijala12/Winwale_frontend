@@ -4,6 +4,7 @@ export interface ModificationSummary {
   priceIncreases: number;
   priceDecreases: number;
   descriptionChanges: number;
+  noChanges: number;
 }
 
 export interface ModificationAction {
@@ -13,7 +14,8 @@ export interface ModificationAction {
   | "REMOVED_PRODUCT"
   | "PRICE_INCREASE"
   | "PRICE_DECREASE"
-  | "DESCRIPTION_CHANGE";
+  | "DESCRIPTION_CHANGE"
+  | "NO_CHANGE";
   product_id?: number | null;
   product_name?: string | null;
   manufacturer_part_number?: string | null;

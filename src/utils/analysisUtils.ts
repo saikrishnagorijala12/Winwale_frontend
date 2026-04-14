@@ -24,6 +24,7 @@ export const processModifications = (
     priceIncreases: 0,
     priceDecreases: 0,
     descriptionChanges: 0,
+    noChanges: 0,
   };
 
   if (!actionSummary) return summary;
@@ -33,6 +34,7 @@ export const processModifications = (
   summary.priceIncreases = actionSummary["PRICE_INCREASE"] || 0;
   summary.priceDecreases = actionSummary["PRICE_DECREASE"] || 0;
   summary.descriptionChanges = actionSummary["DESCRIPTION_CHANGE"] || 0;
+  summary.noChanges = actionSummary["NO_CHANGE"] || 0;
 
   return summary;
 };

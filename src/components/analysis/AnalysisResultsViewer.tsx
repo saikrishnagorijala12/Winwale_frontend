@@ -5,6 +5,7 @@ import {
     TrendingUp,
     TrendingDown,
     FileEdit,
+    Check,
     Download,
     ChevronLeft,
     ChevronRight,
@@ -47,6 +48,12 @@ const tabs = [
         label: "Description Changes",
         icon: FileEdit,
         variant: "blue" as const,
+    },
+    {
+        id: "NO_CHANGE",
+        label: "No Changes",
+        icon: Check,
+        variant: "slate" as const,
     },
 ];
 
@@ -100,7 +107,7 @@ export const AnalysisResultsViewer = ({
     const isPriceChange =
         activeTab === "PRICE_INCREASE" || activeTab === "PRICE_DECREASE";
     const isAddOrDelete =
-        activeTab === "NEW_PRODUCT" || activeTab === "REMOVED_PRODUCT";
+        activeTab === "NEW_PRODUCT" || activeTab === "REMOVED_PRODUCT" || activeTab === "NO_CHANGE";
 
     const startIndex = (currentPage - 1) * itemsPerPage;
 
@@ -192,7 +199,7 @@ export const AnalysisResultsViewer = ({
                 confirmDisabled={selectedExportTypes.length === 0}
                 variant="blue"
             />
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
                 {tabs.map((tab) => (
                     <StatCard
                         key={tab.id}
@@ -200,6 +207,8 @@ export const AnalysisResultsViewer = ({
                         value={actionSummary[tab.id] || 0}
                         icon={<tab.icon className="w-4 h-4" />}
                         variant={tab.variant}
+                        isActive={activeTab === tab.id}
+                        onClick={() => onTabChange(tab.id)}
                     />
                 ))}
             </div>
@@ -209,31 +218,31 @@ export const AnalysisResultsViewer = ({
                     <h3 className="text-lg sm:text-xl font-bold text-slate-900 text-center sm:text-left">Analysis Results</h3>
 
                     <div className="flex items-center justify-center sm:justify-end gap-4 font-normal">
-                            <button
-                                onClick={() => setIsConfirmExportOpen(true)}
-                                disabled={isExporting || totalModifications === 0}
-                                className="group flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm transition-all border bg-white text-slate-700 border-slate-200 hover:bg-slate-50 hover:border-slate-300 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
-                                aria-label="Export Analysis Results"
-                            >
-                                <Download
-                                    size={16}
-                                    className="text-slate-400 group-hover:text-slate-600 transition-colors"
-                                />
-                                Export Data
-                            </button>
+                        <button
+                            onClick={() => setIsConfirmExportOpen(true)}
+                            disabled={isExporting || totalModifications === 0}
+                            className="group flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm transition-all border bg-white text-slate-700 border-slate-200 hover:bg-slate-50 hover:border-slate-300 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+                            aria-label="Export Analysis Results"
+                        >
+                            <Download
+                                size={16}
+                                className="text-slate-400 group-hover:text-slate-600 transition-colors"
+                            />
+                            Export Data
+                        </button>
                     </div>
                 </div>
 
-                <div className="px-4 sm:px-6 pt-4">
-                    <div className="bg-slate-100/80 p-1 rounded-2xl flex items-center w-full overflow-x-auto custom-scrollbar no-scrollbar">
+                <div className="px-4 sm:px-6 pt-6">
+                    <div className="bg-slate-50 border border-slate-200/50 p-1.5 rounded-2xl flex items-center w-full overflow-x-auto no-scrollbar shadow-inner">
                         {tabs.map((tab) => (
                             <button
                                 key={tab.id}
                                 onClick={() => onTabChange(tab.id)}
-                                className={`flex-1 min-w-[120px] sm:min-w-0 flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all
+                                className={`flex-1 min-w-[130px] sm:min-w-0 flex items-center justify-center gap-2.5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all duration-300
                        ${activeTab === tab.id
-                                        ? "bg-white text-slate-900 shadow-sm"
-                                        : "text-slate-500 hover:text-slate-700"
+                                        ? "bg-white text-slate-900 shadow-sm ring-1 ring-slate-200"
+                                        : "text-slate-400 hover:text-slate-600 hover:bg-white/50"
                                     }`}
                             >
                                 <tab.icon
@@ -248,11 +257,11 @@ export const AnalysisResultsViewer = ({
                     </div>
                 </div>
 
-                <div className="p-4 sm:p-6">
-                    <div className="border border-slate-100 rounded-xl overflow-x-auto custom-scrollbar">
+                <div className="p-6">
+                    <div className="border border-slate-100/80 rounded-2xl overflow-x-auto no-scrollbar shadow-sm">
                         <table className="w-full text-sm min-w-[800px] lg:table-fixed">
-                            <thead className="bg-slate-50/50">
-                                <tr>
+                            <thead>
+                                <tr className="bg-slate-50/80 border-b border-slate-100">
                                     <th className="text-left p-3 font-bold text-slate-700">
                                         Part Number
                                     </th>
@@ -311,9 +320,11 @@ export const AnalysisResultsViewer = ({
                                     <tr>
                                         <td
                                             colSpan={4}
-                                            className="p-10 text-center text-slate-400 italic"
+                                            className="p-10 text-center text-slate-400 italic font-medium"
                                         >
-                                            No modifications found for this category.
+                                            {activeTab === "NO_CHANGE"
+                                                ? "No products were identified with 'No Changes'. All products had some form of modification."
+                                                : "No modifications found for this category."}
                                         </td>
                                     </tr>
                                 ) : (
@@ -322,7 +333,7 @@ export const AnalysisResultsViewer = ({
                                             <td className="p-3 font-mono text-xs text-slate-500">
                                                 {action.manufacturer_part_number || "N/A"}
                                             </td>
-                                             <td className="p-3 font-medium text-slate-900 truncate max-w-[200px]">
+                                            <td className="p-3 font-medium text-slate-900 truncate max-w-[200px]">
                                                 <Tooltip content={action.product_name || ""} disabled={!action.product_name} position="top">
                                                     {action.product_name || "-"}
                                                 </Tooltip>

@@ -1,10 +1,10 @@
-import React from "react";
 import {
   Plus,
   Minus,
   TrendingUp,
   TrendingDown,
   FileEdit,
+  Check,
 } from "lucide-react";
 import { ModificationSummary } from "../../types/analysis.types";
 
@@ -54,7 +54,14 @@ export default function ModificationsSummary({
         </span>
       )}
 
-      {!hasModifications && (
+      {summary.noChanges > 0 && (
+        <span className="flex items-center gap-1 text-slate-500 font-bold">
+          <Check className="w-3 h-3" />
+          {summary.noChanges}
+        </span>
+      )}
+
+      {!hasModifications && summary.noChanges === 0 && (
         <span className="text-slate-400 text-xs italic">
           No modifications
         </span>

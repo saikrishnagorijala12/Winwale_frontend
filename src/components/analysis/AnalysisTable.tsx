@@ -129,7 +129,8 @@ export default function AnalysisTable({
                     item.summary.deletions > 0 ||
                     item.summary.priceIncreases > 0 ||
                     item.summary.priceDecreases > 0 ||
-                    item.summary.descriptionChanges > 0;
+                    item.summary.descriptionChanges > 0 ||
+                    item.summary.noChanges > 0;
 
                   return (
                     <tr
