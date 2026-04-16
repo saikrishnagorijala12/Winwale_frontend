@@ -28,6 +28,17 @@ const scrollbarStyles = `
   .custom-scrollbar::-webkit-scrollbar-thumb:hover {
     background: #cbd5e1;
   }
+  
+  @keyframes scan {
+    0% { transform: translateY(-100%); }
+    100% { transform: translateY(100%); }
+  }
+  @keyframes progress {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+  }
+  .animate-scan { animation: scan 2s ease-in-out infinite; }
+  .animate-progress { animation: progress 1.5s ease-in-out infinite; }
 `;
 
 interface FileUploadStepProps {
@@ -218,10 +229,33 @@ export const FileUploadStep = ({
                             {/* Preview Area Column */}
                             <div className="lg:col-span-8">
                                 {isParsingFile ? (
-                                    <div className="flex-1 flex flex-col items-center justify-center min-h-100 bg-slate-50/30 rounded-2xl border border-slate-100 border-dashed">
-                                        <Loader2 className="w-8 h-8 animate-spin text-[#3399cc] mb-4" />
-                                        <p className="text-sm font-bold text-slate-600">Parsing file data...</p>
-                                        <p className="text-[11px] text-slate-400 mt-1">Extracting headers and preview rows</p>
+                                    <div className="flex-1 flex flex-col items-center justify-center min-h-[400px] bg-slate-50/50 rounded-2xl border border-slate-200 border-dashed relative overflow-hidden">
+                                        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#3399cc]/5 to-transparent animate-scan" />
+                                        
+                                        <div className="relative z-10 flex flex-col items-center animate-in fade-in zoom-in-95 duration-500">
+                                            <div className="relative mb-8 mt-4">
+                                                <div className="w-20 h-20 rounded-3xl bg-white shadow-xl shadow-cyan-100 flex items-center justify-center relative z-10 border border-cyan-50">
+                                                    <FileSpreadsheet className="w-10 h-10 text-[#3399cc] animate-pulse" />
+                                                </div>
+                                                {/* Pulse rings */}
+                                                <div className="absolute inset-0 bg-[#3399cc]/20 rounded-3xl animate-ping opacity-75" style={{ animationDuration: '2s' }} />
+                                                <div className="absolute -inset-6 border-[3px] border-[#3399cc]/20 rounded-full animate-spin" style={{ animationDuration: '3s', borderTopColor: 'transparent', borderRightColor: 'transparent' }} />
+                                                <div className="absolute -inset-10 border-[2px] border-emerald-400/20 rounded-full animate-spin" style={{ animationDuration: '4s', animationDirection: 'reverse', borderBottomColor: 'transparent', borderLeftColor: 'transparent' }} />
+                                            </div>
+                                            
+                                            <h4 className="text-xl font-bold text-slate-800 mb-3 tracking-tight">Analyzing Data Structure</h4>
+                                            
+                                            <div className="flex flex-col items-center gap-4 w-64">
+                                                <div className="flex items-center gap-2 text-sm text-slate-500 font-medium">
+                                                    <Loader2 className="w-4 h-4 animate-spin text-[#3399cc]" />
+                                                    <span>Extracting column headers & preview...</span>
+                                                </div>
+                                                
+                                                <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden shadow-inner border border-slate-200/50">
+                                                    <div className="h-full bg-gradient-to-r from-[#3399cc] via-cyan-400 to-[#3399cc] w-full animate-progress rounded-full" />
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 ) : previewData && previewData.length > 0 ? (
                                     <div className="flex flex-col bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">

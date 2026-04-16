@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useClient } from "../context/ClientContext";
 import {
   Search,
@@ -20,9 +20,17 @@ import Pagination from "../components/shared/Pagination";
 
 export default function ClientProducts() {
   const navigate = useNavigate();
-  const { selectedClientId } = useClient();
+  const { id } = useParams<{ id: string }>();
+  const { selectedClientId, setSelectedClientId } = useClient();
 
-  const clientId = selectedClientId;
+  const clientId = id ? parseInt(id) : selectedClientId;
+
+  // Sync context if ID is in URL but not in context
+  useEffect(() => {
+    if (id && parseInt(id) !== selectedClientId) {
+      setSelectedClientId(parseInt(id));
+    }
+  }, [id, selectedClientId, setSelectedClientId]);
 
   const [products, setProducts] = useState<Product[]>([]);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
@@ -65,7 +73,7 @@ export default function ClientProducts() {
 
   const startIndex = (currentPage - 1) * itemsPerPage;
 
-  const formatCurrency = (value?: number) => {
+  const formatCurrency = (value?: number | null) => {
     if (value === undefined || value === null) return "-";
     return new Intl.NumberFormat("en-US", {
       style: "currency",

@@ -47,7 +47,7 @@ export default function AnalysisFilters({
       ? 0
       : (clients.find((c) => c.company_name === clientFilter)?.client_id ?? 0);
 
-  const handleClientSelect = (clientId: number) => {
+  const handleClientSelect = (clientId: number | null) => {
     if (clientId === 0) {
       setClientFilter("All");
     } else {

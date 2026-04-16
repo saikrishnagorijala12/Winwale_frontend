@@ -42,7 +42,7 @@ export const validateStep1 = (
   const zipRequired = v.validateRequired(clientData.company_zip, "ZIP");
   const zipFormat = v.validateZip(clientData.company_zip);
   if (zipRequired || zipFormat)
-    newErrors.company_zip = zipRequired || zipFormat || "";
+    newErrors.company_zip = (zipRequired || zipFormat) as string;
 
   setErrors(newErrors);
   return Object.keys(newErrors).length === 0;
@@ -62,7 +62,7 @@ export const validateStep2 = (
     const titleErr = v.validateRequiredMaxLength(negotiator.title, 50, "Title");
     if (titleErr) negErrors.title = titleErr;
 
-    const emailErr = v.validateEmail(negotiator.email, 100);
+    const emailErr = v.validateEmail(negotiator.email || undefined, 100);
     if (emailErr) negErrors.email = emailErr;
 
     const phoneErr = v.validatePhone(negotiator.phone_no || "", "Phone number");

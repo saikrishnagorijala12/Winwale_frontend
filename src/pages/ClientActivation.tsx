@@ -274,11 +274,11 @@ const ClientActivation = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState<TabType>("pending");
 
-  const [confirmModal, setConfirmModal] = useState({
-    isOpen: false,
-    client: null,
-    action: "approve" as "approve" | "reject",
-  });
+  const [confirmModal, setConfirmModal] = useState<{
+    isOpen: boolean;
+    client: any;
+    action: "approve" | "reject";
+  }>({ isOpen: false, client: null, action: "approve" });
 
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
@@ -299,6 +299,9 @@ const ClientActivation = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [backendError, setBackendError] = useState<string>("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedClientIds, setSelectedClientIds] = useState<Set<number>>(
+    new Set(),
+  );
   const itemsPerPage = 8;
   const debouncedSearchQuery = useDebounce(searchQuery, 500);
 
@@ -327,6 +330,7 @@ const ClientActivation = () => {
       toast.error("Failed to load clients");
     } finally {
       setLoading(false);
+      setSelectedClientIds(new Set());
     }
   };
 
@@ -472,6 +476,45 @@ const ClientActivation = () => {
     }
   };
 
+  const handleBulkStatusUpdate = async (action: "approve" | "reject") => {
+    if (selectedClientIds.size === 0) return;
+
+    try {
+      setLoading(true);
+      await api.patch("/clients/bulk-approve", {
+        client_ids: Array.from(selectedClientIds),
+        action,
+      });
+      toast.success(
+        `${selectedClientIds.size} clients ${action === "approve" ? "approved" : "rejected"} successfully`,
+      );
+      setSelectedClientIds(new Set());
+      await fetchClients(currentPage, debouncedSearchQuery, activeTab);
+    } catch (err) {
+      handleApiError(err, `bulk ${action} clients`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedClientIds.size === clients.length) {
+      setSelectedClientIds(new Set());
+    } else {
+      setSelectedClientIds(new Set(clients.map((c) => c.client_id)));
+    }
+  };
+
+  const toggleSelectClient = (clientId: number) => {
+    const newSelected = new Set(selectedClientIds);
+    if (newSelected.has(clientId)) {
+      newSelected.delete(clientId);
+    } else {
+      newSelected.add(clientId);
+    }
+    setSelectedClientIds(newSelected);
+  };
+
   const handleRowClick = (client: any) => {
     handleViewClient(client);
   };
@@ -571,8 +614,11 @@ const ClientActivation = () => {
           onBack={() => setCurrentStep(1)}
           onChange={(field, value) => {
             setEditingClient({ ...editingClient, [field]: value });
-            if (editErrors[field])
-              setEditErrors({ ...editErrors, [field]: "" });
+
+            const errorField = field as keyof ClientFormErrors;
+            if (editErrors[errorField]) {
+              setEditErrors({ ...editErrors, [errorField]: "" });
+            }
           }}
           onClearError={(field) =>
             setEditErrors({ ...editErrors, [field]: "" })
@@ -685,6 +731,7 @@ const ClientActivation = () => {
           </div>
         </div>
 
+
         <div className="p-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <h2 className="text-xl font-bold">{getTabTitle()}</h2>
@@ -733,26 +780,80 @@ const ClientActivation = () => {
           )}
         </div>
 
+        {selectedClientIds.size > 0 && (
+          <div className="fixed bottom-10 left-1/2 -translate-x-1/2 z-50 px-6 py-4 bg-slate-900 text-white rounded-2xl shadow-2xl flex items-center gap-8 border border-slate-700/50 animate-in fade-in slide-in-from-bottom-4 zoom-in-95 duration-300">
+            <div className="flex items-center gap-4">
+              <div className="w-10 h-10 bg-blue-500/10 rounded-xl flex items-center justify-center border border-blue-500/20">
+                <CheckCircle2 className="w-5 h-5 text-blue-400" />
+              </div>
+              <div className="pr-4 border-r border-slate-700/50">
+                <p className="text-sm font-bold text-white">
+                  {selectedClientIds.size} clients selected
+                </p>
+                <p className="text-[11px] text-slate-400 font-medium whitespace-nowrap">
+                  Perform bulk actions on selection
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => handleBulkStatusUpdate("approve")}
+                disabled={loading}
+                className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl shadow-lg shadow-emerald-900/20 transition-all flex items-center gap-2 disabled:opacity-50 whitespace-nowrap active:scale-95"
+              >
+                <Check className="w-3.5 h-3.5" />
+                Approve {selectedClientIds.size > 1 ? "All" : ""}
+              </button>
+              <button
+                onClick={() => handleBulkStatusUpdate("reject")}
+                disabled={loading}
+                className="px-5 py-2.5 bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold rounded-xl shadow-lg shadow-rose-900/20 transition-all flex items-center gap-2 disabled:opacity-50 whitespace-nowrap active:scale-95"
+              >
+                <X className="w-3.5 h-3.5" />
+                Reject {selectedClientIds.size > 1 ? "All" : ""}
+              </button>
+              <div className="w-px h-6 bg-slate-700/50 mx-1" />
+              <button
+                onClick={() => setSelectedClientIds(new Set())}
+                className="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold rounded-xl transition-all active:scale-95"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
+
         <div className="hidden lg:block  px-6 pb-6 ">
           <table className="w-full border-collapse bg-white rounded-2xl shadow-sm">
             <thead>
               <tr className="bg-slate-50 border-b border-slate-200">
-                <th className="text-left px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-widerral Information">
+                <th className="px-4 py-4 w-10 text-center">
+                  <input
+                    type="checkbox"
+                    className="w-3.5 h-3.5 rounded border-slate-300 accent-[#24588fe1] cursor-pointer disabled:cursor-not-allowed transition-all"
+                    checked={
+                      clients.length > 0 &&
+                      selectedClientIds.size === clients.length
+                    }
+                    onChange={toggleSelectAll}
+                  />
+                </th>
+                <th className="text-left px-4 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                   Company
                 </th>
-                <th className="text-left px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-widerral Information">
+                <th className="text-left px-4 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                   Negotiators
                 </th>
-                <th className="text-left px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-widerral Information">
+                <th className="text-left px-4 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                   Location
                 </th>
-                <th className="text-left px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-widerral Information">
+                <th className="text-left px-4 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                   Status
                 </th>
-                <th className="text-left px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-widerral Information">
+                <th className="text-left px-4 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                   Created Date
                 </th>
-                <th className="text-right px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                <th className="text-right px-4 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
@@ -786,10 +887,27 @@ const ClientActivation = () => {
                 clients.map((client) => (
                   <tr
                     key={client.client_id}
-                    onClick={() => handleRowClick(client)}
-                    className="group hover:bg-slate-50/30 transition-colors cursor-pointer"
+                    className={`group transition-colors cursor-pointer ${
+                      selectedClientIds.has(client.client_id)
+                        ? "bg-blue-50/50"
+                        : "hover:bg-slate-50/30"
+                    }`}
                   >
-                    <td className="px-4 py-5">
+                    <td
+                      className="px-4 py-4 w-10 text-center"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleSelectClient(client.client_id);
+                      }}
+                    >
+                      <input
+                        type="checkbox"
+                        className="w-3.5 h-3.5 rounded border-slate-300 accent-[#24588fe1] cursor-pointer disabled:cursor-not-allowed transition-all"
+                        checked={selectedClientIds.has(client.client_id)}
+                        onChange={() => {}} // Handled by TD click
+                      />
+                    </td>
+                    <td className="px-4 py-5" onClick={() => handleRowClick(client)}>
                       <div className="flex items-center gap-3">
                         <div
                           className={`shrink-0 w-10 h-10 rounded-xl border border-slate-200 flex items-center justify-center text-white font-bold text-xs shadow-sm overflow-hidden ${
@@ -814,7 +932,10 @@ const ClientActivation = () => {
                               {client.company_name}
                             </p>
                           </Tooltip>
-                          <Tooltip content={client.company_email} position="top">
+                          <Tooltip
+                            content={client.company_email}
+                            position="top"
+                          >
                             <p className="text-xs text-slate-400 flex items-center gap-1 truncate max-w-50">
                               {client.company_email}
                             </p>

@@ -42,5 +42,5 @@ export interface ClientListRead {
 }
 
 export interface FormErrors {
-  [key: string]: string;
+  [key: string]: string | null | undefined;
 }

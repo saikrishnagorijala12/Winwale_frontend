@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
 
 interface TooltipProps {
-  content: string | number;
+  content: string | number | null | undefined;
   children: React.ReactNode;
   position?: "top" | "bottom" | "left" | "right";
   delay?: number;
