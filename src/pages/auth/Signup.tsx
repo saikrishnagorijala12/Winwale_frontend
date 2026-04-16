@@ -32,14 +32,16 @@ const PasswordChecklist: React.FC<{ password: string }> = ({ password }) => {
         return (
           <li
             key={key}
-            className={`flex items-center gap-2 ${passed ? "text-green-600" : "text-slate-400"
-              }`}
+            className={`flex items-center gap-2 ${
+              passed ? "text-green-600" : "text-slate-400"
+            }`}
           >
             <span
-              className={`inline-flex h-4 w-4 items-center justify-center rounded-full border text-xs ${passed
+              className={`inline-flex h-4 w-4 items-center justify-center rounded-full border text-xs ${
+                passed
                   ? "border-green-600 bg-green-600 text-white"
                   : "border-slate-300"
-                }`}
+              }`}
             >
               {passed ? "✓" : ""}
             </span>
@@ -118,7 +120,7 @@ const Signup: React.FC = () => {
   };
 
   const title = "Sign up";
-  const subtitle = "Company employees only – use your official email";
+  const subtitle = "Company employees only – use your @winvale.com email";
 
   return (
     <AuthLayout title={title} subtitle={subtitle}>
@@ -222,10 +224,11 @@ const Signup: React.FC = () => {
           </div>
 
           <div
-            className={`overflow-hidden transition-all duration-300 ease-in-out ${passwordFocused && hasFailedRules && formData.password.length > 0
+            className={`overflow-hidden transition-all duration-300 ease-in-out ${
+              passwordFocused && hasFailedRules && formData.password.length > 0
                 ? "max-h-40 opacity-100"
                 : "max-h-0 opacity-0"
-              }`}
+            }`}
           >
             <PasswordChecklist password={formData.password} />
           </div>

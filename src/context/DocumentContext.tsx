@@ -143,7 +143,7 @@ export const DocumentProvider: React.FC<{ children: React.ReactNode }> = ({
   const [documentConfig, setDocumentConfig] = useState<DocumentConfig | null>(
     null,
   );
-  const [formData, setFormData] = useState<Record<string, string | number | string[]>>({});
+  const [formData, setFormData] = useState<Record<string, string | number>>({});
   const [validationErrors, setValidationErrors] = useState<ValidationError[]>(
     [],
   );
@@ -236,7 +236,7 @@ export const DocumentProvider: React.FC<{ children: React.ReactNode }> = ({
     [user, loadedJobId, cachedJobDetails, setCurrentStep],
   );
 
-  const updateField = useCallback((fieldId: string, value: string | number | string[]) => {
+  const updateField = useCallback((fieldId: string, value: string | number) => {
     setFormData((prev) => ({ ...prev, [fieldId]: value }));
     setValidationErrors((prev) => prev.filter((e) => e.fieldId !== fieldId));
   }, []);

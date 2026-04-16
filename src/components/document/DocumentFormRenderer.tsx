@@ -2,12 +2,12 @@ import React, { useMemo, useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight, AlertCircle } from "lucide-react";
 import { useDocument } from "@/src/context/DocumentContext";
 import { useNavigate } from "react-router-dom";
-
+ 
 interface FieldOption {
   value: string;
   label: string;
 }
-
+ 
 interface DocumentField {
   id: string;
   label: string;
@@ -23,7 +23,7 @@ interface DocumentField {
     value?: string | number;
   }>;
 }
-
+ 
 export default function DocumentFormRenderer() {
   const {
     documentConfig,
@@ -35,9 +35,9 @@ export default function DocumentFormRenderer() {
     availableNegotiators,
   } = useDocument();
   const navigate = useNavigate();
-
+ 
   const [activeTab, setActiveTab] = useState<string>("");
-
+ 
   const colors = {
     bg: "#f5f7f9",
     fg: "#1b2531",
@@ -48,21 +48,21 @@ export default function DocumentFormRenderer() {
     warning: "#f9ab20",
     secondaryBg: "#f8fafc",
   };
-
+ 
   const inputStyles = `
     w-full mt-2 px-4 py-3 rounded-xl border transition-all text-sm font-medium
     focus:outline-none focus:ring-4 focus:ring-[#24548f]/5 focus:border-[#24548f]
     placeholder:text-slate-400
   `;
-
+ 
   const disabledInputStyles = `
     w-full mt-2 px-4 py-3 rounded-xl border bg-[#f8fafc] text-[#627383]
     cursor-not-allowed border-[#d9e0e8] font-medium text-sm
   `;
-
+ 
   const fieldsBySection = useMemo(() => {
     if (!documentConfig?.fields) return {} as Record<string, DocumentField[]>;
-
+ 
     return documentConfig.fields.reduce(
       (acc, field: DocumentField) => {
         const section = field.section || "General Information";
@@ -73,27 +73,27 @@ export default function DocumentFormRenderer() {
       {} as Record<string, DocumentField[]>,
     );
   }, [documentConfig]);
-
+ 
   const sections = useMemo(
     () => Object.keys(fieldsBySection),
     [fieldsBySection],
   );
-
+ 
   useEffect(() => {
     if (sections.length === 0) return;
     if (!sections.includes(activeTab)) {
       setActiveTab(sections[0]);
     }
   }, [sections, activeTab]);
-
-
+ 
+ 
   const handleProceedToValidation = () => {
     const isValid = validateForm();
     if (isValid) {
       setCurrentStep("preview");
     }
   };
-
+ 
   const sectionHasErrors = (sectionName: string) => {
     const sectionFieldIds =
       fieldsBySection[sectionName]?.map((f) => f.id) || [];
@@ -101,7 +101,7 @@ export default function DocumentFormRenderer() {
       sectionFieldIds.includes(err.fieldId),
     );
   };
-
+ 
   if (!documentConfig) {
     return (
       <div className="min-h-100 flex items-center justify-center text-slate-500 font-bold">
@@ -109,7 +109,7 @@ export default function DocumentFormRenderer() {
       </div>
     );
   }
-
+ 
   const getInputType = (type: string) => {
     switch (type) {
       case "number":
@@ -121,16 +121,16 @@ export default function DocumentFormRenderer() {
         return "text";
     }
   };
-
+ 
   const activeIndex = sections.indexOf(activeTab);
-
+ 
   return (
     <div className="animate-fade-in  mx-auto">
       <div className="flex flex-wrap gap-2 mb-6 border-b border-slate-200">
         {sections.map((section) => {
           const isActive = activeTab === section;
           const hasErrors = sectionHasErrors(section);
-
+ 
           return (
             <button
               key={section}
@@ -151,7 +151,7 @@ export default function DocumentFormRenderer() {
           );
         })}
       </div>
-
+ 
       <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden min-h-100 animate-slide-up">
         <div className="p-8 flex flex-wrap -mx-4 gap-y-6">
           {fieldsBySection[activeTab]?.map((field) => {
@@ -162,7 +162,7 @@ export default function DocumentFormRenderer() {
             const widthClass =
               field.width ||
               (field.type === "textarea" ? "w-full" : "w-full md:w-1/2");
-
+ 
             return (
               <div key={field.id} className={`${widthClass} px-4`}>
                 <label
@@ -174,7 +174,7 @@ export default function DocumentFormRenderer() {
                     (rule) => rule.type === "required",
                   ) && <span className="text-red-500 mr-1">*</span>}
                 </label>
-
+ 
                 {field.type === "textarea" ? (
                   <textarea
                     value={formData[field.id] || ""}
@@ -242,7 +242,7 @@ export default function DocumentFormRenderer() {
                       {availableNegotiators.length === 0 && (
                         <option value="" disabled>No negotiators available</option>
                       )}
-
+ 
                       {availableNegotiators.map((n) => (
                         <option key={n.name} value={n.name}>
                           {n.name} - {n.title}
@@ -258,13 +258,13 @@ export default function DocumentFormRenderer() {
                     {field.options?.map((option) => {
                       const currentValues = (formData[field.id] as string[]) || [];
                       const isChecked = currentValues.includes(option.value);
-
+ 
                       return (
                         <label
                           key={option.value}
                           className="flex items-start gap-3 p-3 rounded-xl border transition-all cursor-pointer hover:bg-slate-50 group"
                           style={{
-                            borderColor: colors.border,
+                            borderColor: isChecked ? colors.primary : colors.border,
                             backgroundColor: isChecked ? `${colors.primary}08` : "white",
                           }}
                         >
@@ -279,7 +279,7 @@ export default function DocumentFormRenderer() {
                                 updateField(field.id, newValues);
                               }}
                               disabled={isReadOnly}
-                              className="w-4 h-4 rounded border-slate-300 accent-[#24588fe1] cursor-pointer disabled:cursor-not-allowed transition-all"
+                              className="w-4 h-4 rounded border-slate-300 text-[#24548f] focus:ring-[#24548f]"
                             />
                           </div>
                           <span
@@ -321,7 +321,7 @@ export default function DocumentFormRenderer() {
           })}
         </div>
       </div>
-
+ 
       <div className="mt-8 flex items-center justify-between pb-10">
         {activeIndex === 0 ? (
           <button
@@ -344,7 +344,7 @@ export default function DocumentFormRenderer() {
             Previous Section
           </button>
         )}
-
+ 
         {activeIndex === sections.length - 1 ? (
           <button onClick={handleProceedToValidation} className="btn-primary">
             Review & Continue

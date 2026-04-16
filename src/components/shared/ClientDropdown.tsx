@@ -4,8 +4,8 @@ import { Client } from "../../types/pricelist.types";
 
 interface ClientDropdownProps {
   clients: Client[];
-  selectedClient: number | null;
-  onClientSelect: (clientId: number | null) => void;
+  selectedClient: number;
+  onClientSelect: (clientId: number) => void;
   placeholder?: string;
   disabled?: boolean;
   className?: string;

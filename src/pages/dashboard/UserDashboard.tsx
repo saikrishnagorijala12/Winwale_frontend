@@ -10,18 +10,17 @@ import {
   Upload,
   Building2,
   Package,
-  Check,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-import { clientService } from "../../services/clientService";
+import api from "@/src/lib/axios";
 import StatusBadge from "../../components/shared/StatusBadge";
 import { fetchAnalysisJobs } from "../../services/analysisService";
 import { productService } from "../../services/productService";
 import { AnalysisJobResponse } from "../../types/analysis.types";
 import { Tooltip } from "../../components/shared/Tooltip";
 
-const Skeleton = ({ className }: { className?: string }) => (
+const Skeleton = ({ className }) => (
   <div className={`animate-pulse bg-slate-200 rounded-md ${className}`} />
 );
 
@@ -67,15 +66,15 @@ export default function Dashboard() {
       setLoading(true);
       const [clientsRes, jobsData, approvedData, pendingData, productsData] =
         await Promise.all([
-          clientService.getAllClients(),
+          api.get("clients"),
           fetchAnalysisJobs({ page: 1, page_size: 5 }),
           fetchAnalysisJobs({ status: "approved", page: 1, page_size: 1 }),
           fetchAnalysisJobs({ status: "pending", page: 1, page_size: 1 }),
           productService.getAllProducts({ page: 1, page_size: 1 }),
         ]);
 
-      setClients(clientsRes?.clients || []);
-      setClientStats(clientsRes?.status_counts || { all: 0, pending: 0, approved: 0, rejected: 0 });
+      setClients(clientsRes.data?.clients || []);
+      setClientStats(clientsRes.data?.status_counts || { all: 0, pending: 0, approved: 0, rejected: 0 });
       setJobs(jobsData.items || []);
       setTotalApproved(approvedData.total || 0);
       setTotalPending(pendingData.total || 0);
@@ -131,7 +130,6 @@ export default function Dashboard() {
       incr: job.action_summary?.["PRICE_INCREASE"] || 0,
       decr: job.action_summary?.["PRICE_DECREASE"] || 0,
       desc: job.action_summary?.["DESCRIPTION_CHANGE"] || 0,
-      noChange: job.action_summary?.["NO_CHANGE"] || 0,
     }));
 
   return (
@@ -372,18 +370,6 @@ export default function Dashboard() {
                         <p className="flex items-center gap-1 text-indigo-600 text-sm font-bold">
                           <FileEdit className="w-3 h-3" />
                           {item.desc}
-                        </p>
-                      </div>
-                      <div className="text-center">
-                        <p
-                          className="text-[9px] font-black uppercase"
-                          style={{ color: colors.muted }}
-                        >
-                          No Chg
-                        </p>
-                        <p className="flex items-center gap-1 text-slate-500 text-sm font-bold">
-                          <Check className="w-3 h-3" />
-                          {item.noChange}
                         </p>
                       </div>
                     </div>

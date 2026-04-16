@@ -1,12 +1,11 @@
 import React, { useState } from "react";
 import { Save, Shield } from "lucide-react";
 import { Role } from "@/src/types/roles.types";
-import { User } from "@/src/types/user.types";
 import * as v from "../../utils/validators";
 import { normalizePhoneNumber, formatPhoneNumber } from "../../utils/phoneUtils";
 
 interface ProfileSectionProps {
-  user: User;
+  user: any;
   onSave: (data: { fullName: string; phone: string | null }) => Promise<void>;
   loading: boolean;
 }

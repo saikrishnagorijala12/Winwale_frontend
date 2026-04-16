@@ -78,7 +78,7 @@ export default function EditContractModal({
     if (step === 1) {
       const validation = validateStep1({
         ...formData,
-        client_id: initialContract?.client_id,
+        client_id: initialContract.client_id,
       } as any);
 
       setErrors(validation.errors);
@@ -96,7 +96,7 @@ export default function EditContractModal({
 
     const validationStep2 = validateStep2({
       ...formData,
-      client_id: initialContract?.client_id,
+      client_id: initialContract.client_id,
     } as any);
 
     if (!validationStep2.isValid) {
@@ -117,7 +117,7 @@ export default function EditContractModal({
         expedited_delivery_time: formData.expedited_delivery_time,
       };
 
-      await contractService.updateContract(initialContract?.client_id as number, payload);
+      await contractService.updateContract(initialContract.client_id, payload);
       toast.success("Contract updated successfully");
       onSuccess();
       handleClose();

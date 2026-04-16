@@ -277,9 +277,7 @@ export function Step2({
   return (
     <div className="grid md:grid-cols-2 gap-6">
       <div>
-        <label className="text-sm font-bold text-slate-700">
-          FOB Term <span className="text-red-500">*</span>
-        </label>
+        <label className="text-sm font-bold text-slate-700">FOB Term <span className="text-red-500">*</span></label>
         <div className="relative">
           <select
             className={`${selectClass} pr-10`}
@@ -322,7 +320,7 @@ export function Step2({
           <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/4 w-4 h-4 text-slate-400 pointer-events-none" />
         </div>
       </div>
-      <div>
+      <div >
         <label className="text-sm font-bold text-slate-700">
           EPA Method / Mechanism <span className="text-red-500">*</span>
         </label>
@@ -335,9 +333,7 @@ export function Step2({
               onClearError?.("epa_method_mechanism");
             }}
           >
-            <option value="" disabled>
-              Select EPA Provision
-            </option>
+            <option value="" disabled>Select EPA Provision</option>
             <option value="GSAM 538.270-4(a)(1), Based on fixed escalation rates">
               GSAM 538.270-4(a)(1), Based on fixed escalation rates
             </option>
@@ -404,7 +400,7 @@ export function Step2({
       </div>
       <div>
         <label className="text-sm font-bold text-slate-700">
-          Expedited Delivery <span className="text-red-500">*</span>
+          Expedited Delivery (Days) <span className="text-red-500">*</span>
         </label>
         <input
           type="text"
@@ -415,8 +411,7 @@ export function Step2({
             onClearError?.("expedited_delivery_time");
           }}
           placeholder="e.g. 10 or Contact Contractor"
-        />
-        {errors.expedited_delivery_time && (
+        />{errors.expedited_delivery_time && (
           <div className="mt-1 text-xs text-red-600">
             <span>{errors.expedited_delivery_time}</span>
           </div>

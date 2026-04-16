@@ -74,13 +74,11 @@ export default function Settings() {
       <SettingsHeader />
 
       <div className="space-y-6">
-        {user && (
-          <ProfileSection
-            user={user}
-            onSave={handleProfileSave}
-            loading={loading}
-          />
-        )}
+        <ProfileSection
+          user={user}
+          onSave={handleProfileSave}
+          loading={loading}
+        />
 
         <PasswordSection
           onUpdate={handlePasswordChange}

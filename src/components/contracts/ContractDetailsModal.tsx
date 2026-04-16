@@ -91,12 +91,8 @@ export default function ContractDetailsModal({
                 return (
                   <div className="flex flex-col items-center justify-center py-6 gap-2 text-center">
                     <User className="w-8 h-8 text-slate-200" />
-                    <p className="text-sm font-semibold text-slate-400">
-                      No officer details on record
-                    </p>
-                    <p className="text-xs text-slate-300">
-                      Contact information has not been added for this contract.
-                    </p>
+                    <p className="text-sm font-semibold text-slate-400">No officer details on record</p>
+                    <p className="text-xs text-slate-300">Contact information has not been added for this contract.</p>
                   </div>
                 );
               }
@@ -107,9 +103,7 @@ export default function ContractDetailsModal({
                 [contract.contract_officer_state, contract.contract_officer_zip]
                   .filter(Boolean)
                   .join(" "),
-              ]
-                .filter(Boolean)
-                .join(", ");
+              ].filter(Boolean).join(", ");
 
               return (
                 <div className="space-y-4">
@@ -167,7 +161,7 @@ export default function ContractDetailsModal({
                     Expedited
                   </label>
                   <p className="text-sm font-bold text-slate-700">
-                    {contract.expedited_delivery_time}
+                    {contract.expedited_delivery_time} Days
                   </p>
                 </div>
               </div>
@@ -177,11 +171,10 @@ export default function ContractDetailsModal({
                 </label>
                 <div className="flex items-center gap-2 mt-1">
                   <ShieldCheck
-                    className={`w-4 h-4 ${
-                      contract.energy_star_compliance === "Yes"
+                    className={`w-4 h-4 ${contract.energy_star_compliance === "Yes"
                         ? "text-emerald-500"
                         : "text-slate-300"
-                    }`}
+                      }`}
                   />
                   <span className="text-sm font-bold text-slate-700">
                     {contract.energy_star_compliance}

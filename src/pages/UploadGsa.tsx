@@ -6,42 +6,16 @@ import {
   Loader2,
   ChevronLeft,
   FileSpreadsheet,
-  Inbox,
   X,
   ArrowRight,
-  CheckCircle2,
-  ExternalLink,
 } from "lucide-react";
 import * as XLSX from "xlsx";
 import api from "../lib/axios";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { ClientDropdown } from "../components/shared/ClientDropdown";
 import ConfirmationModal from "../components/shared/ConfirmationModal";
 import { toast } from "sonner";
 
-const loaderStyles = `
-  @keyframes scan {
-    0% { transform: translateY(-100%); }
-    100% { transform: translateY(100%); }
-  }
-  @keyframes progress {
-    0% { transform: translateX(-100%); }
-    100% { transform: translateX(100%); }
-  }
-  @keyframes pulseLight {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.95; transform: scale(0.98); }
-  }
-  @keyframes successBounce {
-    0% { transform: scale(0.8); opacity: 0; }
-    50% { transform: scale(1.1); }
-    100% { transform: scale(1); opacity: 1; }
-  }
-  .animate-scan { animation: scan 2s ease-in-out infinite; }
-  .animate-progress { animation: progress 2s ease-in-out infinite; }
-  .animate-pulse-light { animation: pulseLight 3s ease-in-out infinite; }
-  .animate-success { animation: successBounce 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
-`;
 interface Client {
   client_id: number;
   company_name: string;
@@ -49,26 +23,8 @@ interface Client {
 }
 
 interface UploadResult {
-  upload_id: string;
   status: string;
   message: string;
-}
-
-interface UploadStatus {
-  upload_id?: string;
-  client_id: number;
-  filename?: string;
-  status: "idle" | "processing" | "completed" | "failed";
-  message?: string;
-  processed_count?: number;
-  total_count?: number;
-  result?: {
-    inserted: number;
-    updated: number;
-    reactivated: number;
-    deleted: number;
-    skipped: number;
-  };
 }
 
 type PreviewRow = Record<string, unknown>;
@@ -100,88 +56,11 @@ const UploadGsa: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [previewData, setPreviewData] = useState<PreviewRow[] | null>(null);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
-  const [showSuccess, setShowSuccess] = useState(false);
-  const [uploadStatus, setUploadStatus] = useState<UploadStatus | null>(null);
-  const [pollError, setPollError] = useState<boolean>(false);
-  const [currentUploadId, setCurrentUploadId] = useState<string | null>(null);
 
 
   useEffect(() => {
     fetchClients();
   }, []);
-
-  // Poll for upload status when processing
-  useEffect(() => {
-    let interval: NodeJS.Timeout | undefined;
-    let failCount = 0;
-
-    const pollStatus = async () => {
-      if (selectedClient === 0) return;
-
-      // If we just started an upload, wait until we have the ID to poll correctly
-      if (loading && !currentUploadId) return;
-
-      try {
-        const response = await api.get<UploadStatus>(`/upload/${selectedClient}/status`);
-
-        // Ensure we're talking about the same upload
-        if (currentUploadId && response.data.upload_id !== currentUploadId) {
-          return;
-        }
-
-        setUploadStatus(response.data);
-        setPollError(false);
-        failCount = 0;
-
-        if (response.data.status !== "processing") {
-          setLoading(false);
-          if (response.data.status === "completed") {
-            setShowSuccess(true);
-          }
-          if (interval) clearInterval(interval);
-        }
-      } catch (err) {
-        failCount++;
-        console.error(`Polling failed (attempt ${failCount}):`, err);
-        if (failCount >= 3) {
-          setPollError(true);
-          if (interval) clearInterval(interval);
-        }
-      }
-    };
-
-    if (loading || (uploadStatus?.status === "processing")) {
-      if (!pollError) {
-        interval = setInterval(pollStatus, 2000);
-        pollStatus(); // Initial check
-      }
-    }
-
-    return () => {
-      if (interval) clearInterval(interval);
-    };
-  }, [loading, selectedClient, uploadStatus?.status, pollError, currentUploadId]);
-
-  // Check initial status when client changes
-  useEffect(() => {
-    if (selectedClient !== 0) {
-      const checkInitialStatus = async () => {
-        try {
-          const response = await api.get<UploadStatus>(`/upload/${selectedClient}/status`);
-          setUploadStatus(response.data);
-          if (response.data.status === "processing") {
-            setLoading(true);
-            if (response.data.upload_id) {
-              setCurrentUploadId(response.data.upload_id);
-            }
-          }
-        } catch (err) {
-          console.error("Initial status check failed", err);
-        }
-      };
-      checkInitialStatus();
-    }
-  }, [selectedClient]);
 
   const fetchClients = async (): Promise<void> => {
     try {
@@ -333,50 +212,28 @@ const UploadGsa: React.FC = () => {
       return;
     }
 
-    setIsConfirmOpen(false);
     setLoading(true);
     setError(null);
-    setShowSuccess(false);
-    setUploadStatus(null);
-    setCurrentUploadId(null);
 
     const formData = new FormData();
     formData.append("file", file);
 
     try {
-      const response = await api.post<UploadResult>(
+      await api.post<UploadResult>(
         `/upload/${selectedClient}`,
         formData,
         { headers: { "Content-Type": "multipart/form-data" } },
       );
-
-      setCurrentUploadId(response.data.upload_id);
+      toast.success(
+        "Upload received! Your product catalog is being processed in the background."
+      );
       setFile(null);
       setPreviewData(null);
     } catch (err: any) {
+      toast.error(err?.message ?? "Upload failed");
+    } finally {
       setLoading(false);
-      toast.error(err?.message ?? "Upload initiation failed");
-    }
-  };
-
-  const resetUpload = () => {
-    setFile(null);
-    setPreviewData(null);
-    setError(null);
-    setSelectedClient(0);
-    setShowSuccess(false);
-  };
-
-  const handleResetStatus = async () => {
-    if (selectedClient === 0) return;
-    try {
-      await api.post(`/upload/${selectedClient}/reset`);
-      setLoading(false);
-      setUploadStatus(null);
-      setPollError(false);
-      toast.success("Upload status reset successfully");
-    } catch (err: any) {
-      toast.error(err?.response?.data?.detail || "Failed to reset upload status");
+      setIsConfirmOpen(false);
     }
   };
 
@@ -386,10 +243,8 @@ const UploadGsa: React.FC = () => {
     return Object.keys(previewData[0]);
   };
 
-  const activeClient = clients.find((c) => c.client_id === selectedClient);
-
   return (
-    <div className="min-h-screen bg-linear-to-br from-slate-50 to-slate-100 p-6 font-sans transition-colors duration-500">
+    <div className="min-h-screen bg-linear-to-br from-slate-50 to-slate-100 p-6 md:p-10">
       <ConfirmationModal
         isOpen={isConfirmOpen}
         onClose={() => setIsConfirmOpen(false)}
@@ -399,7 +254,7 @@ const UploadGsa: React.FC = () => {
           <>
             Are you sure you want to upload the product catalog for{" "}
             <span className="font-bold text-slate-800">
-              {activeClient?.company_name}
+              {clients.find((c) => c.client_id === selectedClient)?.company_name}
             </span>
             ?
           </>
@@ -407,7 +262,9 @@ const UploadGsa: React.FC = () => {
         details={[
           {
             label: "Client",
-            value: activeClient?.company_name || "",
+            value:
+              clients.find((c) => c.client_id === selectedClient)
+                ?.company_name || "",
           },
           { label: "File", value: file?.name || "" },
           { label: "Size", value: `${((file?.size || 0) / 1024).toFixed(1)} KB` },
@@ -422,8 +279,7 @@ const UploadGsa: React.FC = () => {
         isSubmitting={loading}
         variant="emerald"
       />
-      <style>{loaderStyles}</style>
-      <div className="mx-auto">
+      <div className=" mx-auto">
 
         <button
           onClick={() => navigate(-1)}
@@ -436,7 +292,7 @@ const UploadGsa: React.FC = () => {
           Back
         </button>
 
-        <div className="mb-8">
+        <div className="mb-10">
           <h1 className="text-3xl font-bold text-slate-900 tracking-tight">
             Upload GSA Products Catalog
           </h1>
@@ -446,272 +302,139 @@ const UploadGsa: React.FC = () => {
         </div>
 
         <div className="grid grid-cols-1 gap-8">
-          <div className="bg-white rounded-3xl shadow-sm border border-slate-200 p-8 md:p-10 relative overflow-hidden transition-all duration-500 min-h-[520px] flex flex-col justify-center">
-            {loading ? (
-              <div className="absolute inset-0 flex flex-col items-center justify-center p-8 animate-in fade-in zoom-in-95 duration-500 bg-white z-20">
-                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#3399cc]/5 to-transparent animate-scan" />
-                <div className="relative z-10 flex flex-col items-center animate-pulse-light w-full max-w-md mx-auto">
-                  {pollError ? (
-                    <div className="flex flex-col items-center text-center">
-                      <div className="w-20 h-20 bg-red-50 rounded-3xl flex items-center justify-center mb-6 ring-4 ring-red-50/50">
-                        <AlertCircle className="w-10 h-10 text-red-500" />
+          <div className="bg-white rounded-4xl shadow-sm border border-slate-200 p-8 md:p-10 relative overflow-hidden">
+            <div className="absolute top-0 right-0 p-8 pointer-events-none opacity-5">
+              <FileSpreadsheet size={120} />
+            </div>
+
+            <div className="space-y-8 relative">
+              <div className="space-y-3">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="w-6 h-6 rounded-full bg-[#3399cc] text-white flex items-center justify-center text-xs font-bold">
+                    1
+                  </span>
+                  <label className="text-sm font-bold text-slate-700 uppercase tracking-wider">
+                    Select Client
+                  </label>
+                </div>
+
+                {loadingClients ? (
+                  <div className="flex items-center gap-3 p-4 bg-slate-50 rounded-2xl">
+                    <Loader2 className="w-5 h-5 animate-spin text-[#24578f]" />
+                    <span className="text-slate-500 text-sm font-medium">
+                      Fetching approved clients...
+                    </span>
+                  </div>
+                ) : (
+                  <ClientDropdown
+                    clients={clients}
+                    selectedClient={selectedClient}
+                    onClientSelect={setSelectedClient}
+                  />
+                )}
+              </div>
+
+              <div className="space-y-3">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="w-6 h-6 rounded-full bg-[#3399cc] text-white flex items-center justify-center text-xs font-bold">
+                    2
+                  </span>
+                  <label className="text-sm font-bold text-slate-700 uppercase tracking-wider">
+                    Upload Spreadsheet
+                  </label>
+                </div>
+
+                {!file ? (
+                  <label
+                    className={`group flex flex-col items-center justify-center w-full h-56 border-2 border-dashed rounded-4xl cursor-pointer transition-all ${isDragging
+                      ? "border-[#3399cc] bg-blue-50/60 scale-[1.01]"
+                      : "border-slate-200 bg-slate-50/50 hover:border-[#3399cc] hover:bg-blue-50/30"
+                      }`}
+                    onDragOver={handleDragOver}
+                    onDragLeave={handleDragLeave}
+                    onDrop={handleDrop}
+                  >
+                    <div className="flex flex-col items-center justify-center p-6 text-center">
+                      <div className={`w-16 h-16 bg-white rounded-2xl shadow-sm flex items-center justify-center mb-4 transition-transform ${isDragging ? "scale-110" : "group-hover:scale-110"
+                        }`}>
+                        <Upload className={`w-8 h-8 ${isDragging ? "text-[#2b82ad]" : "text-[#3399cc]"}`} />
                       </div>
-                      <h4 className="text-xl font-bold text-slate-900 mb-2">Connection Lost</h4>
-                      <p className="text-sm text-slate-500 mb-8 px-4">
-                        We're having trouble connecting to the server. Your upload is likely still processing in the background.
+                      <p className="text-base font-bold text-slate-700 mb-1">
+                        {isDragging ? "Drop your file here" : "Drag & drop or click to browse"}
                       </p>
-                      <div className="flex gap-3 w-full">
-                        <button
-                          onClick={() => {
-                            setPollError(false);
-                          }}
-                          className="flex-1 bg-slate-900 text-white py-3 rounded-2xl font-bold text-sm hover:bg-slate-800 transition-all active:scale-95 shadow-lg shadow-slate-100"
-                        >
-                          Retry Connection
-                        </button>
-                        <button
-                          onClick={() => setLoading(false)}
-                          className="flex-1 bg-white border border-slate-200 text-slate-600 py-3 rounded-2xl font-bold text-sm hover:bg-slate-50 transition-all active:scale-95"
-                        >
-                          Go Back
-                        </button>
-                      </div>
+                      <p className="text-sm text-slate-400">
+                        Excel (.xlsx or .xls) files only
+                      </p>
                     </div>
-                  ) : (
-                    <>
-                      <div className="relative mb-8 mt-2">
-                        <div className="w-24 h-24 rounded-3xl bg-white shadow-xl shadow-cyan-100 flex items-center justify-center relative z-10 border border-cyan-50">
-                          <Upload className="w-12 h-12 text-[#3399cc] animate-pulse" />
-                        </div>
-                        <div className="absolute inset-0 bg-[#3399cc]/20 rounded-3xl animate-ping opacity-75" style={{ animationDuration: '2.5s' }} />
-                        <div className="absolute -inset-6 border-[3px] border-[#3399cc]/20 rounded-full animate-spin" style={{ animationDuration: '3s', borderTopColor: 'transparent', borderRightColor: 'transparent' }} />
-                        <div className="absolute -inset-10 border-[2px] border-[#3399cc]/10 rounded-full animate-spin" style={{ animationDuration: '4s', animationDirection: 'reverse', borderBottomColor: 'transparent', borderLeftColor: 'transparent' }} />
+                    <input
+                      id="file-input"
+                      type="file"
+                      accept=".xlsx,.xls"
+                      onChange={handleFileChange}
+                      className="hidden"
+                    />
+                  </label>
+                ) : (
+                  <div className="flex items-center justify-between p-6 bg-blue-50 border border-blue-100 rounded-2xl">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 bg-[#3399cc] rounded-xl flex items-center justify-center text-white">
+                        <FileSpreadsheet size={24} />
                       </div>
-                      <h4 className="text-2xl font-bold text-slate-800 mb-3 tracking-tight text-center">
-                        {uploadStatus?.status === "processing" ? "Processing Catalog Data" : "Uploading GSA Catalog"}
-                      </h4>
-                      <div className="flex flex-col items-center gap-4 w-full px-8">
-                        <div className="flex items-center gap-2 text-sm text-slate-500 font-medium">
-                          <Loader2 className="w-5 h-5 animate-spin text-[#3399cc]" />
-                          <span>
-                            {uploadStatus?.status === "processing"
-                              ? `Processed ${uploadStatus.processed_count?.toLocaleString() || 0}${uploadStatus.total_count ? ` of ${uploadStatus.total_count.toLocaleString()}` : ""} rows...`
-                              : "Transferring product data securely..."}
-                          </span>
-                        </div>
-                        <div className="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden shadow-inner border border-slate-200/50 relative">
-                          <div
-                            className={`h-full bg-gradient-to-r from-[#3399cc] via-cyan-400 to-[#3399cc] transition-all duration-500 rounded-full ${!uploadStatus?.total_count ? "w-full animate-progress" : ""}`}
-                            style={uploadStatus?.total_count ? { width: `${Math.min(100, ((uploadStatus.processed_count || 0) / uploadStatus.total_count) * 100)}%` } : {}}
-                          />
-                        </div>
-                        <p className="text-[11px] text-slate-400 text-center">
-                          {uploadStatus?.status === "processing"
-                            ? "The catalog is being parsed and validated in the background."
-                            : "Background processing will begin shortly after upload completes"}
+                      <div>
+                        <p className="text-sm font-bold text-slate-900 truncate max-w-50 md:max-w-xs">
+                          {file.name}
+                        </p>
+                        <p className="text-xs text-slate-500">
+                          {(file.size / 1024).toFixed(1)} KB • Ready to upload
                         </p>
                       </div>
-
-                      {/* Troubleshooting reset */}
-                      {(uploadStatus?.status === "processing" || pollError) && (
-                        <div className="mt-8 pt-5 border-t border-slate-50 w-64 flex flex-col items-center animate-in fade-in slide-in-from-bottom-2 duration-700">
-                          <p className="text-[9px] text-slate-300 mb-2 uppercase tracking-[0.2em] font-black">Troubleshooting</p>
-                          <button
-                            onClick={handleResetStatus}
-                            className="text-[11px] text-slate-400 hover:text-red-400 font-bold flex items-center gap-1.5 transition-all group"
-                          >
-                            <X size={12} className="group-hover:rotate-90 transition-transform duration-300" />
-                            Force Reset Stuck Status
-                          </button>
-                        </div>
-                      )}
-                    </>
-                  )}
-                </div>
-              </div>
-            ) : showSuccess ? (
-              <div className="flex flex-col items-center justify-center py-6 animate-success">
-                <div className="w-20 h-20 bg-emerald-50 rounded-full flex items-center justify-center mb-6 ring-8 ring-emerald-50/50">
-                  <CheckCircle2 className="w-10 h-10 text-emerald-500" />
-                </div>
-
-                <h3 className="text-2xl font-bold text-slate-900 mb-2 text-center tracking-tight">Upload Complete!</h3>
-
-                <div className="max-w-md w-full bg-slate-50 border border-slate-100 rounded-3xl p-5 mb-6">
-                  <p className="text-slate-600 text-sm text-center leading-relaxed mb-4">
-                    The product catalog for <span className="font-bold text-slate-900">{activeClient?.company_name}</span> has been processed successfully.
-                  </p>
-
-                  {uploadStatus?.result && (
-                    <div className="grid grid-cols-2 gap-2 mb-2">
-                      <div className="bg-white p-2.5 rounded-2xl border border-slate-200 shadow-xs">
-                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-wider mb-0.5">New Products</p>
-                        <p className="text-base font-bold text-emerald-600">{uploadStatus.result.inserted}</p>
-                      </div>
-                      <div className="bg-white p-2.5 rounded-2xl border border-slate-200 shadow-xs">
-                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-wider mb-0.5">Updated Products</p>
-                        <p className="text-base font-bold text-blue-600">{uploadStatus.result.updated}</p>
-                      </div>
-                      <div className="bg-white p-2.5 rounded-2xl border border-slate-200 shadow-xs">
-                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-wider mb-0.5">Restored Items</p>
-                        <p className="text-base font-bold text-amber-600">{uploadStatus.result.reactivated}</p>
-                      </div>
-                      <div className="bg-white p-2.5 rounded-2xl border border-slate-200 shadow-xs">
-                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-wider mb-0.5">No Changes</p>
-                        <p className="text-base font-bold text-slate-500">{uploadStatus.result.skipped}</p>
-                      </div>
                     </div>
-                  )}
-                </div>
-
-                <div className="flex flex-col sm:flex-row gap-4 w-full max-w-sm">
-                  <button
-                    onClick={resetUpload}
-                    className="flex-1 bg-white border border-slate-200 text-slate-700 py-3.5 rounded-2xl font-bold text-sm hover:bg-slate-50 transition-all shadow-sm active:scale-95"
-                  >
-                    Upload Another Catalog
-                  </button>
-                  <Link
-                    to={`/clients/${selectedClient}/products`}
-                    className="flex-1 bg-[#3399cc] text-white py-3.5 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 hover:bg-[#2b82ad] transition-all shadow-lg shadow-blue-100 active:scale-95"
-                  >
-                    View Client Products
-                  </Link>
-                </div>
-              </div>
-            ) : (
-              <>
-                <div className="absolute top-0 right-0 p-8 pointer-events-none opacity-5">
-                  <FileSpreadsheet size={120} />
-                </div>
-
-                <div className="space-y-8 relative py-2">
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-3 mb-2">
-                      <span className="w-7 h-7 rounded-full bg-[#3399cc] text-white flex items-center justify-center text-xs font-bold shadow-sm shadow-blue-200">
-                        1
-                      </span>
-                      <label className="text-sm font-bold text-slate-700 uppercase tracking-wider">
-                        Select Client
-                      </label>
-                    </div>
-
-                    {loadingClients ? (
-                      <div className="flex items-center gap-3 p-4 bg-slate-50 rounded-2xl">
-                        <Loader2 className="w-5 h-5 animate-spin text-[#24578f]" />
-                        <span className="text-slate-500 text-sm font-medium">
-                          Fetching approved clients...
-                        </span>
-                      </div>
-                    ) : (
-                      <ClientDropdown
-                        clients={clients}
-                        selectedClient={selectedClient}
-                        onClientSelect={(id) => setSelectedClient(id || 0)}
-                      />
-                    )}
-                  </div>
-
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-3 mb-2">
-                      <span className="w-7 h-7 rounded-full bg-[#3399cc] text-white flex items-center justify-center text-xs font-bold shadow-sm shadow-blue-200">
-                        2
-                      </span>
-                      <label className="text-sm font-bold text-slate-700 uppercase tracking-wider">
-                        Upload Spreadsheet
-                      </label>
-                    </div>
-
-                    {!file ? (
-                      <label
-                        className={`group flex flex-col items-center justify-center w-full h-56 border-2 border-dashed rounded-4xl cursor-pointer transition-all ${isDragging
-                          ? "border-[#3399cc] bg-blue-50/60 scale-[1.01]"
-                          : "border-slate-200 bg-slate-50/50 hover:border-[#3399cc] hover:bg-blue-50/30"
-                          }`}
-                        onDragOver={handleDragOver}
-                        onDragLeave={handleDragLeave}
-                        onDrop={handleDrop}
-                      >
-                        <div className="flex flex-col items-center justify-center p-6 text-center">
-                          <div className={`w-16 h-16 bg-white rounded-2xl shadow-sm flex items-center justify-center mb-4 transition-transform ${isDragging ? "scale-110" : "group-hover:scale-110"
-                            }`}>
-                            <Upload className={`w-8 h-8 ${isDragging ? "text-[#2b82ad]" : "text-[#3399cc]"}`} />
-                          </div>
-                          <p className="text-base font-bold text-slate-700 mb-1">
-                            {isDragging ? "Drop your file here" : "Drag & drop or click to browse"}
-                          </p>
-                          <p className="text-sm text-slate-400">
-                            Excel (.xlsx or .xls) files only
-                          </p>
-                        </div>
-                        <input
-                          id="file-input"
-                          type="file"
-                          accept=".xlsx,.xls"
-                          onChange={handleFileChange}
-                          className="hidden"
-                        />
-                      </label>
-                    ) : (
-                      <div className="flex items-center justify-between p-6 bg-blue-50 border border-blue-100 rounded-2xl">
-                        <div className="flex items-center gap-4">
-                          <div className="w-12 h-12 bg-[#3399cc] rounded-xl flex items-center justify-center text-white">
-                            <FileSpreadsheet size={24} />
-                          </div>
-                          <div>
-                            <p className="text-sm font-bold text-slate-900 truncate max-w-50 md:max-w-xs">
-                              {file.name}
-                            </p>
-                            <p className="text-xs text-slate-500">
-                              {(file.size / 1024).toFixed(1)} KB • Ready to upload
-                            </p>
-                          </div>
-                        </div>
-                        <button
-                          onClick={() => {
-                            setFile(null);
-                            setPreviewData(null);
-                            setError(null);
-                          }}
-                          className="p-2 hover:bg-white rounded-full text-slate-400 hover:text-red-500 transition-all"
-                          aria-label="Remove selected file"
-                        >
-                          <X size={20} />
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                  <div className="pt-4">
                     <button
-                      onClick={handleUploadClick}
-                      disabled={loading || !file || selectedClient === 0 || !previewData?.length}
-                      className="w-full bg-[#3399cc] text-white py-4 rounded-2xl font-bold flex items-center justify-center gap-3 transition-all hover:bg-[#2b82ad] disabled:opacity-40 disabled:grayscale shadow-lg shadow-blue-200 hover:shadow-xl active:scale-[0.98] text-sm"
+                      onClick={() => {
+                        setFile(null);
+                        setPreviewData(null);
+                        setError(null);
+                      }}
+                      className="p-2 hover:bg-white rounded-full text-slate-400 hover:text-red-500 transition-all"
+                      aria-label="Remove selected file"
                     >
-                      {loading ? (
-                        <>
-                          <Loader2 className="w-5 h-5 animate-spin" /> Processing Upload...
-                        </>
-                      ) : (
-                        <>
-                          <Upload size={20} /> Start Product Import <ArrowRight size={18} />
-                        </>
-                      )}
+                      <X size={20} />
                     </button>
                   </div>
+                )}
+              </div>
 
-                  {error && (
-                    <div className="p-4 bg-red-50 border border-red-100 rounded-2xl flex items-start gap-3 animate-in fade-in slide-in-from-top-2 mt-6">
-                      <AlertCircle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
-                      <p className="text-sm text-red-700 font-medium">{error}</p>
-                    </div>
+              <div className="pt-4">
+                <button
+                  onClick={handleUploadClick}
+
+                  disabled={loading || !file || selectedClient === 0 || !previewData?.length}
+                  className="w-full bg-[#3399cc] text-white py-4 rounded-2xl font-bold flex items-center justify-center gap-3 transition-all hover:bg-[#2b82ad] disabled:opacity-40 disabled:grayscale shadow-lg shadow-blue-200 hover:shadow-xl active:scale-[0.98]"
+                >
+                  {loading ? (
+                    <>
+                      <Loader2 className="w-5 h-5 animate-spin" /> Processing
+                      Upload...
+                    </>
+                  ) : (
+                    <>
+                      <Upload size={20} /> Start Product Import{" "}
+                      <ArrowRight size={18} />
+                    </>
                   )}
+                </button>
+              </div>
+
+              {error && (
+                <div className="p-4 bg-red-50 border border-red-100 rounded-2xl flex items-start gap-3 animate-in fade-in slide-in-from-top-2">
+                  <AlertCircle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
+                  <p className="text-sm text-red-700 font-medium">{error}</p>
                 </div>
-              </>
-            )}
+              )}
+            </div>
           </div>
 
-
-          {!showSuccess && previewData && previewData.length > 0 && (
+          {previewData && previewData.length > 0 && (
             <div className="bg-white rounded-4xl shadow-sm border border-slate-200 overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
               <div className="p-6 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
                 <h2 className="text-sm font-black text-slate-400 uppercase tracking-[0.2em]">

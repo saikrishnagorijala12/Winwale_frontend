@@ -75,8 +75,7 @@ export default function ClientsAndContractsPage() {
         }
     }, [clients]);
 
-    const getContractForClient = (clientId: number | null) => {
-        if (clientId === null) return null;
+    const getContractForClient = (clientId: number) => {
         const client = clients.find(c => c.id === clientId);
         return client?.contractDetails ?? null;
     };
@@ -184,7 +183,7 @@ export default function ClientsAndContractsPage() {
                     <>
                         Are you sure you want to delete contract{" "}
                         <span className="font-bold text-slate-700">
-                            {contractToDelete != null ? getContractForClient(contractToDelete)?.contract_number : ""}
+                            {getContractForClient(contractToDelete)?.contract_number}
                         </span>
                         ?
                     </>

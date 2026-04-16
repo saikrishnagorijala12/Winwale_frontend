@@ -63,7 +63,7 @@ export const ClientActionsMenu: React.FC<ClientActionsMenuProps> = ({
           className="w-full px-4 py-3 text-left text-sm font-bold text-slate-700 hover:bg-slate-50 flex items-center gap-3 transition-colors group"
           onClick={() => {
             setSelectedClientId(client.id);
-            navigate(`/clients/${client.id}/products`);
+            navigate(`/clients/products`);
             onClose();
           }}
         >

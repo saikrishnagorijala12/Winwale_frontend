@@ -40,7 +40,7 @@ export default function ContractsPage() {
       setLoading(true);
       const data = await contractService.getAllContracts();
       setContracts(data);
-    } catch (err: any) {
+    } catch (err) {
       console.error("Error fetching contracts:", err);
       toast.error("Failed to load contracts");
     } finally {
@@ -85,7 +85,7 @@ export default function ContractsPage() {
         ),
       );
       toast.success("Contract deleted successfully");
-    } catch (err: any) {
+    } catch (err) {
       toast.error(err.message || "Failed to delete contract");
     } finally {
       setDeleting(false);
@@ -101,6 +101,7 @@ export default function ContractsPage() {
 
   return (
     <div className="min-h-screen bg-linear-to-br from-slate-50 via-blue-50/30 to-slate-100 p-6 lg:p-10 space-y-10">
+
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-12 mx-auto ">
         <div>
           <h1 className="text-3xl font-extrabold tracking-tight text-slate-800">

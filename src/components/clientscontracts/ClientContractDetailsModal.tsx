@@ -31,6 +31,7 @@ import { useClickOutside } from "../../hooks/useClickOutside";
 import { formatPhoneNumber } from "../../utils/phoneUtils";
 import { Tooltip } from "../shared/Tooltip";
 
+
 interface ClientContractDetailsModalProps {
   client: Client | null;
   contract: ClientContractRead | null;
@@ -281,10 +282,7 @@ export const ClientContractDetailsModal: React.FC<
                       <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm relative group overflow-hidden">
                         {client.negotiators.length > 1 && (
                           <div className="absolute top-4 right-4 flex gap-1 z-10">
-                            <Tooltip
-                              content="Previous Negotiator"
-                              position="top"
-                            >
+                            <Tooltip content="Previous Negotiator" position="top">
                               <button
                                 onClick={() =>
                                   setCurrentNegIndex((prev) =>
@@ -338,8 +336,7 @@ export const ClientContractDetailsModal: React.FC<
                               icon={Phone}
                               label="Phone"
                               value={formatPhoneNumber(
-                                client.negotiators[currentNegIndex].phone_no ||
-                                  "",
+                                client.negotiators[currentNegIndex].phone_no,
                               )}
                             />
                             <DetailItem
@@ -441,6 +438,7 @@ export const ClientContractDetailsModal: React.FC<
                           : "text-green-500"
                       }
                     />
+
 
                     <DetailItem
                       icon={FileText}

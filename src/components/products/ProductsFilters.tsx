@@ -20,7 +20,7 @@ export default function ProductsFilters({
   onClientSelect,
   isLoading = false,
 }: ProductsFiltersProps) {
-  const handleClientSelect = (clientId: number | null) => {
+  const handleClientSelect = (clientId: number) => {
     if (clientId === 0) {
       onClientSelect(null);
     } else {

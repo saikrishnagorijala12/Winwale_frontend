@@ -68,11 +68,11 @@ export default function DownloadHistory() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
-  const handleDownload = (fileName: string) => {
+  const handleDownload = (fileName) => {
     toast.success(`Downloading ${fileName}...`);
   };
 
-  const formatDate = (date: Date) => {
+  const formatDate = (date) => {
     return new Intl.DateTimeFormat("en-US", {
       month: "short",
       day: "numeric",
@@ -171,7 +171,7 @@ export default function DownloadHistory() {
                   <td className="p-5">
                     <div className="flex items-center gap-4">
                       <div
-                        className={`p-2.5 rounded-xl border ${fileTypeStyles[doc.type as keyof typeof fileTypeStyles] || "bg-slate-50"}`}
+                        className={`p-2.5 rounded-xl border ${fileTypeStyles[doc.type] || "bg-slate-50"}`}
                       >
                         {doc.type === "Excel" || doc.type === "CSV" ? (
                           <FileSpreadsheet className="w-5 h-5" />

@@ -1,12 +1,11 @@
 import api from "../lib/axios";
-import { Role } from "../types/roles.types";
 
 export interface UserProfile {
   user_id: number;
   name: string;
   email: string;
   phone_no?: string;
-  role: Role;
+  role: string;
   is_active: boolean;
   is_deleted:boolean;
 }

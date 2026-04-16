@@ -13,26 +13,16 @@ import {
   UserCheck,
   Upload,
   Package,
-  Check,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-import { userService } from "../../services/userService";
-import { clientService } from "../../services/clientService";
+import api from "@/src/lib/axios";
 import StatusBadge from "../../components/shared/StatusBadge";
 import { fetchAnalysisJobs } from "../../services/analysisService";
 import { AnalysisJobResponse } from "../../types/analysis.types";
 import { Tooltip } from "../../components/shared/Tooltip";
-import { User } from "../../types/user.types";
-import { ClientMinimal } from "../../types/product.types";
 
-interface DashboardClient {
-  client_id: number;
-  company_name: string;
-  status: string;
-}
-
-const Skeleton = ({ className }: { className?: string }) => (
+const Skeleton = ({ className }) => (
   <div className={`animate-pulse bg-slate-200 rounded-md ${className}`} />
 );
 
@@ -40,8 +30,8 @@ export default function UnifiedAdminDashboard() {
   const navigate = useNavigate();
   const { user } = useAuth();
 
-  const [usersList, setUsersList] = useState<User[]>([]);
-  const [clients, setClients] = useState<DashboardClient[]>([]);
+  const [usersList, setUsersList] = useState([]);
+  const [clients, setClients] = useState([]);
   const [clientStats, setClientStats] = useState({ all: 0, pending: 0, approved: 0, rejected: 0 });
   const [jobs, setJobs] = useState<AnalysisJobResponse[]>([]);
   const [totalPendingJobs, setTotalPendingJobs] = useState(0);
@@ -68,19 +58,21 @@ export default function UnifiedAdminDashboard() {
     try {
       setLoading(true);
       const [usersRes, clientsRes, jobsData, pendingJobsData] = await Promise.all([
-        userService.getAllUsers({
-          status: "pending",
+        api.get("/users/all", {
+          params: {
+            status: "pending",
+          },
         }),
-        clientService.getAllClients(),
+        api.get("/clients"),
         fetchAnalysisJobs({ page: 1, page_size: 5 }),
         fetchAnalysisJobs({ status: "pending", page: 1, page_size: 1 }),
       ]);
 
       setUsersList(
-        Array.isArray(usersRes?.users) ? usersRes.users : [],
+        Array.isArray(usersRes.data?.users) ? usersRes.data.users : [],
       );
-      setClients(Array.isArray(clientsRes?.clients) ? clientsRes.clients : []);
-      setClientStats(clientsRes?.status_counts || { all: 0, pending: 0, approved: 0, rejected: 0 });
+      setClients(Array.isArray(clientsRes.data?.clients) ? clientsRes.data.clients : []);
+      setClientStats(clientsRes.data?.status_counts || { all: 0, pending: 0, approved: 0, rejected: 0 });
       setJobs(jobsData.items || []);
       setTotalPendingJobs(pendingJobsData.total || 0);
     } catch (error) {
@@ -132,7 +124,6 @@ export default function UnifiedAdminDashboard() {
         incr: job.action_summary?.["PRICE_INCREASE"] || 0,
         decr: job.action_summary?.["PRICE_DECREASE"] || 0,
         desc: job.action_summary?.["DESCRIPTION_CHANGE"] || 0,
-        noChange: job.action_summary?.["NO_CHANGE"] || 0,
       };
     });
 
@@ -376,18 +367,6 @@ export default function UnifiedAdminDashboard() {
                           {item.desc}
                         </p>
                       </div>
-                      <div className="text-center">
-                        <p
-                          className="text-[9px] font-black uppercase"
-                          style={{ color: colors.muted }}
-                        >
-                          No Chg
-                        </p>
-                        <p className="flex items-center gap-1 text-slate-500 text-sm font-bold">
-                          <Check className="w-3 h-3" />
-                          {item.noChange}
-                        </p>
-                      </div>
                     </div>
                     <div className="flex items-center gap-3">
                       <StatusBadge status={item.status} />
@@ -531,7 +510,7 @@ export default function UnifiedAdminDashboard() {
                             {item.name}
                           </p>
                           <p className="text-[10px] text-slate-400">
-                            {new Date(item.created_time || "").toLocaleDateString()}
+                            {new Date(item.created_time).toLocaleDateString()}
                           </p>
                         </div>
                       </div>

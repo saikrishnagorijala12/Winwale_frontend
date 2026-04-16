@@ -21,6 +21,7 @@ import ProtectedRoute from "../components/ProtectedRoute";
 import { useAuth } from "../context/AuthContext";
 import AppLayout from "../components/layout/AppLayout";
 
+import ClientsAndContracts from "../pages/ClientsAndContracts";
 import ClientProducts from "../pages/ClientProducts";
 import ClientActivation from "../pages/ClientActivation";
 import UserActivation from "../pages/UserActivation";
@@ -113,7 +114,7 @@ const AppRoutes: React.FC = () => {
                   <Route path="/contracts" element={<ContractsPage />} /> */}
                   <Route path="/client-profiles" element={<ClientsAndContractsPage />} />
                   <Route
-                    path="/clients/:id/products"
+                    path="/clients/products"
                     element={<ClientProducts />}
                   />
 
