@@ -18,7 +18,7 @@ import {
 } from "../../utils/contractValidations";
 import { getInitialFormData } from "../../utils/clientUtils";
 import { contractService } from "../../services/contractService";
-import api from "../../lib/axios";
+import { clientService } from "../../services/clientService";
 import { toast } from "sonner";
 import { normalizePhoneNumber } from "../../utils/phoneUtils";
 
@@ -87,7 +87,11 @@ export default function AddClientContractModal({
   };
 
   const handleClearContractError = (field: keyof FormErrors) => {
-    setContractErrors((prev) => ({ ...prev, [field]: undefined }));
+    setContractErrors((prev) => {
+      const nextErrors = { ...prev };
+      delete nextErrors[field];
+      return nextErrors;
+    });
   };
 
   const handleNext = (e: React.FormEvent) => {
@@ -149,15 +153,11 @@ export default function AddClientContractModal({
         negotiators: normalizedNegotiators,
       };
 
-      const clientRes = await api.post("/clients", finalClientPayload);
-      const newClientId: number = clientRes.data.client_id;
+      const clientRes = await clientService.createClient(finalClientPayload);
+      const newClientId: number = clientRes.client_id;
 
       if (logoFile) {
-        const logoFormData = new FormData();
-        logoFormData.append("file", logoFile);
-        await api.post(`/clients/${newClientId}/logo`, logoFormData, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
+        await clientService.uploadClientLogo(newClientId, logoFile);
       }
 
       const { client_id, ...contractPayload } = {

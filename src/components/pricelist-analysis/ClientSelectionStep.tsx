@@ -7,11 +7,11 @@ import {
   ChevronDownIcon,
   Loader2,
 } from "lucide-react";
-import { Client } from "../../types/pricelist.types";
+import { ClientMinimal } from "../../types/product.types";
 import { ClientDropdown } from "../../components/shared/ClientDropdown";
 
 interface ClientSelectionStepProps {
-  clients: Client[];
+  clients: ClientMinimal[];
   selectedClient: number | null;
   onClientSelect: (clientId: number | null) => void;
   onContinue: () => void;

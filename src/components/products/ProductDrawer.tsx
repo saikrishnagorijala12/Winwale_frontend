@@ -101,7 +101,7 @@ export default function ProductDrawer({
           <DrawerSection title="Pricing & Classification">
             <DrawerField
               label="Commercial List Price"
-              value={formatCurrency(product.commercial_list_price)}
+              value={formatCurrency(product.commercial_list_price ?? undefined)}
             />
             <DrawerField label="UOM" value={product.uom} />
             <DrawerField label="SIN" value={product.sin} />

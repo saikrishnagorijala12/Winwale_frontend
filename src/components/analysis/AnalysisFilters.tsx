@@ -7,7 +7,7 @@ import {
   Loader2,
 } from "lucide-react";
 import { StatusFilter } from "../../types/analysis.types";
-import { Client } from "../../types/pricelist.types";
+import { ClientMinimal } from "../../types/product.types";
 import { ClientDropdown } from "../shared/ClientDropdown";
 
 interface AnalysisFiltersProps {
@@ -21,7 +21,7 @@ interface AnalysisFiltersProps {
   setDateFrom: (value: Date | undefined) => void;
   dateTo: Date | undefined;
   setDateTo: (value: Date | undefined) => void;
-  clients: Client[];
+  clients: ClientMinimal[];
   onClearFilters: () => void;
   isLoading?: boolean;
 }
@@ -47,8 +47,8 @@ export default function AnalysisFilters({
       ? 0
       : (clients.find((c) => c.company_name === clientFilter)?.client_id ?? 0);
 
-  const handleClientSelect = (clientId: number) => {
-    if (clientId === 0) {
+  const handleClientSelect = (clientId: number | null) => {
+    if (!clientId || clientId === 0) {
       setClientFilter("All");
     } else {
       const client = clients.find((c) => c.client_id === clientId);

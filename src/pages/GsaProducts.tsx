@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { Client, Product } from "../types/product.types";
+import { ClientMinimal as Client, Product } from "../types/product.types";
 import { productService } from "../services/productService";
 import { clientService } from "../services/clientService";
+import { startProductsExport } from "../services/analysisService";
+import { useExportTask } from "../hooks/useExportTask";
+
 import ProductsHeader from "../components/products/ProductsHeader";
 import ProductsFilters from "../components/products/ProductsFilters";
 import ProductsTable from "../components/products/ProductsTable";
@@ -23,7 +26,8 @@ export default function ProductsPage() {
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
-  const [isExporting, setIsExporting] = useState(false);
+  const { startExport, isExporting, progress, message } = useExportTask();
+
   const [isConfirmExportOpen, setIsConfirmExportOpen] = useState(false);
   const [totalItems, setTotalItems] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
@@ -106,46 +110,21 @@ export default function ProductsPage() {
   const startIndex = (currentPage - 1) * itemsPerPage;
 
   const handleExport = async () => {
-    try {
-      setIsExporting(true);
-
-      const blob = await productService.exportProducts(
-        selectedClient?.client_id
-      );
-
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-
-      const dateStr = new Date().toISOString().split("T")[0];
-
-      if (selectedClient) {
-        a.download = `${selectedClient.company_name}_products_${dateStr}.xlsx`;
-      } else {
-        a.download = `all_products_${dateStr}.xlsx`;
-      }
-
-      document.body.appendChild(a);
-      a.click();
-
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
-
-      toast.success("Export completed successfully.");
-      setIsConfirmExportOpen(false);
-    } catch (err: any) {
-      toast.error(err?.message || "Failed to export products.");
-    } finally {
-      setIsExporting(false);
-    }
+    setIsConfirmExportOpen(false);
+    await startExport(() => startProductsExport({
+      client_id: selectedClient?.client_id
+    }));
   };
 
+
   return (
-    <div className="min-h-screen bg-linear-to-br from-slate-50 via-blue-50/30 to-slate-100 p-6 lg:p-10 space-y-10">
+    <div className="min-h-screen bg-linear-to-br from-slate-50 via-blue-50/30 to-slate-100 p-6 lg:p-10 space-y-6">
+
+
       <div className="mx-auto">
         <ProductsHeader
           onUploadClick={() => navigate("/gsa-products/upload")}
-          onExportClick={() => setIsConfirmExportOpen(true)}
+          onExportClick={selectedClient ? () => setIsConfirmExportOpen(true) : undefined}
           isExporting={isExporting}
           totalCount={totalItems}
         />
@@ -186,12 +165,10 @@ export default function ProductsPage() {
         onConfirm={handleExport}
         title="Export GSA Products"
         message={
-          selectedClient
-            ? <>Export all products for <span className="font-bold text-slate-800">{selectedClient.company_name}</span> to Excel?</>
-            : "Export all products across all clients to Excel?"
+          <>Export all products for <span className="font-bold text-slate-800">{selectedClient?.company_name}</span> to Excel?</>
         }
         details={[
-          { label: "Client", value: selectedClient?.company_name ?? "All Clients" },
+          { label: "Client", value: selectedClient?.company_name ?? "Selected Client" },
           { label: "Total Products", value: exportableCount.toLocaleString() },
         ]}
         confirmText="Yes, Export"

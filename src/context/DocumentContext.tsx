@@ -7,14 +7,13 @@ import {
   WorkflowStep,
 } from "../types/document.types";
 import { getDocumentConfig } from "../types/documentConfigs";
-import api from "../lib/axios";
+import { fetchGenerationJobDetails } from "../services/analysisService";
 import { useAuth } from "./AuthContext";
 import * as validators from "../utils/validators";
 import { toast } from "sonner";
 
 const fetchJobDetails = async (jobId: number) => {
-  const response = await api.get(`/generate/${jobId}`);
-  return response.data;
+  return await fetchGenerationJobDetails(jobId);
 };
 
 const mapJobDetailsToForm = (api: any) => {
@@ -143,7 +142,9 @@ export const DocumentProvider: React.FC<{ children: React.ReactNode }> = ({
   const [documentConfig, setDocumentConfig] = useState<DocumentConfig | null>(
     null,
   );
-  const [formData, setFormData] = useState<Record<string, string | number>>({});
+  const [formData, setFormData] = useState<
+    Record<string, string | number | string[]>
+  >({});
   const [validationErrors, setValidationErrors] = useState<ValidationError[]>(
     [],
   );
@@ -193,7 +194,7 @@ export const DocumentProvider: React.FC<{ children: React.ReactNode }> = ({
           mappedData.consultantPhone = user.phone_no;
         }
 
-        const newValues: Record<string, string | number> = {};
+        const newValues: Record<string, string | number | string[]> = {};
         config.fields.forEach((field) => {
           if (mappedData[field.id] !== undefined) {
             newValues[field.id] = mappedData[field.id];
@@ -236,10 +237,13 @@ export const DocumentProvider: React.FC<{ children: React.ReactNode }> = ({
     [user, loadedJobId, cachedJobDetails, setCurrentStep],
   );
 
-  const updateField = useCallback((fieldId: string, value: string | number) => {
-    setFormData((prev) => ({ ...prev, [fieldId]: value }));
-    setValidationErrors((prev) => prev.filter((e) => e.fieldId !== fieldId));
-  }, []);
+  const updateField = useCallback(
+    (fieldId: string, value: string | number | string[]) => {
+      setFormData((prev) => ({ ...prev, [fieldId]: value }));
+      setValidationErrors((prev) => prev.filter((e) => e.fieldId !== fieldId));
+    },
+    [],
+  );
 
   const validateForm = useCallback((): boolean => {
     if (!documentConfig) return false;

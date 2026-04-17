@@ -21,6 +21,10 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     return <Navigate to="/login" replace />;
   }
 
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
   if (!isActive) {
     return <Navigate to="/pending-approval" replace />;
   }

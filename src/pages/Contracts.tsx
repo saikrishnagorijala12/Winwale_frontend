@@ -86,7 +86,9 @@ export default function ContractsPage() {
       );
       toast.success("Contract deleted successfully");
     } catch (err) {
-      toast.error(err.message || "Failed to delete contract");
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to delete contract";
+      toast.error(errorMessage);
     } finally {
       setDeleting(false);
       setShowDeleteDialog(false);

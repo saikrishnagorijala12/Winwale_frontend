@@ -76,6 +76,11 @@ export default function EditContractModal({
     e.preventDefault();
 
     if (step === 1) {
+      if (!initialContract) {
+        setErrors({ submit: "Missing contract data. Cannot update." });
+        return;
+      }
+
       const validation = validateStep1({
         ...formData,
         client_id: initialContract.client_id,

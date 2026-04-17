@@ -61,7 +61,9 @@ export const validateStep2 = (
 
   const discountErr =
     v.validateRequired(contract.gsa_proposed_discount, "Discount") ||
-    v.validateRange(contract.gsa_proposed_discount, 0, 100, "Discount");
+    (contract.gsa_proposed_discount !== undefined
+      ? v.validateRange(contract.gsa_proposed_discount, 0, 100, "Discount")
+      : null);
   if (discountErr) errors.gsa_proposed_discount = discountErr;
 
   const qvErr =
@@ -81,7 +83,12 @@ export const validateStep2 = (
 
   const normalDeliveryErr =
     v.validateRequired(contract.normal_delivery_time, "Normal Delivery Time") ||
-    v.validatePositiveInteger(contract.normal_delivery_time, "Normal delivery time");
+    (contract.normal_delivery_time !== undefined
+      ? v.validatePositiveInteger(
+          contract.normal_delivery_time,
+          "Normal delivery time",
+        )
+      : null);
   if (normalDeliveryErr) errors.normal_delivery_time = normalDeliveryErr;
 
   const expeditedDeliveryErr =

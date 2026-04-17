@@ -406,39 +406,7 @@ export const documentConfigs: DocumentConfig[] = [
         section: "Request Details",
         validation: [{ type: "required", message: "Required" }],
       },
-      {
-        id: "is_hazardous",
-        label: "Hazardous Material Status",
-        type: "select",
-        behavior: "readonly",
-        section: "Logistics & Compliance",
-        options: [
-          { value: "yes", label: "Yes" },
-          { value: "no", label: "No" },
-        ],
-      },
 
-      {
-        id: "epa_method_mechanism",
-        label: "EPA Method/Mechanism",
-        type: "select",
-        behavior: "readonly",
-        section: "Logistics & Compliance",
-        options: [
-          {
-            value: "GSAM 538.270-4(a)(1), Based on fixed escalation rates",
-            label: "GSAM 538.270-4(a)(1), Based on fixed escalation rates",
-          },
-          {
-            value: "GSAM 538.270-4(a)(2), Based on a market index or other basis",
-            label: "GSAM 538.270-4(a)(2), Based on a market index or other basis",
-          },
-          {
-            value: "GSAM 538.270-4(a)(3), Based on established pricing",
-            label: "GSAM 538.270-4(a)(3), Based on established pricing",
-          },
-        ],
-      },
       {
         id: "attachments",
         label: "Attachments",
@@ -628,39 +596,7 @@ export const documentConfigs: DocumentConfig[] = [
         section: "Request Details",
         validation: [{ type: "required", message: "Required" }],
       },
-      {
-        id: "is_hazardous",
-        label: "Hazardous Material Status",
-        type: "select",
-        behavior: "readonly",
-        section: "Logistics & Compliance",
-        options: [
-          { value: "yes", label: "Yes" },
-          { value: "no", label: "No" },
-        ],
-      },
 
-      {
-        id: "epa_method_mechanism",
-        label: "EPA Method/Mechanism",
-        type: "select",
-        behavior: "readonly",
-        section: "Logistics & Compliance",
-        options: [
-          {
-            value: "GSAM 538.270-4(a)(1), Based on fixed escalation rates",
-            label: "GSAM 538.270-4(a)(1), Based on fixed escalation rates",
-          },
-          {
-            value: "GSAM 538.270-4(a)(2), Based on a market index or other basis",
-            label: "GSAM 538.270-4(a)(2), Based on a market index or other basis",
-          },
-          {
-            value: "GSAM 538.270-4(a)(3), Based on established pricing",
-            label: "GSAM 538.270-4(a)(3), Based on established pricing",
-          },
-        ],
-      },
       {
         id: "attachments",
         label: "Attachments",
@@ -834,39 +770,7 @@ export const documentConfigs: DocumentConfig[] = [
         section: "Request Details",
         validation: [{ type: "required", message: "Required" }],
       },
-      {
-        id: "is_hazardous",
-        label: "Hazardous Material Status",
-        type: "select",
-        behavior: "readonly",
-        section: "Logistics & Compliance",
-        options: [
-          { value: "yes", label: "Yes" },
-          { value: "no", label: "No" },
-        ],
-      },
 
-      {
-        id: "epa_method_mechanism",
-        label: "EPA Method/Mechanism",
-        type: "select",
-        behavior: "readonly",
-        section: "Logistics & Compliance",
-        options: [
-          {
-            value: "GSAM 538.270-4(a)(1), Based on fixed escalation rates",
-            label: "GSAM 538.270-4(a)(1), Based on fixed escalation rates",
-          },
-          {
-            value: "GSAM 538.270-4(a)(2), Based on a market index or other basis",
-            label: "GSAM 538.270-4(a)(2), Based on a market index or other basis",
-          },
-          {
-            value: "GSAM 538.270-4(a)(3), Based on established pricing",
-            label: "GSAM 538.270-4(a)(3), Based on established pricing",
-          },
-        ],
-      },
       {
         id: "attachments",
         label: "Attachments",
@@ -1000,16 +904,8 @@ export const documentConfigs: DocumentConfig[] = [
         validation: [{ type: "required", message: "Required" }],
       },
       {
-        id: "negotiatorTitle",
-        label: "Authorized Negotiator Title",
-        type: "text",
-        behavior: "manual",
-        section: "Contract & Contact Info",
-        validation: [{ type: "required", message: "Required" }],
-      },
-      {
         id: "negotiatorName",
-        label: "Authorized Negotiator Name",
+        label: "Authorized Negotiator",
         type: "text",
         behavior: "manual",
         section: "Contract & Contact Info",
@@ -1039,39 +935,7 @@ export const documentConfigs: DocumentConfig[] = [
         section: "Request Details",
         validation: [{ type: "required", message: "Required" }],
       },
-      {
-        id: "is_hazardous",
-        label: "Hazardous Material Status",
-        type: "select",
-        behavior: "readonly",
-        section: "Logistics & Compliance",
-        options: [
-          { value: "yes", label: "Yes" },
-          { value: "no", label: "No" },
-        ],
-      },
 
-      {
-        id: "epa_method_mechanism",
-        label: "EPA Method/Mechanism",
-        type: "select",
-        behavior: "readonly",
-        section: "Logistics & Compliance",
-        options: [
-          {
-            value: "GSAM 538.270-4(a)(1), Based on fixed escalation rates",
-            label: "GSAM 538.270-4(a)(1), Based on fixed escalation rates",
-          },
-          {
-            value: "GSAM 538.270-4(a)(2), Based on a market index or other basis",
-            label: "GSAM 538.270-4(a)(2), Based on a market index or other basis",
-          },
-          {
-            value: "GSAM 538.270-4(a)(3), Based on established pricing",
-            label: "GSAM 538.270-4(a)(3), Based on established pricing",
-          },
-        ],
-      },
       {
         id: "attachments",
         label: "Attachments",

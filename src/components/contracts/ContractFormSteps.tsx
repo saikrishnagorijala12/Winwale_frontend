@@ -1,9 +1,9 @@
 import React, { useRef } from "react";
 import {
   ClientContractCreate,
-  ClientListRead,
   FormErrors,
 } from "../../types/contract.types";
+import { ClientMinimal } from "../../types/product.types";
 import { useClickOutside } from "../../hooks/useClickOutside";
 import { ChevronDown, X } from "lucide-react";
 
@@ -11,7 +11,7 @@ interface Step1Props {
   contract: ClientContractCreate;
   onChange: (contract: ClientContractCreate) => void;
   onClearError?: (field: keyof FormErrors) => void;
-  clients: ClientListRead[];
+  clients: ClientMinimal[];
   clientSearch: string;
   setClientSearch: (search: string) => void;
   showClientDropdown: boolean;

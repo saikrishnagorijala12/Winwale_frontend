@@ -25,16 +25,18 @@
   }
   .btn-secondary {
     @apply inline-flex items-center justify-center gap-2
-      px-6 py-2.5
+      px-5 py-2.5
       bg-white
       border border-slate-200
-      text-slate-600
-      font-medium
+      text-slate-700
+      font-bold
       rounded-xl
+      shadow-sm
       transition-all
-      hover:bg-slate-50
-      hover:scale-[1.02]
-      active:scale-[0.98];
+      hover:bg-blue-50
+      hover:text-[#38A1DB]
+      hover:border-blue-200
+      active:scale-95;
   }
 
   .btn-secondary:disabled {

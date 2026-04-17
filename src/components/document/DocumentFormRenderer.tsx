@@ -326,7 +326,7 @@ export default function DocumentFormRenderer() {
         {activeIndex === 0 ? (
           <button
             onClick={() => navigate(-1)}
-            className="flex items-center gap-2 px-5 py-3 rounded-xl font-medium text-sm bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 transition-colors"
+            className="btn-secondary"
           >
             <ChevronLeft className="w-4 h-4" />
             Back
@@ -338,7 +338,7 @@ export default function DocumentFormRenderer() {
                 ? setActiveTab(sections[activeIndex - 1])
                 : setCurrentStep("select-type")
             }
-            className="flex items-center gap-2 px-5 py-3 rounded-xl font-medium text-sm bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 transition-colors"
+            className="btn-secondary"
           >
             <ChevronLeft className="w-4 h-4" />
             Previous Section

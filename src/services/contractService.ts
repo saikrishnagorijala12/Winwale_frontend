@@ -6,12 +6,12 @@ import {
 } from "../types/contract.types";
 
 export const contractService = {
-  async getAllContracts(): Promise<ClientContractRead[]> {
+  async getAllContracts(): Promise<any> {
     const response = await api.get("/contracts");
     return response.data;
   },
 
-  async getContractByClientId(clientId: number): Promise<ClientContractRead> {
+  async getContractByClientId(clientId: number): Promise<any> {
     const response = await api.get(`/contracts/${clientId}`);
     return response.data;
   },

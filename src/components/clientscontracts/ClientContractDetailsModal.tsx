@@ -21,9 +21,12 @@ import {
   XCircle,
   ChevronLeft,
   ChevronRight,
+  Package,
 } from "lucide-react";
 import { toast } from "sonner";
-import api from "../../lib/axios";
+import { useNavigate } from "react-router-dom";
+import { useClient } from "../../context/ClientContext";
+import { clientService } from "../../services/clientService";
 import { Client } from "../../types/client.types";
 import { ClientContractRead } from "../../types/contract.types";
 import StatusBadge from "../shared/StatusBadge";
@@ -38,6 +41,7 @@ interface ClientContractDetailsModalProps {
   onClose: () => void;
   onEdit: (client: Client) => void;
   onSuccess?: () => void;
+  showViewProducts?: boolean;
 }
 
 const DetailItem = ({
@@ -100,11 +104,13 @@ const Section = ({
 
 export const ClientContractDetailsModal: React.FC<
   ClientContractDetailsModalProps
-> = ({ client, contract, onClose, onEdit, onSuccess }) => {
+> = ({ client, contract, onClose, onEdit, onSuccess, showViewProducts = true }) => {
   const [isUploading, setIsUploading] = React.useState(false);
   const [currentNegIndex, setCurrentNegIndex] = React.useState(0);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
   const modalRef = React.useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
+  const { setSelectedClientId } = useClient();
 
   useClickOutside(modalRef, onClose);
 
@@ -126,11 +132,7 @@ export const ClientContractDetailsModal: React.FC<
 
     try {
       setIsUploading(true);
-      await api.post(`/clients/${client.id}/logo`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+      await clientService.uploadClientLogo(client.id, file);
       toast.success("Logo uploaded successfully");
       onSuccess?.();
     } catch (error: any) {
@@ -336,7 +338,7 @@ export const ClientContractDetailsModal: React.FC<
                               icon={Phone}
                               label="Phone"
                               value={formatPhoneNumber(
-                                client.negotiators[currentNegIndex].phone_no,
+                                client.negotiators[currentNegIndex].phone_no ?? "",
                               )}
                             />
                             <DetailItem
@@ -473,10 +475,28 @@ export const ClientContractDetailsModal: React.FC<
           <div className="flex gap-3 w-full sm:w-auto">
             <button
               onClick={onClose}
-              className="flex-1 sm:flex-none px-6 rounded-xl border border-slate-200 bg-white text-slate-600 font-bold text-sm hover:bg-slate-50 transition-all active:scale-95"
+              className="flex-1 sm:flex-none px-6 py-2.5 rounded-xl text-slate-500 font-bold text-sm hover:bg-slate-100/80 hover:text-slate-700 transition-all active:scale-95"
             >
               Close
             </button>
+
+            {showViewProducts && (
+              <Tooltip content="View Product Catalog" position="top">
+                <button
+                  onClick={() => {
+                    setSelectedClientId(client.id);
+                    navigate(`/clients/${client.id}/products`);
+                    onClose();
+                  }}
+                  className="btn-secondary flex-1 sm:flex-none"
+                  aria-label="View Client Products"
+                >
+                  <Package className="w-4 h-4 text-[#38A1DB]" />
+                  View Catalog
+                </button>
+              </Tooltip>
+            )}
+
             <Tooltip content="Edit Client Details" position="top">
               <button
                 onClick={() => {

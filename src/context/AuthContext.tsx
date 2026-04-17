@@ -5,11 +5,10 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { UserProfile } from "../api/user";
+import { userService } from "../services/userService";
+import { UserProfile } from "../types/user.types";
+import { AuthStatus } from "../types/auth.types";
 import { fetchAuthSession, signOut } from "aws-amplify/auth";
-import api from "../lib/axios";
-
-type AuthStatus = "loading" | "authenticated" | "unauthenticated";
 
 interface AuthContextType {
   user: UserProfile | null;
@@ -32,8 +31,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const bootstrapped = useRef(false);
 
   const refreshUser = async (): Promise<UserProfile> => {
-    const response = await api.get("/users/me");
-    const userData = response.data;
+    const userData = await userService.getMe();
 
     setUser(userData);
     setIsActive(!!userData.is_active);

@@ -36,11 +36,6 @@ export interface ClientContractUpdate extends ClientContractBase {
   is_deleted?: boolean;
 }
 
-export interface ClientListRead {
-  client_id: number;
-  company_name: string;
-}
-
 export interface FormErrors {
   [key: string]: string;
 }

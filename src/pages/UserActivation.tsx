@@ -17,26 +17,30 @@ import {
 } from "lucide-react";
 import StatusBadge from "../components/shared/StatusBadge";
 import Pagination from "../components/shared/Pagination";
-import api from "../lib/axios";
+import { userService } from "../services/userService";
 import { Role } from "../types/roles.types";
 import { toast } from "sonner";
 import ConfirmationModal from "../components/shared/ConfirmationModal";
+import { User, UserProfile } from "../types/user.types";
+import { TabType } from "../types/common.types";
 import { formatPhoneNumber } from "../utils/phoneUtils";
 import { useDebounce } from "../hooks/useDebounce";
 import { Tooltip } from "../components/shared/Tooltip";
+import { useAuth } from "../context/AuthContext";
 
 const ROLE_MAP: Record<Role, string> = {
   admin: "Administrator",
   user: "Consultant",
 };
 
-type TabType = "all" | "pending" | "approved" | "rejected";
+
 
 interface ActionDropdownProps {
-  user: any;
+  user: User;
   onApprove: () => void;
   onReject: () => void;
   onChangeRole: () => void;
+  isSelf?: boolean;
 }
 
 const ActionDropdown: React.FC<ActionDropdownProps> = ({
@@ -44,6 +48,7 @@ const ActionDropdown: React.FC<ActionDropdownProps> = ({
   onApprove,
   onReject,
   onChangeRole,
+  isSelf = false,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -85,73 +90,81 @@ const ActionDropdown: React.FC<ActionDropdownProps> = ({
 
       {isOpen && (
         <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-slate-200 py-2 z-10">
-          {isPending && (
+          {isSelf ? (
+            <div className="px-4 py-2 text-xs font-medium text-slate-400 italic">
+              Self-actions disabled
+            </div>
+          ) : (
             <>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onApprove();
-                  setIsOpen(false);
-                }}
-                className="w-full px-4 py-2 text-left text-sm font-medium text-emerald-600 hover:bg-emerald-50 flex items-center gap-2 transition-colors"
-              >
-                <UserCheck className="w-4 h-4" />
-                Approve
-              </button>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onReject();
-                  setIsOpen(false);
-                }}
-                className="w-full px-4 py-2 text-left text-sm font-medium text-rose-600 hover:bg-rose-50 flex items-center gap-2 transition-colors"
-              >
-                <UserX className="w-4 h-4" />
-                Reject
-              </button>
-            </>
-          )}
+              {isPending && (
+                <>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onApprove();
+                      setIsOpen(false);
+                    }}
+                    className="w-full px-4 py-2 text-left text-sm font-medium text-emerald-600 hover:bg-emerald-50 flex items-center gap-2 transition-colors"
+                  >
+                    <UserCheck className="w-4 h-4" />
+                    Approve
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onReject();
+                      setIsOpen(false);
+                    }}
+                    className="w-full px-4 py-2 text-left text-sm font-medium text-rose-600 hover:bg-rose-50 flex items-center gap-2 transition-colors"
+                  >
+                    <UserX className="w-4 h-4" />
+                    Reject
+                  </button>
+                </>
+              )}
 
-          {isApproved && (
-            <>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onChangeRole();
-                  setIsOpen(false);
-                }}
-                className="w-full px-4 py-2 text-left text-sm  text-slate-700 font-medium  hover:bg-slate-50 flex items-center gap-2 transition-colors"
-              >
-                <RefreshCw className="w-4 h-4 text-[#3399cc]" />
-                Change Role
-              </button>
-              <div className="border-t border-slate-100 my-2"></div>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onReject();
-                  setIsOpen(false);
-                }}
-                className="w-full px-4 py-2 text-left text-sm font-medium text-rose-600 hover:bg-rose-50 flex items-center gap-2 transition-colors"
-              >
-                <UserX className="w-4 h-4" />
-                Reject
-              </button>
-            </>
-          )}
+              {isApproved && (
+                <>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onChangeRole();
+                      setIsOpen(false);
+                    }}
+                    className="w-full px-4 py-2 text-left text-sm  text-slate-700 font-medium  hover:bg-slate-50 flex items-center gap-2 transition-colors"
+                  >
+                    <RefreshCw className="w-4 h-4 text-[#3399cc]" />
+                    Change Role
+                  </button>
+                  <div className="border-t border-slate-100 my-2"></div>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onReject();
+                      setIsOpen(false);
+                    }}
+                    className="w-full px-4 py-2 text-left text-sm font-medium text-rose-600 hover:bg-rose-50 flex items-center gap-2 transition-colors"
+                  >
+                    <UserX className="w-4 h-4" />
+                    Reject
+                  </button>
+                </>
+              )}
 
-          {user.is_deleted && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onApprove();
-                setIsOpen(false);
-              }}
-              className="w-full px-4 py-2 text-left text-sm font-medium text-emerald-600 hover:bg-emerald-50 flex items-center gap-2 transition-colors"
-            >
-              <UserCheck className="w-4 h-4" />
-              Approve
-            </button>
+              {user.is_deleted && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onApprove();
+                    setIsOpen(false);
+                  }}
+                  className="w-full px-4 py-2 text-left text-sm font-medium text-emerald-600 hover:bg-emerald-50 flex items-center gap-2 transition-colors"
+                >
+                  <UserCheck className="w-4 h-4" />
+                  Approve
+                </button>
+              )}
+            </>
           )}
         </div>
       )}
@@ -160,11 +173,12 @@ const ActionDropdown: React.FC<ActionDropdownProps> = ({
 };
 
 interface UserCardProps {
-  user: any;
+  user: User;
   onApprove: () => void;
   onReject: () => void;
   onChangeRole: () => void;
-  getRoleStyle: (roleId: string) => string;
+  getRoleStyle: (roleId: Role) => string;
+  isSelf?: boolean;
 }
 
 const UserCard: React.FC<UserCardProps> = ({
@@ -173,6 +187,7 @@ const UserCard: React.FC<UserCardProps> = ({
   onReject,
   onChangeRole,
   getRoleStyle,
+  isSelf = false,
 }) => {
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-5 hover:shadow-md transition-all">
@@ -184,7 +199,7 @@ const UserCard: React.FC<UserCardProps> = ({
           <div className="flex-1 min-w-0 flex flex-col items-start">
             <Tooltip content={user.name} position="top">
               <h3 className="font-bold text-slate-800 text-base truncate">
-                {user.name}
+                {user.name} {isSelf && <span className="text-blue-500 text-xs ml-1">(You)</span>}
               </h3>
             </Tooltip>
             <Tooltip content={user.email} position="top">
@@ -198,6 +213,7 @@ const UserCard: React.FC<UserCardProps> = ({
             onApprove={onApprove}
             onReject={onReject}
             onChangeRole={onChangeRole}
+            isSelf={isSelf}
           />
         </div>
       </div>
@@ -205,22 +221,22 @@ const UserCard: React.FC<UserCardProps> = ({
       <div className="space-y-2.5 mb-4">
         <div className="flex items-center gap-2 text-sm text-slate-600">
           <Phone className="w-4 h-4 text-slate-400 shrink-0" />
-          <span className="truncate">{formatPhoneNumber(user.phone_no)}</span>
+          <span className="truncate">{formatPhoneNumber(user.phone_no || "")}</span>
         </div>
         <div className="flex items-center gap-2 text-sm">
           <Shield className="w-4 h-4 text-slate-400 shrink-0" />
           <span
             className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold border capitalize ${getRoleStyle(
-              user.role,
+              user.role as Role,
             )}`}
           >
-            {ROLE_MAP[user.role] || "User"}
+            {ROLE_MAP[user.role as Role] || "User"}
           </span>
         </div>
         <div className="flex items-center gap-2 text-sm text-slate-600">
           <Calendar className="w-4 h-4 text-slate-400 shrink-0" />
           <span>
-            {new Date(user.created_time).toLocaleDateString("en-US", {
+            {new Date(user.created_time || "").toLocaleDateString("en-US", {
               month: "short",
               day: "2-digit",
               year: "numeric",
@@ -245,17 +261,25 @@ const UserCard: React.FC<UserCardProps> = ({
 };
 
 export default function UserActivation() {
-  const [users, setUsers] = useState<any[]>([]);
+  const { user: currentUser } = useAuth();
+  const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [isActionLoading, setIsActionLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState<TabType>("pending");
-  const [confirmModal, setConfirmModal] = useState({
+  const [confirmModal, setConfirmModal] = useState<{
+    isOpen: boolean;
+    user: User | null;
+    action: "approve" | "reject";
+  }>({
     isOpen: false,
     user: null,
-    action: "approve" as "approve" | "reject",
+    action: "approve",
   });
-  const [roleChangeModal, setRoleChangeModal] = useState({
+  const [roleChangeModal, setRoleChangeModal] = useState<{
+    isOpen: boolean;
+    user: User | null;
+  }>({
     isOpen: false,
     user: null,
   });
@@ -268,21 +292,22 @@ export default function UserActivation() {
   });
   const [totalItems, setTotalItems] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedUserIds, setSelectedUserIds] = useState<Set<string>>(
+    new Set(),
+  );
   const itemsPerPage = 8;
   const debouncedSearchQuery = useDebounce(searchQuery, 500);
 
   const fetchUsers = async (page: number, query: string, tab: TabType) => {
     try {
       setLoading(true);
-      const response = await api.get("/users/all", {
-        params: {
-          page,
-          page_size: itemsPerPage,
-          status: tab,
-          search: query || undefined,
-        },
+      const response = await userService.getAllUsers({
+        page,
+        page_size: itemsPerPage,
+        status: tab,
+        search: query || undefined,
       });
-      const { users: fetchedUsers, total_count, status_counts } = response.data;
+      const { users: fetchedUsers, total_count, status_counts } = response;
       setUsers(fetchedUsers);
       setTotalItems(total_count);
       if (status_counts) {
@@ -292,6 +317,7 @@ export default function UserActivation() {
       toast.error("Failed to load users. Please try again.");
     } finally {
       setLoading(false);
+      setSelectedUserIds(new Set());
     }
   };
 
@@ -299,7 +325,7 @@ export default function UserActivation() {
     fetchUsers(currentPage, debouncedSearchQuery, activeTab);
   }, [currentPage, debouncedSearchQuery, activeTab]);
 
-  const openConfirmModal = (user, action: "approve" | "reject") => {
+  const openConfirmModal = (user: User, action: "approve" | "reject") => {
     setConfirmModal({
       isOpen: true,
       user,
@@ -315,7 +341,7 @@ export default function UserActivation() {
     });
   };
 
-  const openRoleChangeModal = (user) => {
+  const openRoleChangeModal = (user: User) => {
     setRoleChangeModal({
       isOpen: true,
       user,
@@ -329,35 +355,79 @@ export default function UserActivation() {
     });
   };
 
-  const handleApprove = async (userId, action) => {
+  const handleApprove = async (userId: number, action: "approve" | "reject") => {
     try {
       setIsActionLoading(true);
 
-      await api.patch(`/users/${userId}/approve`, null, {
-        params: { action },
-      });
-      setUsers((prevUsers) =>
-        prevUsers.map((user) => {
-          if (user.user_id === userId) {
-            return {
-              ...user,
-              is_active: action === "approve",
-              is_deleted: action === "reject",
-            };
-          }
-          return user;
-        }),
-      );
+      await userService.approveUser(Number(userId), action);
+      await fetchUsers(currentPage, debouncedSearchQuery, activeTab);
       toast.success(
         `User account ${action === "approve" ? "approved" : "rejected"} successfully`,
       );
       closeConfirmModal();
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      toast.error(`Failed to ${action} user`);
+      toast.error(error.message || `Failed to ${action} user`);
     } finally {
       setIsActionLoading(false);
     }
+  };
+
+  const handleBulkStatusUpdate = async (action: "approve" | "reject") => {
+    if (selectedUserIds.size === 0) return;
+
+    try {
+      setIsActionLoading(true);
+
+      // Filter out self if accidentally selected
+      const userIdsToUpdate = Array.from(selectedUserIds).filter(
+        (id) => String(id) !== String(currentUser?.user_id)
+      ).map(Number);
+
+      if (userIdsToUpdate.length === 0) {
+        toast.error("Cannot perform bulk actions on yourself");
+        return;
+      }
+
+      await userService.bulkUpdateUserStatus(
+        userIdsToUpdate,
+        action,
+      );
+      
+      const skippedCount = selectedUserIds.size - userIdsToUpdate.length;
+      if (skippedCount > 0) {
+        toast.info(`${skippedCount} user record (you) was skipped`);
+      }
+
+      toast.success(
+        `${userIdsToUpdate.length} users ${action === "approve" ? "approved" : "rejected"} successfully`,
+      );
+      setSelectedUserIds(new Set());
+      await fetchUsers(currentPage, debouncedSearchQuery, activeTab);
+    } catch (error: any) {
+      console.error(error);
+      toast.error(error.message || `Failed to bulk ${action} users`);
+    } finally {
+      setIsActionLoading(false);
+    }
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedUserIds.size === users.length) {
+      setSelectedUserIds(new Set());
+    } else {
+      setSelectedUserIds(new Set(users.map((u) => String(u.user_id))));
+    }
+  };
+
+  const toggleSelectUser = (userId: string) => {
+    const newSelected = new Set(selectedUserIds);
+    if (newSelected.has(userId)) {
+      newSelected.delete(userId);
+    } else {
+      newSelected.add(userId);
+    }
+    setSelectedUserIds(newSelected);
   };
 
   const confirmStatusChange = () => {
@@ -371,7 +441,7 @@ export default function UserActivation() {
 
     try {
       setIsActionLoading(true);
-      await api.put(`/users/change_role/${roleChangeModal.user.user_id}`);
+      await userService.changeUserRole(Number(roleChangeModal.user.user_id));
       await fetchUsers(currentPage, debouncedSearchQuery, activeTab);
 
       toast.success("User role changed successfully");
@@ -384,7 +454,7 @@ export default function UserActivation() {
     }
   };
 
-  const getRoleStyle = (roleId) => {
+  const getRoleStyle = (roleId: Role) => {
     const role = ROLE_MAP[roleId] || "default";
     switch (role) {
       case "Administrator":
@@ -466,15 +536,15 @@ export default function UserActivation() {
         }
         details={[
           { label: "Email", value: confirmModal.user?.email || "" },
-          { label: "Role", value: ROLE_MAP[confirmModal.user?.role] || "User" },
+          { label: "Role", value: confirmModal.user ? ROLE_MAP[confirmModal.user.role as Role] : "User" },
         ]}
         warning={
           confirmModal.action === "reject"
             ? {
-                message:
-                  "This action will reject the user's account. They won't be able to access the system.",
-                type: "rose",
-              }
+              message:
+                "This action will reject the user's account. They won't be able to access the system.",
+              type: "rose",
+            }
             : undefined
         }
         variant={confirmModal.action === "approve" ? "emerald" : "rose"}
@@ -499,7 +569,7 @@ export default function UserActivation() {
         details={[
           {
             label: "Current Role",
-            value: ROLE_MAP[roleChangeModal.user?.role] || "User",
+            value: roleChangeModal.user ? ROLE_MAP[roleChangeModal.user.role as Role] : "User",
           },
           {
             label: "New Role",
@@ -610,11 +680,10 @@ export default function UserActivation() {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as TabType)}
-                className={`px-4 sm:px-6 py-2 sm:py-3 rounded-t-xl font-bold text-xs sm:text-sm transition-all whitespace-nowrap ${
-                  activeTab === tab.id
+                className={`px-4 sm:px-6 py-2 sm:py-3 rounded-t-xl font-bold text-xs sm:text-sm transition-all whitespace-nowrap ${activeTab === tab.id
                     ? `bg-${tab.color}-50 text-${tab.color}-600 border-b-2 border-${tab.color}-600`
                     : "text-slate-500 hover:text-slate-700 hover:bg-slate-50"
-                }`}
+                  }`}
               >
                 {tab.label} ({tab.count})
               </button>
@@ -667,31 +736,86 @@ export default function UserActivation() {
                 onReject={() => openConfirmModal(user, "reject")}
                 onChangeRole={() => openRoleChangeModal(user)}
                 getRoleStyle={getRoleStyle}
+                isSelf={String(user.user_id) === String(currentUser?.user_id)}
               />
             ))
           )}
         </div>
 
+        {selectedUserIds.size > 0 && (
+          <div className="fixed bottom-10 left-1/2 -translate-x-1/2 z-50 px-6 py-4 bg-slate-900 text-white rounded-2xl shadow-2xl flex items-center gap-8 border border-slate-700/50 animate-in fade-in slide-in-from-bottom-4 zoom-in-95 duration-300">
+            <div className="flex items-center gap-4">
+              <div className="w-10 h-10 bg-blue-500/10 rounded-xl flex items-center justify-center border border-blue-500/20">
+                <UserCheck className="w-5 h-5 text-blue-400" />
+              </div>
+              <div className="pr-4 border-r border-slate-700/50">
+                <p className="text-sm font-bold text-white">
+                  {selectedUserIds.size} users selected
+                </p>
+                <p className="text-[11px] text-slate-400 font-medium whitespace-nowrap">
+                  Perform bulk actions on selection
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => handleBulkStatusUpdate("approve")}
+                disabled={isActionLoading}
+                className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl shadow-lg shadow-emerald-900/20 transition-all flex items-center gap-2 disabled:opacity-50 whitespace-nowrap active:scale-95"
+              >
+                <UserCheck className="w-3.5 h-3.5" />
+                Approve {selectedUserIds.size > 1 ? "All" : ""}
+              </button>
+              <button
+                onClick={() => handleBulkStatusUpdate("reject")}
+                disabled={isActionLoading}
+                className="px-5 py-2.5 bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold rounded-xl shadow-lg shadow-rose-900/20 transition-all flex items-center gap-2 disabled:opacity-50 whitespace-nowrap active:scale-95"
+              >
+                <UserX className="w-3.5 h-3.5" />
+                Reject {selectedUserIds.size > 1 ? "All" : ""}
+              </button>
+              <div className="w-px h-6 bg-slate-700/50 mx-1" />
+              <button
+                onClick={() => setSelectedUserIds(new Set())}
+                className="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold rounded-xl transition-all active:scale-95"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
+
         <div className="hidden lg:block  px-6 pb-6">
           <table className="w-full border-collapse bg-white rounded-2xl shadow-sm">
             <thead>
               <tr className="bg-slate-50 border-b border-slate-200">
-                <th className="text-left px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                <th className="px-4 py-4 w-10 text-center">
+                  <input
+                    type="checkbox"
+                    className="w-3.5 h-3.5 rounded border-slate-300 accent-[#24588fe1] cursor-pointer disabled:cursor-not-allowed transition-all"
+                    checked={
+                      users.length > 0 &&
+                      selectedUserIds.size === users.length
+                    }
+                    onChange={toggleSelectAll}
+                  />
+                </th>
+                <th className="text-left px-4 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                   User
                 </th>
-                <th className="text-left px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                <th className="text-left px-4 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                   Role
                 </th>
-                <th className="text-left px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                <th className="text-left px-4 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                   Phone
                 </th>
-                <th className="text-left px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                <th className="text-left px-4 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                   Status
                 </th>
-                <th className="text-left px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                <th className="text-left px-4 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                   Registered Date
                 </th>
-                <th className="text-right px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                <th className="text-right px-4 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
@@ -725,8 +849,25 @@ export default function UserActivation() {
                 users.map((user) => (
                   <tr
                     key={user.user_id}
-                    className="group hover:bg-slate-50/30 transition-colors"
+                    className={`group transition-colors ${selectedUserIds.has(String(user.user_id))
+                        ? "bg-blue-50/50"
+                        : "hover:bg-slate-50/30"
+                      }`}
                   >
+                    <td
+                      className="px-4 py-4 w-10 text-center"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleSelectUser(String(user.user_id));
+                      }}
+                    >
+                      <input
+                        type="checkbox"
+                        className="w-3.5 h-3.5 rounded border-slate-300 accent-[#24588fe1] cursor-pointer disabled:cursor-not-allowed transition-all"
+                        checked={selectedUserIds.has(String(user.user_id))}
+                        onChange={() => { }} // Handled by TD click
+                      />
+                    </td>
                     <td className="px-4 py-5">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 bg-blue-50 rounded-full flex items-center justify-center text-blue-500 font-bold text-xs uppercase">
@@ -735,7 +876,7 @@ export default function UserActivation() {
                         <div className="flex flex-col items-start">
                           <Tooltip content={user.name} position="top">
                             <p className="font-bold text-sm text-slate-800 truncate max-w-37.5">
-                              {user.name}
+                              {user.name} {String(user.user_id) === String(currentUser?.user_id) && <span className="text-blue-500 text-xs ml-1">(You)</span>}
                             </p>
                           </Tooltip>
                           <Tooltip content={user.email} position="top">
@@ -749,11 +890,11 @@ export default function UserActivation() {
                     <td className="px-4 py-5">
                       <span
                         className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold border capitalize ${getRoleStyle(
-                          user.role,
+                          user.role as Role,
                         )}`}
                       >
                         <Shield className="w-3 h-3" />
-                        {ROLE_MAP[user.role] || "User"}
+                        {ROLE_MAP[user.role as Role] || "User"}
                       </span>
                     </td>
                     <td className="px-4 py-5">
@@ -781,7 +922,7 @@ export default function UserActivation() {
                     <td className="px-4 py-5">
                       <div className="flex items-center gap-2 text-sm text-slate-400 font-medium">
                         <Calendar className="w-4 h-4" />
-                        {new Date(user.created_time).toLocaleDateString(
+                        {new Date(user.created_time || "").toLocaleDateString(
                           "en-US",
                           {
                             month: "short",
@@ -798,6 +939,7 @@ export default function UserActivation() {
                           onApprove={() => openConfirmModal(user, "approve")}
                           onReject={() => openConfirmModal(user, "reject")}
                           onChangeRole={() => openRoleChangeModal(user)}
+                          isSelf={String(user.user_id) === String(currentUser?.user_id)}
                         />
                       </div>
                     </td>

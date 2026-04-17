@@ -1,11 +1,11 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Building2, ChevronDown, Search, Check } from "lucide-react";
-import { Client } from "../../types/pricelist.types";
+import { ClientMinimal } from "../../types/product.types";
 
 interface ClientDropdownProps {
-  clients: Client[];
-  selectedClient: number;
-  onClientSelect: (clientId: number) => void;
+  clients: ClientMinimal[];
+  selectedClient: number | null;
+  onClientSelect: (clientId: number | null) => void;
   placeholder?: string;
   disabled?: boolean;
   className?: string;

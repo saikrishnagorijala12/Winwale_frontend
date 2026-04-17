@@ -24,11 +24,22 @@ export const productService = {
     return response.data;
   },
 
-  async exportProducts(clientId?: number): Promise<Blob> {
-    const response = await api.get("/export/", {
-      params: clientId ? { client_id: clientId } : {},
-      responseType: "blob",
+  async uploadGsaProducts(clientId: number, file: File): Promise<any> {
+    const formData = new FormData();
+    formData.append("file", file);
+    const response = await api.post(`/upload/${clientId}`, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
     });
+    return response.data;
+  },
+
+  async getGsaUploadStatus(clientId: number): Promise<any> {
+    const response = await api.get(`/upload/${clientId}/status`);
+    return response.data;
+  },
+
+  async resetGsaUploadStatus(clientId: number): Promise<any> {
+    const response = await api.post(`/upload/${clientId}/reset`);
     return response.data;
   },
 };

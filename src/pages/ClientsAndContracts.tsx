@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import { Plus } from "lucide-react";
 import { toast } from "sonner";
-import api from "../lib/axios";
+import { clientService } from "../services/clientService";
 import { Client } from "../types/client.types";
 import {
     normalizeClientFromAPI,
@@ -41,15 +41,13 @@ export default function ClientsAndContractsPage() {
     const fetchClientsAndContracts = async (page: number, query: string, status: string) => {
         try {
             setClientLoading(true);
-            const res = await api.get("/clients", {
-                params: {
-                    page,
-                    page_size: itemsPerPage,
-                    status: status === "all" ? undefined : status,
-                    search: query || undefined,
-                }
+            const res = await clientService.getAllClients({
+                page,
+                page_size: itemsPerPage,
+                status: status === "all" ? undefined : status,
+                search: query || undefined,
             });
-            const { clients: fetchedClients, total_count } = res.data;
+            const { clients: fetchedClients, total_count } = res;
             setClients(fetchedClients.map(normalizeClientFromAPI));
             setTotalItems(total_count);
         } catch {
@@ -183,7 +181,7 @@ export default function ClientsAndContractsPage() {
                     <>
                         Are you sure you want to delete contract{" "}
                         <span className="font-bold text-slate-700">
-                            {getContractForClient(contractToDelete)?.contract_number}
+                            {contractToDelete ? getContractForClient(contractToDelete)?.contract_number : ""}
                         </span>
                         ?
                     </>

@@ -1,6 +1,6 @@
 import React from "react";
 import { Loader2, Inbox, Package } from "lucide-react";
-import { Product, Client } from "../../types/product.types";
+import { Product, ClientMinimal } from "../../types/product.types";
 import ProductTableRow from "./ProductTableRow";
 import Pagination from "../shared/Pagination";
 
@@ -8,7 +8,7 @@ interface ProductsTableProps {
   products: Product[];
   totalItems: number;
   loading: boolean;
-  selectedClient: Client | null;
+  selectedClient: ClientMinimal | null;
   currentPage: number;
   totalPages: number;
   itemsPerPage: number;

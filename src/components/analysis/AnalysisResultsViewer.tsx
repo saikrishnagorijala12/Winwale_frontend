@@ -45,7 +45,7 @@ const tabs = [
     },
     {
         id: "DESCRIPTION_CHANGE",
-        label: "Description Changes",
+        label: "Descr. Changes",
         icon: FileEdit,
         variant: "blue" as const,
     },
@@ -117,8 +117,8 @@ export const AnalysisResultsViewer = ({
                 isOpen={isConfirmExportOpen}
                 onClose={() => setIsConfirmExportOpen(false)}
                 onConfirm={async () => {
-                    await onExport(selectedExportTypes);
                     setIsConfirmExportOpen(false);
+                    onExport(selectedExportTypes);
                 }}
                 title="Export Analysis Results"
                 message={

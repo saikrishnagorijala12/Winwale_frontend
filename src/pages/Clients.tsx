@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { toast } from "sonner";
-import api from "../lib/axios";
+import { clientService } from "../services/clientService";
 import {
   Client,
   ClientFormData,
@@ -16,7 +16,7 @@ import { normalizePhoneNumber } from "../utils/phoneUtils";
 import { ClientHeader } from "../components/clients/ClientHeader";
 import { SearchBar } from "../components/clients/SearchBar";
 import { ClientTable } from "../components/clients/ClientTable";
-import { ClientDetailsModal } from "../components/clients/ClientDetailsModal";
+import { ClientContractDetailsModal } from "../components/clientscontracts/ClientContractDetailsModal";
 import { ClientFormModal } from "../components/clients/ClientFormModal";
 
 export default function ClientsPage() {
@@ -129,15 +129,11 @@ export default function ClientsPage() {
         })),
       };
 
-      const res = await api.post("/clients", finalPayload);
-      const clientId = res.data.client_id;
+      const res = await clientService.createClient(finalPayload);
+      const clientId = res.client_id;
 
       if (logoFile) {
-        const logoFormData = new FormData();
-        logoFormData.append("file", logoFile);
-        await api.post(`/clients/${clientId}/logo`, logoFormData, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
+        await clientService.uploadClientLogo(clientId, logoFile);
       }
 
       await fetchClients();
@@ -186,14 +182,10 @@ export default function ClientsPage() {
         })),
       };
 
-      const res = await api.put(`/clients/${editingClient.id}`, finalPayload);
+      await clientService.updateClient(editingClient.id, finalPayload);
 
       if (logoFile) {
-        const logoFormData = new FormData();
-        logoFormData.append("file", logoFile);
-        await api.post(`/clients/${editingClient.id}/logo`, logoFormData, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
+        await clientService.uploadClientLogo(editingClient.id, logoFile);
       }
 
       await fetchClients();
@@ -266,10 +258,10 @@ export default function ClientsPage() {
   const fetchClients = async () => {
     try {
       setLoading(true);
-      const res = await api.get("/clients");
-      const fetchedClients = Array.isArray(res.data)
-        ? res.data
-        : res.data.clients || [];
+      const data = await clientService.getAllClients();
+      const fetchedClients = Array.isArray(data)
+        ? data
+        : data.clients || [];
       const normalized = fetchedClients.map(normalizeClientFromAPI);
       setClients(normalized);
     } catch {
@@ -308,12 +300,6 @@ export default function ClientsPage() {
         totalClients={totalClients}
         itemsPerPage={itemsPerPage}
         onPageChange={setCurrentPage}
-      />
-
-      <ClientDetailsModal
-        client={selectedClient}
-        onClose={() => setSelectedClient(null)}
-        onEdit={openEditDialog}
       />
 
       <ClientFormModal
@@ -367,6 +353,13 @@ export default function ClientsPage() {
           submitButtonText="Update Client"
         />
       )}
+
+      <ClientContractDetailsModal
+        client={selectedClient}
+        contract={selectedClient?.contractDetails || null}
+        onClose={() => setSelectedClient(null)}
+        onEdit={openEditDialog}
+      />
     </div>
   );
 }

@@ -42,8 +42,8 @@ export default function ProductTableRow({
         </span>
       </td>
       <td className="px-6 py-4 text-sm text-slate-600 font-semibold truncate max-w-37.5">
-        <Tooltip content={product.client_name} position="top">
-          {product.client_name}
+        <Tooltip content={product.client_name ?? "—"} position="top">
+          {product.client_name ?? "—"}
         </Tooltip>
       </td>
       <td className="px-6 py-4 text-sm text-slate-600 truncate max-w-37.5">
@@ -55,7 +55,7 @@ export default function ProductTableRow({
         {product.manufacturer_part_number}
       </td>
       <td className="px-6 py-4 text-sm font-black text-slate-900">
-        {formatCurrency(product.commercial_list_price)}
+        {formatCurrency(product.commercial_list_price ?? undefined)}
       </td>
       <td className="px-6 py-4 text-sm font-mono text-slate-600">
         {product.uom}

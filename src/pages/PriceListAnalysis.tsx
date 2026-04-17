@@ -1,15 +1,17 @@
 import React, { ChangeEvent, useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { toast } from "sonner"; // Added toast import
 
-import api from "../lib/axios";
 import * as XLSX from "xlsx";
 import {
-  exportPriceModifications,
   fetchAnalysisJobById,
+  uploadCpl,
+  startPriceModificationsExport,
 } from "../services/analysisService";
+import { clientService } from "../services/clientService";
 import { downloadBlob } from "../utils/downloadUtils";
-import { useAnalysis } from "../context/AnalysisContext";
-import { toast } from "sonner";
+import { useSSE } from "../hooks/useSSE";
+import { useExportTask } from "../hooks/useExportTask";
 import { processModifications } from "../utils/analysisUtils";
 import {
   findHeaderRow,
@@ -22,7 +24,9 @@ import { ClientSelectionStep } from "../components/pricelist-analysis/ClientSele
 import { FileUploadStep } from "../components/pricelist-analysis/FileUploadStep";
 import { RunAnalysisStep } from "../components/pricelist-analysis/RunAnalysisStep";
 import { ReviewResultsStep } from "../components/pricelist-analysis/ReviewResultsStep";
-import { Client, Step, CategorizedActions } from "../types/pricelist.types";
+import { Step } from "../types/analysis.types";
+import { ClientMinimal } from "../types/product.types";
+import { useAnalysis } from "../context/AnalysisContext";
 
 const steps: Step[] = [
   { id: 1, title: "Select Client", description: "Choose a client" },
@@ -38,10 +42,9 @@ export default function PriceListAnalysis() {
   const [currentStep, setCurrentStep] = useState(1);
   const [selectedClient, setSelectedClient] = useState<number | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [isExporting, setIsExporting] = useState(false);
-
-  const [clients, setClients] = useState<Client[]>([]);
+  const [clients, setClients] = useState<ClientMinimal[]>([]);
   const [loadingClients, setLoadingClients] = useState<boolean>(true);
+  const { startExport, isExporting: isJobExporting, progress: exportProgress, message: exportMessage } = useExportTask();
   const [error, setError] = useState<React.ReactNode | null>(null);
   const [errorVariant, setErrorVariant] = useState<
     "error" | "warning" | "info"
@@ -60,6 +63,26 @@ export default function PriceListAnalysis() {
     fetchClients();
   }, []);
 
+  const { data: sseData, disconnect: disconnectSSE } = useSSE<any>(
+    selectedClient && isAnalyzing ? `/cpl/${selectedClient}/events` : null
+  );
+
+  useEffect(() => {
+    if (sseData) {
+      if (sseData.status === "completed") {
+        setUploadResult(sseData.result);
+        setSelectedJobId(sseData.result.job_id);
+        setIsAnalyzing(false);
+        setCurrentStep(4);
+        disconnectSSE();
+      } else if (sseData.status === "failed") {
+        setIsAnalyzing(false);
+        setError(sseData.message || "Analysis failed");
+        disconnectSSE();
+      }
+    }
+  }, [sseData, setSelectedJobId, disconnectSSE]);
+
   const [activeTab, setActiveTab] = useState<string>("NEW_PRODUCT");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 7;
@@ -73,8 +96,8 @@ export default function PriceListAnalysis() {
   const fetchClients = async () => {
     try {
       setLoadingClients(true);
-      const res = await api.get("/clients/approved");
-      setClients(res.data);
+      const data = await clientService.getApprovedClients();
+      setClients(data);
     } catch (err) {
       console.error("Failed to fetch clients:", err);
     } finally {
@@ -107,7 +130,8 @@ export default function PriceListAnalysis() {
     e: ChangeEvent<HTMLInputElement> | React.MouseEvent,
   ) => {
     if (e.type === "click") {
-      document.getElementById("file-upload-input")?.click();
+      const input = document.getElementById("file-upload-input");
+      if (input) (input as HTMLInputElement).click();
       return;
     }
     const target = e.target as HTMLInputElement;
@@ -182,7 +206,6 @@ export default function PriceListAnalysis() {
 
       const validFiles: File[] = [];
       const newFileWarnings: Record<string, string> = { ...fileWarnings };
-      let firstValidPreviewFile: File | null = null;
 
       for (const file of uniqueFiles) {
         try {
@@ -307,19 +330,15 @@ export default function PriceListAnalysis() {
     setError(null);
     setErrorVariant("error");
 
-    const formData = new FormData();
-    files.forEach((f) => formData.append("files", f));
-
     try {
-      const response = await api.post(`/cpl/${selectedClient}`, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      const response = await uploadCpl(selectedClient, files);
 
-      setUploadResult(response.data);
-      setSelectedJobId(response.data.job_id);
-      setCurrentStep(4);
+      // After starting the job, we stay on Step 3 and wait for SSE
+      // Capture job_id if returned (backend refactor planned)
+      if (response.job_id) {
+        setSelectedJobId(response.job_id);
+      }
 
-      setIsAnalyzing(false);
     } catch (err: any) {
       setIsAnalyzing(false);
       toast.error(err?.message ?? "Analysis failed. Please try again.");
@@ -421,6 +440,8 @@ export default function PriceListAnalysis() {
             uploadedFileName={files.length > 0 ? `${files.length} files selected` : ""}
             totalRows={files.length}
             isAnalyzing={isAnalyzing}
+            percent={sseData?.percent}
+            message={sseData?.message}
             error={error}
             errorVariant={errorVariant}
             onBack={() => {
@@ -441,40 +462,17 @@ export default function PriceListAnalysis() {
             currentPage={currentPage}
             activeTab={activeTab}
             isLoading={isFetchingJob}
-            isExporting={isExporting}
+            isExporting={isJobExporting}
             onTabChange={(tab) => {
               setActiveTab(tab);
               setCurrentPage(1);
             }}
             onPageChange={(page) => setCurrentPage(page)}
             onExport={async (selectedTypes) => {
-              try {
-                setIsExporting(true);
-                const date = new Date()
-                  .toLocaleDateString("en-US", {
-                    month: "2-digit",
-                    day: "2-digit",
-                    year: "numeric",
-                  })
-                  .replace(/\//g, "-");
-
-                const clientName =
-                  activeClient?.company_name.replace(/\s+/g, "-") || "Client";
-                const contract = activeClient?.contract_number || "NoContract";
-                const fileName = `${clientName}_${contract}_modifications_${date}.xlsx`;
-
-                const blob = await exportPriceModifications({
-                  job_id: uploadResult?.job_id,
-                  types: selectedTypes,
-                });
-                downloadBlob(blob, fileName);
-                toast.success("Analysis export complete");
-              } catch (error) {
-                console.error("Export failed:", error);
-                toast.error("Failed to export analysis");
-              } finally {
-                setIsExporting(false);
-              }
+              await startExport(() => startPriceModificationsExport({
+                job_id: uploadResult?.job_id,
+                types: selectedTypes,
+              }));
             }}
             onReset={handleReset}
             onGenerateDocuments={() =>
@@ -499,6 +497,32 @@ export default function PriceListAnalysis() {
       </div>
 
       <AnalysisStepper steps={steps} currentStep={currentStep} />
+
+      {isJobExporting && (
+        <div className="w-full bg-white border border-blue-100 rounded-2xl p-4 shadow-sm animate-in fade-in slide-in-from-top-4 duration-300">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600">
+                <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                </svg>
+              </div>
+              <div>
+                <p className="text-sm font-bold text-slate-800">Exporting Data...</p>
+                <p className="text-xs text-slate-500 font-medium">{exportMessage}</p>
+              </div>
+            </div>
+            <span className="text-sm font-bold text-blue-600 tabular-nums">{exportProgress}%</span>
+          </div>
+          <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+            <div 
+              className="h-full bg-blue-600 transition-all duration-500 ease-out"
+              style={{ width: `${exportProgress}%` }}
+            />
+          </div>
+        </div>
+      )}
 
       <div className="w-full">{renderStepContent()}</div>
     </div>

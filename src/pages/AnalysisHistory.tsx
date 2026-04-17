@@ -5,16 +5,23 @@ import AnalysisHistoryHeader from "../components/analysis/AnalysisHistoryHeader"
 import AnalysisFilters from "../components/analysis/AnalysisFilters";
 import AnalysisTable from "../components/analysis/AnalysisTable";
 import { processModifications } from "../utils/analysisUtils";
+import * as XLSX from "xlsx";
 import {
   fetchAnalysisJobs,
   approveAnalysisJob,
   rejectAnalysisJob,
+  fetchAnalysisJobById,
+  uploadCpl,
+  startPriceModificationsExport,
 } from "../services/analysisService";
 import { AnalysisJob, SortConfig, StatusFilter } from "../types/analysis.types";
 import ConfirmationModal from "../components/shared/ConfirmationModal";
-import { Client } from "../types/pricelist.types";
-import api from "../lib/axios";
+import { clientService } from "../services/clientService";
+import { downloadBlob } from "../utils/downloadUtils";
+import { useSSE } from "../hooks/useSSE";
+import { useExportTask } from "../hooks/useExportTask";
 import { useDebounce } from "../hooks/useDebounce";
+import { ClientMinimal } from "../types/product.types";
 
 export default function AnalysisHistory() {
   const navigate = useNavigate();
@@ -42,13 +49,13 @@ export default function AnalysisHistory() {
     action: "approve" as "approve" | "reject",
   });
 
-  const [clients, setClients] = useState<Client[]>([]);
+  const [clients, setClients] = useState<ClientMinimal[]>([]);
 
   const fetchClients = async () => {
     try {
       setLoadingClients(true);
-      const response = await api.get<Client[]>("clients/approved");
-      setClients(response.data);
+      const data = await clientService.getApprovedClients();
+      setClients(data);
     } catch (error) {
       console.error("Failed to fetch clients:", error);
     } finally {
@@ -69,7 +76,7 @@ export default function AnalysisHistory() {
         date_to: dateTo?.toISOString(),
       });
 
-      const formattedData: AnalysisJob[] = data.items.map((job) => ({
+      const formattedData: AnalysisJob[] = data.items.map((job: AnalysisJob) => ({
         ...job,
         summary: processModifications(job.action_summary),
       }));

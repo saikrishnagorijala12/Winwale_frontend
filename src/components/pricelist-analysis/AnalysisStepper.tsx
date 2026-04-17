@@ -1,6 +1,6 @@
 import React from "react";
 import { Check } from "lucide-react";
-import { Step } from "../../types/pricelist.types";
+import { Step } from "../../types/analysis.types";
 
 interface AnalysisStepperProps {
     steps: Step[];

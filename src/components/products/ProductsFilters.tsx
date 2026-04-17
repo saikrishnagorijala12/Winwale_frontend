@@ -1,6 +1,6 @@
 import React from "react";
 import { Search, Loader2 } from "lucide-react";
-import { Client as ProductClient } from "../../types/product.types";
+import { ClientMinimal as ProductClient } from "../../types/product.types";
 import { ClientDropdown } from "../shared/ClientDropdown";
 
 interface ProductsFiltersProps {
@@ -20,8 +20,8 @@ export default function ProductsFilters({
   onClientSelect,
   isLoading = false,
 }: ProductsFiltersProps) {
-  const handleClientSelect = (clientId: number) => {
-    if (clientId === 0) {
+  const handleClientSelect = (clientId: number | null) => {
+    if (!clientId || clientId === 0) {
       onClientSelect(null);
     } else {
       const match = clients.find((c) => c.client_id === clientId);

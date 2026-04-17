@@ -22,7 +22,7 @@ import {
 } from "../../utils/contractValidations";
 import { getInitialFormData } from "../../utils/clientUtils";
 import { contractService } from "../../services/contractService";
-import api from "../../lib/axios";
+import { clientService } from "../../services/clientService";
 import { toast } from "sonner";
 import { normalizePhoneNumber } from "../../utils/phoneUtils";
 
@@ -131,7 +131,11 @@ export default function EditClientContractModal({
   };
 
   const handleClearContractError = (field: keyof FormErrors) => {
-    setContractErrors((prev) => ({ ...prev, [field]: undefined }));
+    setContractErrors((prev) => {
+      const nextErrors = { ...prev };
+      delete nextErrors[field];
+      return nextErrors;
+    });
   };
 
   const handleNext = (e: React.FormEvent) => {
@@ -196,14 +200,10 @@ export default function EditClientContractModal({
           : logoUrl || null,
       };
 
-      await api.put(`/clients/${client.id}`, finalPayload);
+      await clientService.updateClient(client.id, finalPayload);
 
       if (logoFile) {
-        const logoFormData = new FormData();
-        logoFormData.append("file", logoFile);
-        await api.post(`/clients/${client.id}/logo`, logoFormData, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
+        await clientService.uploadClientLogo(client.id, logoFile);
       }
 
       const payload = {

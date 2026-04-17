@@ -2,9 +2,9 @@ import React, { useState, useEffect } from "react";
 import { X, CheckCircle2, Loader2, AlertCircle } from "lucide-react";
 import {
   ClientContractCreate,
-  ClientListRead,
   FormErrors,
 } from "../../types/contract.types";
+import { ClientMinimal } from "../../types/product.types";
 import { Step1, Step2 } from "./ContractFormSteps";
 import { clientService } from "../../services/clientService";
 import { contractService } from "../../services/contractService";
@@ -44,7 +44,7 @@ export default function AddContractModal({
 }: AddContractModalProps) {
   const [step, setStep] = useState<1 | 2>(1);
   const [contract, setContract] = useState<ClientContractCreate>(initialForm);
-  const [clients, setClients] = useState<ClientListRead[]>([]);
+  const [clients, setClients] = useState<ClientMinimal[]>([]);
   const [clientSearch, setClientSearch] = useState("");
   const [showClientDropdown, setShowClientDropdown] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);

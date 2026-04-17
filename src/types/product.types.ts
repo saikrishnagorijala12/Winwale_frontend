@@ -1,9 +1,36 @@
-export interface Client {
+export interface ClientMinimal {
   client_id: number;
   company_name: string;
-  company_email: string;
-  status: string;
+  company_email?: string;
+  status?: string;
+  contract_number?: string | null;
+  has_products?: boolean;
 }
+
+export interface UploadResult {
+  upload_id: string;
+  status: string;
+  message: string;
+}
+
+export interface UploadStatus {
+  upload_id?: string;
+  client_id: number;
+  filename?: string;
+  status: "idle" | "processing" | "completed" | "failed";
+  message?: string;
+  processed_count?: number;
+  total_count?: number;
+  result?: {
+    inserted: number;
+    updated: number;
+    reactivated: number;
+    deleted: number;
+    skipped: number;
+  };
+}
+
+export type PreviewRow = Record<string, unknown>;
 
 export interface Product {
   product_id: number;

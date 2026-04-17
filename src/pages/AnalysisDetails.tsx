@@ -9,14 +9,16 @@ import {
   ArrowRight,
 } from "lucide-react";
 import {
-  exportPriceModifications,
+  startPriceModificationsExport,
   fetchAnalysisJobById,
 } from "../services/analysisService";
+import { useExportTask } from "../hooks/useExportTask";
+
 import { AnalysisJob } from "../types/analysis.types";
 import { AnalysisResultsViewer } from "../components/analysis/AnalysisResultsViewer";
 import { toast } from "sonner";
-import { downloadBlob } from "../utils/downloadUtils";
 import { processModifications } from "../utils/analysisUtils";
+
 
 export default function AnalysisDetails() {
   const [searchParams] = useSearchParams();
@@ -25,7 +27,8 @@ export default function AnalysisDetails() {
 
   const [job, setJob] = useState<AnalysisJob | null>(null);
   const [isFetchingJob, setIsFetchingJob] = useState(true);
-  const [isExporting, setIsExporting] = useState(false);
+  const { startExport, isExporting, progress, message } = useExportTask();
+
   const [activeTab, setActiveTab] = useState<string>("NEW_PRODUCT");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 7;
@@ -127,6 +130,7 @@ export default function AnalysisDetails() {
       </div>
 
       <div className="relative">
+
         <AnalysisResultsViewer
           actions={job?.modifications_actions || []}
           actionSummary={job?.action_summary || {}}
@@ -139,40 +143,19 @@ export default function AnalysisDetails() {
           isLoading={isFetchingJob}
           isExporting={isExporting}
           onExport={async (selectedTypes) => {
-            try {
-              setIsExporting(true);
-              const date = new Date()
-                .toLocaleDateString("en-US", {
-                  month: "2-digit",
-                  day: "2-digit",
-                  year: "numeric",
-                })
-                .replace(/\//g, "-");
-
-              const clientName = job?.client?.replace(/\s+/g, "-") || "Client";
-              const contract = job?.contract_number || "NoContract";
-              const fileName = `${clientName}_${contract}_modifications_${date}.xlsx`;
-
-              const blob = await exportPriceModifications({
-                job_id: Number(jobId),
-                types: selectedTypes,
-              });
-              downloadBlob(blob, fileName);
-              toast.success("Analysis export complete");
-            } catch (error) {
-              console.error("Export failed:", error);
-              toast.error("Failed to export analysis");
-            } finally {
-              setIsExporting(false);
-            }
+            await startExport(() => startPriceModificationsExport({
+              job_id: Number(jobId),
+              types: selectedTypes,
+            }));
           }}
+
         />
       </div>
 
       <div className="flex items-center justify-between">
         <button
           onClick={() => navigate(-1)}
-          className="group flex items-center gap-2 px-6 py-2.5 bg-white border border-slate-200 text-slate-600 font-bold rounded-xl transition-all hover:bg-slate-50 hover:text-slate-900 active:scale-95 shadow-sm"
+          className="btn-secondary group shadow-sm"
         >
           <ChevronLeft className="w-4 h-4 transition-transform group-hover:-translate-x-0.5" />
           Back

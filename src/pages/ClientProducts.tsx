@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useClient } from "../context/ClientContext";
 import {
   Search,
@@ -10,19 +10,33 @@ import {
   Inbox,
   Loader2,
   Check,
+  Download,
+  Upload,
 } from "lucide-react";
 import { Product } from "../types/product.types";
 import { productService } from "../services/productService";
 import { toast } from "sonner";
 import { useDebounce } from "../hooks/useDebounce";
+import { useExportTask } from "../hooks/useExportTask";
+import { startProductsExport } from "../services/analysisService";
 import StatusBadge from "../components/shared/StatusBadge";
 import Pagination from "../components/shared/Pagination";
+import ConfirmationModal from "../components/shared/ConfirmationModal";
+import { Breadcrumbs } from "../components/shared/Breadcrumbs";
 
 export default function ClientProducts() {
   const navigate = useNavigate();
-  const { selectedClientId } = useClient();
+  const { id } = useParams<{ id: string }>();
+  const { selectedClientId, setSelectedClientId } = useClient();
 
-  const clientId = selectedClientId;
+  const clientId = id ? parseInt(id) : selectedClientId;
+
+  // Sync context if ID is in URL but not in context
+  useEffect(() => {
+    if (id && parseInt(id) !== selectedClientId) {
+      setSelectedClientId(parseInt(id));
+    }
+  }, [id, selectedClientId, setSelectedClientId]);
 
   const [products, setProducts] = useState<Product[]>([]);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
@@ -33,6 +47,8 @@ export default function ClientProducts() {
   const [totalPages, setTotalPages] = useState(0);
 
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
+  const { startExport, isExporting: isProductsExporting } = useExportTask();
+  const [isConfirmExportOpen, setIsConfirmExportOpen] = useState(false);
 
   const itemsPerPage = 50;
 
@@ -65,7 +81,13 @@ export default function ClientProducts() {
 
   const startIndex = (currentPage - 1) * itemsPerPage;
 
-  const formatCurrency = (value?: number) => {
+  const handleExport = async () => {
+    if (!clientId) return;
+    setIsConfirmExportOpen(false);
+    await startExport(() => startProductsExport({ client_id: clientId }));
+  };
+
+  const formatCurrency = (value?: number | null) => {
     if (value === undefined || value === null) return "-";
     return new Intl.NumberFormat("en-US", {
       style: "currency",
@@ -79,16 +101,16 @@ export default function ClientProducts() {
     <div className="min-h-screen bg-linear-to-br from-slate-50 to-slate-100 p-6">
       <div className="mx-auto">
         <div className="mb-8">
-          <button
-            onClick={() => navigate(-1)}
-            className="flex items-center gap-2 text-slate-500 hover:text-slate-800 transition-colors mb-6 font-medium group"
-          >
-            <ChevronLeft
-              size={20}
-              className="group-hover:-translate-x-1 transition-transform"
-            />
-            Back
-          </button>
+
+          <Breadcrumbs
+            items={[
+              { label: "Client Profiles", path: "/client-profiles" },
+              {
+                label: products[0]?.client_name || (clientId ? "Client" : "Select Client"),
+              },
+              { label: "Products" },
+            ]}
+          />
 
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
             <div>
@@ -99,10 +121,33 @@ export default function ClientProducts() {
               </h1>
               <p className="text-slate-500">
                 {clientId
-                  ? `Managing ${products.length} catalog items`
+                  ? `Managing ${totalItems} catalog items`
                   : "Please select a client from the Clients page"}
               </p>
             </div>
+            {clientId && (
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => setIsConfirmExportOpen(true)}
+                  disabled={isProductsExporting || products.length === 0}
+                  className="btn-secondary flex items-center gap-2"
+                >
+                  {isProductsExporting ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <Download size={18} />
+                  )}
+                  Export Catalog
+                </button>
+                <button
+                  onClick={() => navigate(`/gsa-products/upload?client_id=${clientId}`)}
+                  className="btn-primary flex items-center gap-2"
+                >
+                  <Upload size={18} />
+                  Upload Catalog
+                </button>
+              </div>
+            )}
           </div>
           <div className="mx-auto bg-white p-4 rounded-4xl shadow-sm border border-slate-100 mb-8 flex flex-col lg:flex-row gap-4 items-center">
             <div className="relative flex-1 w-full">
@@ -424,6 +469,24 @@ export default function ClientProducts() {
           </div>
         </div>
       )}
+
+      <ConfirmationModal
+        isOpen={isConfirmExportOpen}
+        onClose={() => setIsConfirmExportOpen(false)}
+        onConfirm={handleExport}
+        title="Export Product Catalog"
+        message={
+          <>Export the full product catalog for <span className="font-bold text-slate-800">{products[0]?.client_name || "this client"}</span> to Excel?</>
+        }
+        details={[
+          { label: "Client", value: products[0]?.client_name || "Current Client" },
+          { label: "Total Products", value: totalItems.toLocaleString() },
+        ]}
+        confirmText="Yes, Export"
+        cancelText="Cancel"
+        isSubmitting={isProductsExporting}
+        variant="blue"
+      />
     </div>
   );
 }

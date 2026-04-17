@@ -69,10 +69,22 @@ api.interceptors.response.use(
       window.dispatchEvent(new CustomEvent("custom:unauthorized"));
     }
 
-    const message =
-      error.response.data?.detail ||
-      error.response.data?.message ||
-      "Something went wrong.";
+    const data = error.response.data;
+    let message = "Something went wrong.";
+
+    if (data?.detail) {
+      if (typeof data.detail === "string") {
+        message = data.detail;
+      } else if (Array.isArray(data.detail)) {
+        message = data.detail
+          .map((err: any) => (typeof err === "string" ? err : err.msg || JSON.stringify(err)))
+          .join(". ");
+      } else if (typeof data.detail === "object") {
+        message = data.detail.message || JSON.stringify(data.detail);
+      }
+    } else if (data?.message) {
+      message = data.message;
+    }
 
     return Promise.reject({
       status,

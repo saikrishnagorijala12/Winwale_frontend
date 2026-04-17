@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import { Save, Shield } from "lucide-react";
 import { Role } from "@/src/types/roles.types";
+import { UserProfile } from "../../types/user.types";
 import * as v from "../../utils/validators";
 import { normalizePhoneNumber, formatPhoneNumber } from "../../utils/phoneUtils";
 
 interface ProfileSectionProps {
-  user: any;
+  user: UserProfile | null;
   onSave: (data: { fullName: string; phone: string | null }) => Promise<void>;
   loading: boolean;
 }
@@ -27,6 +28,7 @@ export const ProfileSection = ({
   loading,
 }: ProfileSectionProps) => {
   const [name, setName] = useState(user?.name || "");
+  const role: Role | undefined = user?.role;
 
   const [phoneNo, setPhoneNo] = useState(
     user?.phone_no && user.phone_no !== "NA" ? formatPhoneNumber(user.phone_no) : "",
@@ -94,7 +96,7 @@ export const ProfileSection = ({
             <div className="inline-flex items-center gap-2 mt-2 px-3 py-1 bg-slate-100 rounded-full">
               <Shield className="w-3.5 h-3.5 text-[#3498db]" />
               <span className="text-xs font-bold uppercase tracking-wider text-slate-600">
-                {ROLE_MAP[user?.role] || "User"}
+                {role ? ROLE_MAP[role] : "User"}
               </span>
             </div>
           </div>

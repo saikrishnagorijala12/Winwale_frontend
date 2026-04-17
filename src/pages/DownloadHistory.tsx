@@ -11,7 +11,20 @@ import {
 import { toast } from "sonner";
 import Pagination from "../components/shared/Pagination";
 
-const mockDownloadHistory = [
+type DownloadFileType = "PDF" | "Excel" | "CSV";
+
+interface DownloadRecord {
+  id: string;
+  analysisId: string;
+  fileName: string;
+  client: string;
+  type: DownloadFileType;
+  size: string;
+  date: Date;
+  status: "Ready" | "Expired";
+}
+
+const mockDownloadHistory: DownloadRecord[] = [
   {
     id: "DOC-2024-101",
     analysisId: "ANL-2024-001",
@@ -54,7 +67,7 @@ const mockDownloadHistory = [
   },
 ];
 
-const fileTypeStyles = {
+const fileTypeStyles: Record<DownloadFileType, string> = {
   PDF: "bg-rose-50 text-rose-600 border-rose-100",
   Excel: "bg-emerald-50 text-emerald-600 border-emerald-100",
   CSV: "bg-blue-50 text-blue-600 border-blue-100",
@@ -68,11 +81,11 @@ export default function DownloadHistory() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
-  const handleDownload = (fileName) => {
+  const handleDownload = (fileName: string) => {
     toast.success(`Downloading ${fileName}...`);
   };
 
-  const formatDate = (date) => {
+  const formatDate = (date: Date) => {
     return new Intl.DateTimeFormat("en-US", {
       month: "short",
       day: "numeric",
