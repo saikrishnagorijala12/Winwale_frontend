@@ -12,8 +12,13 @@ import { useDocument } from "@/src/context/DocumentContext";
 import { DocumentBodyRenderer } from "./DocumentBodyRenderer";
 import { RichTextEditor } from "./RichTextEditor";
 import { convertTiptapToDocx } from "../../utils/documentExportUtils";
+import { BreadcrumbItem, Breadcrumbs } from "../shared/Breadcrumbs";
 
-export const DocumentPreview = () => {
+interface DocumentPreviewProps {
+  breadcrumbs?: BreadcrumbItem[];
+}
+
+export const DocumentPreview = ({ breadcrumbs }: DocumentPreviewProps) => {
   const {
     documentConfig,
     formData,
@@ -111,7 +116,9 @@ export const DocumentPreview = () => {
       className="min-h-screen p-6 lg:p-10 animate-fade-in"
       style={{ backgroundColor: colors.bg }}
     >
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10 animate-slide-up">
+      <div className="mx-auto">
+        {breadcrumbs && <Breadcrumbs items={breadcrumbs} />}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10 animate-slide-up">
         <div className="space-y-1">
           <h1
             className="text-3xl font-extrabold tracking-tight"
@@ -366,6 +373,7 @@ export const DocumentPreview = () => {
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 };

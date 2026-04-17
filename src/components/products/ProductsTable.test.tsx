@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import ProductsTable from './ProductsTable';
 import { MemoryRouter } from 'react-router-dom';
@@ -32,21 +32,23 @@ describe('ProductsTable', () => {
     const products = [
       {
         product_id: 1,
-        item_description: 'Test Item',
-        product_type: 'Software',
+        item_name: 'Test Item',
+        item_description: 'Test item description',
+        item_type: 'B',
         client_id: 1,
+        client_name: 'Client A',
         manufacturer: 'Acme',
-        mfr_part_number: 'P-123',
-        price: '100.00',
+        manufacturer_part_number: 'P-123',
+        commercial_list_price: 100,
         uom: 'EA',
-        client: 'Client A'
       }
     ] as any;
     
     render(<MemoryRouter><ProductsTable {...defaultProps} products={products} /></MemoryRouter>);
     
-    // Check if table headers are present
     expect(screen.getByText('Item Description')).toBeInTheDocument();
     expect(screen.getByText('Manufacturer')).toBeInTheDocument();
+    expect(screen.getByText('Test Item')).toBeInTheDocument();
+    expect(screen.getByText('Client A')).toBeInTheDocument();
   });
 });

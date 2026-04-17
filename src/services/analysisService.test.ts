@@ -62,7 +62,9 @@ describe('analysisService', () => {
 
       const result = await approveAnalysisJob(10);
 
-      expect(api.post).toHaveBeenCalledWith('/jobs/10/status?action=approve');
+      expect(api.post).toHaveBeenCalledWith('/jobs/10/status', null, {
+        params: { action: 'approve' }
+      });
       expect(result).toEqual(resData);
     });
   });
@@ -74,7 +76,9 @@ describe('analysisService', () => {
 
       const result = await rejectAnalysisJob(10);
 
-      expect(api.post).toHaveBeenCalledWith('/jobs/10/status?action=reject');
+      expect(api.post).toHaveBeenCalledWith('/jobs/10/status', null, {
+        params: { action: 'reject' }
+      });
       expect(result).toEqual(resData);
     });
   });

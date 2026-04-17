@@ -120,6 +120,7 @@ const AppRoutes: React.FC = () => {
 
                   <Route path="/gsa-products" element={<GsaProducts />} />
                   <Route path="/gsa-products/upload" element={<UploadGsa />} />
+                  <Route path="/clients/:id/products/upload" element={<UploadGsa />} />
                   <Route
                     path="/pricelist-analysis"
                     element={<PriceListAnalysis />}

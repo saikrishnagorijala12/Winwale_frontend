@@ -123,7 +123,11 @@ export default function ProductsPage() {
 
       <div className="mx-auto">
         <ProductsHeader
-          onUploadClick={() => navigate("/gsa-products/upload")}
+          onUploadClick={() =>
+            selectedClient
+              ? navigate(`/clients/${selectedClient.client_id}/products/upload`)
+              : navigate("/gsa-products/upload")
+          }
           onExportClick={selectedClient ? () => setIsConfirmExportOpen(true) : undefined}
           isExporting={isExporting}
           totalCount={totalItems}

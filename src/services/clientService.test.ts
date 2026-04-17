@@ -17,7 +17,7 @@ describe('clientService', () => {
 
       const result = await clientService.getAllClients();
 
-      expect(api.get).toHaveBeenCalledWith('/clients');
+      expect(api.get).toHaveBeenCalledWith('/clients', { params: undefined });
       expect(result).toEqual(mockData);
     });
   });

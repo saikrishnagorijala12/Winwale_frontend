@@ -3,7 +3,8 @@ import { DocumentTypeCard } from "../components/document/DocumentTypeSelector";
 import DocumentFormRenderer from "../components/document/DocumentFormRenderer";
 import { DocumentPreview } from "../components/document/DocumentPreview";
 import { documentConfigs } from "../types/documentConfigs";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useLocation, Link } from "react-router-dom";
+import { Breadcrumbs, BreadcrumbItem } from "../components/shared/Breadcrumbs";
 import { useEffect } from "react";
 import { useAnalysis } from "../context/AnalysisContext";
 import { DocumentFormSkeleton } from "../components/document/DocumentFormSkeleton";
@@ -18,6 +19,7 @@ export const DocumentWorkflowRenderer = () => {
   } = useDocument();
 
   const [searchParams] = useSearchParams();
+  const location = useLocation();
   const { selectedJobId, setSelectedJobId } = useAnalysis();
   const urlJobId = searchParams.get("job_id");
   const jobId = urlJobId ? Number(urlJobId) : selectedJobId;
@@ -65,13 +67,39 @@ export const DocumentWorkflowRenderer = () => {
 
   const modificationMessage = getModificationMessage();
 
+  const from = location.state?.from || 'history';
+  const breadcrumbItems: BreadcrumbItem[] = [
+    { 
+      label: from === 'pricelist' ? 'Pricelist Analysis' : 'Analysis History', 
+      path: from === 'pricelist' ? '/pricelist-analysis' : '/analyses' 
+    },
+  ];
+
+  if (from === 'history') {
+    breadcrumbItems.push({ 
+      label: 'Analysis Details', 
+      path: `/analyses/details?id=${jobId}` 
+    });
+  }
+
+  breadcrumbItems.push({ 
+    label: 'Generate Documents',
+    onClick: currentStep === 'preview' ? () => setCurrentStep("form-entry") : undefined,
+    path: currentStep === 'preview' ? `/documents?job_id=${jobId}` : undefined
+  });
+
+  if (currentStep === 'preview') {
+    breadcrumbItems.push({ label: 'Document Preview' });
+  }
+
   if (currentStep === "preview") {
-    return <DocumentPreview />;
+    return <DocumentPreview breadcrumbs={breadcrumbItems} />;
   }
 
   return (
-    <div className="min-h-screen bg-slate-50/50 p-6 lg:p-10 space-y-8 animate-fade-in">
-      <div className="mx-auto  space-y-10">
+    <div className="min-h-screen bg-slate-50/50 p-6 lg:p-10 animate-fade-in">
+      <div className="mx-auto space-y-10">
+        <Breadcrumbs items={breadcrumbItems} />
         <div className="space-y-1">
           <h1 className="text-3xl font-bold tracking-tight text-slate-900">
             Generate Documents

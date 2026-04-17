@@ -50,7 +50,7 @@ export const ReviewResultsStep = ({
                 isExporting={isExporting}
             />
 
-            <div className="flex justify-between items-center pt-4">
+            <div className="flex justify-between items-center mt-8">
                 <button
                     onClick={onReset}
                     className="btn-secondary"

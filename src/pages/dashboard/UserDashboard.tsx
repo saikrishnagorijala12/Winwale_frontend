@@ -277,7 +277,7 @@ export default function Dashboard() {
                   <div
                     key={item.id}
                     onClick={() => {
-                      navigate(`/analyses/details?id=${item.id}`);
+                      navigate(`/analyses/details?id=${item.id}`, { state: { from: 'history' } });
                     }}
                     className="group flex items-center gap-4 p-4 rounded-2xl border border-transparent hover:shadow-sm transition-all cursor-pointer"
                     style={{ backgroundColor: `${colors.bg}80` }}

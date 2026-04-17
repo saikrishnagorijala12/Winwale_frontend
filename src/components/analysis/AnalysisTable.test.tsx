@@ -50,7 +50,7 @@ describe('AnalysisTable', () => {
         client: 'Client A',
         contract_number: '1234',
         status: 'pending',
-        summary: { additions: 0, deletions: 0, priceIncreases: 0, priceDecreases: 0, descriptionChanges: 0 },
+        summary: { additions: 0, deletions: 0, priceIncreases: 0, priceDecreases: 0, descriptionChanges: 0, noChanges: 1 },
         created_time: '2023-01-01T00:00:00Z',
         user: 'User A',
         file_name: 'test.xlsx',
@@ -65,7 +65,7 @@ describe('AnalysisTable', () => {
     );
 
     expect(screen.getByText('Analysis ID')).toBeInTheDocument();
-    // Use getByText with exact: false or getAllByText for dynamic text
     expect(screen.getAllByText('ANAL-JOB-1').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Client A').length).toBeGreaterThan(0);
   });
 });

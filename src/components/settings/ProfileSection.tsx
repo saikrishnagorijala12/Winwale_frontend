@@ -34,9 +34,11 @@ export const ProfileSection = ({
     user?.phone_no && user.phone_no !== "NA" ? formatPhoneNumber(user.phone_no) : "",
   );
   const [nameError, setNameError] = useState("");
+  const [phoneError, setPhoneError] = useState("");
   const [formError, setFormError] = useState("");
 
-  const [phoneError, setPhoneError] = useState("");
+  const originalPhone = user?.phone_no && user.phone_no !== "NA" ? formatPhoneNumber(user.phone_no) : "";
+  const hasChanges = name.trim() !== (user?.name || "") || phoneNo.trim() !== originalPhone;
 
   const handleSave = async () => {
     const trimmedName = name.trim();
@@ -62,14 +64,6 @@ export const ProfileSection = ({
         setPhoneError(phoneError);
         return;
       }
-    }
-
-    if (
-      trimmedName === user?.name &&
-      (trimmedPhone || null) === (user?.phone_no || null)
-    ) {
-      setFormError("No changes to save");
-      return;
     }
 
     await onSave({
@@ -173,8 +167,8 @@ export const ProfileSection = ({
         <div className="flex justify-end pt-4">
           <button
             onClick={handleSave}
-            disabled={loading}
-            className="btn-primary flex items-center gap-2"
+            disabled={loading || !hasChanges}
+            className="btn-primary flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
           >
             <Save className="w-4 h-4" />
             Save Changes

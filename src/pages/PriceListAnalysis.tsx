@@ -476,7 +476,7 @@ export default function PriceListAnalysis() {
             }}
             onReset={handleReset}
             onGenerateDocuments={() =>
-              navigate(`/documents?job_id=${uploadResult?.job_id}`)
+              navigate(`/documents?job_id=${uploadResult?.job_id}`, { state: { from: 'pricelist' } })
             }
           />
         );

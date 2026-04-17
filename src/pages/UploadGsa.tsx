@@ -15,7 +15,7 @@ import {
 import * as XLSX from "xlsx";
 import { clientService } from "../services/clientService";
 import { productService } from "../services/productService";
-import { useNavigate, Link, useSearchParams } from "react-router-dom";
+import { useNavigate, Link, useSearchParams, useParams, useLocation } from "react-router-dom";
 import { ClientDropdown } from "../components/shared/ClientDropdown";
 import ConfirmationModal from "../components/shared/ConfirmationModal";
 import { toast } from "sonner";
@@ -65,13 +65,17 @@ const GSA_BASE_HEADERS = [
 ];
 
 const UploadGsa: React.FC = () => {
-  const navigate = useNavigate();
+  const { id } = useParams<{ id: string }>();
+  const location = useLocation();
   const [searchParams] = useSearchParams();
   const clientIdFromParam = searchParams.get("client_id");
 
+  // Determine if we are on a client-specific route
+  const isClientRoute = location.pathname.includes("/clients/");
+
   const [clients, setClients] = useState<ClientMinimal[]>([]);
   const [selectedClient, setSelectedClient] = useState<number>(
-    clientIdFromParam ? parseInt(clientIdFromParam) : 0
+    id ? parseInt(id) : clientIdFromParam ? parseInt(clientIdFromParam) : 0
   );
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
@@ -83,6 +87,14 @@ const UploadGsa: React.FC = () => {
   const [uploadStatus, setUploadStatus] = useState<UploadStatus | null>(null);
   const [pollError, setPollError] = useState<boolean>(false);
   const [currentUploadId, setCurrentUploadId] = useState<string | null>(null);
+
+  // Sync selectedClient with URL parameters
+  useEffect(() => {
+    const newId = id ? parseInt(id) : clientIdFromParam ? parseInt(clientIdFromParam) : 0;
+    if (newId !== selectedClient) {
+      setSelectedClient(newId);
+    }
+  }, [id, clientIdFromParam]);
 
 
   useEffect(() => {
@@ -337,7 +349,7 @@ const UploadGsa: React.FC = () => {
   const activeClient = clients.find((c) => c.client_id === selectedClient);
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-slate-50 to-slate-100 p-6 font-sans transition-colors duration-500">
+    <div className="min-h-screen bg-linear-to-br from-slate-50 to-slate-100 p-6 lg:p-10 font-sans transition-colors duration-500">
       <ConfirmationModal
         isOpen={isConfirmOpen}
         onClose={() => setIsConfirmOpen(false)}
@@ -376,7 +388,7 @@ const UploadGsa: React.FC = () => {
 
         <Breadcrumbs
           items={
-            selectedClient !== 0
+            isClientRoute || id || clientIdFromParam
               ? [
                   { label: "Client Profiles", path: "/client-profiles" },
                   { label: activeClient?.company_name || "Client" },
@@ -540,36 +552,38 @@ const UploadGsa: React.FC = () => {
                 </div>
 
                 <div className="space-y-8 relative py-2">
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-3 mb-2">
-                      <span className="w-7 h-7 rounded-full bg-[#3399cc] text-white flex items-center justify-center text-xs font-bold shadow-sm shadow-blue-200">
-                        1
-                      </span>
-                      <label className="text-sm font-bold text-slate-700 uppercase tracking-wider">
-                        Select Client
-                      </label>
-                    </div>
-
-                    {loadingClients ? (
-                      <div className="flex items-center gap-3 p-4 bg-slate-50 rounded-2xl">
-                        <Loader2 className="w-5 h-5 animate-spin text-[#24578f]" />
-                        <span className="text-slate-500 text-sm font-medium">
-                          Fetching approved clients...
+                  {!isClientRoute && (
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-3 mb-2">
+                        <span className="w-7 h-7 rounded-full bg-[#3399cc] text-white flex items-center justify-center text-xs font-bold shadow-sm shadow-blue-200">
+                          1
                         </span>
+                        <label className="text-sm font-bold text-slate-700 uppercase tracking-wider">
+                          Select Client
+                        </label>
                       </div>
-                    ) : (
-                      <ClientDropdown
-                        clients={clients}
-                        selectedClient={selectedClient}
-                        onClientSelect={(id) => setSelectedClient(id || 0)}
-                      />
-                    )}
-                  </div>
+
+                      {loadingClients ? (
+                        <div className="flex items-center gap-3 p-4 bg-slate-50 rounded-2xl">
+                          <Loader2 className="w-5 h-5 animate-spin text-[#24578f]" />
+                          <span className="text-slate-500 text-sm font-medium">
+                            Fetching approved clients...
+                          </span>
+                        </div>
+                      ) : (
+                        <ClientDropdown
+                          clients={clients}
+                          selectedClient={selectedClient}
+                          onClientSelect={(id) => setSelectedClient(id || 0)}
+                        />
+                      )}
+                    </div>
+                  )}
 
                   <div className="space-y-3">
                     <div className="flex items-center gap-3 mb-2">
                       <span className="w-7 h-7 rounded-full bg-[#3399cc] text-white flex items-center justify-center text-xs font-bold shadow-sm shadow-blue-200">
-                        2
+                        {isClientRoute ? "1" : "2"}
                       </span>
                       <label className="text-sm font-bold text-slate-700 uppercase tracking-wider">
                         Upload Spreadsheet

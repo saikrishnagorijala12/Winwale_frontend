@@ -136,7 +136,7 @@ export default function AnalysisTable({
                     <tr
                       key={item.job_id}
                       onClick={() => {
-                        navigate(`/analyses/details?id=${item.job_id}`);
+                        navigate(`/analyses/details?id=${item.job_id}`, { state: { from: 'history' } });
                       }}
                       className="cursor-pointer group border-b border-slate-50 hover:bg-slate-50/50 transition-colors"
                     >
@@ -288,7 +288,7 @@ export default function AnalysisTable({
                 <div
                   key={item.job_id}
                   onClick={() => {
-                    navigate(`/analyses/details?id=${item.job_id}`);
+                    navigate(`/analyses/details?id=${item.job_id}`, { state: { from: 'history' } });
                   }}
                   className="p-4 hover:bg-slate-50/50 transition-colors cursor-pointer"
                 >

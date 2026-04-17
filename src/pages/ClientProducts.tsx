@@ -31,7 +31,6 @@ export default function ClientProducts() {
 
   const clientId = id ? parseInt(id) : selectedClientId;
 
-  // Sync context if ID is in URL but not in context
   useEffect(() => {
     if (id && parseInt(id) !== selectedClientId) {
       setSelectedClientId(parseInt(id));
@@ -98,7 +97,7 @@ export default function ClientProducts() {
 
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-slate-50 to-slate-100 p-6">
+    <div className="min-h-screen bg-linear-to-br from-slate-50 to-slate-100 p-6 lg:p-10">
       <div className="mx-auto">
         <div className="mb-8">
 
@@ -137,14 +136,14 @@ export default function ClientProducts() {
                   ) : (
                     <Download size={18} />
                   )}
-                  Export Catalog
+                  Export Products
                 </button>
                 <button
-                  onClick={() => navigate(`/gsa-products/upload?client_id=${clientId}`)}
+                  onClick={() => navigate(`/clients/${clientId}/products/upload`)}
                   className="btn-primary flex items-center gap-2"
                 >
                   <Upload size={18} />
-                  Upload Catalog
+                  Upload GSA Products
                 </button>
               </div>
             )}

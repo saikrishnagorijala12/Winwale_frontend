@@ -5,6 +5,7 @@ import { ChevronRight, Home } from "lucide-react";
 export interface BreadcrumbItem {
   label: string;
   path?: string;
+  onClick?: () => void;
 }
 
 interface BreadcrumbsProps {
@@ -25,7 +26,14 @@ export const Breadcrumbs: React.FC<BreadcrumbsProps> = ({ items, className = "" 
               <ChevronRight size={10} className="text-slate-300 shrink-0" />
             )}
             
-            {item.path && !isLast ? (
+            {item.onClick ? (
+              <button
+                onClick={item.onClick}
+                className="text-slate-400 hover:text-[#38A1DB] transition-colors whitespace-nowrap cursor-pointer uppercase font-black tracking-[0.15em]"
+              >
+                {item.label}
+              </button>
+            ) : item.path && !isLast ? (
               <Link
                 to={item.path}
                 className="text-slate-400 hover:text-[#38A1DB] transition-colors whitespace-nowrap"
