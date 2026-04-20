@@ -221,7 +221,7 @@ export const AnalysisResultsViewer = ({
                         <button
                             onClick={() => setIsConfirmExportOpen(true)}
                             disabled={isExporting || totalModifications === 0}
-                            className="group flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm transition-all border bg-white text-slate-700 border-slate-200 hover:bg-slate-50 hover:border-slate-300 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+                            className="btn-secondary"
                             aria-label="Export Analysis Results"
                         >
                             <Download

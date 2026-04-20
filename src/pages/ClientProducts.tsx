@@ -128,8 +128,8 @@ export default function ClientProducts() {
               <div className="flex items-center gap-3">
                 <button
                   onClick={() => setIsConfirmExportOpen(true)}
-                  disabled={isProductsExporting || products.length === 0}
-                  className="btn-secondary flex items-center gap-2"
+                  disabled={isProductsExporting || totalItems === 0}
+                  className="btn-secondary"
                 >
                   {isProductsExporting ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
@@ -140,7 +140,7 @@ export default function ClientProducts() {
                 </button>
                 <button
                   onClick={() => navigate(`/clients/${clientId}/products/upload`)}
-                  className="btn-primary flex items-center gap-2"
+                  className="btn-primary"
                 >
                   <Upload size={18} />
                   Upload GSA Products

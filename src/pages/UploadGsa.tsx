@@ -87,6 +87,8 @@ const UploadGsa: React.FC = () => {
   const [uploadStatus, setUploadStatus] = useState<UploadStatus | null>(null);
   const [pollError, setPollError] = useState<boolean>(false);
   const [currentUploadId, setCurrentUploadId] = useState<string | null>(null);
+  const [isParsingFile, setIsParsingFile] = useState<boolean>(false);
+  const [parsingMessage, setParsingMessage] = useState<string>("Parsing catalog data...");
 
   // Sync selectedClient with URL parameters
   useEffect(() => {
@@ -162,6 +164,7 @@ const UploadGsa: React.FC = () => {
   const processFile = async (selectedFile: File): Promise<void> => {
     setFile(selectedFile);
     setError(null);
+    setIsParsingFile(true);
     await previewExcel(selectedFile);
   };
 
@@ -189,9 +192,15 @@ const UploadGsa: React.FC = () => {
 
   const previewExcel = async (file: File): Promise<void> => {
     try {
+      setParsingMessage("Reading file contents...");
+      await new Promise(resolve => setTimeout(resolve, 50));
       const arrayBuffer = await file.arrayBuffer();
       const data = new Uint8Array(arrayBuffer);
-      const workbook = XLSX.read(data, { type: "array" });
+      // Only read first 100 rows for preview to improve performance on large files
+      const workbook = XLSX.read(data, { type: "array", sheetRows: 100 });
+      
+      setParsingMessage("Identifying 'PRODUCTS' tab...");
+      await new Promise(resolve => setTimeout(resolve, 50));
       const productsSheetName = workbook.SheetNames.find(
         (name) => name.trim().toUpperCase() === "PRODUCTS",
       );
@@ -199,9 +208,12 @@ const UploadGsa: React.FC = () => {
       if (!productsSheetName) {
         setPreviewData(null);
         setError("No 'PRODUCTS' tab found in the uploaded file.");
+        setIsParsingFile(false);
         return;
       }
 
+      setParsingMessage("Extracting catalog data...");
+      await new Promise(resolve => setTimeout(resolve, 50));
       const sheet = workbook.Sheets[productsSheetName];
 
       const rows = XLSX.utils.sheet_to_json<any[]>(sheet, {
@@ -270,6 +282,8 @@ const UploadGsa: React.FC = () => {
       console.error("Preview failed:", err);
       setError("Failed to process the Excel file. Please try again.");
       setPreviewData(null);
+    } finally {
+      setIsParsingFile(false);
     }
   };
 
@@ -679,7 +693,20 @@ const UploadGsa: React.FC = () => {
           </div>
 
 
-          {!showSuccess && previewData && previewData.length > 0 && (
+          {!showSuccess && isParsingFile && (
+            <div className="bg-white rounded-3xl shadow-sm border border-slate-200 p-12 flex flex-col items-center justify-center animate-in fade-in zoom-in-95 duration-500 min-h-[300px]">
+              <div className="relative mb-6">
+                <div className="w-16 h-16 rounded-2xl bg-cyan-50 flex items-center justify-center relative z-10 border border-cyan-100">
+                  <Loader2 className="w-8 h-8 text-[#3399cc] animate-spin" />
+                </div>
+                <div className="absolute inset-0 bg-[#3399cc]/10 rounded-2xl animate-pulse" />
+              </div>
+              <h4 className="text-lg font-bold text-slate-800 mb-1">{parsingMessage}</h4>
+              <p className="text-sm text-slate-500">This will only take a moment</p>
+            </div>
+          )}
+
+          {!showSuccess && !isParsingFile && previewData && previewData.length > 0 && (
             <div className="bg-white rounded-4xl shadow-sm border border-slate-200 overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
               <div className="p-6 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
                 <h2 className="text-sm font-black text-slate-400 uppercase tracking-[0.2em]">

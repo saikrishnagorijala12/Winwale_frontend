@@ -10,19 +10,20 @@
     @apply inline-flex items-center justify-center gap-2
       px-6 py-2.5
       bg-[#3399cc]
-      hover:bg-[#2980b9]
       text-white
       font-medium
       rounded-xl
       shadow-lg shadow-blue-500/30
       transition-all
-      hover:scale-[1.02]
-      active:scale-[0.98];
+
+      enabled:hover:bg-[#2980b9]
+      enabled:hover:scale-[1.02]
+      enabled:active:scale-[0.98]
+
+      disabled:opacity-70
+      disabled:cursor-not-allowed;
   }
 
-  .btn-primary:disabled {
-    @apply opacity-70 cursor-not-allowed;
-  }
   .btn-secondary {
     @apply inline-flex items-center justify-center gap-2
       px-5 py-2.5
@@ -33,14 +34,17 @@
       rounded-xl
       shadow-sm
       transition-all
-      hover:bg-blue-50
-      hover:text-[#38A1DB]
-      hover:border-blue-200
-      active:scale-95;
-  }
 
-  .btn-secondary:disabled {
-    @apply opacity-70 cursor-not-allowed;
+      enabled:hover:bg-blue-50
+      enabled:hover:text-[#38A1DB]
+      enabled:hover:border-blue-200
+      enabled:active:scale-95
+
+      disabled:bg-white
+      disabled:text-slate-400
+      disabled:border-slate-200
+      disabled:shadow-none
+      disabled:cursor-not-allowed;
   }
 }
 
@@ -56,8 +60,16 @@
 }
 
 @keyframes progress {
-  0%   { transform: translateX(-100%); width: 50%; }
-  50%  { transform: translateX(100%);  width: 70%; }
-  100% { transform: translateX(200%);  width: 50%; }
+  0% {
+    transform: translateX(-100%);
+    width: 50%;
+  }
+  50% {
+    transform: translateX(100%);
+    width: 70%;
+  }
+  100% {
+    transform: translateX(200%);
+    width: 50%;
+  }
 }
-

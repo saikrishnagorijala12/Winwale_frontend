@@ -168,7 +168,7 @@ export const ProfileSection = ({
           <button
             onClick={handleSave}
             disabled={loading || !hasChanges}
-            className="btn-primary flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+            className="btn-primary"
           >
             <Save className="w-4 h-4" />
             Save Changes

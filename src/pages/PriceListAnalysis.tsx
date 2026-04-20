@@ -56,6 +56,7 @@ export default function PriceListAnalysis() {
   const [previewData, setPreviewData] = useState<any[] | null>(null);
   const [isFetchingJob, setIsFetchingJob] = useState(false);
   const [isParsingFile, setIsParsingFile] = useState(false);
+  const [parsingMessage, setParsingMessage] = useState("Parsing file data...");
   const [fileWarnings, setFileWarnings] = useState<Record<string, string>>({});
   const [previewIndex, setPreviewIndex] = useState<number | null>(null);
 
@@ -147,17 +148,29 @@ export default function PriceListAnalysis() {
 
   const generatePreview = async (file: File) => {
     setIsParsingFile(true);
+    setParsingMessage("Reading file contents...");
+    await new Promise(resolve => setTimeout(resolve, 50));
     setPreviewData(null);
     try {
       const arrayBuffer = await file.arrayBuffer();
       const data = new Uint8Array(arrayBuffer);
-      const workbook = XLSX.read(data, { type: "array" });
+      // Only read first 100 rows for preview to improve performance on large files
+      const workbook = XLSX.read(data, { type: "array", sheetRows: 100 });
+      setParsingMessage("Identifying head row...");
+      await new Promise(resolve => setTimeout(resolve, 50));
       const sheet = workbook.Sheets[workbook.SheetNames[0]];
-      const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "" }) as any[][];
-      let headerIdx = findHeaderRow(rows);
+      const rows = XLSX.utils.sheet_to_json(sheet, { 
+        header: 1, 
+        defval: "",
+        range: { s: { r: 0, c: 0 }, e: { r: 100, c: 50 } } // Limit range to improve speed
+      }) as any[][];
+      
+      const headerIdx = findHeaderRow(rows);
       const actualHeaderIdx = headerIdx === -1 ? 0 : headerIdx;
 
       if (rows.length > actualHeaderIdx) {
+        setParsingMessage("Generating preview...");
+        await new Promise(resolve => setTimeout(resolve, 50));
         const previewRows = rows.slice(actualHeaderIdx, actualHeaderIdx + 11);
         const headers = (previewRows[0] || []).map((h: any, i: number) =>
           String(h || "").trim() || `Column ${i + 1}`
@@ -208,16 +221,23 @@ export default function PriceListAnalysis() {
       const newFileWarnings: Record<string, string> = { ...fileWarnings };
 
       for (const file of uniqueFiles) {
+        setParsingMessage(`Reading ${file.name}...`);
+        await new Promise(resolve => setTimeout(resolve, 50));
         try {
           const arrayBuffer = await file.arrayBuffer();
           const data = new Uint8Array(arrayBuffer);
-          const workbook = XLSX.read(data, { type: "array" });
+          // Only read first 100 rows for validation to improve performance
+          const workbook = XLSX.read(data, { type: "array", sheetRows: 100 });
           const sheetName = workbook.SheetNames[0];
+
+          setParsingMessage(`Validating headers in ${file.name}...`);
+          await new Promise(resolve => setTimeout(resolve, 50));
           const sheet = workbook.Sheets[sheetName];
 
           const rows = XLSX.utils.sheet_to_json(sheet, {
             header: 1,
             defval: "",
+            range: { s: { r: 0, c: 0 }, e: { r: 100, c: 50 } } // Limit range for header detection
           }) as any[][];
 
           if (rows.length === 0) {
@@ -412,6 +432,7 @@ export default function PriceListAnalysis() {
             previewData={previewData}
             previewIndex={previewIndex}
             isParsingFile={isParsingFile}
+            parsingMessage={parsingMessage}
             error={error}
             errorVariant={errorVariant}
             onFileChange={handleFileChange}

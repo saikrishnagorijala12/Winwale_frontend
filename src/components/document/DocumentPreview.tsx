@@ -223,7 +223,7 @@ export const DocumentPreview = ({ breadcrumbs }: DocumentPreviewProps) => {
               className={`flex items-center gap-2 px-5 py-2.5 rounded-xl transition-all active:scale-95 font-bold text-sm shadow-sm
             ${isEditingContent
                   ? "btn-primary"
-                  : "bg-white text-slate-600 border border-slate-300 hover:bg-slate-50 hover:text-slate-900"
+                  : "btn-secondary"
                 }`}
             >
               {isEditingContent ? (

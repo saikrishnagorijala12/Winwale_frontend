@@ -36,6 +36,7 @@ interface FileUploadStepProps {
     previewData: any[] | null;
     previewIndex: number | null;
     isParsingFile: boolean;
+    parsingMessage?: string;
     error: React.ReactNode;
     errorVariant?: "error" | "warning" | "info";
     onFileChange: (e: React.ChangeEvent<HTMLInputElement> | React.MouseEvent) => void;
@@ -54,6 +55,7 @@ export const FileUploadStep = ({
     previewData,
     previewIndex,
     isParsingFile,
+    parsingMessage = "Parsing file data...",
     error,
     errorVariant = "error",
     onFileChange,
@@ -218,10 +220,15 @@ export const FileUploadStep = ({
                             {/* Preview Area Column */}
                             <div className="lg:col-span-8">
                                 {isParsingFile ? (
-                                    <div className="flex-1 flex flex-col items-center justify-center min-h-100 bg-slate-50/30 rounded-2xl border border-slate-100 border-dashed">
-                                        <Loader2 className="w-8 h-8 animate-spin text-[#3399cc] mb-4" />
-                                        <p className="text-sm font-bold text-slate-600">Parsing file data...</p>
-                                        <p className="text-[11px] text-slate-400 mt-1">Extracting headers and preview rows</p>
+                                    <div className="flex-1 flex flex-col items-center justify-center min-h-100 bg-white/50 rounded-2xl border border-slate-100 animate-in fade-in zoom-in-95 duration-500">
+                                        <div className="relative mb-6">
+                                            <div className="w-16 h-16 rounded-2xl bg-cyan-50 flex items-center justify-center relative z-10 border border-cyan-100">
+                                                <Loader2 className="w-8 h-8 text-[#3399cc] animate-spin" />
+                                            </div>
+                                            <div className="absolute inset-0 bg-[#3399cc]/10 rounded-2xl animate-pulse" />
+                                        </div>
+                                        <h4 className="text-base font-bold text-slate-800 mb-1">{parsingMessage}</h4>
+                                        <p className="text-[11px] text-slate-500">This will only take a moment</p>
                                     </div>
                                 ) : previewData && previewData.length > 0 ? (
                                     <div className="flex flex-col bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
