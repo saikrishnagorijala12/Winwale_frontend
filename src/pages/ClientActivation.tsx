@@ -22,11 +22,9 @@ import { toast } from "sonner";
 import { clientService } from "../services/clientService";
 import ConfirmationModal from "../components/shared/ConfirmationModal";
 import { ClientContractDetailsModal } from "../components/clientscontracts/ClientContractDetailsModal";
-import { ClientFormModal } from "../components/clients/ClientFormModal";
-import { Client, ClientFormErrors, EditingClient } from "../types/client.types";
-import { validateStep1, validateStep2 } from "../utils/clientValidations";
+import EditClientContractModal from "../components/clientscontracts/EditClientContractModal";
+import { Client } from "../types/client.types";
 import { normalizeClientFromAPI } from "../utils/clientUtils";
-import { normalizePhoneNumber } from "../utils/phoneUtils";
 import { useDebounce } from "../hooks/useDebounce";
 import { Tooltip } from "../components/shared/Tooltip";
 
@@ -281,9 +279,7 @@ const ClientActivation = () => {
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [editingClient, setEditingClient] = useState<EditingClient | null>(
-    null,
-  );
+  const [editingClient, setEditingClient] = useState<Client | null>(null);
 
   const [statusCounts, setStatusCounts] = useState<Record<string, number>>({
     all: 0,
@@ -292,10 +288,6 @@ const ClientActivation = () => {
     rejected: 0,
   });
   const [totalItems, setTotalItems] = useState(0);
-  const [editErrors, setEditErrors] = useState<ClientFormErrors>({});
-  const [currentStep, setCurrentStep] = useState(1);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [backendError, setBackendError] = useState<string>("");
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedClientIds, setSelectedClientIds] = useState<Set<number>>(
     new Set(),
@@ -338,11 +330,6 @@ const ClientActivation = () => {
     const errorMessage =
       err.message || `Failed to ${context}. Please try again.`;
 
-    if (err.status === 409) {
-      setCurrentStep(1);
-    }
-
-    setBackendError(errorMessage);
     toast.error(errorMessage);
   };
 
@@ -378,92 +365,8 @@ const ClientActivation = () => {
   };
 
   const handleEditClient = (client: Client) => {
-    const addrParts = client.address.split(", ");
-    setEditingClient({
-      id: client.id,
-      company_name: client.name,
-      company_email: client.email,
-      company_phone_no: client.phone,
-      company_address: addrParts[0] || "",
-      company_city: addrParts[1] || "",
-      company_state: addrParts[2] || "",
-      company_zip: addrParts[3] || "",
-      negotiators: client.negotiators.map((neg) => ({
-        name: neg.name || "",
-        title: neg.title || "",
-        email: neg.email || "",
-        phone_no: neg.phone_no || "",
-        address: neg.address || "",
-        city: neg.city || "",
-        state: neg.state || "",
-        zip: neg.zip || "",
-      })),
-      status: client.status,
-      logoUrl: client.logoUrl || "",
-      logoFile: null,
-    });
+    setEditingClient(client);
     setIsEditModalOpen(true);
-    setCurrentStep(1);
-    setEditErrors({});
-    setBackendError("");
-  };
-
-  const handleNextStep = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (editingClient && validateStep1(editingClient, setEditErrors)) {
-      setCurrentStep(2);
-    }
-  };
-
-  const handleEditSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!editingClient) return;
-
-    const step1Valid = validateStep1(editingClient, setEditErrors);
-    if (!step1Valid) {
-      setCurrentStep(1);
-      return;
-    }
-
-    const step2Result = validateStep2(editingClient);
-    if (!step2Result.isValid) {
-      setEditErrors((prev) => ({ ...prev, ...step2Result.errors }));
-      setCurrentStep(2);
-      return;
-    }
-
-    setIsSubmitting(true);
-    try {
-      const { logoFile, logoUrl, ...clientPayload } = editingClient;
-
-      const finalPayload = {
-        ...clientPayload,
-        company_phone_no:
-          normalizePhoneNumber(clientPayload.company_phone_no) ||
-          clientPayload.company_phone_no,
-        negotiators: clientPayload.negotiators.map((neg) => ({
-          ...neg,
-          phone_no: normalizePhoneNumber(neg.phone_no || "") || neg.phone_no,
-        })),
-        company_logo_url: logoUrl?.startsWith("data:")
-          ? undefined
-          : logoUrl || null,
-      };
-
-      await clientService.updateClient(editingClient.id, finalPayload);
-
-      if (logoFile) {
-        await clientService.uploadClientLogo(editingClient.id, logoFile);
-      }
-
-      toast.success("Client updated successfully");
-      await fetchClients(currentPage, debouncedSearchQuery, activeTab);
-      setIsEditModalOpen(false);
-    } catch (err: any) {
-      handleApiError(err, "update client");
-    } finally {
-      setIsSubmitting(false);
-    }
   };
 
   const handleBulkStatusUpdate = async (action: "approve" | "reject") => {
@@ -974,35 +877,16 @@ const ClientActivation = () => {
         onEdit={handleEditClient}
       />
 
-      {editingClient && (
-        <ClientFormModal
-          isOpen={isEditModalOpen}
-          title="Edit Client"
-          subtitle="Update client information"
-          formData={editingClient}
-          errors={editErrors}
-          backendError={backendError}
-          currentStep={currentStep}
-          isSubmitting={isSubmitting}
-          onClose={() => setIsEditModalOpen(false)}
-          onSubmit={handleEditSubmit}
-          onNext={handleNextStep}
-          onBack={() => setCurrentStep(1)}
-          onChange={(field, value) => {
-            setEditingClient({ ...editingClient, [field]: value });
-
-            const errorField = field as keyof ClientFormErrors;
-            if (editErrors[errorField]) {
-              setEditErrors({ ...editErrors, [errorField]: "" });
-            }
-          }}
-          onClearError={(field) =>
-            setEditErrors({ ...editErrors, [field]: "" })
-          }
-          onClearBackendError={() => setBackendError("")}
-          submitButtonText="Update Client"
-        />
-      )}
+      <EditClientContractModal
+        isOpen={isEditModalOpen}
+        onClose={() => {
+          setIsEditModalOpen(false);
+          setEditingClient(null);
+        }}
+        onSuccess={() => fetchClients(currentPage, debouncedSearchQuery, activeTab)}
+        client={editingClient}
+        contract={editingClient?.contractDetails || null}
+      />
     </div>
   );
 };
